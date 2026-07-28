@@ -1,0 +1,1285 @@
+src/context/BattleContext.tsx:import { Pokemon, Move, LogEntry } from '../types';
+src/components/Tutorial.tsx:    content: "Switch to the Battle tab to simulate combats. Try 'Full Chaos Match' for a random fight, or just select your own moves to battle an opponent."
+src/components/Tutorial.tsx:    content: "If you're in a tough battle, use the Chat tab. Our Pokétheology Assistant will help you figure out what to do next based on your stats and moves!"
+src/components/BattleMessage.tsx:  type: 'default' | 'critical' | 'effective' | 'status' | 'move';
+src/components/BattleMessage.tsx:    }, type === 'move' ? 800 : 1200);
+src/components/BattleMessage.tsx:      case 'move':
+src/lib/firebase.ts:// Test connection removed
+src/lib/moveEffects.ts:import { Move } from '../types';
+src/lib/moveEffects.ts:export const getMoveEffect = (move: Move) => {
+src/lib/moveEffects.ts:  // Use real data from the move object
+src/lib/moveEffects.ts:    type: move.damage_class,
+src/lib/moveEffects.ts:    power: move.power || 0,
+src/lib/moveEffects.ts:    accuracy: move.accuracy || 100,
+src/lib/moveEffects.ts:    pp: move.pp
+src/lib/moveEffects.ts:  if (move.stat_changes && move.stat_changes.length > 0) {
+src/lib/moveEffects.ts:    effect.statChanges = move.stat_changes.map(sc => ({
+src/lib/moveEffects.ts:  if (move.meta && move.meta.ailment && move.meta.ailment.name !== 'none') {
+src/lib/moveEffects.ts:    effect.statusEffect = move.meta.ailment.name.toUpperCase();
+src/lib/moveEffects.ts:    effect.statusChance = (move.meta.ailment_chance || 100) / 100;
+src/lib/sounds.ts:              audio.removeEventListener('canplaythrough', onCanPlay);
+src/lib/sounds.ts:              audio.removeEventListener('error', onError);
+src/lib/sounds.ts:  physicalMove: () => {
+src/lib/sounds.ts:  specialMove: () => {
+src/lib/sounds.ts:  playMoveSound: (type: string, isSpecial: boolean) => {
+src/lib/sounds.ts:          sounds.specialMove();
+src/lib/sounds.ts:          sounds.physicalMove();
+src/lib/api.ts:import { Pokemon, Ability, EvolutionNode, Move } from '../types';
+src/lib/api.ts:  // Fetch moves details (limited to avoid 100+ requests)
+src/lib/api.ts:  let movesSource = data.moves;
+src/lib/api.ts:  // If the pokemon has no moves (common for Gigantamax forms), fetch the base species moves
+src/lib/api.ts:  if (movesSource.length === 0 && data.species && data.species.url) {
+src/lib/api.ts:        movesSource = basePokemonData.moves;
+src/lib/api.ts:      console.error("Failed to fetch base species moves for form", e);
+src/lib/api.ts:  // Prioritize level-up moves
+src/lib/api.ts:  const levelUpMoves = movesSource.filter((m: any) => 
+src/lib/api.ts:    m.version_group_details.some((v: any) => v.move_learn_method.name === 'level-up')
+src/lib/api.ts:  const otherMoves = movesSource.filter((m: any) => 
+src/lib/api.ts:    !m.version_group_details.some((v: any) => v.move_learn_method.name === 'level-up')
+src/lib/api.ts:  const movesToFetch = [...levelUpMoves, ...otherMoves].slice(0, 40); // Increased to 40 for more variety
+src/lib/api.ts:  const moves: Move[] = await Promise.all(
+src/lib/api.ts:    movesToFetch.map(async (m: any) => {
+src/lib/api.ts:        const res = await fetch(m.move.url);
+src/lib/api.ts:        const moveData = await res.json();
+src/lib/api.ts:        const entry = moveData.flavor_text_entries.find((e: any) => e.language.name === baseLang) || 
+src/lib/api.ts:                      moveData.flavor_text_entries.find((e: any) => e.language.name === 'en');
+src/lib/api.ts:        let learnMethod: Move['learn_method'] = 'other';
+src/lib/api.ts:        if (versionGroup.move_learn_method.name === 'level-up') learnMethod = 'level-up';
+src/lib/api.ts:        else if (versionGroup.move_learn_method.name === 'machine') learnMethod = 'machine';
+src/lib/api.ts:        else if (versionGroup.move_learn_method.name === 'egg') learnMethod = 'egg';
+src/lib/api.ts:        else if (versionGroup.move_learn_method.name === 'tutor') learnMethod = 'tutor';
+src/lib/api.ts:          name: m.move.name,
+src/lib/api.ts:          url: m.move.url,
+src/lib/api.ts:          power: moveData.power,
+src/lib/api.ts:          accuracy: moveData.accuracy,
+src/lib/api.ts:          priority: moveData.priority,
+src/lib/api.ts:          type: moveData.type.name,
+src/lib/api.ts:          pp: moveData.pp,
+src/lib/api.ts:          damage_class: moveData.damage_class.name,
+src/lib/api.ts:          effect_chance: moveData.effect_chance,
+src/lib/api.ts:          stat_changes: moveData.stat_changes.map((sc: any) => ({
+src/lib/api.ts:          meta: moveData.meta,
+src/lib/api.ts:          target: moveData.target.name
+src/lib/api.ts:          name: m.move.name,
+src/lib/api.ts:          url: m.move.url,
+src/lib/api.ts:          description: 'Failed to load move data.',
+src/lib/api.ts:    moves,
+src/types.ts:export interface Move {
+src/types.ts:  moves: Move[];
+src/hooks/useBattleSimulation.ts:import { Pokemon, Move, LogEntry } from '../types';
+src/App.tsx:import { Search, Loader2, Database, Sparkles, Volume2, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock } from 'lucide-react';
+src/App.tsx:import { Pokemon, EvolutionNode, Move, LogEntry } from './types';
+src/App.tsx:const getOpponentMoveQuote = (pokeName: string, moveName: string, langCode: string) => {
+src/App.tsx:  const lowerMove = moveName.toLowerCase();
+src/App.tsx:  if (lowerMove.includes('protect') || lowerMove.includes('detect') || lowerMove.includes('substitute')) return pool.protect;
+src/App.tsx:  if (lowerMove.includes('recover') || lowerMove.includes('heal') || lowerMove.includes('roost') || lowerMove.includes('rest')) return pool.healing;
+src/App.tsx:  if (lowerMove.includes('dance') || lowerMove.includes('calm') || lowerMove.includes('nasty') || lowerMove.includes('swords') || lowerMove.includes('charge')) return pool.boost;
+src/App.tsx:  if (lowerMove.includes('fire') || lowerMove.includes('burn') || lowerMove.includes('flame')) return pool.fire;
+src/App.tsx:  if (lowerMove.includes('water') || lowerMove.includes('wave') || lowerMove.includes('surf') || lowerMove.includes('hydro')) return pool.water;
+src/App.tsx:  if (lowerMove.includes('bolt') || lowerMove.includes('thunder') || lowerMove.includes('spark') || lowerMove.includes('shock')) return pool.electric;
+src/App.tsx:  if (lowerMove.includes('leaf') || lowerMove.includes('giga') || lowerMove.includes('seed') || lowerMove.includes('grass')) return pool.grass;
+src/App.tsx:  if (lowerMove.includes('ice') || lowerMove.includes('freeze') || lowerMove.includes('blizzard') || lowerMove.includes('chill')) return pool.ice;
+src/App.tsx:  if (lowerMove.includes('psych') || lowerMove.includes('mind') || lowerMove.includes('zen') || lowerMove.includes('teleport')) return pool.psychic;
+src/App.tsx:  if (lowerMove.includes('dragon') || lowerMove.includes('draco') || lowerMove.includes('claw') || lowerMove.includes('outrage')) return pool.dragon;
+src/App.tsx:  attack: "Physical Attack: Affects the damage dealt by physical moves.",
+src/App.tsx:  defense: "Physical Defense: Reduces the damage taken from physical moves.",
+src/App.tsx:  "special-attack": "Special Attack: Affects the damage dealt by special moves.",
+src/App.tsx:  "special-defense": "Special Defense: Reduces the damage taken from special moves.",
+src/App.tsx:  speed: "Speed: Determines which Pokémon moves first in battle.",
+src/App.tsx:                  <MoveRight className="w-3.5 h-3.5" />
+src/App.tsx:  const [hoveredMove, setHoveredMove] = useState<Move | null>(null);
+src/App.tsx:      localStorage.removeItem('pokethology_quota_limit');
+src/App.tsx:      setError('Active Combat Squad is at full capacity (Max 6 units). Remove a unit before adding another.');
+src/App.tsx:  const removeFromPlayerTeam = useCallback((name: string) => {
+src/App.tsx:  const [moveBeingLearned, setMoveBeingLearned] = useState<Move | null>(null);
+src/App.tsx:  const [isMoveLearningOpen, setIsMoveLearningOpen] = useState(false);
+src/App.tsx:  const [offeredMoves, setOfferedMoves] = useState<Move[]>([]);
+src/App.tsx:  const [isReplacingMove, setIsReplacingMove] = useState(false);
+src/App.tsx:  const [moveAnimation, setMoveAnimation] = useState<'none' | 'physical' | 'special'>('none');
+src/App.tsx:  const [battleMessage, setBattleMessage] = useState<{ text: string; type: 'default' | 'critical' | 'effective' | 'status' | 'move' } | null>(null);
+src/App.tsx:  const removeFloatingText = useCallback((id: number) => {
+src/App.tsx:  const [selectedMoves, setSelectedMoves] = useState<Move[]>([]);
+src/App.tsx:  const selectedMovesRef = useRef(selectedMoves);
+src/App.tsx:    selectedMovesRef.current = selectedMoves;
+src/App.tsx:  }, [selectedMoves]);
+src/App.tsx:  const [opponentMoves, setOpponentMoves] = useState<Move[]>([]);
+src/App.tsx:  const [moveSearchQuery, setMoveSearchQuery] = useState('');
+src/App.tsx:  const [selectedMoveDetail, setSelectedMoveDetail] = useState<Move | null>(null);
+src/App.tsx:  const [isMoveDetailOpen, setIsMoveDetailOpen] = useState(false);
+src/App.tsx:  const [chaosPhase, setChaosPhase] = useState<'none' | 'selecting_pokemon' | 'moves_ready'>('none');
+src/App.tsx:  const getTypeEffectiveness = useCallback((moveType: string, targetTypes: string[]) => {
+src/App.tsx:      if (TYPE_CHART[moveType]?.[t] !== undefined) {
+src/App.tsx:        multiplier *= TYPE_CHART[moveType][t];
+src/App.tsx:          moves: selectedMoves.map(m => ({ name: m.name, type: m.type, power: m.power }))
+src/App.tsx:  }, [pokemon, battleOpponent, pokemonHP, pokemonMaxHP, selectedMoves, opponentHP, opponentMaxHP, opponentStatus]);
+src/App.tsx:    setSelectedMoves(prev => prev.map(m => ({ ...m, currentPP: m.pp })));
+src/App.tsx:    const opponentMoves = battleOpponent?.moves.filter(m => m.learn_method === 'level-up') || [];
+src/App.tsx:    if (opponentMoves.length === 0) {
+src/App.tsx:      setOpponentMoves((battleOpponent?.moves || []).slice(0, 4).map(m => ({ ...m, currentPP: m.pp })));
+src/App.tsx:      setOpponentMoves(opponentMoves.slice(0, 4).map(m => ({ ...m, currentPP: m.pp })));
+src/App.tsx:    setMoveAnimation('none');
+src/App.tsx:      setIsMoveDetailOpen(false);
+src/App.tsx:      setSelectedMoves([]);
+src/App.tsx:      setOpponentMoves([]);
+src/App.tsx:    if (battleState === 'finished' && !isMoveLearningOpen) {
+src/App.tsx:  }, [battleState, isMoveLearningOpen]);
+src/App.tsx:  const executeMove = useCallback(async (attacker: Pokemon, defender: Pokemon, move: Move, isPlayer: boolean) => {
+src/App.tsx:    // Effect removed.
+src/App.tsx:      log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
+src/App.tsx:      log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
+src/App.tsx:      log(`${attacker.name.toUpperCase()} is paralyzed! It can't move!`, 'status-effect');
+src/App.tsx:    if (move.accuracy && Math.random() * 100 > move.accuracy) {
+src/App.tsx:      log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+src/App.tsx:    if (move.name.toLowerCase() === 'transform') {
+src/App.tsx:      log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+src/App.tsx:      setBattleMessage({ text: "TRANSFORM!", type: 'move' });
+src/App.tsx:      sounds.playMoveSound('normal', true);
+src/App.tsx:      setBattleMessage({ text: "TRANSFORMED!", type: 'move' });
+src/App.tsx:        moves: [...defender.moves],
+src/App.tsx:        setSelectedMoves([...opponentMoves]);
+src/App.tsx:        setOpponentMoves([...selectedMoves]);
+src/App.tsx:    const moveAccuracy = move.accuracy;
+src/App.tsx:    const doesHit = moveAccuracy === null || (Math.random() * 100) <= moveAccuracy;
+src/App.tsx:    const speakQuote = getOpponentMoveQuote(attacker.name, move.name, selectedLang);
+src/App.tsx:    log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+src/App.tsx:    setBattleMessage({ text: move.name.toUpperCase(), type: 'move' });
+src/App.tsx:    const isSpecial = move.damage_class === 'special';
+src/App.tsx:    sounds.playMoveSound(move.type, isSpecial);
+src/App.tsx:    const isProtectMove = move.name === 'protect' || move.name === 'detect' || move.name === 'spiky-shield' || move.name === 'kings-shield';
+src/App.tsx:    if (isProtectMove) {
+src/App.tsx:    if (isDefenderProtected && (move.power !== null && move.power > 0 || (move.stat_changes && move.stat_changes.some(s => s.change < 0)))) {
+src/App.tsx:    if (move.name === 'substitute') {
+src/App.tsx:    // Calculate damage based on move power, stats, and type effectiveness
+src/App.tsx:    const isDamaging = move.power !== null && move.power > 0;
+src/App.tsx:      effectiveness = getTypeEffectiveness(move.type, targetTypes);
+src/App.tsx:      const minHits = move.meta?.min_hits || 1;
+src/App.tsx:      const maxHits = move.meta?.max_hits || 1;
+src/App.tsx:        const stabMultiplier = attackerTypes.includes(move.type) ? 1.5 : 1;
+src/App.tsx:        // Determine if move is physical or special (simplified logic)
+src/App.tsx:        const baseDamage = move.power || 40;
+src/App.tsx:          setMoveAnimation(animationType);
+src/App.tsx:          setMoveAnimation('none');
+src/App.tsx:        // Visual feedback for move execution
+src/App.tsx:          setBattleMessage({ text: `${move.name.toUpperCase()} (Hit ${i + 1})`, type: 'move' });
+src/App.tsx:    // Handle Healing Moves
+src/App.tsx:    if (move.meta?.healing && move.meta.healing > 0) {
+src/App.tsx:      const healAmount = Math.floor(attackerMaxHP * (move.meta.healing / 100));
+src/App.tsx:    // Handle Drain Moves
+src/App.tsx:    if (move.meta?.drain && move.meta.drain !== 0 && totalDamage > 0) {
+src/App.tsx:      const drainAmount = Math.floor(totalDamage * (move.meta.drain / 100));
+src/App.tsx:    if (move.stat_changes) {
+src/App.tsx:      for (const change of move.stat_changes) {
+src/App.tsx:        // Determine if move targets user or opponent
+src/App.tsx:        const targetsUser = move.target === 'user' || move.target === 'users-field';
+src/App.tsx:    if (!defenderStatus && move.meta?.ailment && Math.random() < (move.meta.ailment_chance || 100) / 100) {
+src/App.tsx:      const ailment = move.meta.ailment.name;
+src/App.tsx:        log(`${defender.name.toUpperCase()} is paralyzed! It may be unable to move!`, 'status-effect');
+src/App.tsx:    // Catch-all for Status Moves that don't fall into the simplified ailments/stat changes (e.g. Protect, Splash, Conversion, Weather moves)
+src/App.tsx:    const hasStatChanges = move.stat_changes && move.stat_changes.length > 0;
+src/App.tsx:    const hasHealing = move.meta?.healing && move.meta.healing > 0;
+src/App.tsx:    const hasDrain = move.meta?.drain && move.meta.drain !== 0 && totalDamage > 0;
+src/App.tsx:      if (move.description && move.description !== 'No description available.') {
+src/App.tsx:        log(`Effect: ${move.description.replace(/\n|\f|\r/g, ' ')}`, 'system');
+src/App.tsx:    if (goesFirst && move.meta?.flinch_chance && Math.random() < move.meta.flinch_chance / 100) {
+src/App.tsx:  }, [pokemonMaxHP, opponentMaxHP, pokemonStatus, opponentStatus, pokemonFlinched, opponentFlinched, pokemon, battleOpponent, selectedMoves, opponentMoves, playerStatStages, opponentStatStages, enableAnimations, delay, addFloatingText, getEffectiveStat, getTypeEffectiveness, isAnimating, customStats, turnNumber]);
+src/App.tsx:    const prompt = `Give me a highly concise tactical tip for my active battle match: my **${pokemon.name}** vs opponent's **${battleOpponent.name}**. My current moves: ${selectedMoves.map(m => m.name).join(', ')}. HP status: Player ${pokemonHP}/${pokemonMaxHP}, Opponent ${opponentHP}/${opponentMaxHP}.`;
+src/App.tsx:    if (!pokemon || !battleOpponent || selectedMoves.length === 0) {
+src/App.tsx:      setBattleLog([{ text: "SELECT 4 MOVES BEFORE STARTING!", type: 'system' }]);
+src/App.tsx:    setMoveAnimation('none');
+src/App.tsx:        // Simulate learning a new move after defeat too
+src/App.tsx:            const currentSelectedMoves = selectedMovesRef.current;
+src/App.tsx:            const potentialMoves = pokemon.moves.filter(m => 
+src/App.tsx:              !currentSelectedMoves.some(sm => sm.name === m.name)
+src/App.tsx:            if (potentialMoves.length > 0) {
+src/App.tsx:              // Offer up to 3 random moves
+src/App.tsx:              const shuffled = [...potentialMoves].sort(() => 0.5 - Math.random());
+src/App.tsx:              setOfferedMoves(offered);
+src/App.tsx:              setIsMoveLearningOpen(true);
+src/App.tsx:              setIsReplacingMove(false);
+src/App.tsx:        // Simulate learning a new move after victory
+src/App.tsx:            const currentSelectedMoves = selectedMovesRef.current;
+src/App.tsx:            const potentialMoves = pokemon.moves.filter(m => 
+src/App.tsx:              !currentSelectedMoves.some(sm => sm.name === m.name)
+src/App.tsx:            if (potentialMoves.length > 0) {
+src/App.tsx:              // Offer up to 3 random moves
+src/App.tsx:              const shuffled = [...potentialMoves].sort(() => 0.5 - Math.random());
+src/App.tsx:              setOfferedMoves(offered);
+src/App.tsx:              setIsMoveLearningOpen(true);
+src/App.tsx:              setIsReplacingMove(false);
+src/App.tsx:  const handlePlayerMove = async (move: Move) => {
+src/App.tsx:      setSelectedMoves(prev => prev.map(m => m.name === move.name ? { ...m, currentPP: Math.max(0, (m.currentPP ?? m.pp) - 1) } : m));
+src/App.tsx:      await executeMove(pokemon, battleOpponent, move, true);
+src/App.tsx:      console.error("Error during player move:", err);
+src/App.tsx:        // Strategic Move Selection AI
+src/App.tsx:        const chooseOptimalMove = () => {
+src/App.tsx:          if (!opponentMoves || opponentMoves.length === 0) return battleOpponent.moves[0];
+src/App.tsx:          // Filter moves with PP
+src/App.tsx:          const availableMoves = opponentMoves.filter(m => (m.currentPP ?? m.pp) > 0);
+src/App.tsx:          if (availableMoves.length === 0) {
+src/App.tsx:            return opponentMoves[0];
+src/App.tsx:          let bestMove = availableMoves[0];
+src/App.tsx:          for (const move of availableMoves) {
+src/App.tsx:            if (move.name.toLowerCase() === 'transform') {
+src/App.tsx:            const effectiveness = getTypeEffectiveness(move.type, defenderTypes);
+src/App.tsx:            if (move.power && move.power > 0) {
+src/App.tsx:              let expectedDamage = move.power * effectiveness;
+src/App.tsx:              if (move.damage_class === 'physical') {
+src/App.tsx:              } else if (move.damage_class === 'special') {
+src/App.tsx:              const accuracy = move.accuracy || 100;
+src/App.tsx:              if (battleOpponent.types.some(t => t.type.name === move.type)) {
+src/App.tsx:              // Finisher logic: If this moves KO the player, prioritize it heavily
+src/App.tsx:              if (playerHealthPercent < 22 && (move.priority || 0) > 0) {
+src/App.tsx:              // Status, Setup, and Utility moves
+src/App.tsx:              if (move.meta?.ailment && move.meta.ailment.name !== 'none') {
+src/App.tsx:                  const ailmentStr = move.meta.ailment.name.toLowerCase();
+src/App.tsx:                  score *= ((move.accuracy || 100) / 100);
+src/App.tsx:              // Stat raising/lowering moves
+src/App.tsx:              if (move.stat_changes && move.stat_changes.length > 0) {
+src/App.tsx:                for (const change of move.stat_changes) {
+src/App.tsx:            // Healing Moves
+src/App.tsx:            if (move.meta?.healing && move.meta.healing > 0) {
+src/App.tsx:                score += (move.meta.healing * 4) + 200;
+src/App.tsx:                score += move.meta.healing * 1.5;
+src/App.tsx:              if (move.power && move.power > 70) score += 120;
+src/App.tsx:              bestMove = move;
+src/App.tsx:          return bestMove;
+src/App.tsx:        const move = chooseOptimalMove();
+src/App.tsx:        if (move) {
+src/App.tsx:            setOpponentMoves(prev => prev.map(m => m.name === move.name ? { ...m, currentPP: Math.max(0, (m.currentPP ?? m.pp) - 1) } : m));
+src/App.tsx:            const damage = await executeMove(battleOpponent, pokemon, move, false);
+src/App.tsx:            // We can just rely on the state updates in `executeMove` and `applyEndOfTurnEffects`.
+src/App.tsx:            // Wait, `executeMove` updates the state, but `damage` is returned.
+src/App.tsx:            // We don't need to manually calculate `newPokemonHP` because `executeMove` already called `setPokemonHP`.
+src/App.tsx:            console.error("Error during opponent move:", err);
+src/App.tsx:    setMoveSearchQuery('');
+src/App.tsx:    setSelectedMoves([]);
+src/App.tsx:            : `SYSTEM ONLINE. Analyzing **${pokeData.name.toUpperCase()}**. I am **Pokéthology**, your tactical analysis AI. I can:\n\n- Analyze stats, moves, and weaknesses\n- Suggest 6v6 team battle strategies\n- Search for other Pokémon if you simply type their name in chat\n\nHow can I assist you right now?`
+src/App.tsx:                          {/* Tabs for Stats, AI & Battle (Moved Up) */}
+src/App.tsx:                                    {/* Moves Section */}
+src/App.tsx:                                    {pokemon.moves && pokemon.moves.length > 0 && (
+src/App.tsx:                                        <h3 className="text-cyan-500 font-hud text-[10px] font-bold tracking-wider uppercase tracking-[0.2em] mb-3 border-b border-cyan-900/30 pb-1">Moveset Analysis</h3>
+src/App.tsx:                                            const methodMoves = pokemon.moves.filter(m => m.learn_method === method);
+src/App.tsx:                                            if (methodMoves.length === 0) return null;
+src/App.tsx:                                                  {methodMoves.map((move) => (
+src/App.tsx:                                                      key={move.name} 
+src/App.tsx:                                                        setSelectedMoveDetail(move);
+src/App.tsx:                                                        setIsMoveDetailOpen(true);
+src/App.tsx:                                                        <span className="text-cyan-300 text-[10px] font-bold tracking-wider font-hud uppercase tracking-wider">{move.name.replace('-', ' ')}</span>
+src/App.tsx:                                                            typeColors[move.type] || "bg-slate-600"
+src/App.tsx:                                                            {move.type}
+src/App.tsx:                                                          {move.power && <span className="text-slate-300 font-medium text-[7px] font-bold tracking-wider">PWR: {move.power}</span>}
+src/App.tsx:                                                          {move.accuracy && <span className="text-slate-300 font-medium text-[7px] font-bold tracking-wider">ACC: {move.accuracy}%</span>}
+src/App.tsx:                                                        <span className="text-cyan-600 font-mono text-[8px] font-bold tracking-wider uppercase">PP: {move.pp}</span>
+src/App.tsx:                                          ? [`Lore: ${pokemon?.name}`, `Counter for ${pokemon?.name}?`, `Battle usage?`, `Moveset?`]
+src/App.tsx:                                              (e.target as HTMLImageElement).classList.remove('opacity-0');
+src/App.tsx:                                                onComplete={removeFloatingText}
+src/App.tsx:                                                  <p className="text-[9px] text-slate-400 italic">Pokemon selected. Now get some random moves!</p>
+src/App.tsx:                                                      // Player Moves Randomization
+src/App.tsx:                                                      let pMoves = [...(pokemon.moves || [])];
+src/App.tsx:                                                      if (pMoves.length === 0 && pokemon?.name?.includes('-')) {
+src/App.tsx:                                                          pMoves = [...(baseP.moves || [])];
+src/App.tsx:                                                      const pPool = pMoves.filter(m => (m.power || 0) > 0 || (m.pp || 0) > 0);
+src/App.tsx:                                                      const pRand = (pPool.length >= 4 ? pPool : pMoves.length > 0 ? pMoves : [])
+src/App.tsx:                                                      // Calculate at least 2 STAB moves for player
+src/App.tsx:                                                      const poolForStab = pPool.length >= 4 ? pPool : pMoves.length > 0 ? pMoves : [];
+src/App.tsx:                                                      setSelectedMoves(finalPRand);
+src/App.tsx:                                                      // Opponent Moves Randomization
+src/App.tsx:                                                      let oMoves = [...(battleOpponent.moves || [])];
+src/App.tsx:                                                      if (oMoves.length === 0 && battleOpponent?.name?.includes('-')) {
+src/App.tsx:                                                          oMoves = [...(baseO.moves || [])];
+src/App.tsx:                                                      const oPool = oMoves.filter(m => (m.power || 0) > 0 || (m.pp || 0) > 0);
+src/App.tsx:                                                      const oPoolForStab = oPool.length >= 4 ? oPool : oMoves.length > 0 ? oMoves : [];
+src/App.tsx:                                                      setOpponentMoves(oRand);
+src/App.tsx:                                                      setChaosPhase('moves_ready');
+src/App.tsx:                                                    Random Moves
+src/App.tsx:                                                    {selectedMoves.map(m => (
+src/App.tsx:                                             {selectedMoves.map(move => {
+src/App.tsx:                                               const effectiveness = getTypeEffectiveness(move.type, opponentTypes);
+src/App.tsx:                                                   key={move.name}
+src/App.tsx:                                                   onClick={() => handlePlayerMove(move)} onMouseEnter={() => sounds.hover()}
+src/App.tsx:                                                   disabled={(move.currentPP ?? move.pp) === 0}
+src/App.tsx:                                                     "group/move py-3 px-2 xs:py-4 xs:px-3 sm:py-5 sm:px-4 rounded-xl flex flex-col items-center justify-center gap-1 transition-all border border-white/10 relative overflow-hidden h-full min-h-[60px] xs:min-h-[70px] sm:min-h-[80px] min-w-0",
+src/App.tsx:                                                     (move.currentPP ?? move.pp) === 0 
+src/App.tsx:                                                           typeColors[move.type] ? `${typeColors[move.type]} border-white/10 hover:border-white/30` : "bg-slate-900/80 text-cyan-400 border-cyan-900/50 hover:border-cyan-400"
+src/App.tsx:                                                       {move.name.replace('-', ' ')}
+src/App.tsx:                                                         {abbreviateType(move.type)}
+src/App.tsx:                                                          (move.currentPP ?? move.pp) / move.pp < 0.25 ? "text-red-400" : "text-white/60"
+src/App.tsx:                                                         PP: {move.currentPP ?? move.pp}/{move.pp}
+src/App.tsx:                                                  // Reset moves for manual chaos randomization later
+src/App.tsx:                                                  setSelectedMoves([]);
+src/App.tsx:                                                  setOpponentMoves([]);
+src/App.tsx:                                                  setBattleLog([{ text: 'CHAOS SETUP INITIATED. SELECT MOVES.', type: 'critical' }]);
+src/App.tsx:                                                  // Randomize Opponent Moves
+src/App.tsx:                                                  const oAttacking = finalOpponent.moves.filter(m => (m.power || 0) > 0);
+src/App.tsx:                                                  const oStatus = finalOpponent.moves.filter(m => (m.power || 0) === 0);
+src/App.tsx:                                                  const oppRandomMoves = [...oSelectedAttacking, ...oSelectedStatus]
+src/App.tsx:                                                  setOpponentMoves(oppRandomMoves);
+src/App.tsx:                                              <span className="text-[10px] font-bold tracking-wider text-cyan-700 font-hud uppercase tracking-widest">Select 4 Moves</span>
+src/App.tsx:                                                    const attacking = pokemon.moves.filter(m => (m.power || 0) > 0);
+src/App.tsx:                                                    const status = pokemon.moves.filter(m => (m.power || 0) === 0);
+src/App.tsx:                                                    const randomMoves = [...selectedAttacking, ...selectedStatus]
+src/App.tsx:                                                     const customStabs = (pokemon.moves || []).filter(m => customSTABTypes.includes(m.type));
+src/App.tsx:                                                     const customRemainingPool = (pokemon.moves || []).filter(m => !customChosenNames.has(m.name));
+src/App.tsx:                                                     const customRandomMoves = [...customChosenStab, ...customChosenOther].slice(0, 4);
+src/App.tsx:                                                     setSelectedMoves(customRandomMoves);
+src/App.tsx:                                                  <span className={cn(selectedMoves.length === 4 ? "text-green-400" : "text-cyan-400", "font-mono font-bold text-[9px]")}>
+src/App.tsx:                                                    {selectedMoves.length}/4
+src/App.tsx:                                              {pokemon.moves
+src/App.tsx:                                                .map(move => {
+src/App.tsx:                                                const isSelected = selectedMoves.some(m => m.name === move.name);
+src/App.tsx:                                                    key={move.name}
+src/App.tsx:                                                    disabled={!isSelected && selectedMoves.length >= 4}
+src/App.tsx:                                                        setSelectedMoves(prev => prev.filter(m => m.name !== move.name));
+src/App.tsx:                                                      } else if (selectedMoves.length < 4) {
+src/App.tsx:                                                        setSelectedMoves(prev => [...prev, move]);
+src/App.tsx:                                                      !isSelected && selectedMoves.length >= 4 && "opacity-50 cursor-not-allowed"
+src/App.tsx:                                                      <span className="font-hud uppercase tracking-wider">{move.name.replace('-', ' ')}</span>
+src/App.tsx:                                                        typeColors[move.type] || "bg-slate-600"
+src/App.tsx:                                                      )}>{abbreviateType(move.type)}</span>
+src/App.tsx:                                                      <span>PWR: {move.power || '-'}</span>
+src/App.tsx:                                                      <span>ACC: {move.accuracy || '-'}%</span>
+src/App.tsx:                                                      <span>PP: {move.pp}</span>
+src/App.tsx:                                            disabled={selectedMoves.length === 0 || !battleOpponent}
+src/App.tsx:                                              (selectedMoves.length === 0 || !battleOpponent) && "opacity-50 cursor-not-allowed bg-slate-900 border-slate-700 text-slate-300 font-medium shadow-none hover:bg-slate-900"
+src/App.tsx:                                            {!battleOpponent ? "SELECT OPPONENT FIRST" : selectedMoves.length === 0 ? `SELECT AT LEAST 1 MOVE` : "INITIATE BATTLE"}
+src/App.tsx:                                              <MoveRight className="w-3 h-3" />
+src/App.tsx:        {/* Move Learning Modal */}
+src/App.tsx:          {isMoveLearningOpen && (
+src/App.tsx:                    {isReplacingMove ? "Replace Move" : "New Moves Available"}
+src/App.tsx:                  {!isReplacingMove ? (
+src/App.tsx:                        {battleResult === 'victory' ? "Victory achieved!" : "Even in defeat, progress is made!"} Select a new move for {pokemon?.name?.toUpperCase()}:
+src/App.tsx:                        {offeredMoves.map((move) => (
+src/App.tsx:                            key={move.name}
+src/App.tsx:                              if (selectedMoves.length < 4) {
+src/App.tsx:                                setSelectedMoves(prev => [...prev, move]);
+src/App.tsx:                                setBattleLog(prev => [...prev, { text: `${pokemon?.name?.toUpperCase()} LEARNED ${move.name.toUpperCase()}!`, type: 'system' }]);
+src/App.tsx:                                setIsMoveLearningOpen(false);
+src/App.tsx:                                setOfferedMoves([]);
+src/App.tsx:                                setMoveBeingLearned(move);
+src/App.tsx:                                setIsReplacingMove(true);
+src/App.tsx:                                {move.name.replace('-', ' ')}
+src/App.tsx:                                typeColors[move.type]
+src/App.tsx:                                {move.type}
+src/App.tsx:                              <span>PWR: {move.power || '--'}</span>
+src/App.tsx:                              <span>ACC: {move.accuracy || '--'}</span>
+src/App.tsx:                              <span>PP: {move.pp}</span>
+src/App.tsx:                          setIsMoveLearningOpen(false);
+src/App.tsx:                          setOfferedMoves([]);
+src/App.tsx:                  ) : moveBeingLearned && (
+src/App.tsx:                          <span className="text-cyan-300 font-hud text-sm font-bold tracking-wider uppercase">{moveBeingLearned.name.replace('-', ' ')}</span>
+src/App.tsx:                          <span className={cn("px-2 py-0.5 rounded text-[8px] font-bold tracking-wider text-white uppercase", typeColors[moveBeingLearned.type])}>
+src/App.tsx:                            {moveBeingLearned.type}
+src/App.tsx:                      <p className="text-red-400 text-[8px] font-bold tracking-wider uppercase tracking-widest text-center mb-2">Select a move to forget:</p>
+src/App.tsx:                        {selectedMoves.map((move, index) => (
+src/App.tsx:                            key={move.name}
+src/App.tsx:                              const newMoves = [...selectedMoves];
+src/App.tsx:                              newMoves[index] = moveBeingLearned;
+src/App.tsx:                              setSelectedMoves(newMoves);
+src/App.tsx:                              setIsMoveLearningOpen(false);
+src/App.tsx:                              setMoveBeingLearned(null);
+src/App.tsx:                              setIsReplacingMove(false);
+src/App.tsx:                              setOfferedMoves([]);
+src/App.tsx:                              setBattleLog(prev => [...prev, { text: `${pokemon?.name?.toUpperCase()} FORGOT ${move.name.toUpperCase()} AND LEARNED ${moveBeingLearned.name.toUpperCase()}!`, type: 'system' }]);
+src/App.tsx:                              <span className="text-red-400 text-[10px] font-bold tracking-wider font-hud uppercase">{move.name.replace('-', ' ')}</span>
+src/App.tsx:                                <span>PWR: {move.power || '--'}</span>
+src/App.tsx:                                <span>PP: {move.pp}</span>
+src/App.tsx:                          setIsReplacingMove(false);
+src/App.tsx:                          setMoveBeingLearned(null);
+src/App.tsx:        {/* Move Detail Modal */}
+src/App.tsx:          {isMoveDetailOpen && selectedMoveDetail && (
+src/App.tsx:                  typeColors[selectedMoveDetail.type]
+src/App.tsx:                      {selectedMoveDetail.name.replace('-', ' ')}
+src/App.tsx:                        {selectedMoveDetail.type}
+src/App.tsx:                        {selectedMoveDetail.currentPP ?? selectedMoveDetail.pp} / {selectedMoveDetail.pp} PP
+src/App.tsx:                        selectedMoveDetail.damage_class === 'physical' ? "bg-red-900/40" : 
+src/App.tsx:                        selectedMoveDetail.damage_class === 'special' ? "bg-blue-900/40" : "bg-slate-700/40"
+src/App.tsx:                        {selectedMoveDetail.damage_class}
+src/App.tsx:                    onClick={() => setIsMoveDetailOpen(false)}
+src/App.tsx:                  {selectedMoveDetail.description && (
+src/App.tsx:                        "{selectedMoveDetail.description}"
+src/App.tsx:                        <span className="text-xl font-mono text-cyan-400">{selectedMoveDetail.power || '--'}</span>
+src/App.tsx:                        <span className="text-xl font-mono text-cyan-400">{selectedMoveDetail.accuracy ? `${selectedMoveDetail.accuracy}%` : '--'}</span>
+src/App.tsx:                        <span className="text-xl font-mono text-cyan-400">{selectedMoveDetail.effect_chance ? `${selectedMoveDetail.effect_chance}%` : '--'}</span>
+src/App.tsx:                  {selectedMoveDetail.stat_changes && selectedMoveDetail.stat_changes.length > 0 && (
+src/App.tsx:                        {selectedMoveDetail.stat_changes.map((sc, i) => (
+src/App.tsx:                  {selectedMoveDetail.meta && (
+src/App.tsx:                        {selectedMoveDetail.meta.ailment && selectedMoveDetail.meta.ailment.name !== 'none' && (
+src/App.tsx:                            <span className="text-red-400 uppercase">{selectedMoveDetail.meta.ailment.name}</span>
+src/App.tsx:                        {selectedMoveDetail.priority !== undefined && (
+src/App.tsx:                            <span className="text-cyan-400">{selectedMoveDetail.priority}</span>
+src/App.tsx:                        {selectedMoveDetail.target && (
+src/App.tsx:                            <span className="text-slate-200 uppercase">{selectedMoveDetail.target.replace('-', ' ')}</span>
+src/App.tsx:                      onClick={() => setIsMoveDetailOpen(false)}
+src/App.tsx:                      <li>● <strong>Fighting:</strong> Pick a move to attack. Faster Pokemon usually go first!</li>
+src/App.tsx:                      <li>● <strong>AI Helper:</strong> Click 'AI Strategy' if you want advice on which move is best to use.</li>
+src/App.tsx:                    <br/>- You click 'Random Moves' to get 4 attacks.
+tmp.txt:1081:          moves: selectedMoves.map(m => ({ name: m.name, type: m.type, power: m.power }))
+tmp.txt:1251:      log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
+tmp.txt:1259:      log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
+tmp.txt:1269:      log(`${attacker.name.toUpperCase()} is paralyzed! It can't move!`, 'status-effect');
+tmp.txt:1347:      log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+tmp.txt:1358:    if (move.name.toLowerCase() === 'transform') {
+tmp.txt:1359:      log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+tmp.txt:1402:    const speakQuote = getOpponentMoveQuote(attacker.name, move.name, selectedLang);
+tmp.txt:1413:    log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+tmp.txt:1414:    setBattleMessage({ text: move.name.toUpperCase(), type: 'move' });
+tmp.txt:1426:    const isProtectMove = move.name === 'protect' || move.name === 'detect' || move.name === 'spiky-shield' || move.name === 'kings-shield';
+tmp.txt:1449:    if (move.name === 'substitute') {
+tmp.txt:1548:          setBattleMessage({ text: `${move.name.toUpperCase()} (Hit ${i + 1})`, type: 'move' });
+tmp.txt:1717:      const ailment = move.meta.ailment.name;
+tmp.txt:1719:        log(`${defender.name.toUpperCase()} is paralyzed! It may be unable to move!`, 'status-effect');
+tmp.txt:1836:           analysis += `* **Recommendation**: Use **${bestMove.name.toUpperCase()}** - It's super effective!\n`;
+tmp.txt:1840:           analysis += `* **Recommendation**: **${bestMove.name.toUpperCase()}** is your best damage option.\n`;
+tmp.txt:1976:              !currentSelectedMoves.some(sm => sm.name === m.name)
+tmp.txt:2008:              !currentSelectedMoves.some(sm => sm.name === m.name)
+tmp.txt:2037:      setSelectedMoves(prev => prev.map(m => m.name === move.name ? { ...m, currentPP: Math.max(0, (m.currentPP ?? m.pp) - 1) } : m));
+tmp.txt:2089:            if (move.name.toLowerCase() === 'transform') {
+tmp.txt:2108:              if (battleOpponent.types.some(t => t.type.name === move.type)) {
+tmp.txt:2117:            if (move.meta?.ailment && move.meta.ailment.name !== 'none') {
+tmp.txt:2156:            setOpponentMoves(prev => prev.map(m => m.name === move.name ? { ...m, currentPP: Math.max(0, (m.currentPP ?? m.pp) - 1) } : m));
+tmp.txt:2508:            : `SYSTEM ONLINE. Analyzing **${pokeData.name.toUpperCase()}**. I am **Pokéthology**, your tactical analysis AI. I can:\n\n- Analyze stats, moves, and weaknesses\n- Suggest 6v6 team battle strategies\n- Search for other Pokémon if you simply type their name in chat\n\nHow can I assist you right now?`
+tmp.txt:3497:                                                      key={move.name} 
+tmp.txt:3506:                                                        <span className="text-cyan-300 text-[10px] font-bold tracking-wider font-hud uppercase tracking-wider">{move.name.replace('-', ' ')}</span>
+tmp.txt:3654:                                          ? [`Lore: ${pokemon.name}`, `Counter for ${pokemon.name}?`, `Battle usage?`, `Moveset?`]
+tmp.txt:4146:                                                      if (pMoves.length === 0 && pokemon.name.includes('-')) {
+tmp.txt:4171:                                                      if (oMoves.length === 0 && battleOpponent.name.includes('-')) {
+tmp.txt:4250:                                                key={move.name}
+tmp.txt:4265:                                                    {move.name.replace('-', ' ')}
+tmp.txt:4453:                                                     const customRemainingPool = (pokemon.moves || []).filter(m => !customChosenNames.has(m.name));
+tmp.txt:4475:                                                const isSelected = selectedMoves.some(m => m.name === move.name);
+tmp.txt:4478:                                                    key={move.name}
+tmp.txt:4482:                                                        setSelectedMoves(prev => prev.filter(m => m.name !== move.name));
+tmp.txt:4497:                                                      <span className="font-hud uppercase tracking-wider">{move.name.replace('-', ' ')}</span>
+tmp.txt:5227:                        {battleResult === 'victory' ? "Victory achieved!" : "Even in defeat, progress is made!"} Select a new move for {pokemon?.name.toUpperCase()}:
+tmp.txt:5232:                            key={move.name}
+tmp.txt:5236:                                setBattleLog(prev => [...prev, { text: `${pokemon?.name.toUpperCase()} LEARNED ${move.name.toUpperCase()}!`, type: 'system' }]);
+tmp.txt:5250:                                {move.name.replace('-', ' ')}
+tmp.txt:5283:                          <span className="text-cyan-300 font-hud text-sm font-bold tracking-wider uppercase">{moveBeingLearned.name.replace('-', ' ')}</span>
+tmp.txt:5293:                            key={move.name}
+tmp.txt:5303:                              setBattleLog(prev => [...prev, { text: `${pokemon?.name.toUpperCase()} FORGOT ${move.name.toUpperCase()} AND LEARNED ${moveBeingLearned.name.toUpperCase()}!`, type: 'system' }]);
+tmp.txt:5308:                              <span className="text-red-400 text-[10px] font-bold tracking-wider font-hud uppercase">{move.name.replace('-', ' ')}</span>
+tmp.txt:5358:                      {selectedMoveDetail.name.replace('-', ' ')}
+tmp.txt:5439:                        {selectedMoveDetail.meta.ailment && selectedMoveDetail.meta.ailment.name !== 'none' && (
+tmp.txt:5442:                            <span className="text-red-400 uppercase">{selectedMoveDetail.meta.ailment.name}</span>
+states.txt:312:  const [hoveredMove, setHoveredMove] = useState<Move | null>(null);
+states.txt:339:  const [moveBeingLearned, setMoveBeingLearned] = useState<Move | null>(null);
+states.txt:340:  const [isMoveLearningOpen, setIsMoveLearningOpen] = useState(false);
+states.txt:343:  const [moveAnimation, setMoveAnimation] = useState<'none' | 'physical' | 'special'>('none');
+states.txt:352:  const [selectedMoves, setSelectedMoves] = useState<Move[]>([]);
+states.txt:353:  const [opponentMoves, setOpponentMoves] = useState<Move[]>([]);
+states.txt:355:  const [moveSearchQuery, setMoveSearchQuery] = useState('');
+states.txt:361:  const [moveEffect, setMoveEffect] = useState<{ type: string; active: boolean; moveType?: string }>({ type: '', active: false });
+states.txt:363:  const [selectedMoveDetail, setSelectedMoveDetail] = useState<Move | null>(null);
+states.txt:364:  const [isMoveDetailOpen, setIsMoveDetailOpen] = useState(false);
+tmp_app.txt:2:import { Search, Loader2, Database, Sparkles, Volume2, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart } from 'lucide-react';
+tmp_app.txt:13:import { Pokemon, EvolutionNode, Move, LogEntry } from './types';
+tmp_app.txt:362:const getOpponentMoveQuote = (pokeName: string, moveName: string, langCode: string) => {
+tmp_app.txt:364:  const lowerMove = moveName.toLowerCase();
+tmp_app.txt:436:  if (lowerMove.includes('protect') || lowerMove.includes('detect') || lowerMove.includes('substitute')) return pool.protect;
+tmp_app.txt:437:  if (lowerMove.includes('recover') || lowerMove.includes('heal') || lowerMove.includes('roost') || lowerMove.includes('rest')) return pool.healing;
+tmp_app.txt:438:  if (lowerMove.includes('dance') || lowerMove.includes('calm') || lowerMove.includes('nasty') || lowerMove.includes('swords') || lowerMove.includes('charge')) return pool.boost;
+tmp_app.txt:441:  if (lowerMove.includes('fire') || lowerMove.includes('burn') || lowerMove.includes('flame')) return pool.fire;
+tmp_app.txt:442:  if (lowerMove.includes('water') || lowerMove.includes('wave') || lowerMove.includes('surf') || lowerMove.includes('hydro')) return pool.water;
+tmp_app.txt:443:  if (lowerMove.includes('bolt') || lowerMove.includes('thunder') || lowerMove.includes('spark') || lowerMove.includes('shock')) return pool.electric;
+tmp_app.txt:444:  if (lowerMove.includes('leaf') || lowerMove.includes('giga') || lowerMove.includes('seed') || lowerMove.includes('grass')) return pool.grass;
+tmp_app.txt:445:  if (lowerMove.includes('ice') || lowerMove.includes('freeze') || lowerMove.includes('blizzard') || lowerMove.includes('chill')) return pool.ice;
+tmp_app.txt:446:  if (lowerMove.includes('psych') || lowerMove.includes('mind') || lowerMove.includes('zen') || lowerMove.includes('teleport')) return pool.psychic;
+tmp_app.txt:447:  if (lowerMove.includes('dragon') || lowerMove.includes('draco') || lowerMove.includes('claw') || lowerMove.includes('outrage')) return pool.dragon;
+tmp_app.txt:475:  attack: "Physical Attack: Affects the damage dealt by physical moves.",
+tmp_app.txt:476:  defense: "Physical Defense: Reduces the damage taken from physical moves.",
+tmp_app.txt:477:  "special-attack": "Special Attack: Affects the damage dealt by special moves.",
+tmp_app.txt:478:  "special-defense": "Special Defense: Reduces the damage taken from special moves.",
+tmp_app.txt:479:  speed: "Speed: Determines which Pokémon moves first in battle.",
+tmp_app.txt:915:  const [hoveredMove, setHoveredMove] = useState<Move | null>(null);
+tmp_app.txt:942:    localStorage.removeItem('pokethology_quota_limit');
+tmp_app.txt:963:  const [moveBeingLearned, setMoveBeingLearned] = useState<Move | null>(null);
+tmp_app.txt:964:  const [isMoveLearningOpen, setIsMoveLearningOpen] = useState(false);
+tmp_app.txt:965:  const [offeredMoves, setOfferedMoves] = useState<Move[]>([]);
+tmp_app.txt:966:  const [isReplacingMove, setIsReplacingMove] = useState(false);
+tmp_app.txt:969:  const [moveAnimation, setMoveAnimation] = useState<'none' | 'physical' | 'special'>('none');
+tmp_app.txt:970:  const [battleMessage, setBattleMessage] = useState<{ text: string; type: 'default' | 'critical' | 'effective' | 'status' | 'move' } | null>(null);
+tmp_app.txt:983:  const removeFloatingText = useCallback((id: number) => {
+tmp_app.txt:996:  const [selectedMoves, setSelectedMoves] = useState<Move[]>([]);
+tmp_app.txt:997:  const selectedMovesRef = useRef(selectedMoves);
+tmp_app.txt:999:    selectedMovesRef.current = selectedMoves;
+tmp_app.txt:1000:  }, [selectedMoves]);
+tmp_app.txt:1001:  const [opponentMoves, setOpponentMoves] = useState<Move[]>([]);
+tmp_app.txt:1003:  const [moveSearchQuery, setMoveSearchQuery] = useState('');
+tmp_app.txt:1019:  const [selectedMoveDetail, setSelectedMoveDetail] = useState<Move | null>(null);
+tmp_app.txt:1020:  const [isMoveDetailOpen, setIsMoveDetailOpen] = useState(false);
+tmp_app.txt:1031:  const [chaosPhase, setChaosPhase] = useState<'none' | 'selecting_pokemon' | 'moves_ready'>('none');
+tmp_app.txt:1042:  const getTypeEffectiveness = useCallback((moveType: string, targetTypes: string[]) => {
+tmp_app.txt:1045:      if (TYPE_CHART[moveType]?.[t] !== undefined) {
+tmp_app.txt:1046:        multiplier *= TYPE_CHART[moveType][t];
+tmp_app.txt:1069:          moves: selectedMoves.map(m => ({ name: m.name, type: m.type, power: m.power }))
+tmp_app.txt:1119:  }, [pokemon, battleOpponent, pokemonHP, pokemonMaxHP, selectedMoves, opponentHP, opponentMaxHP, opponentStatus]);
+tmp_app.txt:1159:    setMoveAnimation('none');
+tmp_app.txt:1173:      setIsMoveDetailOpen(false);
+tmp_app.txt:1206:      setSelectedMoves([]);
+tmp_app.txt:1207:      setOpponentMoves([]);
+tmp_app.txt:1228:  const executeMove = useCallback(async (attacker: Pokemon, defender: Pokemon, move: Move, isPlayer: boolean) => {
+tmp_app.txt:1239:      log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
+tmp_app.txt:1247:      log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
+tmp_app.txt:1257:      log(`${attacker.name.toUpperCase()} is paralyzed! It can't move!`, 'status-effect');
+tmp_app.txt:1334:    if (move.accuracy && Math.random() * 100 > move.accuracy) {
+tmp_app.txt:1335:      log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+tmp_app.txt:1346:    if (move.name.toLowerCase() === 'transform') {
+tmp_app.txt:1347:      log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+tmp_app.txt:1348:      setBattleMessage({ text: "TRANSFORM!", type: 'move' });
+tmp_app.txt:1349:      sounds.playMoveSound('normal', true);
+tmp_app.txt:1353:      setBattleMessage({ text: "TRANSFORMED!", type: 'move' });
+tmp_app.txt:1366:        moves: [...defender.moves],
+tmp_app.txt:1372:        setSelectedMoves([...opponentMoves]);
+tmp_app.txt:1376:        setOpponentMoves([...selectedMoves]);
+tmp_app.txt:1386:    const moveAccuracy = move.accuracy;
+tmp_app.txt:1387:    const doesHit = moveAccuracy === null || (Math.random() * 100) <= moveAccuracy;
+tmp_app.txt:1390:    const speakQuote = getOpponentMoveQuote(attacker.name, move.name, selectedLang);
+tmp_app.txt:1401:    log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+tmp_app.txt:1402:    setBattleMessage({ text: move.name.toUpperCase(), type: 'move' });
+tmp_app.txt:1405:    const isSpecial = move.damage_class === 'special';
+tmp_app.txt:1406:    sounds.playMoveSound(move.type, isSpecial);
+tmp_app.txt:1414:    const isProtectMove = move.name === 'protect' || move.name === 'detect' || move.name === 'spiky-shield' || move.name === 'kings-shield';
+tmp_app.txt:1415:    if (isProtectMove) {
+tmp_app.txt:1426:    if (isDefenderProtected && (move.power !== null && move.power > 0 || (move.stat_changes && move.stat_changes.some(s => s.change < 0)))) {
+tmp_app.txt:1437:    if (move.name === 'substitute') {
+tmp_app.txt:1472:    // Calculate damage based on move power, stats, and type effectiveness
+tmp_app.txt:1473:    const isDamaging = move.power !== null && move.power > 0;
+tmp_app.txt:1480:      effectiveness = getTypeEffectiveness(move.type, targetTypes);
+tmp_app.txt:1483:      const minHits = move.meta?.min_hits || 1;
+tmp_app.txt:1484:      const maxHits = move.meta?.max_hits || 1;
+tmp_app.txt:1492:        const stabMultiplier = attackerTypes.includes(move.type) ? 1.5 : 1;
+tmp_app.txt:1494:        // Determine if move is physical or special (simplified logic)
+tmp_app.txt:1498:        const baseDamage = move.power || 40;
+tmp_app.txt:1511:          setMoveAnimation(animationType);
+tmp_app.txt:1531:          setMoveAnimation('none');
+tmp_app.txt:1534:        // Visual feedback for move execution
+tmp_app.txt:1536:          setBattleMessage({ text: `${move.name.toUpperCase()} (Hit ${i + 1})`, type: 'move' });
+tmp_app.txt:1631:    // Handle Healing Moves
+tmp_app.txt:1632:    if (move.meta?.healing && move.meta.healing > 0) {
+tmp_app.txt:1634:      const healAmount = Math.floor(attackerMaxHP * (move.meta.healing / 100));
+tmp_app.txt:1648:    // Handle Drain Moves
+tmp_app.txt:1649:    if (move.meta?.drain && move.meta.drain !== 0 && totalDamage > 0) {
+tmp_app.txt:1650:      const drainAmount = Math.floor(totalDamage * (move.meta.drain / 100));
+tmp_app.txt:1668:    if (move.stat_changes) {
+tmp_app.txt:1669:      for (const change of move.stat_changes) {
+tmp_app.txt:1670:        // Determine if move targets user or opponent
+tmp_app.txt:1671:        const targetsUser = move.target === 'user' || move.target === 'users-field';
+tmp_app.txt:1704:    if (!defenderStatus && move.meta?.ailment && Math.random() < (move.meta.ailment_chance || 100) / 100) {
+tmp_app.txt:1705:      const ailment = move.meta.ailment.name;
+tmp_app.txt:1707:        log(`${defender.name.toUpperCase()} is paralyzed! It may be unable to move!`, 'status-effect');
+tmp_app.txt:1756:    // Catch-all for Status Moves that don't fall into the simplified ailments/stat changes (e.g. Protect, Splash, Conversion, Weather moves)
+tmp_app.txt:1757:    const hasStatChanges = move.stat_changes && move.stat_changes.length > 0;
+tmp_app.txt:1758:    const hasHealing = move.meta?.healing && move.meta.healing > 0;
+tmp_app.txt:1759:    const hasDrain = move.meta?.drain && move.meta.drain !== 0 && totalDamage > 0;
+tmp_app.txt:1762:      if (move.description && move.description !== 'No description available.') {
+tmp_app.txt:1763:        log(`Effect: ${move.description.replace(/\n|\f|\r/g, ' ')}`, 'system');
+tmp_app.txt:1775:    if (goesFirst && move.meta?.flinch_chance && Math.random() < move.meta.flinch_chance / 100) {
+tmp_app.txt:1785:  }, [pokemonMaxHP, opponentMaxHP, pokemonStatus, opponentStatus, pokemonFlinched, opponentFlinched, pokemon, battleOpponent, selectedMoves, opponentMoves, playerStatStages, opponentStatStages, enableAnimations, delay, addFloatingText, getEffectiveStat, getTypeEffectiveness, isAnimating, customStats, turnNumber]);
+tmp_app.txt:1811:      if (selectedMoves.length > 0) {
+tmp_app.txt:1812:        let bestMove = null;
+tmp_app.txt:1815:        selectedMoves.forEach(m => {
+tmp_app.txt:1819:             bestMove = m;
+tmp_app.txt:1823:        if (highestMultiplier > 1 && bestMove) {
+tmp_app.txt:1824:           analysis += `* **Recommendation**: Use **${bestMove.name.toUpperCase()}** - It's super effective!\n`;
+tmp_app.txt:1826:           analysis += `* **Warning**: Your attacks are not very effective. Consider swapping or using status moves.\n`;
+tmp_app.txt:1827:        } else if (bestMove) {
+tmp_app.txt:1828:           analysis += `* **Recommendation**: **${bestMove.name.toUpperCase()}** is your best damage option.\n`;
+tmp_app.txt:1831:        analysis += `* Please select some moves to get attack recommendations.\n`;
+tmp_app.txt:1854:    if (!pokemon || !battleOpponent || selectedMoves.length === 0) {
+tmp_app.txt:1855:      setBattleLog([{ text: "SELECT 4 MOVES BEFORE STARTING!", type: 'system' }]);
+tmp_app.txt:1869:    setMoveAnimation('none');
+tmp_app.txt:1906:    setSelectedMoves(prev => prev.map(m => ({ ...m, currentPP: m.pp })));
+tmp_app.txt:1907:    setOpponentMoves(prev => prev.map(m => ({ ...m, currentPP: m.pp })));
+tmp_app.txt:1913:    // Auto-select opponent moves if not set
+tmp_app.txt:1914:    if (opponentMoves.length === 0) {
+tmp_app.txt:1915:      setOpponentMoves(battleOpponent.moves.slice(0, 4).map(m => ({ ...m, currentPP: m.pp })));
+tmp_app.txt:1959:        // Simulate learning a new move after defeat too
+tmp_app.txt:1962:            const currentSelectedMoves = selectedMovesRef.current;
+tmp_app.txt:1963:            const potentialMoves = pokemon.moves.filter(m => 
+tmp_app.txt:1964:              !currentSelectedMoves.some(sm => sm.name === m.name)
+tmp_app.txt:1967:            if (potentialMoves.length > 0) {
+tmp_app.txt:1968:              // Offer up to 3 random moves
+tmp_app.txt:1969:              const shuffled = [...potentialMoves].sort(() => 0.5 - Math.random());
+tmp_app.txt:1971:              setOfferedMoves(offered);
+tmp_app.txt:1972:              setIsMoveLearningOpen(true);
+tmp_app.txt:1973:              setIsReplacingMove(false);
+tmp_app.txt:1991:        // Simulate learning a new move after victory
+tmp_app.txt:1994:            const currentSelectedMoves = selectedMovesRef.current;
+tmp_app.txt:1995:            const potentialMoves = pokemon.moves.filter(m => 
+tmp_app.txt:1996:              !currentSelectedMoves.some(sm => sm.name === m.name)
+tmp_app.txt:1999:            if (potentialMoves.length > 0) {
+tmp_app.txt:2000:              // Offer up to 3 random moves
+tmp_app.txt:2001:              const shuffled = [...potentialMoves].sort(() => 0.5 - Math.random());
+tmp_app.txt:2003:              setOfferedMoves(offered);
+tmp_app.txt:2004:              setIsMoveLearningOpen(true);
+tmp_app.txt:2005:              setIsReplacingMove(false);
+tmp_app.txt:2020:  const handlePlayerMove = async (move: Move) => {
+tmp_app.txt:2025:      setSelectedMoves(prev => prev.map(m => m.name === move.name ? { ...m, currentPP: Math.max(0, (m.currentPP ?? m.pp) - 1) } : m));
+tmp_app.txt:2027:      await executeMove(pokemon, battleOpponent, move, true);
+tmp_app.txt:2032:      console.error("Error during player move:", err);
+tmp_app.txt:2051:        // Strategic Move Selection AI
+tmp_app.txt:2052:        const chooseOptimalMove = () => {
+tmp_app.txt:2053:          if (!opponentMoves || opponentMoves.length === 0) return battleOpponent.moves[0];
+tmp_app.txt:2055:          // Filter moves with PP
+tmp_app.txt:2056:          const availableMoves = opponentMoves.filter(m => (m.currentPP ?? m.pp) > 0);
+tmp_app.txt:2058:          if (availableMoves.length === 0) {
+tmp_app.txt:2059:            return opponentMoves[0];
+tmp_app.txt:2062:          let bestMove = availableMoves[0];
+tmp_app.txt:2074:          for (const move of availableMoves) {
+tmp_app.txt:2077:            if (move.name.toLowerCase() === 'transform') {
+tmp_app.txt:2081:            if (move.power && move.power > 0) {
+tmp_app.txt:2082:              const effectiveness = getTypeEffectiveness(move.type, defenderTypes);
+tmp_app.txt:2083:              let expectedDamage = move.power * effectiveness;
+tmp_app.txt:2085:              if (move.damage_class === 'physical') {
+tmp_app.txt:2087:              } else if (move.damage_class === 'special') {
+tmp_app.txt:2091:              const accuracy = move.accuracy || 100;
+tmp_app.txt:2096:              if (battleOpponent.types.some(t => t.type.name === move.type)) {
+tmp_app.txt:2100:              if (playerHealthPercent < 20 && (move.priority || 0) > 0) {
+tmp_app.txt:2105:            if (move.meta?.ailment && move.meta.ailment.name !== 'none') {
+tmp_app.txt:2109:                const chance = move.meta.ailment_chance || 100;
+tmp_app.txt:2114:            if (move.stat_changes && move.stat_changes.length > 0) {
+tmp_app.txt:2118:            if (move.meta?.healing && move.meta.healing > 0) {
+tmp_app.txt:2120:                score += move.meta.healing * 2;
+tmp_app.txt:2127:              if (move.power && move.power > 60) score += 50;
+tmp_app.txt:2134:              bestMove = move;
+tmp_app.txt:2137:          return bestMove;
+tmp_app.txt:2140:        const move = chooseOptimalMove();
+tmp_app.txt:2142:        if (move) {
+tmp_app.txt:2144:            setOpponentMoves(prev => prev.map(m => m.name === move.name ? { ...m, currentPP: Math.max(0, (m.currentPP ?? m.pp) - 1) } : m));
+tmp_app.txt:2146:            const damage = await executeMove(battleOpponent, pokemon, move, false);
+tmp_app.txt:2150:            // We can just rely on the state updates in `executeMove` and `applyEndOfTurnEffects`.
+tmp_app.txt:2151:            // Wait, `executeMove` updates the state, but `damage` is returned.
+tmp_app.txt:2152:            // We don't need to manually calculate `newPokemonHP` because `executeMove` already called `setPokemonHP`.
+tmp_app.txt:2161:            console.error("Error during opponent move:", err);
+tmp_app.txt:2181:    setMoveSearchQuery('');
+tmp_app.txt:2182:    setSelectedMoves([]);
+tmp_app.txt:2496:            : `SYSTEM ONLINE. Analyzing **${pokeData.name.toUpperCase()}**. I am **Pokéthology**, your tactical analysis AI. I can:\n\n- Analyze stats, moves, and weaknesses\n- Suggest 6v6 team battle strategies\n- Search for other Pokémon if you simply type their name in chat\n\nHow can I assist you right now?`
+tmp_app.txt:3477:                                    {/* Moves Section */}
+tmp_app.txt:3478:                                    {pokemon.moves && pokemon.moves.length > 0 && (
+tmp_app.txt:3480:                                        <h3 className="text-cyan-500 font-hud text-[10px] font-bold tracking-wider uppercase tracking-[0.2em] mb-3 border-b border-cyan-900/30 pb-1">Moveset Analysis</h3>
+tmp_app.txt:3483:                                            const methodMoves = pokemon.moves.filter(m => m.learn_method === method);
+tmp_app.txt:3484:                                            if (methodMoves.length === 0) return null;
+tmp_app.txt:3493:                                                  {methodMoves.map((move) => (
+tmp_app.txt:3495:                                                      key={move.name} 
+tmp_app.txt:3497:                                                        setSelectedMoveDetail(move);
+tmp_app.txt:3498:                                                        setIsMoveDetailOpen(true);
+tmp_app.txt:3504:                                                        <span className="text-cyan-300 text-[10px] font-bold tracking-wider font-hud uppercase tracking-wider">{move.name.replace('-', ' ')}</span>
+tmp_app.txt:3508:                                                            typeColors[move.type] || "bg-slate-600"
+tmp_app.txt:3510:                                                            {move.type}
+tmp_app.txt:3512:                                                          {move.power && <span className="text-slate-300 font-medium text-[7px] font-bold tracking-wider">PWR: {move.power}</span>}
+tmp_app.txt:3513:                                                          {move.accuracy && <span className="text-slate-300 font-medium text-[7px] font-bold tracking-wider">ACC: {move.accuracy}%</span>}
+tmp_app.txt:3517:                                                        <span className="text-cyan-600 font-mono text-[8px] font-bold tracking-wider uppercase">PP: {move.pp}</span>
+tmp_app.txt:3652:                                          ? [`Lore: ${pokemon.name}`, `Counter for ${pokemon.name}?`, `Battle usage?`, `Moveset?`]
+tmp_app.txt:4098:                                                onComplete={removeFloatingText}
+tmp_app.txt:4137:                                                  <p className="text-[9px] text-slate-400 italic">Pokemon selected. Now get some random moves!</p>
+tmp_app.txt:4143:                                                      // Player Moves Randomization
+tmp_app.txt:4144:                                                      let pMoves = [...(pokemon.moves || [])];
+tmp_app.txt:4145:                                                      if (pMoves.length === 0 && pokemon.name.includes('-')) {
+tmp_app.txt:4148:                                                          pMoves = [...(baseP.moves || [])];
+tmp_app.txt:4151:                                                      const pPool = pMoves.filter(m => (m.power || 0) > 0 || (m.pp || 0) > 0);
+tmp_app.txt:4152:                                                      const pRand = (pPool.length >= 4 ? pPool : pMoves.length > 0 ? pMoves : [])
+tmp_app.txt:4155:                                                      // Calculate at least 2 STAB moves for player
+tmp_app.txt:4157:                                                      const poolForStab = pPool.length >= 4 ? pPool : pMoves.length > 0 ? pMoves : [];
+tmp_app.txt:4166:                                                      setSelectedMoves(finalPRand);
+tmp_app.txt:4168:                                                      // Opponent Moves Randomization
+tmp_app.txt:4169:                                                      let oMoves = [...(battleOpponent.moves || [])];
+tmp_app.txt:4170:                                                      if (oMoves.length === 0 && battleOpponent.name.includes('-')) {
+tmp_app.txt:4173:                                                          oMoves = [...(baseO.moves || [])];
+tmp_app.txt:4176:                                                      const oPool = oMoves.filter(m => (m.power || 0) > 0 || (m.pp || 0) > 0);
+tmp_app.txt:4178:                                                      const oPoolForStab = oPool.length >= 4 ? oPool : oMoves.length > 0 ? oMoves : [];
+tmp_app.txt:4187:                                                      setOpponentMoves(oRand);
+tmp_app.txt:4189:                                                      setChaosPhase('moves_ready');
+tmp_app.txt:4194:                                                    Random Moves
+tmp_app.txt:4200:                                                    {selectedMoves.map(m => (
+tmp_app.txt:4247:                                            {selectedMoves.map(move => (
+tmp_app.txt:4249:                                                key={move.name}
+tmp_app.txt:4250:                                                onClick={() => handlePlayerMove(move)}
+tmp_app.txt:4251:                                                disabled={(move.currentPP ?? move.pp) === 0}
+tmp_app.txt:4253:                                                  "group/move py-2.5 px-2 xs:py-3 xs:px-3 sm:py-3 sm:px-4 rounded-xl flex flex-col items-center justify-center gap-1 transition-all border border-white/10 relative overflow-hidden h-full min-h-[52px] xs:min-h-[58px] sm:min-h-[64px] min-w-0",
+tmp_app.txt:4254:                                                  (move.currentPP ?? move.pp) === 0 
+tmp_app.txt:4258:                                                        typeColors[move.type] ? `${typeColors[move.type]} border-white/10 hover:border-white/30` : "bg-slate-900/80 text-cyan-400 border-cyan-900/50 hover:border-cyan-400"
+tmp_app.txt:4264:                                                    {move.name.replace('-', ' ')}
+tmp_app.txt:4268:                                                      {abbreviateType(move.type)}
+tmp_app.txt:4272:                                                       (move.currentPP ?? move.pp) / move.pp < 0.25 ? "text-red-400" : "text-white/60"
+tmp_app.txt:4274:                                                      PP: {move.currentPP ?? move.pp}/{move.pp}
+tmp_app.txt:4336:                                                  // Reset moves for manual chaos randomization later
+tmp_app.txt:4337:                                                  setSelectedMoves([]);
+tmp_app.txt:4338:                                                  setOpponentMoves([]);
+tmp_app.txt:4346:                                                  setBattleLog([{ text: 'CHAOS SETUP INITIATED. SELECT MOVES.', type: 'critical' }]);
+tmp_app.txt:4387:                                                  // Randomize Opponent Moves
+tmp_app.txt:4388:                                                  const oAttacking = finalOpponent.moves.filter(m => (m.power || 0) > 0);
+tmp_app.txt:4389:                                                  const oStatus = finalOpponent.moves.filter(m => (m.power || 0) === 0);
+tmp_app.txt:4392:                                                  const oppRandomMoves = [...oSelectedAttacking, ...oSelectedStatus]
+tmp_app.txt:4396:                                                  setOpponentMoves(oppRandomMoves);
+tmp_app.txt:4423:                                              <span className="text-[10px] font-bold tracking-wider text-cyan-700 font-hud uppercase tracking-widest">Select 4 Moves</span>
+tmp_app.txt:4428:                                                    const attacking = pokemon.moves.filter(m => (m.power || 0) > 0);
+tmp_app.txt:4429:                                                    const status = pokemon.moves.filter(m => (m.power || 0) === 0);
+tmp_app.txt:4443:                                                    const randomMoves = [...selectedAttacking, ...selectedStatus]
+tmp_app.txt:4448:                                                     const customStabs = (pokemon.moves || []).filter(m => customSTABTypes.includes(m.type));
+tmp_app.txt:4452:                                                     const customRemainingPool = (pokemon.moves || []).filter(m => !customChosenNames.has(m.name));
+tmp_app.txt:4454:                                                     const customRandomMoves = [...customChosenStab, ...customChosenOther].slice(0, 4);
+tmp_app.txt:4455:                                                     setSelectedMoves(customRandomMoves);
+tmp_app.txt:4465:                                                  <span className={cn(selectedMoves.length === 4 ? "text-green-400" : "text-cyan-400", "font-mono font-bold text-[9px]")}>
+tmp_app.txt:4466:                                                    {selectedMoves.length}/4
+tmp_app.txt:4472:                                              {pokemon.moves
+tmp_app.txt:4473:                                                .map(move => {
+tmp_app.txt:4474:                                                const isSelected = selectedMoves.some(m => m.name === move.name);
+tmp_app.txt:4477:                                                    key={move.name}
+tmp_app.txt:4478:                                                    disabled={!isSelected && selectedMoves.length >= 4}
+tmp_app.txt:4481:                                                        setSelectedMoves(prev => prev.filter(m => m.name !== move.name));
+tmp_app.txt:4482:                                                      } else if (selectedMoves.length < 4) {
+tmp_app.txt:4483:                                                        setSelectedMoves(prev => [...prev, move]);
+tmp_app.txt:4492:                                                      !isSelected && selectedMoves.length >= 4 && "opacity-50 cursor-not-allowed"
+tmp_app.txt:4496:                                                      <span className="font-hud uppercase tracking-wider">{move.name.replace('-', ' ')}</span>
+tmp_app.txt:4499:                                                        typeColors[move.type] || "bg-slate-600"
+tmp_app.txt:4500:                                                      )}>{abbreviateType(move.type)}</span>
+tmp_app.txt:4503:                                                      <span>PWR: {move.power || '-'}</span>
+tmp_app.txt:4504:                                                      <span>ACC: {move.accuracy || '-'}%</span>
+tmp_app.txt:4505:                                                      <span>PP: {move.pp}</span>
+tmp_app.txt:4515:                                            disabled={selectedMoves.length === 0 || !battleOpponent}
+tmp_app.txt:4518:                                              (selectedMoves.length === 0 || !battleOpponent) && "opacity-50 cursor-not-allowed bg-slate-900 border-slate-700 text-slate-300 font-medium shadow-none hover:bg-slate-900"
+tmp_app.txt:4521:                                            {!battleOpponent ? "SELECT OPPONENT FIRST" : selectedMoves.length === 0 ? `SELECT AT LEAST 1 MOVE` : "INITIATE BATTLE"}
+tmp_app.txt:4618:                                              <MoveRight className="w-3 h-3" />
+tmp_app.txt:5201:        {/* Move Learning Modal */}
+tmp_app.txt:5203:          {isMoveLearningOpen && (
+tmp_app.txt:5218:                    {isReplacingMove ? "Replace Move" : "New Moves Available"}
+tmp_app.txt:5223:                  {!isReplacingMove ? (
+tmp_app.txt:5226:                        {battleResult === 'victory' ? "Victory achieved!" : "Even in defeat, progress is made!"} Select a new move for {pokemon?.name.toUpperCase()}:
+tmp_app.txt:5229:                        {offeredMoves.map((move) => (
+tmp_app.txt:5231:                            key={move.name}
+tmp_app.txt:5233:                              if (selectedMoves.length < 4) {
+tmp_app.txt:5234:                                setSelectedMoves(prev => [...prev, move]);
+tmp_app.txt:5235:                                setBattleLog(prev => [...prev, { text: `${pokemon?.name.toUpperCase()} LEARNED ${move.name.toUpperCase()}!`, type: 'system' }]);
+tmp_app.txt:5236:                                setIsMoveLearningOpen(false);
+tmp_app.txt:5237:                                setOfferedMoves([]);
+tmp_app.txt:5240:                                setMoveBeingLearned(move);
+tmp_app.txt:5241:                                setIsReplacingMove(true);
+tmp_app.txt:5249:                                {move.name.replace('-', ' ')}
+tmp_app.txt:5253:                                typeColors[move.type]
+tmp_app.txt:5255:                                {move.type}
+tmp_app.txt:5259:                              <span>PWR: {move.power || '--'}</span>
+tmp_app.txt:5260:                              <span>ACC: {move.accuracy || '--'}</span>
+tmp_app.txt:5261:                              <span>PP: {move.pp}</span>
+tmp_app.txt:5268:                          setIsMoveLearningOpen(false);
+tmp_app.txt:5269:                          setOfferedMoves([]);
+tmp_app.txt:5277:                  ) : moveBeingLearned && (
+tmp_app.txt:5282:                          <span className="text-cyan-300 font-hud text-sm font-bold tracking-wider uppercase">{moveBeingLearned.name.replace('-', ' ')}</span>
+tmp_app.txt:5283:                          <span className={cn("px-2 py-0.5 rounded text-[8px] font-bold tracking-wider text-white uppercase", typeColors[moveBeingLearned.type])}>
+tmp_app.txt:5284:                            {moveBeingLearned.type}
+tmp_app.txt:5288:                      <p className="text-red-400 text-[8px] font-bold tracking-wider uppercase tracking-widest text-center mb-2">Select a move to forget:</p>
+tmp_app.txt:5290:                        {selectedMoves.map((move, index) => (
+tmp_app.txt:5292:                            key={move.name}
+tmp_app.txt:5294:                              const newMoves = [...selectedMoves];
+tmp_app.txt:5295:                              newMoves[index] = moveBeingLearned;
+tmp_app.txt:5296:                              setSelectedMoves(newMoves);
+tmp_app.txt:5297:                              setIsMoveLearningOpen(false);
+tmp_app.txt:5298:                              setMoveBeingLearned(null);
+tmp_app.txt:5299:                              setIsReplacingMove(false);
+tmp_app.txt:5300:                              setOfferedMoves([]);
+tmp_app.txt:5302:                              setBattleLog(prev => [...prev, { text: `${pokemon?.name.toUpperCase()} FORGOT ${move.name.toUpperCase()} AND LEARNED ${moveBeingLearned.name.toUpperCase()}!`, type: 'system' }]);
+tmp_app.txt:5307:                              <span className="text-red-400 text-[10px] font-bold tracking-wider font-hud uppercase">{move.name.replace('-', ' ')}</span>
+tmp_app.txt:5309:                                <span>PWR: {move.power || '--'}</span>
+tmp_app.txt:5310:                                <span>PP: {move.pp}</span>
+tmp_app.txt:5319:                          setIsReplacingMove(false);
+tmp_app.txt:5320:                          setMoveBeingLearned(null);
+tmp_app.txt:5335:        {/* Move Detail Modal */}
+tmp_app.txt:5337:          {isMoveDetailOpen && selectedMoveDetail && (
+tmp_app.txt:5352:                  typeColors[selectedMoveDetail.type]
+tmp_app.txt:5357:                      {selectedMoveDetail.name.replace('-', ' ')}
+tmp_app.txt:5361:                        {selectedMoveDetail.type}
+tmp_app.txt:5364:                        {selectedMoveDetail.currentPP ?? selectedMoveDetail.pp} / {selectedMoveDetail.pp} PP
+tmp_app.txt:5368:                        selectedMoveDetail.damage_class === 'physical' ? "bg-red-900/40" : 
+tmp_app.txt:5369:                        selectedMoveDetail.damage_class === 'special' ? "bg-blue-900/40" : "bg-slate-700/40"
+tmp_app.txt:5371:                        {selectedMoveDetail.damage_class}
+tmp_app.txt:5376:                    onClick={() => setIsMoveDetailOpen(false)}
+tmp_app.txt:5385:                  {selectedMoveDetail.description && (
+tmp_app.txt:5389:                        "{selectedMoveDetail.description}"
+tmp_app.txt:5400:                        <span className="text-xl font-mono text-cyan-400">{selectedMoveDetail.power || '--'}</span>
+tmp_app.txt:5404:                        <span className="text-xl font-mono text-cyan-400">{selectedMoveDetail.accuracy ? `${selectedMoveDetail.accuracy}%` : '--'}</span>
+tmp_app.txt:5408:                        <span className="text-xl font-mono text-cyan-400">{selectedMoveDetail.effect_chance ? `${selectedMoveDetail.effect_chance}%` : '--'}</span>
+tmp_app.txt:5414:                  {selectedMoveDetail.stat_changes && selectedMoveDetail.stat_changes.length > 0 && (
+tmp_app.txt:5418:                        {selectedMoveDetail.stat_changes.map((sc, i) => (
+tmp_app.txt:5434:                  {selectedMoveDetail.meta && (
+tmp_app.txt:5438:                        {selectedMoveDetail.meta.ailment && selectedMoveDetail.meta.ailment.name !== 'none' && (
+tmp_app.txt:5441:                            <span className="text-red-400 uppercase">{selectedMoveDetail.meta.ailment.name}</span>
+tmp_app.txt:5444:                        {selectedMoveDetail.priority !== undefined && (
+tmp_app.txt:5447:                            <span className="text-cyan-400">{selectedMoveDetail.priority}</span>
+tmp_app.txt:5450:                        {selectedMoveDetail.target && (
+tmp_app.txt:5453:                            <span className="text-slate-200 uppercase">{selectedMoveDetail.target.replace('-', ' ')}</span>
+tmp_app.txt:5462:                      onClick={() => setIsMoveDetailOpen(false)}
+tmp_app.txt:5615:                      <li>● <strong>Fighting:</strong> Pick a move to attack. Faster Pokemon usually go first!</li>
+tmp_app.txt:5617:                      <li>● <strong>AI Helper:</strong> Click 'AI Strategy' if you want advice on which move is best to use.</li>
+tmp_app.txt:5625:                    <br/>- You click 'Random Moves' to get 4 attacks.
+test.js:import { Search, Loader2, Database as Database2, Sparkles, Volume2, Send, Info, X as X2, ChevronLeft as ChevronLeft2, ChevronRight as ChevronRight3, Plus, Zap as Zap3, BrainCircuit, MoveRight, Moon, Music, Settings, Sun, RotateCcw, Swords as Swords2, Crosshair, Layers, Cpu, Book, BookOpen as BookOpen2, AlertTriangle as AlertTriangle2, Shield as Shield2, Skull as Skull2, TrendingUp as TrendingUp2, TrendingDown as TrendingDown2, Target as Target2, Activity as Activity2, User, RefreshCw } from "lucide-react";
+test.js:    }, type === "move" ? 800 : 1200);
+test.js:      case "move":
+test.js:    content: "Switch to the Battle tab to simulate combats. Try 'Full Chaos Match' for a random fight, or just select your own moves to battle an opponent."
+test.js:    content: "If you're in a tough battle, use the Chat tab. Our AI assistant will help you figure out what to do next based on your stats and moves!"
+test.js:var defaultMoves = [
+test.js:    moves: defaultMoves,
+test.js:    abilities: [{ name: "bulletproof", is_hidden: false, description: "Protects the Pok\xE9mon from some ball and bomb moves." }],
+test.js:    moves: defaultMoves,
+test.js:    moves: defaultMoves,
+test.js:    abilities: [{ name: "protean", is_hidden: false, description: "Changes the Pok\xE9mon's type to the type of the move it's about to use." }],
+test.js:    description: "A form achieved through Mega Evolution that mirrors the legendary Ash-Greninja. It moves faster than the eye can follow.",
+test.js:    moves: defaultMoves,
+test.js:    abilities: [{ name: "fairy-aura", is_hidden: false, description: "Powers up Fairy-type moves for all Pok\xE9mon on the field." }],
+test.js:    moves: defaultMoves,
+test.js:    abilities: [{ name: "dark-aura", is_hidden: false, description: "Powers up Dark-type moves for all Pok\xE9mon on the field." }],
+test.js:    moves: defaultMoves,
+test.js:  let movesSource = data.moves;
+test.js:  if (movesSource.length === 0 && data.species && data.species.url) {
+test.js:        movesSource = basePokemonData.moves;
+test.js:      console.error("Failed to fetch base species moves for form", e);
+test.js:  const levelUpMoves = movesSource.filter(
+test.js:    (m) => m.version_group_details.some((v) => v.move_learn_method.name === "level-up")
+test.js:  const otherMoves = movesSource.filter(
+test.js:    (m) => !m.version_group_details.some((v) => v.move_learn_method.name === "level-up")
+test.js:  const movesToFetch = [...levelUpMoves, ...otherMoves].slice(0, 40);
+test.js:  const moves = await Promise.all(
+test.js:    movesToFetch.map(async (m) => {
+test.js:        const res = await fetch(m.move.url);
+test.js:        const moveData = await res.json();
+test.js:        const entry = moveData.flavor_text_entries.find((e) => e.language.name === baseLang) || moveData.flavor_text_entries.find((e) => e.language.name === "en");
+test.js:        if (versionGroup.move_learn_method.name === "level-up") learnMethod = "level-up";
+test.js:        else if (versionGroup.move_learn_method.name === "machine") learnMethod = "machine";
+test.js:        else if (versionGroup.move_learn_method.name === "egg") learnMethod = "egg";
+test.js:        else if (versionGroup.move_learn_method.name === "tutor") learnMethod = "tutor";
+test.js:          name: m.move.name,
+test.js:          url: m.move.url,
+test.js:          power: moveData.power,
+test.js:          accuracy: moveData.accuracy,
+test.js:          priority: moveData.priority,
+test.js:          type: moveData.type.name,
+test.js:          pp: moveData.pp,
+test.js:          damage_class: moveData.damage_class.name,
+test.js:          effect_chance: moveData.effect_chance,
+test.js:          stat_changes: moveData.stat_changes.map((sc) => ({
+test.js:          meta: moveData.meta,
+test.js:          target: moveData.target.name
+test.js:          name: m.move.name,
+test.js:          url: m.move.url,
+test.js:          description: "Failed to load move data.",
+test.js:    moves,
+test.js:              audio.removeEventListener("canplaythrough", onCanPlay);
+test.js:              audio.removeEventListener("error", onError);
+test.js:  physicalMove: () => {
+test.js:  specialMove: () => {
+test.js:  playMoveSound: (type, isSpecial) => {
+test.js:          sounds.specialMove();
+test.js:          sounds.physicalMove();
+test.js:  attack: "Physical Attack: Affects the damage dealt by physical moves.",
+test.js:  defense: "Physical Defense: Reduces the damage taken from physical moves.",
+test.js:  "special-attack": "Special Attack: Affects the damage dealt by special moves.",
+test.js:  "special-defense": "Special Defense: Reduces the damage taken from special moves.",
+test.js:  speed: "Speed: Determines which Pok\xE9mon moves first in battle."
+test.js:  const [hoveredMove, setHoveredMove] = useState2(null);
+test.js:  const [moveBeingLearned, setMoveBeingLearned] = useState2(null);
+test.js:  const [isMoveLearningOpen, setIsMoveLearningOpen] = useState2(false);
+test.js:  const [offeredMoves, setOfferedMoves] = useState2([]);
+test.js:  const [isReplacingMove, setIsReplacingMove] = useState2(false);
+test.js:  const [moveAnimation, setMoveAnimation] = useState2("none");
+test.js:  const removeFloatingText = useCallback((id) => {
+test.js:  const [selectedMoves, setSelectedMoves] = useState2([]);
+test.js:  const selectedMovesRef = useRef(selectedMoves);
+test.js:    selectedMovesRef.current = selectedMoves;
+test.js:  }, [selectedMoves]);
+test.js:  const [opponentMoves, setOpponentMoves] = useState2([]);
+test.js:  const [moveSearchQuery, setMoveSearchQuery] = useState2("");
+test.js:  const [selectedMoveDetail, setSelectedMoveDetail] = useState2(null);
+test.js:  const [isMoveDetailOpen, setIsMoveDetailOpen] = useState2(false);
+test.js:  const getTypeEffectiveness = useCallback((moveType, targetTypes) => {
+test.js:      if (TYPE_CHART[moveType]?.[t] !== void 0) {
+test.js:        multiplier *= TYPE_CHART[moveType][t];
+test.js:        strategy += "WARNING: Your HP is critically low. Focus on survival or high priority moves. ";
+test.js:        strategy += "They are weak! Use a damaging move to finish them off. ";
+test.js:      if (selectedMoves.length > 0) {
+test.js:        let bestMove = null;
+test.js:        selectedMoves.forEach((m) => {
+test.js:            bestMove = m;
+test.js:        if (highestMultiplier > 1 && bestMove) {
+test.js:          strategy += `${bestMove.name.toUpperCase()} is super effective against ${battleOpponent.name}! Use it. `;
+test.js:          strategy += "None of your current attacks are very effective. Focus on status moves or boosting. ";
+test.js:        } else if (bestMove) {
+test.js:          strategy += `${bestMove.name.toUpperCase()} is your most reliable attack right now. `;
+test.js:        strategy += "Select your moves carefully based on your opponent's types.";
+test.js:  }, [pokemon, battleOpponent, pokemonHP, pokemonMaxHP, selectedMoves, opponentHP, opponentMaxHP, getTypeEffectiveness, opponentStatus]);
+test.js:    setMoveAnimation("none");
+test.js:      setIsMoveDetailOpen(false);
+test.js:      setSelectedMoves([]);
+test.js:      setOpponentMoves([]);
+test.js:  const executeMove = useCallback(async (attacker, defender, move, isPlayer) => {
+test.js:      log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, "status-effect");
+test.js:      log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, "status-effect");
+test.js:      log(`${attacker.name.toUpperCase()} is paralyzed! It can't move!`, "status-effect");
+test.js:    if (move.accuracy && Math.random() * 100 > move.accuracy) {
+test.js:      log(`${attacker.name.toUpperCase()} used ${move.name.toUpperCase()}!`, isPlayer ? "player" : "opponent");
+test.js:    if (move.name.toLowerCase() === "transform") {
+test.js:      log(`${attacker.name.toUpperCase()} used ${move.name.toUpperCase()}!`, isPlayer ? "player" : "opponent");
+test.js:      setBattleMessage({ text: "TRANSFORM!", type: "move" });
+test.js:      sounds.playMoveSound("normal", true);
+test.js:      setBattleMessage({ text: "TRANSFORMED!", type: "move" });
+test.js:        moves: [...defender.moves],
+test.js:        setSelectedMoves([...opponentMoves]);
+test.js:        setOpponentMoves([...selectedMoves]);
+test.js:    const moveAccuracy = move.accuracy;
+test.js:    const doesHit = moveAccuracy === null || Math.random() * 100 <= moveAccuracy;
+test.js:    log(`${attacker.name.toUpperCase()} used ${move.name.toUpperCase()}!`, isPlayer ? "player" : "opponent");
+test.js:    setBattleMessage({ text: move.name.toUpperCase(), type: "move" });
+test.js:    const isSpecial = move.damage_class === "special";
+test.js:    sounds.playMoveSound(move.type, isSpecial);
+test.js:    const isProtectMove = move.name === "protect" || move.name === "detect" || move.name === "spiky-shield" || move.name === "kings-shield";
+test.js:    if (isProtectMove) {
+test.js:    if (isDefenderProtected && (move.power !== null && move.power > 0 || move.stat_changes && move.stat_changes.some((s) => s.change < 0))) {
+test.js:    if (move.name === "substitute") {
+test.js:    const isDamaging = move.power !== null && move.power > 0;
+test.js:      effectiveness = getTypeEffectiveness(move.type, targetTypes);
+test.js:      const minHits = move.meta?.min_hits || 1;
+test.js:      const maxHits = move.meta?.max_hits || 1;
+test.js:        const stabMultiplier = attackerTypes.includes(move.type) ? 1.5 : 1;
+test.js:        const baseDamage = move.power || 40;
+test.js:          setMoveAnimation(animationType);
+test.js:          setMoveAnimation("none");
+test.js:          setBattleMessage({ text: `${move.name.toUpperCase()} (Hit ${i + 1})`, type: "move" });
+test.js:    if (move.meta?.healing && move.meta.healing > 0) {
+test.js:      const healAmount = Math.floor(attackerMaxHP * (move.meta.healing / 100));
+test.js:    if (move.meta?.drain && move.meta.drain !== 0 && totalDamage > 0) {
+test.js:      const drainAmount = Math.floor(totalDamage * (move.meta.drain / 100));
+test.js:    if (move.stat_changes) {
+test.js:      for (const change of move.stat_changes) {
+test.js:        const targetsUser = move.target === "user" || move.target === "users-field";
+test.js:    if (!defenderStatus && move.meta?.ailment && Math.random() < (move.meta.ailment_chance || 100) / 100) {
+test.js:      const ailment = move.meta.ailment.name;
+test.js:        log(`${defender.name.toUpperCase()} is paralyzed! It may be unable to move!`, "status-effect");
+test.js:    const hasStatChanges = move.stat_changes && move.stat_changes.length > 0;
+test.js:    const hasHealing = move.meta?.healing && move.meta.healing > 0;
+test.js:    const hasDrain = move.meta?.drain && move.meta.drain !== 0 && totalDamage > 0;
+test.js:      if (move.description && move.description !== "No description available.") {
+test.js:        log(`Effect: ${move.description.replace(/\n|\f|\r/g, " ")}`, "system");
+test.js:    if (goesFirst && move.meta?.flinch_chance && Math.random() < move.meta.flinch_chance / 100) {
+test.js:  }, [pokemonMaxHP, opponentMaxHP, pokemonStatus, opponentStatus, pokemonFlinched, opponentFlinched, pokemon, battleOpponent, selectedMoves, opponentMoves, playerStatStages, opponentStatStages, enableAnimations, delay, addFloatingText, getEffectiveStat, getTypeEffectiveness, isAnimating, customStats, turnNumber]);
+test.js:      if (selectedMoves.length > 0) {
+test.js:        let bestMove = null;
+test.js:        selectedMoves.forEach((m) => {
+test.js:            bestMove = m;
+test.js:        if (highestMultiplier > 1 && bestMove) {
+test.js:          analysis += `* **Recommendation**: Use **${bestMove.name.toUpperCase()}** - It's super effective!
+test.js:          analysis += `* **Warning**: Your attacks are not very effective. Consider swapping or using status moves.
+test.js:        } else if (bestMove) {
+test.js:          analysis += `* **Recommendation**: **${bestMove.name.toUpperCase()}** is your best damage option.
+test.js:        analysis += `* Please select some moves to get attack recommendations.
+test.js:    if (!pokemon || !battleOpponent || selectedMoves.length === 0) {
+test.js:      setBattleLog([{ text: "SELECT 4 MOVES BEFORE STARTING!", type: "system" }]);
+test.js:    setMoveAnimation("none");
+test.js:    setSelectedMoves((prev) => prev.map((m) => ({ ...m, currentPP: m.pp })));
+test.js:    setOpponentMoves((prev) => prev.map((m) => ({ ...m, currentPP: m.pp })));
+test.js:    if (opponentMoves.length === 0) {
+test.js:      setOpponentMoves(battleOpponent.moves.slice(0, 4).map((m) => ({ ...m, currentPP: m.pp })));
+test.js:            const currentSelectedMoves = selectedMovesRef.current;
+test.js:            const potentialMoves = pokemon.moves.filter(
+test.js:              (m) => !currentSelectedMoves.some((sm) => sm.name === m.name)
+test.js:            if (potentialMoves.length > 0) {
+test.js:              const shuffled = [...potentialMoves].sort(() => 0.5 - Math.random());
+test.js:              setOfferedMoves(offered);
+test.js:              setIsMoveLearningOpen(true);
+test.js:              setIsReplacingMove(false);
+test.js:            const currentSelectedMoves = selectedMovesRef.current;
+test.js:            const potentialMoves = pokemon.moves.filter(
+test.js:              (m) => !currentSelectedMoves.some((sm) => sm.name === m.name)
+test.js:            if (potentialMoves.length > 0) {
+test.js:              const shuffled = [...potentialMoves].sort(() => 0.5 - Math.random());
+test.js:              setOfferedMoves(offered);
+test.js:              setIsMoveLearningOpen(true);
+test.js:              setIsReplacingMove(false);
+test.js:  const handlePlayerMove = async (move) => {
+test.js:      setSelectedMoves((prev) => prev.map((m) => m.name === move.name ? { ...m, currentPP: Math.max(0, (m.currentPP ?? m.pp) - 1) } : m));
+test.js:      await executeMove(pokemon, battleOpponent, move, true);
+test.js:      console.error("Error during player move:", err);
+test.js:        const chooseOptimalMove = () => {
+test.js:          if (!opponentMoves || opponentMoves.length === 0) return battleOpponent.moves[0];
+test.js:          const availableMoves = opponentMoves.filter((m) => (m.currentPP ?? m.pp) > 0);
+test.js:          if (availableMoves.length === 0) {
+test.js:            return opponentMoves[0];
+test.js:          let bestMove = availableMoves[0];
+test.js:          for (const move2 of availableMoves) {
+test.js:            if (move2.name.toLowerCase() === "transform") {
+test.js:            if (move2.power && move2.power > 0) {
+test.js:              const effectiveness = getTypeEffectiveness(move2.type, defenderTypes);
+test.js:              let expectedDamage = move2.power * effectiveness;
+test.js:              if (move2.damage_class === "physical") {
+test.js:              } else if (move2.damage_class === "special") {
+test.js:              const accuracy = move2.accuracy || 100;
+test.js:              if (battleOpponent.types.some((t) => t.type.name === move2.type)) {
+test.js:              if (playerHealthPercent < 20 && (move2.priority || 0) > 0) {
+test.js:            if (move2.meta?.ailment && move2.meta.ailment.name !== "none") {
+test.js:                const chance = move2.meta.ailment_chance || 100;
+test.js:            if (move2.stat_changes && move2.stat_changes.length > 0) {
+test.js:            if (move2.meta?.healing && move2.meta.healing > 0) {
+test.js:                score += move2.meta.healing * 2;
+test.js:              if (move2.power && move2.power > 60) score += 50;
+test.js:              bestMove = move2;
+test.js:          return bestMove;
+test.js:        const move = chooseOptimalMove();
+test.js:        if (move) {
+test.js:            setOpponentMoves((prev) => prev.map((m) => m.name === move.name ? { ...m, currentPP: Math.max(0, (m.currentPP ?? m.pp) - 1) } : m));
+test.js:            const damage = await executeMove(battleOpponent, pokemon, move, false);
+test.js:            console.error("Error during opponent move:", err);
+test.js:    setMoveSearchQuery("");
+test.js:    setSelectedMoves([]);
+test.js:      let response = "I don't understand. Try asking me about stats, types, weaknesses, or moves.";
+test.js:        } else if (lowerInput.includes("move") || lowerInput.includes("attack")) {
+test.js:          response = `**${pokemon.name.toUpperCase()}** learns many moves. In battle, you can teach it up to 4. Check the moves list to assign them.`;
+test.js:                        pokemon.moves && pokemon.moves.length > 0 && /* @__PURE__ */ jsxs6("div", { className: "bg-slate-950/50 rounded-xl p-4 border border-cyan-900/30 w-full", children: [
+test.js:                          /* @__PURE__ */ jsx7("h3", { className: "text-cyan-500 font-hud text-[10px] font-bold tracking-wider uppercase tracking-[0.2em] mb-3 border-b border-cyan-900/30 pb-1", children: "Moveset Analysis" }),
+test.js:                            const methodMoves = pokemon.moves.filter((m) => m.learn_method === method);
+test.js:                            if (methodMoves.length === 0) return null;
+test.js:                              /* @__PURE__ */ jsx7("div", { className: "grid grid-cols-1 gap-2", children: methodMoves.map((move) => /* @__PURE__ */ jsxs6(
+test.js:                                    setSelectedMoveDetail(move);
+test.js:                                    setIsMoveDetailOpen(true);
+test.js:                                      /* @__PURE__ */ jsx7("span", { className: "text-cyan-300 text-[10px] font-bold tracking-wider font-hud uppercase tracking-wider", children: move.name.replace("-", " ") }),
+test.js:                                          typeColors[move.type] || "bg-slate-600"
+test.js:                                        ), children: move.type }),
+test.js:                                        move.power && /* @__PURE__ */ jsxs6("span", { className: "text-slate-300 font-medium text-[7px] font-bold tracking-wider", children: [
+test.js:                                          move.power
+test.js:                                        move.accuracy && /* @__PURE__ */ jsxs6("span", { className: "text-slate-300 font-medium text-[7px] font-bold tracking-wider", children: [
+test.js:                                          move.accuracy,
+test.js:                                        move.pp
+test.js:                                move.name
+test.js:                                    onComplete: removeFloatingText
+test.js:                                    /* @__PURE__ */ jsx7("p", { className: "text-[9px] text-slate-400 italic", children: "Pokemon selected. Now get some random moves!" }),
+test.js:                                          let pMoves = [...pokemon.moves || []];
+test.js:                                          if (pMoves.length === 0 && pokemon.name.includes("-")) {
+test.js:                                              pMoves = [...baseP.moves || []];
+test.js:                                          const pPool = pMoves.filter((m) => (m.power || 0) > 0 || (m.pp || 0) > 0);
+test.js:                                          const pRand = (pPool.length >= 4 ? pPool : pMoves.length > 0 ? pMoves : []).sort(() => 0.5 - Math.random()).slice(0, 4).map((m) => ({ ...m, currentPP: m.pp || 20 }));
+test.js:                                          setSelectedMoves(pRand);
+test.js:                                          let oMoves = [...battleOpponent.moves || []];
+test.js:                                          if (oMoves.length === 0 && battleOpponent.name.includes("-")) {
+test.js:                                              oMoves = [...baseO.moves || []];
+test.js:                                          const oPool = oMoves.filter((m) => (m.power || 0) > 0 || (m.pp || 0) > 0);
+test.js:                                          const oRand = (oPool.length >= 4 ? oPool : oMoves.length > 0 ? oMoves : []).sort(() => 0.5 - Math.random()).slice(0, 4).map((m) => ({ ...m, currentPP: m.pp || 20 }));
+test.js:                                          setOpponentMoves(oRand);
+test.js:                                          setChaosPhase("moves_ready");
+test.js:                                          "Random Moves"
+test.js:                                    /* @__PURE__ */ jsx7("div", { className: "grid grid-cols-2 gap-1.5", children: selectedMoves.map((m) => /* @__PURE__ */ jsx7("div", { className: "bg-slate-950/60 border border-amber-500/20 p-1.5 rounded-lg text-[8px] text-amber-200 uppercase font-black truncate text-center", children: m.name.replace("-", " ") }, m.name)) }),
+test.js:                              selectedMoves.map((move) => /* @__PURE__ */ jsx7(
+test.js:                                  onClick: () => handlePlayerMove(move),
+test.js:                                  disabled: (move.currentPP ?? move.pp) === 0,
+test.js:                                    "group/move py-2 px-2 sm:py-3 sm:px-4 rounded-lg flex flex-col items-center justify-center gap-1 transition-all border border-white/10 relative overflow-hidden",
+test.js:                                    (move.currentPP ?? move.pp) === 0 ? "bg-slate-950/80 text-slate-600 border-slate-900 cursor-not-allowed opacity-50" : cn(
+test.js:                                      typeColors[move.type] ? `${typeColors[move.type]} border-white/10 hover:border-white/30` : "bg-slate-900/80 text-cyan-400 border-cyan-900/50 hover:border-cyan-400"
+test.js:                                    /* @__PURE__ */ jsx7("span", { className: "text-[10px] sm:text-[14px] font-hud font-black uppercase tracking-wider text-white truncate w-full text-center", children: move.name.replace("-", " ") }),
+test.js:                                      /* @__PURE__ */ jsx7("span", { className: "text-[7px] sm:text-[9px] font-mono opacity-80 text-white", children: abbreviateType(move.type) }),
+test.js:                                        (move.currentPP ?? move.pp) / move.pp < 0.25 ? "text-red-400" : "text-white/60"
+test.js:                                        move.currentPP ?? move.pp,
+test.js:                                        move.pp
+test.js:                                move.name
+test.js:                                    setSelectedMoves([]);
+test.js:                                    setOpponentMoves([]);
+test.js:                                    setBattleLog([{ text: "CHAOS SETUP INITIATED. SELECT MOVES.", type: "critical" }]);
+test.js:                                    const oAttacking = finalOpponent.moves.filter((m) => (m.power || 0) > 0);
+test.js:                                    const oStatus = finalOpponent.moves.filter((m) => (m.power || 0) === 0);
+test.js:                                    const oppRandomMoves = [...oSelectedAttacking, ...oSelectedStatus].sort(() => 0.5 - Math.random()).slice(0, 4).map((m) => ({ ...m, currentPP: m.pp }));
+test.js:                                    setOpponentMoves(oppRandomMoves);
+test.js:                              /* @__PURE__ */ jsx7("span", { className: "text-[10px] font-bold tracking-wider text-cyan-700 font-hud uppercase tracking-widest", children: "Select 4 Moves" }),
+test.js:                                      const attacking = pokemon.moves.filter((m) => (m.power || 0) > 0);
+test.js:                                      const status = pokemon.moves.filter((m) => (m.power || 0) === 0);
+test.js:                                      const randomMoves = [...selectedAttacking, ...selectedStatus].sort(() => 0.5 - Math.random()).slice(0, 4);
+test.js:                                      setSelectedMoves(randomMoves);
+test.js:                                  /* @__PURE__ */ jsxs6("span", { className: cn(selectedMoves.length === 4 ? "text-green-400" : "text-cyan-400", "font-mono font-bold text-[9px]"), children: [
+test.js:                                    selectedMoves.length,
+test.js:                            /* @__PURE__ */ jsx7("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-1 max-h-48 sm:max-h-60 overflow-y-auto custom-scrollbar pr-1", children: pokemon.moves.map((move) => {
+test.js:                              const isSelected = selectedMoves.some((m) => m.name === move.name);
+test.js:                                  disabled: !isSelected && selectedMoves.length >= 4,
+test.js:                                      setSelectedMoves((prev) => prev.filter((m) => m.name !== move.name));
+test.js:                                    } else if (selectedMoves.length < 4) {
+test.js:                                      setSelectedMoves((prev) => [...prev, move]);
+test.js:                                    !isSelected && selectedMoves.length >= 4 && "opacity-50 cursor-not-allowed"
+test.js:                                      /* @__PURE__ */ jsx7("span", { className: "font-hud uppercase tracking-wider", children: move.name.replace("-", " ") }),
+test.js:                                        typeColors[move.type] || "bg-slate-600"
+test.js:                                      ), children: abbreviateType(move.type) })
+test.js:                                        move.power || "-"
+test.js:                                        move.accuracy || "-",
+test.js:                                        move.pp
+test.js:                                move.name
+test.js:                              disabled: selectedMoves.length === 0 || !battleOpponent,
+test.js:                                (selectedMoves.length === 0 || !battleOpponent) && "opacity-50 cursor-not-allowed bg-slate-900 border-slate-700 text-slate-300 font-medium shadow-none hover:bg-slate-900"
+test.js:                                  /* @__PURE__ */ jsx7(MoveRight, { className: "w-3 h-3" }),
+test.js:    /* @__PURE__ */ jsx7(AnimatePresence2, { children: isMoveLearningOpen && /* @__PURE__ */ jsx7(
+test.js:              /* @__PURE__ */ jsx7("div", { className: "p-4 sm:p-6 border-b border-cyan-900/30 bg-cyan-950/20", children: /* @__PURE__ */ jsx7("h2", { className: "text-cyan-400 font-hud text-xl uppercase tracking-widest text-center", children: isReplacingMove ? "Replace Move" : "New Moves Available" }) }),
+test.js:              /* @__PURE__ */ jsx7("div", { className: "p-4 sm:p-6 space-y-4", children: !isReplacingMove ? /* @__PURE__ */ jsxs6(Fragment2, { children: [
+test.js:                  " Select a new move for ",
+test.js:                /* @__PURE__ */ jsx7("div", { className: "grid grid-cols-1 gap-3", children: offeredMoves.map((move) => /* @__PURE__ */ jsxs6(
+test.js:                      if (selectedMoves.length < 4) {
+test.js:                        setSelectedMoves((prev) => [...prev, move]);
+test.js:                        setBattleLog((prev) => [...prev, { text: `${pokemon?.name.toUpperCase()} LEARNED ${move.name.toUpperCase()}!`, type: "system" }]);
+test.js:                        setIsMoveLearningOpen(false);
+test.js:                        setOfferedMoves([]);
+test.js:                        setMoveBeingLearned(move);
+test.js:                        setIsReplacingMove(true);
+test.js:                        /* @__PURE__ */ jsx7("span", { className: "text-cyan-400 font-hud text-xs font-bold tracking-wider uppercase tracking-wider group-hover:text-cyan-300", children: move.name.replace("-", " ") }),
+test.js:                          typeColors[move.type]
+test.js:                        ), children: move.type })
+test.js:                          move.power || "--"
+test.js:                          move.accuracy || "--"
+test.js:                          move.pp
+test.js:                  move.name
+test.js:                      setIsMoveLearningOpen(false);
+test.js:                      setOfferedMoves([]);
+test.js:              ] }) : moveBeingLearned && /* @__PURE__ */ jsxs6(Fragment2, { children: [
+test.js:                    /* @__PURE__ */ jsx7("span", { className: "text-cyan-300 font-hud text-sm font-bold tracking-wider uppercase", children: moveBeingLearned.name.replace("-", " ") }),
+test.js:                    /* @__PURE__ */ jsx7("span", { className: cn("px-2 py-0.5 rounded text-[8px] font-bold tracking-wider text-white uppercase", typeColors[moveBeingLearned.type]), children: moveBeingLearned.type })
+test.js:                /* @__PURE__ */ jsx7("p", { className: "text-red-400 text-[8px] font-bold tracking-wider uppercase tracking-widest text-center mb-2", children: "Select a move to forget:" }),
+test.js:                /* @__PURE__ */ jsx7("div", { className: "grid grid-cols-1 gap-2", children: selectedMoves.map((move, index) => /* @__PURE__ */ jsxs6(
+test.js:                      const newMoves = [...selectedMoves];
+test.js:                      newMoves[index] = moveBeingLearned;
+test.js:                      setSelectedMoves(newMoves);
+test.js:                      setIsMoveLearningOpen(false);
+test.js:                      setMoveBeingLearned(null);
+test.js:                      setIsReplacingMove(false);
+test.js:                      setOfferedMoves([]);
+test.js:                      setBattleLog((prev) => [...prev, { text: `${pokemon?.name.toUpperCase()} FORGOT ${move.name.toUpperCase()} AND LEARNED ${moveBeingLearned.name.toUpperCase()}!`, type: "system" }]);
+test.js:                        /* @__PURE__ */ jsx7("span", { className: "text-red-400 text-[10px] font-bold tracking-wider font-hud uppercase", children: move.name.replace("-", " ") }),
+test.js:                            move.power || "--"
+test.js:                            move.pp
+test.js:                  move.name
+test.js:                      setIsReplacingMove(false);
+test.js:                      setMoveBeingLearned(null);
+test.js:    /* @__PURE__ */ jsx7(AnimatePresence2, { children: isMoveDetailOpen && selectedMoveDetail && /* @__PURE__ */ jsx7(
+test.js:                typeColors[selectedMoveDetail.type]
+test.js:                  /* @__PURE__ */ jsx7("h2", { className: "text-white font-hud text-2xl uppercase tracking-widest drop-shadow-lg", children: selectedMoveDetail.name.replace("-", " ") }),
+test.js:                    /* @__PURE__ */ jsx7("span", { className: "px-2 py-0.5 bg-white/20 rounded text-[10px] font-bold tracking-wider font-black text-white uppercase border border-white/30", children: selectedMoveDetail.type }),
+test.js:                      selectedMoveDetail.currentPP ?? selectedMoveDetail.pp,
+test.js:                      selectedMoveDetail.pp,
+test.js:                      selectedMoveDetail.damage_class === "physical" ? "bg-red-900/40" : selectedMoveDetail.damage_class === "special" ? "bg-blue-900/40" : "bg-slate-700/40"
+test.js:                    ), children: selectedMoveDetail.damage_class })
+test.js:                    onClick: () => setIsMoveDetailOpen(false),
+test.js:                selectedMoveDetail.description && /* @__PURE__ */ jsxs6("div", { className: "space-y-2", children: [
+test.js:                    selectedMoveDetail.description,
+test.js:                      /* @__PURE__ */ jsx7("span", { className: "text-xl font-mono text-cyan-400", children: selectedMoveDetail.power || "--" })
+test.js:                      /* @__PURE__ */ jsx7("span", { className: "text-xl font-mono text-cyan-400", children: selectedMoveDetail.accuracy ? `${selectedMoveDetail.accuracy}%` : "--" })
+test.js:                      /* @__PURE__ */ jsx7("span", { className: "text-xl font-mono text-cyan-400", children: selectedMoveDetail.effect_chance ? `${selectedMoveDetail.effect_chance}%` : "--" })
+test.js:                selectedMoveDetail.stat_changes && selectedMoveDetail.stat_changes.length > 0 && /* @__PURE__ */ jsxs6("div", { className: "space-y-2", children: [
+test.js:                  /* @__PURE__ */ jsx7("div", { className: "grid grid-cols-1 gap-2", children: selectedMoveDetail.stat_changes.map((sc, i) => /* @__PURE__ */ jsxs6("div", { className: "bg-slate-950/50 p-2 rounded border border-cyan-900/20 flex justify-between items-center", children: [
+test.js:                selectedMoveDetail.meta && /* @__PURE__ */ jsxs6("div", { className: "space-y-2", children: [
+test.js:                    selectedMoveDetail.meta.ailment && selectedMoveDetail.meta.ailment.name !== "none" && /* @__PURE__ */ jsxs6("div", { className: "flex justify-between border-b border-slate-800 pb-1", children: [
+test.js:                      /* @__PURE__ */ jsx7("span", { className: "text-red-400 uppercase", children: selectedMoveDetail.meta.ailment.name })
+test.js:                    selectedMoveDetail.priority !== void 0 && /* @__PURE__ */ jsxs6("div", { className: "flex justify-between border-b border-slate-800 pb-1", children: [
+test.js:                      /* @__PURE__ */ jsx7("span", { className: "text-cyan-400", children: selectedMoveDetail.priority })
+test.js:                    selectedMoveDetail.target && /* @__PURE__ */ jsxs6("div", { className: "flex justify-between border-b border-slate-800 pb-1 col-span-2", children: [
+test.js:                      /* @__PURE__ */ jsx7("span", { className: "text-slate-200 uppercase", children: selectedMoveDetail.target.replace("-", " ") })
+test.js:                    onClick: () => setIsMoveDetailOpen(false),
+test.js:                      " Pick a move to attack. Faster Pokemon usually go first!"
+test.js:                      " Click 'AI Strategy' if you want advice on which move is best to use."
+test.js:                    "- You click 'Random Moves' to get 4 attacks.",
+server.ts:  const ignoredWords = new Set(["lore", "stats", "moves", "what", "how", "who", "when", "why", "tell", "show", "best", "weak", "strong", "counter", "usage", "moveset", "pokemon", "the", "and", "for", "with", "against", "about"]);
+server.ts:    `Vorausplanung ist alles: Verwende zuverlässige Heilungs- oder Schutz-Moves (z. B. Schutzschild), um deinen einzigen Gegner strategisch zu zermürben.`
+server.ts:      return `🛑 **CRITICAL STATUS:** ${pU} is down to ${pHp}% HP!\n\n⚔️ **TACTICAL COMMAND:** Unleash an immediate fast priority move or deploy a barrier shield to extract the last possible value before faint-lock! ⚡`;
+server.ts:    if (lang === 'de') return "Zweischneidiges Matchup. Hoher Schadensaustausch möglich. Prioritäts-Moves oder Initiative entscheiden den Sieger.";
+server.ts:    return "Double-edged matchup. High damage trade-off capacity. Priority moves or speed status will dictate the victor.";
+server.ts:function getMoveInsight(player: any, opponent: any, weather: string, lang: 'it' | 'es' | 'fr' | 'de' | 'en'): string {
+server.ts:    if (lang === 'de') return "Unter intensivem Sonnenschein verursachen Feuer-Attacken 1.5x Schaden und Grass-Moves laden sofort auf. Nutze sie jetzt!";
+server.ts:    return "Under Solar intensity, Fire damage gains a 1.5x amplification, and Grass-type Solar moves hit instantly. Deploy these resources immediately.";
+server.ts:    if (lang === 'de') return "Unter starkem Regen verursachen Wasser-STAB-Attacken 1.5x Schaden und die Genauigkeit ist perfekt. Entfessle Wasser- oder Elektro-Moves!";
+server.ts:    if (lang === 'de') return "Deine KP sind gefährlich niedrig. Falls du Prioritäts-Moves hast (z.B. Schutzschild, Tiefschlag), nutze sie oder wechsle aus.";
+server.ts:    return "Ally HP is dangerously low. If defensive priority moves (e.g., Protect, Sucker Punch) are equipped, commit them to trace optimal turn trades. Otherwise pivot.";
+server.ts:  if (lang === 'de') return "Bestimme deine Initiative. Wenn du schneller bist, nutze einen starken STAB-Move. Wenn du langsamer bist, verteidige dich.";
+server.ts:  return "Determine your active speed tier. If you move first, attempt a powerful STAB option. If slower, anticipate their blow with defensive covers.";
+server.ts:    if (lang === 'de') return "Gegner ist in kritischem Bereich. Es ist sehr wahrscheinlich, dass er Prioritäts-Moves nutzt oder auswechselt.";
+server.ts:    let keySTABMove = "";
+server.ts:        keySTABMove = "Voliocambio, Palla Ombra o Eterelama";
+server.ts:        keySTABMove = "Retromarcia, Terremoto o Baldeali";
+server.ts:        keySTABMove = "Tossina, Sgombro o Fuocofato";
+server.ts:        keySTABMove = "Incrocolpo, Vampata o Idropompa";
+server.ts:        keySTABMove = "Rayo, Bola Sombra o Vendaval";
+server.ts:        keySTABMove = "Envite Ígneo, Terremoto o Ida y Vuelta";
+server.ts:        keySTABMove = "Fuego Fato, Respiro o Trampa Rocas";
+server.ts:        keySTABMove = "Cascada, Lanzallamas o Fuerza Bruta";
+server.ts:        keySTABMove = "Tonnerre, Ball'Ombre ou Change Éclair";
+server.ts:        keySTABMove = "Demi-Tour, Séisme ou Rapace";
+server.ts:        keySTABMove = "Toxik, Feu Follet ou Piège de Roc";
+server.ts:        keySTABMove = "Claquement, Surchauffe ou Hydrocanon";
+server.ts:        keySTABMove = "Donnerblitz, Spukball oder Voltwechsel";
+server.ts:        keySTABMove = "Kehrtwende, Erdbeben oder Sturzflug";
+server.ts:        keySTABMove = "Toxin, Irrlicht oder Tarnsteine";
+server.ts:        keySTABMove = "Kaskade, Hitzekoller oder Hydropumpe";
+server.ts:        keySTABMove = "Volt Switch, Shadow Ball or Hurricane";
+server.ts:        keySTABMove = "U-turn, Earthquake or Brave Bird";
+server.ts:        strategicProTip = "Exert massive physical pressure on defensive pivots with high priority moves.";
+server.ts:        keySTABMove = "Will-O-Wisp, Recover or Stealth Rock";
+server.ts:        keySTABMove = "Close Combat, Overheat or Hydro Pump";
+server.ts:    // Checking if asking for specific subtopic: moveset / build / nature
+server.ts:    const wantsBuild = userText.includes("mossa") || userText.includes("mosse") || userText.includes("moveset") || userText.includes("moves") || userText.includes("natura") || userText.includes("nature") || userText.includes("build") || userText.includes("evs") || userText.includes("item") || userText.includes("oggetto");
+server.ts:* **💥 Mossa Chiave STAB:** \`${keySTABMove}\`
+server.ts:* **💥 Ataque STAB ideal:** \`${keySTABMove}\`
+server.ts:* **💥 Attaque STAB :** \`${keySTABMove}\`
+server.ts:* **💥 STAB-Angriff:** \`${keySTABMove}\`
+server.ts:* **💥 Primary STAB Move Slot:** \`${keySTABMove}\`
+server.ts:* Sfrutta al massimo la mossa STAB **${keySTABMove}** per spazzare gli oppositori.
+server.ts:* Chiedimi *"debolezze"* o *"moveset per ${pName}"* per calcolare parametri difensivi completi!
+server.ts:* Améliorez d'autres analyses en interrogeant la *"faiblesse"* ou le *"moveset de ${pName}"*.
+server.ts:* Maximale Kraftleistung wird durch \`${keySTABMove}\` und \`${recommendedItem}\` erreicht.
+server.ts:* Ask me about *"weaknesses"* or *"moveset for ${pName}"* to unlock deeper layers of offline tactics!
+server.ts:    return "### ⚡ NEURAL DIAGNOSTICS\nMy systems are performing optimally at 100% computational capacity! Ready to calculate exact move coverages, battle strategies, and element matchups. How are you doing today, Trainer?";
+server.ts:* **Moveset Calibration:** Ask *"moveset for Mewtwo"* to calibrate ideal natures, EV sets, and items.
+server.ts:* **Same-Type Attack Bonus (STAB):** Matching your move's type with your active Pokémon's type grants a strong **1.5x native bonus**.
+server.ts:* Puoi chiedermi consigli sui moveset scrivendo *"mosse di Pikachu"* o *"build Charizard"*.
+server.ts:* Ask about *"moveset for Pikachu"* or *"build Charizard"* to receive nature, EV, and move advice.
+server.ts:2. **Azione Consigliata:** ${getMoveInsight(player, opponent, weather, lang)}
+server.ts:2. **Acción Recomendada:** ${getMoveInsight(player, opponent, weather, lang)}
+server.ts:2. **Directive de Combat :** ${getMoveInsight(player, opponent, weather, lang)}
+server.ts:2. **Empfohlener Zug:** ${getMoveInsight(player, opponent, weather, lang)}
+server.ts:2. **Tactical Action:** ${getMoveInsight(player, opponent, weather, 'en')}
+server.ts:          ? "You are currently providing active combat tactical suggestions. While staying smart, keep the combat advice relatively direct, addressing type match-ups and move predictions."
+server.ts:        systemInstruction: `You are a Battle Frontier Strategist. System Key: ${process.env.POKETHOLOGY || "Pokédex"}. Provide concise, high-impact tactical advice. Focus on 1v1 singles battle formats, type advantages, HP management, and predicted opponent moves where switching is not possible.
+server.ts:      - Player: ${battleData.player?.name || "your Pokemon"} (HP: ${battleData.player?.hpPercent || 100}%, Status: ${battleData.player?.status || "Healthy"}) with moves: ${JSON.stringify(battleData.player?.moves || [])}
+server.ts:        • ⚔️ **COMMAND**: Clear, immediate action/move command.
+check_tags.js:    // Check self-closing first to remove them from further consideration on this line
+matches.txt:1081:          moves: selectedMoves.map(m => ({ name: m.name, type: m.type, power: m.power }))
+matches.txt:1251:      log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
+matches.txt:1259:      log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
+matches.txt:1269:      log(`${attacker.name.toUpperCase()} is paralyzed! It can't move!`, 'status-effect');
+matches.txt:1347:      log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+matches.txt:1358:    if (move.name.toLowerCase() === 'transform') {
+matches.txt:1359:      log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+matches.txt:1402:    const speakQuote = getOpponentMoveQuote(attacker.name, move.name, selectedLang);
+matches.txt:1413:    log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+matches.txt:1414:    setBattleMessage({ text: move.name.toUpperCase(), type: 'move' });
+matches.txt:1426:    const isProtectMove = move.name === 'protect' || move.name === 'detect' || move.name === 'spiky-shield' || move.name === 'kings-shield';
+matches.txt:1449:    if (move.name === 'substitute') {
+matches.txt:1548:          setBattleMessage({ text: `${move.name.toUpperCase()} (Hit ${i + 1})`, type: 'move' });
+matches.txt:1717:      const ailment = move.meta.ailment.name;
+matches.txt:1719:        log(`${defender.name.toUpperCase()} is paralyzed! It may be unable to move!`, 'status-effect');
+matches.txt:1836:           analysis += `* **Recommendation**: Use **${bestMove.name.toUpperCase()}** - It's super effective!\n`;
+matches.txt:1840:           analysis += `* **Recommendation**: **${bestMove.name.toUpperCase()}** is your best damage option.\n`;
+matches.txt:1976:              !currentSelectedMoves.some(sm => sm.name === m.name)
+matches.txt:2008:              !currentSelectedMoves.some(sm => sm.name === m.name)
+matches.txt:2037:      setSelectedMoves(prev => prev.map(m => m.name === move.name ? { ...m, currentPP: Math.max(0, (m.currentPP ?? m.pp) - 1) } : m));
+matches.txt:2089:            if (move.name.toLowerCase() === 'transform') {
+matches.txt:2108:              if (battleOpponent.types.some(t => t.type.name === move.type)) {
+matches.txt:2117:            if (move.meta?.ailment && move.meta.ailment.name !== 'none') {
+matches.txt:2156:            setOpponentMoves(prev => prev.map(m => m.name === move.name ? { ...m, currentPP: Math.max(0, (m.currentPP ?? m.pp) - 1) } : m));
+matches.txt:2508:            : `SYSTEM ONLINE. Analyzing **${pokeData.name.toUpperCase()}**. I am **Pokéthology**, your tactical analysis AI. I can:\n\n- Analyze stats, moves, and weaknesses\n- Suggest 6v6 team battle strategies\n- Search for other Pokémon if you simply type their name in chat\n\nHow can I assist you right now?`
+matches.txt:3497:                                                      key={move.name} 
+matches.txt:3506:                                                        <span className="text-cyan-300 text-[10px] font-bold tracking-wider font-hud uppercase tracking-wider">{move.name.replace('-', ' ')}</span>
+matches.txt:3654:                                          ? [`Lore: ${pokemon.name}`, `Counter for ${pokemon.name}?`, `Battle usage?`, `Moveset?`]
+matches.txt:4146:                                                      if (pMoves.length === 0 && pokemon.name.includes('-')) {
+matches.txt:4171:                                                      if (oMoves.length === 0 && battleOpponent.name.includes('-')) {
+matches.txt:4250:                                                key={move.name}
+matches.txt:4265:                                                    {move.name.replace('-', ' ')}
+matches.txt:4453:                                                     const customRemainingPool = (pokemon.moves || []).filter(m => !customChosenNames.has(m.name));
+matches.txt:4475:                                                const isSelected = selectedMoves.some(m => m.name === move.name);
+matches.txt:4478:                                                    key={move.name}
+matches.txt:4482:                                                        setSelectedMoves(prev => prev.filter(m => m.name !== move.name));
+matches.txt:4497:                                                      <span className="font-hud uppercase tracking-wider">{move.name.replace('-', ' ')}</span>
+matches.txt:5227:                        {battleResult === 'victory' ? "Victory achieved!" : "Even in defeat, progress is made!"} Select a new move for {pokemon?.name.toUpperCase()}:
+matches.txt:5232:                            key={move.name}
+matches.txt:5236:                                setBattleLog(prev => [...prev, { text: `${pokemon?.name.toUpperCase()} LEARNED ${move.name.toUpperCase()}!`, type: 'system' }]);
+matches.txt:5250:                                {move.name.replace('-', ' ')}
+matches.txt:5283:                          <span className="text-cyan-300 font-hud text-sm font-bold tracking-wider uppercase">{moveBeingLearned.name.replace('-', ' ')}</span>
+matches.txt:5293:                            key={move.name}
+matches.txt:5303:                              setBattleLog(prev => [...prev, { text: `${pokemon?.name.toUpperCase()} FORGOT ${move.name.toUpperCase()} AND LEARNED ${moveBeingLearned.name.toUpperCase()}!`, type: 'system' }]);
+matches.txt:5308:                              <span className="text-red-400 text-[10px] font-bold tracking-wider font-hud uppercase">{move.name.replace('-', ' ')}</span>
+matches.txt:5358:                      {selectedMoveDetail.name.replace('-', ' ')}
+matches.txt:5439:                        {selectedMoveDetail.meta.ailment && selectedMoveDetail.meta.ailment.name !== 'none' && (
+matches.txt:5442:                            <span className="text-red-400 uppercase">{selectedMoveDetail.meta.ailment.name}</span>

@@ -1,0 +1,239 @@
+223:  }, [pokemon.name, isShiny, isFemale]);
+226:    const cleanName = getShowdownName(pokemon.name, isFemale);
+305:  const isMegaOrGmax = pokemon.name.includes('-mega') || pokemon.name.includes('-gmax');
+320:  }, [pokemon.height, pokemon.name, isMegaOrGmax]);
+342:          className={cn("absolute inset-0 rounded-full blur-xl mix-blend-screen pointer-events-none -inset-4", pokemon.name.includes('-mega') ? "bg-cyan-500" : "bg-red-500")}
+350:        alt={pokemon.name}
+671:  const isMega = p.name.includes('-mega');
+672:  const isGmax = p.name.includes('-gmax');
+681:    onClick(p.name);
+686:      key={p.name}
+742:          pokemonName={p.name}
+758:        {p.name.replace(/-/g, ' ')}
+769:          key={p.name}
+771:          isSelected={p.name === selectedName}
+772:          isOpponentSelected={p.name === opponentName}
+921:        allPokemonRef.current = data.results.map((r: any) => r.name);
+1036:  const battleBackgroundUrl = useMemo(() => getBattleBackground(battleOpponent?.types?.[0]?.type?.name), [battleOpponent?.types?.[0]?.type?.name]);
+1069:      const battleKey = `${pokemon.name}-${battleOpponent.name}-${pokemonHP}-${opponentHP}-${pokemonStatus}-${opponentStatus}`;
+1078:          name: pokemon.name, 
+1081:          moves: selectedMoves.map(m => ({ name: m.name, type: m.type, power: m.power }))
+1084:          name: battleOpponent.name, 
+1087:          types: battleOpponent.types.map(t => t.type.name)
+1134:    const base = p.stats.find(s => s.stat.name === statName)?.base_stat || 50;
+1135:    const boost = p.name === pokemon?.name ? (customStats[statName] || 0) : 0;
+1251:      log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
+1259:      log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
+1269:      log(`${attacker.name.toUpperCase()} is paralyzed! It can't move!`, 'status-effect');
+1279:        log(`${attacker.name.toUpperCase()} thawed out!`, 'status-effect');
+1286:        log(`${attacker.name.toUpperCase()} is frozen solid!`, 'status-effect');
+1296:      log(`${attacker.name.toUpperCase()} is fast asleep...`, 'status-effect');
+1307:        log(`${attacker.name.toUpperCase()} snapped out of its confusion!`, 'status-effect');
+1314:        log(`${attacker.name.toUpperCase()} is confused!`, 'status-effect');
+1347:      log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+1358:    if (move.name.toLowerCase() === 'transform') {
+1359:      log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+1364:      log(`${attacker.name.toUpperCase()} transformed into ${defender.name.toUpperCase()}!`, 'system');
+1370:        name: defender.name,
+1373:          if (s.stat.name === 'hp') return s;
+1374:          const targetStat = defender.stats.find(ts => ts.stat.name === s.stat.name);
+1402:    const speakQuote = getOpponentMoveQuote(attacker.name, move.name, selectedLang);
+1413:    log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+1414:    setBattleMessage({ text: move.name.toUpperCase(), type: 'move' });
+1426:    const isProtectMove = move.name === 'protect' || move.name === 'detect' || move.name === 'spiky-shield' || move.name === 'kings-shield';
+1430:      log(`${attacker.name.toUpperCase()} protected itself!`, 'stat-boost');
+1440:       log(`${defender.name.toUpperCase()} protected itself!`, 'normal');
+1449:    if (move.name === 'substitute') {
+1465:        log(`${attacker.name.toUpperCase()} sacrificed HP to make a substitute!`, 'system');
+1476:      log(`${attacker.name.toUpperCase()}'s attack missed!`, 'normal');
+1490:      const targetTypes = defender.types.map(t => t.type.name);
+1491:      const attackerTypes = attacker.types.map(t => t.type.name);
+1548:          setBattleMessage({ text: `${move.name.toUpperCase()} (Hit ${i + 1})`, type: 'move' });
+1605:          log(`The substitute took the damage for ${defender.name.toUpperCase()}!`, 'normal');
+1649:        log(`${attacker.name.toUpperCase()} recovered HP!`, 'system');
+1653:        log(`${attacker.name.toUpperCase()} recovered HP!`, 'system');
+1666:        log(`${attacker.name.toUpperCase()} drained health!`, 'system');
+1673:        log(`${attacker.name.toUpperCase()} was hit by recoil!`, 'normal');
+1693:        const statName = change.stat.name;
+1696:          const targetName = targetsUser ? (isPlayer ? pokemon.name : battleOpponent.name) : (isPlayer ? battleOpponent.name : pokemon.name);
+1710:          const targetName = targetsUser ? (isPlayer ? pokemon.name : battleOpponent.name) : (isPlayer ? battleOpponent.name : pokemon.name);
+1717:      const ailment = move.meta.ailment.name;
+1719:        log(`${defender.name.toUpperCase()} is paralyzed! It may be unable to move!`, 'status-effect');
+1725:        log(`${defender.name.toUpperCase()} was burned!`, 'status-effect');
+1731:        log(`${defender.name.toUpperCase()} was poisoned!`, 'status-effect');
+1737:        log(`${defender.name.toUpperCase()} was frozen solid!`, 'status-effect');
+1743:        log(`${defender.name.toUpperCase()} fell asleep!`, 'status-effect');
+1749:        log(`${defender.name.toUpperCase()} became confused!`, 'status-effect');
+1807:      let analysis = `**Matchup Analysis**: **${pokemon.name.toUpperCase()}** vs **${battleOpponent.name.toUpperCase()}**\n\n`;
+1809:      const weaknesses = battleOpponent.types.map(t => t.type.name);
+1836:           analysis += `* **Recommendation**: Use **${bestMove.name.toUpperCase()}** - It's super effective!\n`;
+1840:           analysis += `* **Recommendation**: **${bestMove.name.toUpperCase()}** is your best damage option.\n`;
+1892:      setTimeout(() => sounds.playCry(pokemon.name, pokemon.cries?.latest, pokemon.name.includes('-gmax')), 400);
+1895:      setTimeout(() => sounds.playCry(battleOpponent.name, battleOpponent.cries?.latest, battleOpponent.name.includes('-gmax')), 1200);
+1899:    const pMaxHP = Math.floor(((pokemon.stats.find(s => s.stat.name === 'hp')?.base_stat || 50) + (customStats['hp'] || 0)) * 2 + 110);
+1900:    const oMaxHP = Math.floor((battleOpponent.stats.find(s => s.stat.name === 'hp')?.base_stat || 50) * 2 + 110);
+1941:      log(`${isPlayer ? pokemon?.name.toUpperCase() : battleOpponent?.name.toUpperCase()} is hurt by its burn!`, 'status-effect');
+1947:      log(`${isPlayer ? pokemon?.name.toUpperCase() : battleOpponent?.name.toUpperCase()} is hurt by poison!`, 'status-effect');
+1959:        setBattleLog(prev => [...prev, { text: `${battleOpponent?.name.toUpperCase()} IS THE VICTOR!`, type: 'faint' }]);
+1976:              !currentSelectedMoves.some(sm => sm.name === m.name)
+1991:        setBattleLog(prev => [...prev, { text: `${pokemon?.name.toUpperCase()} IS THE VICTOR!`, type: 'system' }]);
+2008:              !currentSelectedMoves.some(sm => sm.name === m.name)
+2037:      setSelectedMoves(prev => prev.map(m => m.name === move.name ? { ...m, currentPP: Math.max(0, (m.currentPP ?? m.pp) - 1) } : m));
+2076:          const defenderTypes = pokemon.types.map(t => t.type.name);
+2081:          const oppAtk = battleOpponent.stats.find(s => s.stat.name === 'attack')?.base_stat || 50;
+2082:          const oppSpA = battleOpponent.stats.find(s => s.stat.name === 'special-attack')?.base_stat || 50;
+2083:          const defDef = pokemon.stats.find(s => s.stat.name === 'defense')?.base_stat || 50;
+2084:          const defSpD = pokemon.stats.find(s => s.stat.name === 'special-defense')?.base_stat || 50;
+2089:            if (move.name.toLowerCase() === 'transform') {
+2108:              if (battleOpponent.types.some(t => t.type.name === move.type)) {
+2117:            if (move.meta?.ailment && move.meta.ailment.name !== 'none') {
+2156:            setOpponentMoves(prev => prev.map(m => m.name === move.name ? { ...m, currentPP: Math.max(0, (m.currentPP ?? m.pp) - 1) } : m));
+2248:          name: pokemon?.name,
+2252:          types: pokemon?.types.map(t => t.type.name),
+2255:          name: battleOpponent?.name,
+2259:          types: battleOpponent?.types.map(t => t.type.name),
+2333:          name: pokemon.name,
+2334:          types: pokemon.types.map(t => t.type.name),
+2340:          opponent: battleOpponent?.name,
+2501:            ? `SISTEMA ONLINE. Analisi di **${pokeData.name.toUpperCase()}** in corso. Sono **Pokéthology**, la tua intelligenza artificiale tattica. Posso:\n\n- Analizzare debolezze e mosse\n- Suggerire strategie per battaglie complete in team 6v6\n- Cercare altri Pokémon se mi scrivi semplicemente il loro nome\n\nCome posso assisterti oggi?`
+2503:            ? `SISTEMA LOCAL ACTIVO. Analizando a **${pokeData.name.toUpperCase()}**. Soy **Pokéthology**, tu IA de estrategia. Puedo:\n\n- Analizar movimientos y debilidades\n- Sugerir estrategias para combates en equipo 6v6\n- Buscar otros Pokémon si simplemente escribes su nombre\n\n¿En qué te puedo ayudar hoy?`
+2505:            ? `SYSTÈME EN LIGNE. Analyse de **${pokeData.name.toUpperCase()}** en cours. Je suis **Pokéthology**, votre IA d'assistance tactique. Je peux:\n\n- Analyser les faiblesses et les attaques\n- Suggérer des stratégies pour équipes 6v6\n- Chercher n'importe quel autre Pokémon si vous me dites son nom\n\nComment puis-je vous aider ?`
+2507:            ? `SYSTEM ONLINE. Berechne Daten für **${pokeData.name.toUpperCase()}**. Ich bin **Pokéthology**, deine taktische KI. Ich kann:\n\n- Schwächen und Attacken analysieren\n- 6v6-Teamkampfstrategien vorschlagen\n- Nach anderen Pokémon suchen, indem du einfach ihren Namen eingibst\n\nWie kann ich heute helfen?`
+2508:            : `SYSTEM ONLINE. Analyzing **${pokeData.name.toUpperCase()}**. I am **Pokéthology**, your tactical analysis AI. I can:\n\n- Analyze stats, moves, and weaknesses\n- Suggest 6v6 team battle strategies\n- Search for other Pokémon if you simply type their name in chat\n\nHow can I assist you right now?`
+2529:      if (aiCache.current[pokeData.name]) {
+2530:        setAiSuggestion(aiCache.current[pokeData.name]);
+2541:              pokemonName: pokeData.name,
+2552:                 aiCache.current[pokeData.name] = data.suggestion;
+2560:              aiCache.current[pokeData.name] = data.suggestion;
+2574:        setTimeout(() => sounds.playCry(pokeData.name, pokeData.cries?.latest, pokeData.name.includes('-gmax')), 400);
+2609:            v.pokemon.name.includes('-female') || 
+2610:            v.pokemon.name.includes('-f') ||
+2611:            (p.name === 'nidoran-m' && v.pokemon.name === 'nidoran-f') ||
+2612:            (p.name === 'nidoran-f' && v.pokemon.name === 'nidoran-m')
+2615:          if (femaleVariety && femaleVariety.pokemon.name !== p.name) {
+2617:              femaleP = await searchPokemon(femaleVariety.pokemon.name);
+2627:          const baseName = p.name.split('-')[0].toLowerCase();
+2628:          if (genderDifferents.includes(baseName) && !p.name.includes('-f') && !p.name.includes('-female')) {
+2648:        p.name.toLowerCase().includes(search) || 
+2662:          return a.name.localeCompare(b.name);
+2666:        return sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+2830:                  <img src={(isShiny ? pokemon.sprites?.other?.home?.front_shiny : pokemon.sprites?.other?.home?.front_default) || pokemon.sprites?.other?.home?.front_default || pokemon.sprites?.front_default} alt={pokemon.name} className="w-full h-full object-contain scale-[1.3] sm:scale-150 scale-x-[-1]" />
+2838:                  <span className="font-hud uppercase text-cyan-200 tracking-[0.2em] text-xs sm:text-2xl font-black">{pokemon.name}</span>
+2866:                  <img src={(isOpponentShiny ? battleOpponent.sprites?.other?.home?.front_shiny : battleOpponent.sprites?.other?.home?.front_default) || battleOpponent.sprites?.other?.home?.front_default || battleOpponent.sprites?.front_default} alt={battleOpponent.name} className="w-full h-full object-contain scale-[1.3] sm:scale-150" />
+2874:                  <span className="font-hud uppercase text-red-100 tracking-[0.2em] text-xs sm:text-2xl font-black">{battleOpponent.name}</span>
+3113:                                    onClick={() => sounds.playCry(pokemon.name, pokemon.cries?.latest, pokemon.name.includes('-gmax'))}
+3138:                                  {['pyroar', 'unfezant', 'frillish', 'jellicent', 'hippowdon', 'hippopotas', 'meowstic', 'indeedee', 'oinkologne', 'basculegion'].includes(pokemon.name.split('-')[0].toLowerCase()) && (
+3160:                                  {pokemon.name}
+3166:                                      onClick={() => sounds.playCry(pokemon.name, pokemon.cries?.latest, pokemon.name.includes('-gmax'))}
+3182:                                    key={t.type.name}
+3185:                                      typeColors[t.type.name] || "bg-slate-600",
+3186:                                      t.type.name === 'fire' && "shadow-red-500/50",
+3187:                                      t.type.name === 'water' && "shadow-blue-500/50",
+3188:                                      t.type.name === 'grass' && "shadow-emerald-500/50",
+3189:                                      t.type.name === 'electric' && "shadow-yellow-400/50",
+3190:                                      t.type.name === 'ice' && "shadow-cyan-300/50",
+3191:                                      t.type.name === 'fighting' && "shadow-orange-700/50",
+3192:                                      t.type.name === 'poison' && "shadow-purple-500/50",
+3193:                                      t.type.name === 'ground' && "shadow-amber-600/50",
+3194:                                      t.type.name === 'flying' && "shadow-sky-400/50",
+3195:                                      t.type.name === 'psychic' && "shadow-pink-500/50",
+3196:                                      t.type.name === 'bug' && "shadow-lime-500/50",
+3197:                                      t.type.name === 'rock' && "shadow-yellow-800/50",
+3198:                                      t.type.name === 'ghost' && "shadow-indigo-600/50",
+3199:                                      t.type.name === 'dragon' && "shadow-violet-700/50",
+3200:                                      t.type.name === 'dark' && "shadow-slate-800/50",
+3201:                                      t.type.name === 'steel' && "shadow-slate-500/50",
+3202:                                      t.type.name === 'fairy' && "shadow-rose-400/50"
+3205:                                    {t.type.name}
+3211:                              {( (pokemon.varieties && pokemon.varieties.length > 1) || ['pyroar', 'unfezant', 'frillish', 'jellicent', 'hippowdon', 'hippopotas', 'basculegion', 'oinkologne'].some(d => pokemon.name.includes(d)) ) && (
+3214:                                    let varietiesList = pokemon.varieties || [{ pokemon: { name: pokemon.name, url: `https://pokeapi.co/api/v2/pokemon/${pokemon.id || ''}` } }];
+3215:                                    let megas = varietiesList.filter(v => v.pokemon.name.includes('-mega'));
+3217:                                    const gmax = varietiesList.filter(v => v.pokemon.name.includes('-gmax'));
+3219:                                      !v.pokemon.name.includes('-mega') && 
+3220:                                      !v.pokemon.name.includes('-gmax') && 
+3221:                                      !v.pokemon.name.endsWith('-f') && 
+3222:                                      !v.pokemon.name.endsWith('-female') && 
+3223:                                      !v.pokemon.name.endsWith('-m') && 
+3224:                                      !v.pokemon.name.endsWith('-male')
+3230:                                      const isCurrent = v.pokemon.name === pokemon.name;
+3232:                                      let displayName = v.pokemon.name;
+3233:                                      const baseName = pokemon.name.split('-')[0];
+3242:                                          key={v.pokemon.name}
+3244:                                            performSearch(v.pokemon.name);
+3253:                                          title={v.pokemon.name}
+3347:                                            const question = selectedLang === 'it' ? `Scrivi informazioni dettagliate, biologia, e la profonda lore dietro ${pokemon.name}.` :
+3348:                                                             selectedLang === 'es' ? `Escribe información detallada sobre la biología y el lore de ${pokemon.name}.` :
+3349:                                                             selectedLang === 'fr' ? `Donne-moi des informations détaillées sur la biologie et le lore de ${pokemon.name}.` :
+3350:                                                             selectedLang === 'de' ? `Erzähle mir detaillierte Informationen, Biologie und Lore über ${pokemon.name}.` :
+3351:                                                             `Tell me detailed lore, biology, and mythology behind ${pokemon.name}.`;
+3389:                                            <div key={a.name} className="bg-cyan-950/20 p-3 rounded-lg border border-cyan-900/30 hover:bg-cyan-900/20 transition-colors">
+3391:                                                <span className="text-cyan-400 text-[11px] font-hud uppercase tracking-[0.2em] font-black">{a.name.replace('-', ' ')}</span>
+3431:                                          <div key={s.stat.name} className="flex items-center gap-2 sm:gap-3 group/stat relative">
+3434:                                              <span>{s.stat.name.replace('special-', 'sp. ')}</span>
+3436:                                                {statExplanations[s.stat.name] || "No data available."}
+3470:                                                  currentPokemonName={pokemon.name}
+3497:                                                      key={move.name} 
+3506:                                                        <span className="text-cyan-300 text-[10px] font-bold tracking-wider font-hud uppercase tracking-wider">{move.name.replace('-', ' ')}</span>
+3654:                                          ? [`Lore: ${pokemon.name}`, `Counter for ${pokemon.name}?`, `Battle usage?`, `Moveset?`]
+3787:                                                <span className="text-[8px] font-bold tracking-wider sm:text-[12px] font-hud text-red-400 uppercase tracking-widest truncate max-w-[70px] sm:max-w-[120px]">{battleOpponent.name}</span>
+3927:                                                    (battleOpponent.name.includes('-mega') || battleOpponent.name.includes('-gmax')) ? "scale-[0.8] hover:scale-[0.85]" : ""
+3929:                                                  onClick={() => sounds.playCry(battleOpponent.name, battleOpponent.cries?.latest, battleOpponent.name.includes('-gmax'))}
+3948:                                              <span className="text-[8px] font-bold tracking-wider sm:text-[12px] font-hud text-cyan-400 uppercase tracking-widest truncate max-w-[70px] sm:max-w-[120px]">{pokemon.name}</span>
+4068:                                                    (pokemon.name.includes('-mega') || pokemon.name.includes('-gmax')) ? "scale-[0.8] hover:scale-[0.85]" : ""
+4070:                                                  onClick={() => sounds.playCry(pokemon.name, pokemon.cries?.latest, pokemon.name.includes('-gmax'))}
+4125:                                                  <span className="text-[9px] text-cyan-400 font-bold uppercase truncate w-16 tracking-tighter">{pokemon?.name}</span>
+4132:                                                  <span className="text-[9px] text-red-400 font-bold uppercase truncate w-16 tracking-tighter">{battleOpponent?.name}</span>
+4146:                                                      if (pMoves.length === 0 && pokemon.name.includes('-')) {
+4148:                                                          const baseP = await searchPokemon(pokemon.name.split('-')[0]);
+4157:                                                      const playerSTABTypes = (pokemon?.types || []).map((t: any) => t.type.name);
+4162:                                                      const chosenNames = new Set(chosenStab.map(m => m.name));
+4163:                                                      const remainingPool = poolForStab.filter(m => !chosenNames.has(m.name));
+4171:                                                      if (oMoves.length === 0 && battleOpponent.name.includes('-')) {
+4173:                                                          const baseO = await searchPokemon(battleOpponent.name.split('-')[0]);
+4178:                                                      const opponentSTABTypes = (battleOpponent?.types || []).map((t: any) => t.type.name);
+4183:                                                      const oChosenNames = new Set(oChosenStab.map(m => m.name));
+4184:                                                      const oRemainingPool = oPoolForStab.filter(m => !oChosenNames.has(m.name));
+4202:                                                      <div key={m.name} className="bg-slate-950/60 border border-amber-500/20 p-1.5 rounded-lg text-[8px] text-amber-200 uppercase font-black text-center whitespace-normal break-words leading-tight">
+4203:                                                        {m.name.replace('-', ' ')}
+4211:                                                        const pMax = pokemon.stats.find((s: any) => s.stat.name === 'hp')?.base_stat || 100;
+4212:                                                        const oMax = battleOpponent.stats.find((s: any) => s.stat.name === 'hp')?.base_stat || 100;
+4213:                                                        const pSpeed = pokemon.stats.find((s: any) => s.stat.name === 'speed')?.base_stat || 50;
+4214:                                                        const oSpeed = battleOpponent.stats.find((s: any) => s.stat.name === 'speed')?.base_stat || 50;
+4250:                                                key={move.name}
+4265:                                                    {move.name.replace('-', ' ')}
+4310:                                                    finalPlayer = await searchPokemon(pool[varietyIndex].pokemon.name);
+4324:                                                      v.pokemon.name.includes('-mega') || v.pokemon.name.includes('-gmax') || v.pokemon.name.includes('-alola') || v.pokemon.name.includes('-galar') || v.pokemon.name.includes('-hisui') || v.pokemon.name.includes('-primal')
+4328:                                                    finalOpponent = await searchPokemon(pool[varietyIndex].pokemon.name);
+4381:                                                    finalOpponent = await searchPokemon(pool[varietyIndex].pokemon.name);
+4448:                                                     const customSTABTypes = (pokemon?.types || []).map((t: any) => t.type.name);
+4452:                                                     const customChosenNames = new Set(customChosenStab.map(m => m.name));
+4453:                                                     const customRemainingPool = (pokemon.moves || []).filter(m => !customChosenNames.has(m.name));
+4475:                                                const isSelected = selectedMoves.some(m => m.name === move.name);
+4478:                                                    key={move.name}
+4482:                                                        setSelectedMoves(prev => prev.filter(m => m.name !== move.name));
+4497:                                                      <span className="font-hud uppercase tracking-wider">{move.name.replace('-', ' ')}</span>
+4888:                                            {gen.name}
+4984:                                         <PokemonCardSprite pokemonName={dailyPokemon.name} id={String(dailyPokemon.baseId || dailyId)} className="scale-150" />
+4991:                                         <h3 className="text-sm sm:text-lg font-hud font-black text-white uppercase tracking-wider">{dailyPokemon.name.replace('-', ' ')} {dailyFemalePokemon && "(Male)"}</h3>
+4998:                                           <span key={t.type.name} className={cn("inline-block px-1.5 py-0.5 rounded text-[7px] font-bold uppercase", typeColors[t.type.name])}>
+4999:                                             {t.type.name}
+5005:                                            onClick={() => handlePokemonClick(dailyPokemon.name)}
+5026:                                            <PokemonCardSprite pokemonName={dailyFemalePokemon.name} id={String(dailyFemalePokemon.baseId || dailyId)} className="scale-150" />
+5033:                                            <h3 className="text-sm sm:text-lg font-hud font-black text-white uppercase tracking-wider">{dailyPokemon.name.replace('-', ' ')} (Female)</h3>
+5040:                                              <span key={t.type.name} className={cn("inline-block px-1.5 py-0.5 rounded text-[7px] font-bold uppercase cursor-pointer", typeColors[t.type.name])}>
+5041:                                                {t.type.name}
+5047:                                               onClick={() => handlePokemonClick(dailyFemalePokemon.name)}
+5063:                              selectedName={pokemon?.name}
+5064:                              opponentName={battleOpponent?.name}
+5227:                        {battleResult === 'victory' ? "Victory achieved!" : "Even in defeat, progress is made!"} Select a new move for {pokemon?.name.toUpperCase()}:
+5232:                            key={move.name}
+5236:                                setBattleLog(prev => [...prev, { text: `${pokemon?.name.toUpperCase()} LEARNED ${move.name.toUpperCase()}!`, type: 'system' }]);
+5250:                                {move.name.replace('-', ' ')}
+5283:                          <span className="text-cyan-300 font-hud text-sm font-bold tracking-wider uppercase">{moveBeingLearned.name.replace('-', ' ')}</span>
+5293:                            key={move.name}
+5303:                              setBattleLog(prev => [...prev, { text: `${pokemon?.name.toUpperCase()} FORGOT ${move.name.toUpperCase()} AND LEARNED ${moveBeingLearned.name.toUpperCase()}!`, type: 'system' }]);
+5308:                              <span className="text-red-400 text-[10px] font-bold tracking-wider font-hud uppercase">{move.name.replace('-', ' ')}</span>
+5358:                      {selectedMoveDetail.name.replace('-', ' ')}
+5421:                            <span className="text-cyan-400 text-[10px] font-bold tracking-wider font-hud uppercase">{sc.stat.name.replace('-', ' ')}</span>
+5439:                        {selectedMoveDetail.meta.ailment && selectedMoveDetail.meta.ailment.name !== 'none' && (
+5442:                            <span className="text-red-400 uppercase">{selectedMoveDetail.meta.ailment.name}</span>

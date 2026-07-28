@@ -1,0 +1,6 @@
+{
+  "name": "Pokéthology AI",
+  "description": "Where dreams and adventures begin!",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

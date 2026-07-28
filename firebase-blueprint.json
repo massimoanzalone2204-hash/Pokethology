@@ -1,0 +1,37 @@
+{
+  "entities": {
+    "UserSearch": {
+      "title": "User Search",
+      "description": "Records of Pokémon searches performed by users.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The UID of the user who performed the search." },
+        "pokemonName": { "type": "string", "description": "The name of the Pokémon searched." },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When the search occurred." }
+      },
+      "required": ["userId", "pokemonName", "timestamp"]
+    },
+    "ChatHistory": {
+      "title": "Chat History",
+      "description": "Persistent AI chat messages.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The UID of the user." },
+        "role": { "type": "string", "enum": ["user", "model"], "description": "The role of the message author." },
+        "text": { "type": "string", "description": "The message content." },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When the message was sent." }
+      },
+      "required": ["userId", "role", "text", "timestamp"]
+    }
+  },
+  "firestore": {
+    "user_searches/{searchId}": {
+      "schema": "UserSearch",
+      "description": "Collection of search logs."
+    },
+    "users/{userId}/chat_history/{messageId}": {
+      "schema": "ChatHistory",
+      "description": "User-specific persistent chat history."
+    }
+  }
+}

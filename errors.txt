@@ -1,0 +1,13 @@
+server/routes/spotify.ts(48,14): error TS2339: Property 'access_token' does not exist on type 'unknown'.
+server/routes/spotify.ts(49,47): error TS2339: Property 'access_token' does not exist on type 'unknown'.
+server/routes/spotify.ts(53,22): error TS2339: Property 'expires_in' does not exist on type 'unknown'.
+server/routes/spotify.ts(55,16): error TS2339: Property 'refresh_token' does not exist on type 'unknown'.
+server/routes/spotify.ts(56,50): error TS2339: Property 'refresh_token' does not exist on type 'unknown'.
+src/App.tsx(9166,100): error TS2304: Cannot find name 'musicVolumeState'.
+src/App.tsx(9173,32): error TS2304: Cannot find name 'musicVolumeState'.
+src/App.tsx(9176,27): error TS2304: Cannot find name 'setMusicVolumeState'.
+src/App.tsx(9177,27): error TS2304: Cannot find name 'setMusicVolume'.
+src/App.tsx(9664,33): error TS2339: Property 'getAllPacks' does not exist on type '{ setTempoMultiplier: (mult: number) => void; setSFXVolume: (vol: number) => void; setBGMVolume: (vol: number) => void; setBGMPack: (pack: string) => void; getBGMPack: () => string; getSFXVolume: () => number; ... 35 more ...; playMoveSound: (type: string, isSpecial: boolean) => void; }'.
+src/App.tsx(9667,46): error TS2304: Cannot find name 'setBgmPack'.
+src/App.tsx(9667,83): error TS2551: Property 'setBgmPack' does not exist on type '{ setTempoMultiplier: (mult: number) => void; setSFXVolume: (vol: number) => void; setBGMVolume: (vol: number) => void; setBGMPack: (pack: string) => void; getBGMPack: () => string; getSFXVolume: () => number; ... 35 more ...; playMoveSound: (type: string, isSpecial: boolean) => void; }'. Did you mean 'setBGMPack'?
+src/App.tsx(9670,31): error TS2304: Cannot find name 'bgmPack'.
