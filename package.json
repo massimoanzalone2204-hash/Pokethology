@@ -16,6 +16,7 @@
     "@google/genai": "^1.48.0",
     "@tailwindcss/vite": "^4.1.14",
     "@types/cors": "^2.8.19",
+    "@vercel/speed-insights": "^2.0.0",
     "@vitejs/plugin-react": "^5.0.4",
     "axios": "^1.15.0",
     "clsx": "^2.1.1",
