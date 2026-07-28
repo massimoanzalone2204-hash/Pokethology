@@ -1356,7 +1356,8 @@ app.post("/api/strategy", async (req, res) => {
 
 // Vite middleware for development
 async function setupVite() {
-  if (process.env.NODE_ENV !== "production") {
+  const isProd = process.env.NODE_ENV === "production" || process.argv[1]?.endsWith('server.cjs');
+  if (!isProd) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -1374,9 +1375,9 @@ async function setupVite() {
 // Listen only if not running as a Vercel function
 if (process.env.VERCEL !== "1") {
   setupVite().then(() => {
-    const PORT = 3000;
+    const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
     const server = app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running on http://localhost:${PORT}`);
+      console.log(`Server running on http://0.0.0.0:${PORT}`);
     });
     initializeWebSocketServer(server);
   });

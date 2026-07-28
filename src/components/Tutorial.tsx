@@ -408,7 +408,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 
                         return (
                           <motion.div 
-                            key={idx} 
+                            key={`news-${idx}`} 
                             whileHover={{ scale: 1.01 }}
                             className="bg-slate-900/40 p-4 rounded-xl border border-slate-850 hover:border-cyan-500/20 transition-all duration-300 flex flex-col gap-2.5"
                           >
@@ -463,7 +463,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                        <div className="flex flex-wrap gap-1.5">
                          {groundingSources.slice(0, 4).map((src, sidx) => (
                            <a
-                             key={sidx}
+                             key={`sources-${sidx}`}
                              href={src.url}
                              target="_blank"
                              rel="noopener noreferrer"

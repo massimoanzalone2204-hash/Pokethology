@@ -1372,7 +1372,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
 
                     return (
                       <button
-                        key={idx}
+                        key={`easy-opt-${idx}`}
                         disabled={easyTriviaStatus !== 'unanswered'}
                         onClick={() => handleEasyTriviaAnswer(idx)}
                         className={cn(
@@ -1380,7 +1380,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                           bStyle
                         )}
                       >
-                        <span className="break-words flex-1 min-w-0 text-left leading-tight pr-1" style={{ overflowWrap: 'break-word' }}>{opt}</span>
+                        <span key={`easy-opt-txt-${idx}`} className="break-words flex-1 min-w-0 text-left leading-tight pr-1" style={{ overflowWrap: 'break-word' }}>{opt}</span>
                         {easyTriviaStatus !== 'unanswered' && isCorrect && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 ml-1" />}
                       </button>
                     );
@@ -1445,7 +1445,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
 
                     return (
                       <button
-                        key={idx}
+                        key={`easy-opt-b-${idx}`}
                         disabled={easyTriviaStatusB !== 'unanswered'}
                         onClick={() => handleEasyTriviaAnswerB(idx)}
                         className={cn(
@@ -1647,7 +1647,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
 
                     return (
                       <button
-                        key={idx}
+                        key={`silver-opt-${idx}`}
                         disabled={medTriviaStatus !== 'unanswered'}
                         onClick={() => handleMedTriviaAnswer(idx)}
                         className={cn(
@@ -1720,7 +1720,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
 
                     return (
                       <button
-                        key={idx}
+                        key={`silver-opt-b-${idx}`}
                         disabled={medTriviaStatusB !== 'unanswered'}
                         onClick={() => handleMedTriviaAnswerB(idx)}
                         className={cn(
@@ -1935,7 +1935,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
 
                     return (
                       <button
-                        key={idx}
+                        key={`hard-opt-${idx}`}
                         disabled={masterExamStatus !== 'unanswered'}
                         onClick={() => handleMasterExamAnswer(idx)}
                         className={cn(
@@ -2010,7 +2010,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
 
                       return (
                         <button
-                          key={idx}
+                          key={`master-opt-b-${idx}`}
                           disabled={masterExamStatusB !== 'unanswered'}
                           onClick={() => handleMasterExamAnswerB(idx)}
                           className={cn(
@@ -2076,7 +2076,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                         <div className="grid grid-cols-3 gap-1 w-20 h-20 shrink-0">
                           {matrixGrid.map((val, idx) => (
                             <button
-                              key={idx}
+                              key={`matrix-cell-${idx}`}
                               onClick={() => handleMatrixCellToggle(idx)}
                               className={cn(
                                 "w-full h-full rounded border font-mono font-black text-[10px] sm:text-[11px] transition-all cursor-pointer flex items-center justify-center",
@@ -2180,7 +2180,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
         <div className="absolute inset-0 pointer-events-none z-50 bg-cyan-400/5 rounded-2xl">
           {[...Array(15)].map((_, i) => (
             <motion.div
-              key={i}
+              key={`sparkle-${i}`}
               className="absolute w-1.5 h-1.5 bg-gradient-to-tr from-amber-400 via-yellow-300 to-cyan-300 rounded-full"
               initial={{ 
                 x: Math.random() * 200 - 100, 

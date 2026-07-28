@@ -84,7 +84,7 @@ export const BattleMessage: React.FC<BattleMessageProps> = memo(({ message, type
         <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 max-w-full relative z-10">
           {subMessages.map((sub, idx) => (
             <span
-              key={idx}
+              key={`sub-msg-${idx}-${sub}`}
               className={cn(
                 "px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg border font-hud uppercase whitespace-nowrap text-[9px] sm:text-xs font-bold leading-tight shadow-sm",
                 styles.chip

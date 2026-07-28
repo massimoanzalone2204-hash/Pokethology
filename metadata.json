@@ -1,6 +1,6 @@
 {
   "name": "Pokéthology AI",
-  "description": "Where dreams and adventures begin!",
+  "description": "An AI-powered Pokémon encyclopedia and battle simulator. Explore an in-depth Pokédex, challenge Gemini in simulated battles, and test your knowledge with daily quizzes.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

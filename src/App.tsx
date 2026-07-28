@@ -1605,7 +1605,7 @@ const BattleLog = memo(({ log, enableAnimations, turn, isBattling }: { log: (Log
 
         return (
           <div 
-            key={i} 
+            key={`battle-log-${entry.turn || turn}-${entry.type || ''}-${i}`} 
             className={cn(
               "border rounded-lg px-2 py-1.5 flex items-center gap-2 transition-all duration-300",
               enableAnimations && !isLatest && "animate-in fade-in slide-in-from-left-1",
@@ -6121,9 +6121,9 @@ export default function App() {
                                       </h3>
                                       <div className="flex flex-wrap gap-2.5">
                                         {pokemon.weaknesses && pokemon.weaknesses.length > 0 ? (
-                                          pokemon.weaknesses.map((w) => (
+                                          pokemon.weaknesses.map((w, idx) => (
                                             <span
-                                              key={w}
+                                              key={`weakness-${w}-${idx}`}
                                               className={cn(
                                                 "px-3 py-1.5 rounded-md text-[9px] font-bold tracking-wider font-hud font-black uppercase tracking-[0.2em] shadow-md hover:scale-110 transition-transform",
                                                 typeColors[w] || "bg-slate-600"
@@ -6158,8 +6158,8 @@ export default function App() {
                                       </h3>
 
                                       <div className="w-full flex flex-col gap-3 sm:gap-4 relative z-10">
-                                        {pokemon.stats.map((s) => (
-                                          <div key={s.stat.name} className="flex items-center gap-2 sm:gap-3 group/stat relative w-full">
+                                        {pokemon.stats.map((s, idx) => (
+                                          <div key={`stat-${s.stat.name}-${idx}`} className="flex items-center gap-2 sm:gap-3 group/stat relative w-full">
                                             <div className={cn("w-24 sm:w-28 uppercase text-[8px] sm:text-[9px] font-black shrink-0 cursor-help flex items-center gap-1.5", isLightMode ? "text-slate-500" : "text-cyan-600")}>
                                               <div className={cn("w-1 h-3 rounded-[1px] transition-colors", isLightMode ? "bg-slate-300 group-hover/stat:bg-cyan-600" : "bg-cyan-900/80 group-hover/stat:bg-cyan-400")}></div>
                                               <span className="truncate">{statNameMap[s.stat.name] || s.stat.name}</span>
@@ -6212,7 +6212,7 @@ export default function App() {
                                             const isCollapsed = collapsedMoveMethods[method] !== false;
                                             
                                             return (
-                                              <div key={method} className={cn("border rounded-xl p-3 mb-3", isLightMode ? "bg-slate-50/55 border-slate-200" : "bg-slate-900/10 border-cyan-900/20")}>
+                                              <div key={`move-method-${method}`} className={cn("border rounded-xl p-3 mb-3", isLightMode ? "bg-slate-50/55 border-slate-200" : "bg-slate-900/10 border-cyan-900/20")}>
                                                 <button
                                                   type="button"
                                                   onClick={() => {
@@ -6488,7 +6488,7 @@ export default function App() {
                                                   <Search className="w-2 h-2 text-cyan-400 animate-pulse" />
                                                   <span className="font-bold uppercase tracking-wider text-[7px] text-cyan-400/70">Scanned Web:</span>
                                                   {msg.groundingMetadata.webSearchQueries.map((query: string, qi: number) => (
-                                                    <span key={qi} className="bg-cyan-950/50 border border-cyan-500/15 px-1 py-0.5 rounded text-[7px] font-bold">
+                                                    <span key={`query-${qi}`} className="bg-cyan-950/50 border border-cyan-500/15 px-1 py-0.5 rounded text-[7px] font-bold">
                                                       "{query}"
                                                     </span>
                                                   ))}
@@ -6509,7 +6509,7 @@ export default function App() {
                                                       } catch (err) {}
                                                       return (
                                                         <a 
-                                                          key={ci} 
+                                                          key={`chunk-${ci}`} 
                                                           href={chunk.web.uri} 
                                                           target="_blank" 
                                                           rel="noopener noreferrer" 
@@ -6538,7 +6538,7 @@ export default function App() {
                                             <div className="flex gap-1">
                                               {[0, 1, 2].map(i => (
                                                 <motion.div
-                                                  key={i}
+                                                  key={`loading-dot-${i}`}
                                                   className="w-1.5 h-1.5 bg-cyan-400 rounded-full"
                                                   animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
                                                   transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
@@ -6571,9 +6571,9 @@ export default function App() {
                                         {(pokemon 
                                           ? [`Lore: ${pokemon?.name}`, `Counter for ${pokemon?.name}?`, `Battle usage?`, `Moveset?`]
                                           : ["Strongest Pokemon?", "Mega Evolutions?", "Chaos Match Tips?", "Who is Arceus?"]
-                                        ).map(s => (
+                                        ).map((s, idx) => (
                                           <button 
-                                            key={s} 
+                                            key={`suggested-${s}-${idx}`} 
                                             onClick={() => {
                                               setChatInput(s);
                                               // Auto trigger send if it feels natural
@@ -7953,7 +7953,7 @@ export default function App() {
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 ">
                           {Object.keys(typeColors).map((type) => (
                             <button
-                              key={type}
+                              key={`typebtn-${type}`}
                               onClick={() => {
                                 setQuery(type);
                                 setInputValue(type);
@@ -8307,7 +8307,7 @@ export default function App() {
                         <span className="text-[6px] font-bold tracking-wider sm:text-[8px] font-bold tracking-wider text-slate-300 font-medium font-hud uppercase tracking-tighter text-center leading-none">ATK \ DEF</span>
                       </div>
                       {Object.keys(typeColors).map(type => (
-                        <div key={type} className="h-10 sm:h-12 flex items-center justify-center">
+                        <div key={`typehdr-${type}`} className="h-10 sm:h-12 flex items-center justify-center">
                           <div className={cn(
                             "w-6 h-16 sm:w-10 sm:h-24 -rotate-45 origin-center flex items-center justify-center text-[5px] sm:text-[8px] font-bold tracking-wider font-black uppercase tracking-tighter rounded shadow-lg transition-transform hover:scale-110",
                             typeColors[type]
@@ -8319,7 +8319,7 @@ export default function App() {
                     </div>
                     <div className="px-2 sm:px-0">
                       {Object.keys(typeColors).map(attackerType => (
-                        <div key={attackerType} className="grid grid-cols-[50px_repeat(18,minmax(28px,1fr))] sm:grid-cols-[100px_repeat(18,minmax(40px,1fr))] gap-1 sm:gap-1.5 mb-1 sm:mb-1.5 group/row">
+                        <div key={`typerow-${attackerType}`} className="grid grid-cols-[50px_repeat(18,minmax(28px,1fr))] sm:grid-cols-[100px_repeat(18,minmax(40px,1fr))] gap-1 sm:gap-1.5 mb-1 sm:mb-1.5 group/row">
                           <div className={cn(
                             "sticky left-0 z-20 h-7 sm:h-10 flex items-center justify-center sm:justify-start sm:px-4 rounded sm:rounded-lg text-[6px] font-bold tracking-wider sm:text-[9px] font-bold tracking-wider font-black uppercase tracking-widest sm:tracking-[0.2em] shadow-[4px_0_10px_rgba(0,0,0,0.5)] group-hover/row:scale-105 transition-transform",
                             typeColors[attackerType]
@@ -8331,7 +8331,7 @@ export default function App() {
                             const multiplier = TYPE_CHART[attackerType]?.[defenderType] ?? 1;
                             return (
                               <div 
-                                key={defenderType} 
+                                key={`typecell-${attackerType}-${defenderType}`} 
                                 className={cn(
                                   "h-7 sm:h-10 flex items-center justify-center text-[8px] font-bold tracking-wider sm:text-[12px] font-mono font-black rounded sm:rounded-lg border transition-all hover:scale-110 hover:z-20",
                                   multiplier === 2 ? "bg-green-500/30 border-green-500/60 text-green-400 shadow-[0_0_10px_rgba(34,197,94,0.3)]" :
@@ -8584,7 +8584,7 @@ export default function App() {
                       <h4 className="text-[8px] font-bold tracking-wider text-cyan-600 uppercase font-hud tracking-widest border-b border-cyan-900/30 pb-1">Modifier Effects</h4>
                       <div className="grid grid-cols-1 gap-2">
                         {selectedMoveDetail.stat_changes.map((sc, i) => (
-                          <div key={i} className="bg-slate-950/50 p-2 rounded border border-cyan-900/20 flex justify-between items-center">
+                          <div key={`sc-${sc.stat?.name || i}-${i}`} className="bg-slate-950/50 p-2 rounded border border-cyan-900/20 flex justify-between items-center">
                             <span className="text-cyan-400 text-[10px] font-bold tracking-wider font-hud uppercase">{sc.stat.name.replace('-', ' ')}</span>
                             <span className={cn(
                               "text-[10px] font-bold tracking-wider font-mono",
@@ -9121,10 +9121,11 @@ export default function App() {
 
         {/* Settings Modal */}
         <AnimatePresence>
-          <OfflineManagerModal isOpen={isOfflineManagerOpen} onClose={() => setIsOfflineManagerOpen(false)} onPlaySound={sounds.hover} />
+          <OfflineManagerModal key="offline-manager-modal" isOpen={isOfflineManagerOpen} onClose={() => setIsOfflineManagerOpen(false)} onPlaySound={sounds.hover} />
 
         {isSettingsOpen && (
             <motion.div
+              key="settings-modal"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

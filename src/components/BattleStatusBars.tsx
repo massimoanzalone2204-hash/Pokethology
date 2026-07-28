@@ -126,7 +126,7 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
     <AnimatePresence mode="wait">
       {!battleOpponent ? (
         <motion.div
-          key="setup"
+          key="opponent-setup"
           initial={{ opacity: 0, x: -20, scale: 0.95 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
           exit={{ opacity: 0, x: -20, scale: 0.95 }}
@@ -145,7 +145,7 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
         </motion.div>
       ) : (
         <motion.div 
-          key="battling"
+          key="opponent-battling"
           initial={{ opacity: 0, x: -20, scale: 0.95 }}
           animate={statChange ? { opacity: 1, scale: 1, x: [0, -6, 6, -6, 6, 0] } : { opacity: 1, scale: 1, x: 0 }}
           exit={{ opacity: 0, x: -20, scale: 0.95 }}
@@ -195,7 +195,7 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
             {Object.entries(opponentStatStages).map(([stat, stage]) => {
               if (stage === 0) return null;
               return (
-                <span key={stat} className={cn(
+                <span key={`opp-stat-${stat}`} className={cn(
                   "text-[5px] sm:text-[6.5px] font-bold tracking-wider px-0.5 rounded uppercase font-mono",
                   stage > 0 ? "bg-green-500/20 text-green-300 border border-green-500/30" : "bg-red-500/20 text-red-300 border border-red-500/30"
                 )}>
@@ -222,7 +222,7 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
             {['hp', 'attack', 'defense', 'speed'].map(s => {
               const diff = oStats[s] - pStats[s];
               return (
-                <div key={s} className="text-center truncate uppercase leading-none">
+                <div key={`opp-stat-diff-${s}`} className="text-center truncate uppercase leading-none">
                   {s.substring(0, 3)}:<span className={diff > 0 ? "text-green-400 font-bold" : diff < 0 ? "text-red-400 font-bold" : "text-slate-500"}>{diff > 0 ? '+' : ''}{diff}</span>
                 </div>
               )
@@ -287,7 +287,7 @@ export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = memo(({
     <AnimatePresence mode="wait">
       {!pokemon ? null : (
         <motion.div 
-          key="battling"
+          key="player-battling"
           initial={{ opacity: 0, x: 20, scale: 0.95 }}
           animate={statChange ? { opacity: 1, scale: 1, x: [0, 10, -10, 10, -10, 0] } : { opacity: 1, scale: 1, x: 0 }}
           exit={{ opacity: 0, x: 20, scale: 0.95 }}
@@ -337,7 +337,7 @@ export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = memo(({
             {Object.entries(playerStatStages).map(([stat, stage]) => {
               if (stage === 0) return null;
               return (
-                <span key={stat} className={cn(
+                <span key={`opp-stat-${stat}`} className={cn(
                   "text-[5px] sm:text-[6.5px] font-bold tracking-wider px-0.5 rounded uppercase font-mono",
                   stage > 0 ? "bg-green-500/20 text-green-300 border border-green-500/30" : "bg-red-500/20 text-red-300 border border-red-500/30"
                 )}>
@@ -364,7 +364,7 @@ export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = memo(({
             {['hp', 'attack', 'defense', 'speed'].map(s => {
               const diff = pStats[s] - oStats[s];
               return (
-                <div key={s} className="text-center truncate uppercase leading-none">
+                <div key={`opp-stat-diff-${s}`} className="text-center truncate uppercase leading-none">
                   {s.substring(0, 3)}:<span className={diff > 0 ? "text-green-400 font-bold" : diff < 0 ? "text-red-400 font-bold" : "text-slate-500"}>{diff > 0 ? '+' : ''}{diff}</span>
                 </div>
               )

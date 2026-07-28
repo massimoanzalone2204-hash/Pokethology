@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 import { Trophy, ShieldAlert, Zap, TrendingUp, Clock, RotateCcw, Target, Sparkles, ChevronRight, Hash, Eye, Award } from 'lucide-react';
 import { HUDCorners } from './HUDCorners';
@@ -249,7 +249,7 @@ export function BattleResultScreen({
                 </div>
                 <div className="space-y-1 font-mono text-[11px]">
                   {lastLogs.map((logItem, i) => (
-                    <div key={i} className="flex gap-2 items-center truncate">
+                    <div key={`reslog-${logItem.turn || i}-${i}`} className="flex gap-2 items-center truncate">
                       <span className="text-[9px] font-hud font-bold opacity-50 shrink-0">T{logItem.turn || turnNumber}</span>
                       <span className="truncate opacity-90">{logItem.text}</span>
                     </div>

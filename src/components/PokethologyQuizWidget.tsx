@@ -797,7 +797,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
 
                   return (
                     <button
-                      key={optIdx}
+                      key={`q-opt-${optIdx}`}
                       disabled={isLocked}
                       onClick={() => handleSelectOption(q.id, optIdx)}
                       className={cn(
