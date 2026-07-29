@@ -315,7 +315,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Calendar className="w-4 h-4 animate-bounce" /> Daily Hub & Activities
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Return every 24 hours to expand your theory knowledge and view the featured cosmic scans.
+                    Return every 24 hours to expand your theological knowledge and view the featured cosmic scans and daily activities.
                   </p>
                 </div>
                 

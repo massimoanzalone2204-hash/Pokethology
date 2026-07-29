@@ -997,7 +997,7 @@ app.get("/api/quiz", async (req, res) => {
   try {
     const response = await generateWithRetry({
       model: DEFAULT_MODEL,
-      contents: `You are the leading Professor of Pokétheology (the study of Pokémon mythology, cosmology, deep lore, and divine origins). Create exactly 3 distinct multiple-choice questions for the Pokétheology Quiz on the date ${currentDateStr}. To ensure today's quiz has a unique academic focus, all three questions must focus specifically around is this theological theme/topic: "${currentTheme}". Avoid simple stat or type trivia; make them deep, academic, and engaging. Provide exactly 4 options per question, indicate the correct option index (0 to 3), and give a detailed theological/mythological explanation of the answer.`,
+      contents: `You are the leading Professor of Pokétheology (the study of Pokémon mythology, cosmology, deep lore, and divine origins). Create exactly 3 distinct multiple-choice questions for the Theory Exam on the date ${currentDateStr}. To ensure today's exam has a unique academic focus, all three questions must focus specifically around this theological theme/topic: "${currentTheme}". Avoid simple stat or type trivia; make them deep, academic, and engaging. Provide exactly 4 options per question, indicate the correct option index (0 to 3), and give a detailed theological/mythological explanation of the answer.`,
       config: {
         responseMimeType: "application/json",
         responseSchema: {

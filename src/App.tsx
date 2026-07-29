@@ -20,7 +20,6 @@ import { sounds } from './lib/sounds';
 import { cn, abbreviateType, hudButtonClass, playHaptic } from './lib/utils';
 import { PokethologyCombatMissionWidget, getDailyCombatMission, COMBAT_MISSIONS, getRequiredCount } from './components/PokethologyCombatMissionWidget';
 import { PokethologyQuizWidget } from './components/PokethologyQuizWidget';
-import { exportPokemonDetailPDF } from './utils/exportPdf';
 import { generateCompetitiveMoveset } from './utils/moveset';
 import { OpponentStatusBar, PlayerStatusBar } from './components/BattleStatusBars';
 import { MoveModal } from './components/MoveModal';
@@ -5521,30 +5520,6 @@ export default function App() {
                               <span className="font-hud text-[10px] font-black sm:text-xs text-slate-300 uppercase tracking-[0.3em]">Analysis Mode</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              {pokemon && (
-                                <button 
-                                  type="button"
-                                  onClick={() => {
-                                    sounds.scan();
-                                    const currentFlavorText = pokemon.gameDescriptions && pokemon.gameDescriptions[selectedGameDescIndex] 
-                                      ? pokemon.gameDescriptions[selectedGameDescIndex].flavor_text 
-                                      : (pokemon.description || "No data available for this unit.");
-                                    const currentGameVersion = pokemon.gameDescriptions && pokemon.gameDescriptions[selectedGameDescIndex]
-                                      ? pokemon.gameDescriptions[selectedGameDescIndex].version
-                                      : "Core Registry";
-                                    exportPokemonDetailPDF(pokemon, {
-                                      selectedEntryText: currentFlavorText,
-                                      selectedGameVersion: currentGameVersion,
-                                      selectedMoves: selectedMoves || pokemon.moves,
-                                    });
-                                  }}
-                                  className={cn(hudButtonClass(false, 'amber'), "!py-1 !px-2.5 !text-[9px] sm:!text-[10px] font-bold tracking-wider flex items-center gap-1.5 cursor-pointer")}
-                                  title="Export PDF Research Dossier for this Pokémon"
-                                >
-                                  <Download className="w-3 h-3 text-amber-400" />
-                                  <span className="hidden xs:inline">DOSSIER PDF</span>
-                                </button>
-                              )}
                               <button 
                                 onClick={() => {
                                   setPokemon(null);
@@ -6138,9 +6113,8 @@ export default function App() {
                                       </div>
                                     </div>
 
-                                    <div id="pokemon-stats-capture-zone" className={cn(
+                                    <div className={cn(
                                       "backdrop-blur-md rounded-2xl p-5 sm:p-7 border shadow-inner relative overflow-hidden group/statshud w-full max-w-full z-10 box-border",
-                                      
                                       isLightMode 
                                         ? "bg-white/95 border-slate-200" 
                                         : "bg-slate-900/60 border-cyan-900/40"
@@ -6295,7 +6269,7 @@ export default function App() {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -15 }}
                                     transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                                    className="w-full max-w-4xl mx-auto flex-1 flex flex-col gap-2 min-h-0 h-full overflow-hidden"
+                                    className="w-full flex-1 flex flex-col gap-2 min-h-0 h-full overflow-hidden"
                                   >
                                     <div className={cn(
                                       "chat-container flex-1 rounded-xl border overflow-hidden flex flex-col relative min-h-0",

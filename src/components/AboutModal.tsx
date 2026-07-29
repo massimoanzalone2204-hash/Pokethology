@@ -128,15 +128,11 @@ export function AboutModal({ isOpen, onClose, isLightMode = false }: AboutModalP
                     <span className="text-slate-400">Audio Synth Engine:</span>
                     <span className="text-cyan-300 font-bold">WebAudio Dual-Oscillator</span>
                   </div>
-                  <div className="flex justify-between items-center text-slate-300">
-                    <span className="text-slate-400">PDF Document Renderer:</span>
-                    <span className="text-emerald-300 font-bold">jsPDF Vector Engine</span>
-                  </div>
                 </div>
 
                 {/* About Description */}
                 <p className="text-[11px] leading-relaxed text-slate-300 font-sans">
-                  <strong className="text-cyan-400 font-hud">Pokéthology Core OS</strong> is an advanced, responsive tactical Pokémon research index and combat simulation terminal. Designed with real-time stat analyzers, damage calculators, move matrix engines, and custom high-resolution PDF document accreditation exports.
+                  <strong className="text-cyan-400 font-hud">Pokéthology Core OS</strong> is an advanced, responsive tactical Pokémon research index and combat simulation terminal. Designed with real-time stat analyzers, damage calculators, and move matrix engines.
                 </p>
 
                 {/* Quick Bug Report Trigger Banner */}
@@ -192,7 +188,6 @@ export function AboutModal({ isOpen, onClose, isLightMode = false }: AboutModalP
                       >
                         <option value="UI & Visuals">UI & Visuals / Layout</option>
                         <option value="Audio & BGM">Audio & Sound / BGM</option>
-                        <option value="PDF Export">PDF Export & Accreditation</option>
                         <option value="Combat Simulation">Combat Simulation Engine</option>
                         <option value="Database & Dex">Database & Pokédex Registry</option>
                         <option value="Other">Other / System Glitch</option>

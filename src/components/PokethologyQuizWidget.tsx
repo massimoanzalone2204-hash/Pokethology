@@ -450,9 +450,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
   const [userAnswersMap, setUserAnswersMap] = useState<Record<string, number>>({});
   const [selectedOptionMap, setSelectedOptionMap] = useState<Record<string, number>>({});
   const [lockedMap, setLockedMap] = useState<Record<string, boolean>>({});
-  const [customSeed, setCustomSeed] = useState<number>(() => {
-    return parseInt(localStorage.getItem('pokethology_exam_custom_seed') || '0', 10);
-  });
+  const [customSeed, setCustomSeed] = useState<number>(0);
 
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
   const formattedToday = useMemo(() => {
@@ -464,7 +462,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
     });
   }, []);
 
-  // Dynamically calculate today's selected 3 theological exam questions per region
+  // Dynamically calculate today's selected 3 theory exam questions per region
   const allExams = useMemo(() => {
     const baseHash = hashCode(`${todayStr}_v2_seed_${customSeed}`);
     
@@ -503,39 +501,9 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
     });
   }, [todayStr, customSeed]);
 
-  // Load state from localStorage on mount (scoped by daily date string so it automatically refreshes each day)
-  useEffect(() => {
-    const dailyAnswerKey = `pokethology_exam_answers_v2_${todayStr}`;
-    const dailyLockKey = `pokethology_exam_locked_v2_${todayStr}`;
-    const savedAnswers = localStorage.getItem(dailyAnswerKey) || localStorage.getItem('pokethology_exam_answers_v2');
-    const savedLocked = localStorage.getItem(dailyLockKey) || localStorage.getItem('pokethology_exam_locked_v2');
-    if (savedAnswers) {
-      try {
-        setUserAnswersMap(JSON.parse(savedAnswers));
-      } catch (e) {}
-    }
-    if (savedLocked) {
-      try {
-        setLockedMap(JSON.parse(savedLocked));
-      } catch (e) {}
-    }
-  }, [todayStr]);
-
-  // Save progress to localStorage scoped by today's date
-  useEffect(() => {
-    if (todayStr) {
-      localStorage.setItem(`pokethology_exam_answers_v2_${todayStr}`, JSON.stringify(userAnswersMap));
-      localStorage.setItem(`pokethology_exam_locked_v2_${todayStr}`, JSON.stringify(lockedMap));
-      // Also write to generic key for backward compatibility
-      localStorage.setItem('pokethology_exam_answers_v2', JSON.stringify(userAnswersMap));
-      localStorage.setItem('pokethology_exam_locked_v2', JSON.stringify(lockedMap));
-    }
-  }, [userAnswersMap, lockedMap, todayStr]);
-
   const handleRerollDailyExam = () => {
     const nextSeed = customSeed + 1;
     setCustomSeed(nextSeed);
-    localStorage.setItem('pokethology_exam_custom_seed', String(nextSeed));
     setUserAnswersMap({});
     setSelectedOptionMap({});
     setLockedMap({});
@@ -543,43 +511,6 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
   };
 
   const currentRegionData = allExams[activeRegionIndex] || allExams[0];
-
-  // Calculate totals across ALL 9 regions
-  const totalQuestionsCount = useMemo(() => {
-    return allExams.reduce((sum, r) => sum + r.questions.length, 0);
-  }, []);
-
-  const answeredQuestionsCount = useMemo(() => {
-    return Object.keys(lockedMap).filter(k => lockedMap[k]).length;
-  }, [lockedMap]);
-
-  const correctAnswersCount = useMemo(() => {
-    let count = 0;
-    allExams.forEach(r => {
-      r.questions.forEach(q => {
-        if (lockedMap[q.id] && userAnswersMap[q.id] === q.answerIndex) {
-          count++;
-        }
-      });
-    });
-    return count;
-  }, [lockedMap, userAnswersMap]);
-
-  const completedRegionsCount = useMemo(() => {
-    return allExams.filter(region => region.questions.every(q => lockedMap[q.id])).length;
-  }, [allExams, lockedMap]);
-
-  const overallPercent = Math.round((answeredQuestionsCount / totalQuestionsCount) * 100) || 0;
-
-  const getAcademicRank = (completedRegions: number, totalRegions: number) => {
-    if (completedRegions >= totalRegions) return { title: 'Master', color: 'text-amber-400 font-black' };
-    if (completedRegions >= 6) return { title: 'Expert', color: 'text-cyan-400 font-extrabold' };
-    if (completedRegions >= 4) return { title: 'Intermediate', color: 'text-emerald-400 font-bold' };
-    if (completedRegions >= 2) return { title: 'Beginner', color: 'text-purple-400 font-bold' };
-    return { title: 'Novice', color: 'text-slate-400 font-semibold' };
-  };
-
-  const currentRank = getAcademicRank(completedRegionsCount, allExams.length);
 
   const handleSelectOption = (questionId: string, optionIdx: number) => {
     if (lockedMap[questionId]) return;
@@ -609,7 +540,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
           <span className="text-[10px] font-mono font-bold text-cyan-300 tracking-wider uppercase">
-            {formattedToday.toUpperCase()}
+            {formattedToday.toUpperCase()} - THEORY EXAM
           </span>
         </div>
         <button
@@ -623,43 +554,9 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
         </button>
       </div>
 
-      {/* PERSISTENT ACADEMIC PROGRESS BAR */}
-      <div className="bg-slate-900/90 border border-cyan-500/30 rounded-xl p-3.5 sm:p-4 shadow-lg relative overflow-hidden">
-        <HUDCorners />
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2.5">
-          <div className="flex items-center gap-2">
-            <GraduationCap className="w-5 h-5 text-amber-400 animate-pulse shrink-0" />
-            <div className="flex flex-col">
-              <span className="text-[10px] font-hud font-black text-amber-400 tracking-wider uppercase">
-                GLOBAL ACADEMIC PROGRESS
-              </span>
-              <span className={cn('text-xs font-hud uppercase tracking-widest', currentRank.color)}>
-                {currentRank.title}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] font-mono text-cyan-300 font-bold bg-cyan-950/60 border border-cyan-500/30 px-2.5 py-1 rounded-md">
-              {answeredQuestionsCount} / {totalQuestionsCount} COMPLETED
-            </span>
-          </div>
-        </div>
-
-        {/* Glowing Progress Track */}
-        <div className="w-full h-2.5 bg-slate-950 rounded-full border border-slate-800 overflow-hidden relative">
-          <div
-            className="h-full bg-gradient-to-r from-cyan-500 via-emerald-400 to-amber-400 rounded-full transition-all duration-500"
-            style={{ width: `${overallPercent}%` }}
-          />
-        </div>
-      </div>
-
       {/* REGION SELECTION TABS */}
       <div className="w-full flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1.5 shrink-0">
         {allExams.map((rData, idx) => {
-          const regionQuestions = rData.questions;
-          const answeredInRegion = regionQuestions.filter(q => lockedMap[q.id]).length;
-          const isComplete = answeredInRegion === regionQuestions.length;
           const isActive = idx === activeRegionIndex;
 
           return (
@@ -677,13 +574,6 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
               )}
             >
               <span>{rData.region}</span>
-              {isComplete ? (
-                <CheckCircle2 className={cn('w-3 h-3', isActive ? 'text-slate-950' : 'text-emerald-400')} />
-              ) : (
-                <span className={cn('text-[8px] font-mono font-bold px-1 rounded', isActive ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-950 text-cyan-400')}>
-                  {answeredInRegion}/3
-                </span>
-              )}
             </button>
           );
         })}

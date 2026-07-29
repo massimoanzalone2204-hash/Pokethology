@@ -338,31 +338,10 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     return isCompleted ? requiredCount : 0;
   }, [todayStr, isCompleted, requiredCount, missionProgressCount]);
   
-  // Dynamic stats
-  const [combatPoints, setCombatPoints] = useState<number>(0);
-  const [showCelebration, setShowCelebration] = useState<boolean>(false);
-  const [celebrationPoints, setCelebrationPoints] = useState<number>(0);
-  const [successModal, setSuccessModal] = useState<{
-    isOpen: boolean;
-    title: string;
-    points: number;
-    categoryName?: string;
-    description: string;
-    itemUnlocked?: string;
-  } | null>(null);
-
   // Loading and Particle Explosion States
-  const [isWidgetLoading, setIsWidgetLoading] = useState<boolean>(true);
+  const [isWidgetLoading, setIsWidgetLoading] = useState<boolean>(false);
   const [showMissionExplosion, setShowMissionExplosion] = useState<boolean>(false);
   const prevProgress = useRef<number>(-1);
-
-  // Simulate populating local storage and daily mission data
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsWidgetLoading(false);
-    }, 850);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Monitor progress for real-time mission completion explosion
   useEffect(() => {
@@ -370,14 +349,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       if (progressCount >= requiredCount && prevProgress.current !== -1 && prevProgress.current < requiredCount) {
         setShowMissionExplosion(true);
         try { sounds.success?.(); } catch (_) {}
-        setSuccessModal({
-          isOpen: true,
-          title: "TOTAL MISSION PARAMETERS EXCEEDED",
-          points: 500,
-          categoryName: "DAILY HUB SUPREMACY",
-          description: "INCREDIBLE PERFORMANCE: All daily combat objectives have been neutralized with extreme tactical efficiency. Your dedication to the Pokétheology grid is truly unparalleled!",
-          itemUnlocked: "Master-Tier Operational Credential"
-        });
       }
       prevProgress.current = progressCount;
     }
@@ -393,116 +364,53 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     }
   }, [isWidgetLoading, isCompleted, progressCount, requiredCount]);
 
-  // Loading states
-  useEffect(() => {
-    const savedPoints = localStorage.getItem(`pokethology_combat_points_${todayStr}`);
-    if (savedPoints) {
-      setCombatPoints(parseInt(savedPoints, 10));
-    } else {
-      setCombatPoints(0);
-    }
-  }, [todayStr]);
-
-  // Sync stage points
-  const addBonusPoints = (pts: number, details?: { title: string; category?: string; description?: string; itemUnlocked?: string }) => {
-    const savedPoints = localStorage.getItem(`pokethology_combat_points_${todayStr}`);
-    const currentTotal = savedPoints ? parseInt(savedPoints, 10) : 0;
-    const newTotal = currentTotal + pts;
-    localStorage.setItem(`pokethology_combat_points_${todayStr}`, newTotal.toString());
-    setCombatPoints(newTotal);
-    setCelebrationPoints(pts);
-    setShowCelebration(true);
-
-    // Trigger AnimatePresence success modal!
-    setSuccessModal({
-      isOpen: true,
-      title: details?.title || "Operational Bounty Secured",
-      points: pts,
-      categoryName: details?.category || "Sinnoh Core Mission Command",
-      description: details?.description || "You have successfully synchronized with the divine Pokétheology grid and unlocked operational resources.",
-      itemUnlocked: details?.itemUnlocked || (pts >= 300 ? "Arceus Origin Cosmic Shard" : pts >= 180 ? "Sinnoh Core-Link Vector" : "Zen Meditation Candle Chip")
-    });
-
-    try {
-      sounds.success?.();
-    } catch (_) {}
-  };
-
-  // --- EASY ACTIVITIES STATES ---
+  // --- EASY ACTIVITIES STATES (IN-MEMORY SESSION ONLY) ---
   
   // 1. Daily Synapse Med Check-in
-  const [medCheckinStatus, setMedCheckinStatus] = useState<'idle' | 'breathing' | 'claimable' | 'completed'>(() => {
-    return (localStorage.getItem(`pokethology_act_med_${todayStr}`) === 'completed') ? 'completed' : 'idle';
-  });
+  const [medCheckinStatus, setMedCheckinStatus] = useState<'idle' | 'breathing' | 'claimable' | 'completed'>('idle');
   const [medSeconds, setMedSeconds] = useState<number>(10);
   
   // 2. Easy Trivia Question A
-  const [easyTriviaStatus, setEasyTriviaStatus] = useState<'unanswered' | 'correct' | 'incorrect'>(() => {
-    return (localStorage.getItem(`pokethology_act_etriv_${todayStr}`) as any) || 'unanswered';
-  });
-  const [easyChosenOption, setEasyChosenOption] = useState<number | null>(() => {
-    const saved = localStorage.getItem(`pokethology_act_etriv_opt_${todayStr}`);
-    return saved !== null ? parseInt(saved, 10) : null;
-  });
+  const [easyTriviaStatus, setEasyTriviaStatus] = useState<'unanswered' | 'correct' | 'incorrect'>('unanswered');
+  const [easyChosenOption, setEasyChosenOption] = useState<number | null>(null);
   const easyTriviaIndex = useMemo(() => {
     const hash = todayStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return hash % EASY_TRIVIA_QUESTIONS.length;
   }, [todayStr]);
   const easyTriviaQuestion = sessionEasyTriviaQuestion || EASY_TRIVIA_QUESTIONS[easyTriviaIndex];
 
-  // 3. Easy Trivia Question B (REPLACES COMBAT ARENA STRIKE)
-  const [easyTriviaStatusB, setEasyTriviaStatusB] = useState<'unanswered' | 'correct' | 'incorrect'>(() => {
-    return (localStorage.getItem(`pokethology_act_etriv_b_${todayStr}`) as any) || 'unanswered';
-  });
-  const [easyChosenOptionB, setEasyChosenOptionB] = useState<number | null>(() => {
-    const saved = localStorage.getItem(`pokethology_act_etriv_opt_b_${todayStr}`);
-    return saved !== null ? parseInt(saved, 10) : null;
-  });
+  // 3. Easy Trivia Question B
+  const [easyTriviaStatusB, setEasyTriviaStatusB] = useState<'unanswered' | 'correct' | 'incorrect'>('unanswered');
+  const [easyChosenOptionB, setEasyChosenOptionB] = useState<number | null>(null);
   const easyTriviaIndexB = useMemo(() => {
     const hash = todayStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return (hash + 1) % EASY_TRIVIA_QUESTIONS.length;
   }, [todayStr]);
   const easyTriviaQuestionB = sessionEasyTriviaQuestionB || EASY_TRIVIA_QUESTIONS[easyTriviaIndexB];
 
-  // Legacy holder so it does not break types or initial state lookups
-  const [easyStrikeClaimed, setEasyStrikeClaimed] = useState<boolean>(() => {
-    return localStorage.getItem(`pokethology_act_estrike_${todayStr}`) === 'claimed';
-  });
+  // Legacy holder
+  const [easyStrikeClaimed, setEasyStrikeClaimed] = useState<boolean>(false);
 
   // 4. Cosmic Grid Scan
-  const [scanStatus, setScanStatus] = useState<'idle' | 'scanning' | 'completed'>(() => {
-    return (localStorage.getItem(`pokethology_act_escan_${todayStr}`) === 'completed') ? 'completed' : 'idle';
-  });
+  const [scanStatus, setScanStatus] = useState<'idle' | 'scanning' | 'completed'>('idle');
 
-  // 5. Dimensional Time Sync (NEW EASY)
-  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'completed'>(() => {
-    return (localStorage.getItem(`pokethology_act_esync_${todayStr}`) === 'completed') ? 'completed' : 'idle';
-  });
+  // 5. Dimensional Time Sync
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'completed'>('idle');
 
   // --- MEDIUM ACTIVITIES STATES ---
 
   // 1. Advanced Lore Exam A
-  const [medTriviaStatus, setMedTriviaStatus] = useState<'unanswered' | 'correct' | 'incorrect'>(() => {
-    return (localStorage.getItem(`pokethology_act_mtriv_${todayStr}`) as any) || 'unanswered';
-  });
-  const [medChosenOption, setMedChosenOption] = useState<number | null>(() => {
-    const saved = localStorage.getItem(`pokethology_act_mtriv_opt_${todayStr}`);
-    return saved !== null ? parseInt(saved, 10) : null;
-  });
+  const [medTriviaStatus, setMedTriviaStatus] = useState<'unanswered' | 'correct' | 'incorrect'>('unanswered');
+  const [medChosenOption, setMedChosenOption] = useState<number | null>(null);
   const medTriviaIndex = useMemo(() => {
     const hash = todayStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return (hash + 3) % MEDIUM_TRIVIA_QUESTIONS.length;
   }, [todayStr]);
   const medTriviaQuestion = sessionMedTriviaQuestion || MEDIUM_TRIVIA_QUESTIONS[medTriviaIndex];
 
-  // 2. Medium Trivia Question B (REPLACES COMBAT ARENA CHAOS)
-  const [medTriviaStatusB, setMedTriviaStatusB] = useState<'unanswered' | 'correct' | 'incorrect'>(() => {
-    return (localStorage.getItem(`pokethology_act_mtriv_b_${todayStr}`) as any) || 'unanswered';
-  });
-  const [medChosenOptionB, setMedChosenOptionB] = useState<number | null>(() => {
-    const saved = localStorage.getItem(`pokethology_act_mtriv_opt_b_${todayStr}`);
-    return saved !== null ? parseInt(saved, 10) : null;
-  });
+  // 2. Medium Trivia Question B
+  const [medTriviaStatusB, setMedTriviaStatusB] = useState<'unanswered' | 'correct' | 'incorrect'>('unanswered');
+  const [medChosenOptionB, setMedChosenOptionB] = useState<number | null>(null);
   const medTriviaIndexB = useMemo(() => {
     const hash = todayStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return (hash + 5) % MEDIUM_TRIVIA_QUESTIONS.length;
@@ -510,33 +418,22 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
   const medTriviaQuestionB = sessionMedTriviaQuestionB || MEDIUM_TRIVIA_QUESTIONS[medTriviaIndexB];
 
   // Legacy holder
-  const [chaosClaimed, setChaosClaimed] = useState<boolean>(() => {
-    return localStorage.getItem(`pokethology_act_mchaos_${todayStr}`) === 'claimed';
-  });
+  const [chaosClaimed, setChaosClaimed] = useState<boolean>(false);
 
   // 3. Chrono-Anomaly Strike
-  const [chronoClaimed, setChronoClaimed] = useState<boolean>(() => {
-    return localStorage.getItem(`pokethology_act_mchrono_${todayStr}`) === 'claimed';
-  });
+  const [chronoClaimed, setChronoClaimed] = useState<boolean>(false);
 
   // 4. Temporal Core Recharge Game
-  const [coreRechargeStatus, setCoreRechargeStatus] = useState<'idle' | 'playing' | 'completed'>(() => {
-    return (localStorage.getItem(`pokethology_act_mcore_${todayStr}`) === 'completed') ? 'completed' : 'idle';
-  });
+  const [coreRechargeStatus, setCoreRechargeStatus] = useState<'idle' | 'playing' | 'completed'>('idle');
   const [sliderPosition, setSliderPosition] = useState<number>(0);
   const sliderDirectionRef = useRef<number>(1);
   const [gameResult, setGameResult] = useState<string | null>(null);
 
   // --- HARD ACTIVITIES STATES ---
   
-  // 1. Hard Trivia Question B (REPLACES COMBAT ARENA RAID)
-  const [masterExamStatusB, setMasterExamStatusB] = useState<'unanswered' | 'correct' | 'incorrect'>(() => {
-    return (localStorage.getItem(`pokethology_act_hexam_b_${todayStr}`) as any) || 'unanswered';
-  });
-  const [masterChosenOptionB, setMasterChosenOptionB] = useState<number | null>(() => {
-    const saved = localStorage.getItem(`pokethology_act_hexam_opt_b_${todayStr}`);
-    return saved !== null ? parseInt(saved, 10) : null;
-  });
+  // 1. Hard Trivia Question B
+  const [masterExamStatusB, setMasterExamStatusB] = useState<'unanswered' | 'correct' | 'incorrect'>('unanswered');
+  const [masterChosenOptionB, setMasterChosenOptionB] = useState<number | null>(null);
   const masterTriviaIndexB = useMemo(() => {
     const hash = todayStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return (hash + 1) % HARD_TRIVIA_QUESTIONS.length;
@@ -544,23 +441,14 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
   const hardTriviaQuestionB = sessionHardTriviaQuestionB || HARD_TRIVIA_QUESTIONS[masterTriviaIndexB];
 
   // Legacy holder
-  const [legendaryClaimed, setLegendaryClaimed] = useState<boolean>(() => {
-      return localStorage.getItem(`pokethology_act_hlegend_${todayStr}`) === 'claimed';
-  });
+  const [legendaryClaimed, setLegendaryClaimed] = useState<boolean>(false);
   
   // 2. Elite Speed Trial
-  const [speedTrialStatus, setSpeedTrialStatus] = useState<'idle' | 'running' | 'completed'>(() => {
-      return (localStorage.getItem(`pokethology_act_hspeed_${todayStr}`) === 'completed') ? 'completed' : 'idle';
-  });
+  const [speedTrialStatus, setSpeedTrialStatus] = useState<'idle' | 'running' | 'completed'>('idle');
   
   // 3. Master Strategist Exam A
-  const [masterExamStatus, setMasterExamStatus] = useState<'unanswered' | 'correct' | 'incorrect'>(() => {
-    return (localStorage.getItem(`pokethology_act_hexam_${todayStr}`) as any) || 'unanswered';
-  });
-  const [masterChosenOption, setMasterChosenOption] = useState<number | null>(() => {
-    const saved = localStorage.getItem(`pokethology_act_hexam_opt_${todayStr}`);
-    return saved !== null ? parseInt(saved, 10) : null;
-  });
+  const [masterExamStatus, setMasterExamStatus] = useState<'unanswered' | 'correct' | 'incorrect'>('unanswered');
+  const [masterChosenOption, setMasterChosenOption] = useState<number | null>(null);
   const masterTriviaIndex = useMemo(() => {
     const hash = todayStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return Math.abs(hash) % HARD_TRIVIA_QUESTIONS.length;
@@ -568,9 +456,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
   const hardTriviaQuestion = sessionHardTriviaQuestion || HARD_TRIVIA_QUESTIONS[masterTriviaIndex];
   
   // 4. Ultimate Matrix Lockdown
-  const [matrixLockdownStatus, setMatrixLockdownStatus] = useState<'idle' | 'active' | 'completed'>(() => {
-      return (localStorage.getItem(`pokethology_act_hmatrix_${todayStr}`) === 'completed') ? 'completed' : 'idle';
-  });
+  const [matrixLockdownStatus, setMatrixLockdownStatus] = useState<'idle' | 'active' | 'completed'>('idle');
 
   // --- HARD ACTIVITIES INTERACTIVE STATES & LOGIC ---
   // A. Raid Battle States for Legendary Defeat
@@ -619,14 +505,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       if (next <= 0) {
         setRaidActive(false);
         setLegendaryClaimed(true);
-        localStorage.setItem(`pokethology_act_hlegend_${todayStr}`, 'claimed');
-        localStorage.setItem(`pokethology_legendary_defeated_${todayStr}`, 'true');
-        addBonusPoints(300, {
-          title: "Legendary Boss Overthrown",
-          category: "HARD MYTHOLOGY COGNITION",
-          description: "Neutralized the spatial anomaly bosses and repaired the rift in the theological matrix.",
-          itemUnlocked: "Arceus Origin Cosmic Crest"
-        });
         setRaidMessage('VICTORY! COGNITIVE BARRIER SECURED!');
       }
       return next;
@@ -641,13 +519,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       setLegendaryFlash(false);
     }, 1500);
     setLegendaryClaimed(true);
-    localStorage.setItem(`pokethology_act_hlegend_${todayStr}`, 'claimed');
-    addBonusPoints(300, {
-      title: "Mythology Sovereign Neutralized",
-      category: "HARD MYTHOLOGY COGNITION",
-      description: "Successfully quarantined the Boss and secured the Outer Space boundaries.",
-      itemUnlocked: "Griseous Singularity Beacon"
-    });
   };
 
   const startSpeedTrial = () => {
@@ -681,13 +552,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     try { sounds.scan(); } catch (_) {}
     if (speedTrialCurrent >= 365) {
       setSpeedTrialStatus('completed');
-      localStorage.setItem(`pokethology_act_hspeed_${todayStr}`, 'completed');
-      addBonusPoints(250, {
-        title: "Velocity Threshold Surpassed",
-        category: "HARD EXPERTISE",
-        description: "Successfully struck the sweet-spot threshold during extreme speed surges (>365 MPH).",
-        itemUnlocked: "Speed-Force Micro-Chip"
-      });
     } else {
       setSpeedTrialCurrent(60);
     }
@@ -716,13 +580,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       if (allEnabled) {
         setTimeout(() => {
           setMatrixLockdownStatus('completed');
-          localStorage.setItem(`pokethology_act_hmatrix_${todayStr}`, 'completed');
-          addBonusPoints(350, {
-            title: "Matrix Grid Alignment",
-            category: "HARD CORE OPERATIONS",
-            description: "Synchronized all structural micro-network nodes to unlock default matrix throughput.",
-            itemUnlocked: "Arceus Cosmos Kernel Key"
-          });
         }, 80);
       }
       
@@ -740,7 +597,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
   useEffect(() => {
     if (medCheckinStatus !== 'breathing') return;
     if (medSeconds <= 0) {
-      setMedCheckinStatus('claimable');
+      setMedCheckinStatus('completed');
       return;
     }
     const timer = setTimeout(() => {
@@ -784,13 +641,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       setMeditationFlash(false);
     }, 1500);
     setMedCheckinStatus('completed');
-    localStorage.setItem(`pokethology_act_med_${todayStr}`, 'completed');
-    addBonusPoints(50, {
-      title: "Silent Recalibration Complete",
-      category: "EASY OPERATIONS",
-      description: "Successfully calibrated neural frequencies via targeted breathing patterns and synchronized biological rhythms.",
-      itemUnlocked: "Zen Meditation Candle"
-    });
   };
 
   const handleEasyTriviaAnswer = (optIdx: number) => {
@@ -800,18 +650,9 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     
     if (correct) {
       setEasyTriviaStatus('correct');
-      localStorage.setItem(`pokethology_act_etriv_${todayStr}`, 'correct');
-      localStorage.setItem(`pokethology_act_etriv_opt_${todayStr}`, optIdx.toString());
-      addBonusPoints(100, {
-        title: "Trivia Intel Verified",
-        category: "EASY THEORY",
-        description: "Verified fundamental status mechanics and item dynamics under clinical simulation parameters.",
-        itemUnlocked: "Kanto Bio-Scanner Mini-Core"
-      });
+      try { sounds.success?.(); } catch (_) {}
     } else {
       setEasyTriviaStatus('incorrect');
-      localStorage.setItem(`pokethology_act_etriv_${todayStr}`, 'incorrect');
-      localStorage.setItem(`pokethology_act_etriv_opt_${todayStr}`, optIdx.toString());
       try { sounds.error(); } catch (_) {}
     }
   };
@@ -823,18 +664,9 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     
     if (correct) {
       setEasyTriviaStatusB('correct');
-      localStorage.setItem(`pokethology_act_etriv_b_${todayStr}`, 'correct');
-      localStorage.setItem(`pokethology_act_etriv_opt_b_${todayStr}`, optIdx.toString());
-      addBonusPoints(120, {
-        title: "Sinnoh Myth Entry Verification",
-        category: "EASY THEORY",
-        description: "Successfully validated foundational cosmological folklore indexes for Sinnoh regional records.",
-        itemUnlocked: "Lake Verity Local Map"
-      });
+      try { sounds.success?.(); } catch (_) {}
     } else {
       setEasyTriviaStatusB('incorrect');
-      localStorage.setItem(`pokethology_act_etriv_b_${todayStr}`, 'incorrect');
-      localStorage.setItem(`pokethology_act_etriv_opt_b_${todayStr}`, optIdx.toString());
       try { sounds.error(); } catch (_) {}
     }
   };
@@ -846,18 +678,9 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     
     if (correct) {
       setMasterExamStatus('correct');
-      localStorage.setItem(`pokethology_act_hexam_${todayStr}`, 'correct');
-      localStorage.setItem(`pokethology_act_hexam_opt_${todayStr}`, optIdx.toString());
-      addBonusPoints(300, {
-        title: "Grandmaster Cosmology Verified",
-        category: "HARD THEORY EXAMS",
-        description: "Solved high-density legendary questions concerning Space-Time creation and divinity origins.",
-        itemUnlocked: "Griseous Orb Vector Key"
-      });
+      try { sounds.success?.(); } catch (_) {}
     } else {
       setMasterExamStatus('incorrect');
-      localStorage.setItem(`pokethology_act_hexam_${todayStr}`, 'incorrect');
-      localStorage.setItem(`pokethology_act_hexam_opt_${todayStr}`, optIdx.toString());
       try { sounds.error(); } catch (_) {}
     }
   };
@@ -869,18 +692,9 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     
     if (correct) {
       setMasterExamStatusB('correct');
-      localStorage.setItem(`pokethology_act_hexam_b_${todayStr}`, 'correct');
-      localStorage.setItem(`pokethology_act_hexam_opt_b_${todayStr}`, optIdx.toString());
-      addBonusPoints(350, {
-        title: "Arceus Origin Theorist Clearance",
-        category: "HARD THEORY EXAMS",
-        description: "Resolved critical structural space-time creation and legendary origin myths successfully.",
-        itemUnlocked: "Arceus Core Matrix Seal"
-      });
+      try { sounds.success?.(); } catch (_) {}
     } else {
       setMasterExamStatusB('incorrect');
-      localStorage.setItem(`pokethology_act_hexam_b_${todayStr}`, 'incorrect');
-      localStorage.setItem(`pokethology_act_hexam_opt_b_${todayStr}`, optIdx.toString());
       try { sounds.error(); } catch (_) {}
     }
   };
@@ -893,13 +707,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
         setEasyStrikeFlash(false);
       }, 1500);
       setEasyStrikeClaimed(true);
-      localStorage.setItem(`pokethology_act_estrike_${todayStr}`, 'claimed');
-      addBonusPoints(150, {
-        title: "Tactical Strike Bounty Unlocked",
-        category: "EASY OPERATIONS",
-        description: "Successfully tracked and defeated designated combat targets during dynamic biospheric simulations.",
-        itemUnlocked: "Battle Frontier Honour Badge"
-      });
     }
   };
 
@@ -908,13 +715,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     setScanStatus('scanning');
     setTimeout(() => {
       setScanStatus('completed');
-      localStorage.setItem(`pokethology_act_escan_${todayStr}`, 'completed');
-      addBonusPoints(80, {
-        title: "Deep Spatial Sweep Complete",
-        category: "EASY OPERATIONS",
-        description: "Successfully mapped active background cosmic structures and recorded dimensional anomalies.",
-        itemUnlocked: "Cosmic Coordinate Signal #88"
-      });
     }, 2800);
   };
 
@@ -926,18 +726,9 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     
     if (correct) {
       setMedTriviaStatus('correct');
-      localStorage.setItem(`pokethology_act_mtriv_${todayStr}`, 'correct');
-      localStorage.setItem(`pokethology_act_mtriv_opt_${todayStr}`, optIdx.toString());
-      addBonusPoints(150, {
-        title: "Combat Analysis Cleared",
-        category: "MEDIUM THEORY",
-        description: "Calculated climate modifiers and turn-order speed thresholds with absolute clinical accuracy.",
-        itemUnlocked: "Eviolite Matrix Shard"
-      });
+      try { sounds.success?.(); } catch (_) {}
     } else {
       setMedTriviaStatus('incorrect');
-      localStorage.setItem(`pokethology_act_mtriv_${todayStr}`, 'incorrect');
-      localStorage.setItem(`pokethology_act_mtriv_opt_${todayStr}`, optIdx.toString());
       try { sounds.error(); } catch (_) {}
     }
   };
@@ -949,104 +740,54 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     
     if (correct) {
       setMedTriviaStatusB('correct');
-      localStorage.setItem(`pokethology_act_mtriv_b_${todayStr}`, 'correct');
-      localStorage.setItem(`pokethology_act_mtriv_opt_b_${todayStr}`, optIdx.toString());
-      addBonusPoints(200, {
-        title: "Synergy Theory Verified",
-        category: "MEDIUM THEORY",
-        description: "Resolved ability interaction multipliers on active environmental battle fields.",
-        itemUnlocked: "Terrain Seed Link"
-      });
+      try { sounds.success?.(); } catch (_) {}
     } else {
       setMedTriviaStatusB('incorrect');
-      localStorage.setItem(`pokethology_act_mtriv_b_${todayStr}`, 'incorrect');
-      localStorage.setItem(`pokethology_act_mtriv_opt_b_${todayStr}`, optIdx.toString());
       try { sounds.error(); } catch (_) {}
     }
   };
 
   const handleChaosClaim = () => {
-    const isChaosWon = localStorage.getItem(`pokethology_sandbox_${todayStr}`) === 'true';
-    if (isChaosWon && !chaosClaimed) {
-      playHaptic(30);
-      setChaosFlash(true);
-      setTimeout(() => {
-        setChaosFlash(false);
-      }, 1500);
-      setChaosClaimed(true);
-      localStorage.setItem(`pokethology_act_mchaos_${todayStr}`, 'claimed');
-      addBonusPoints(180, {
-        title: "Chaos draft victory",
-        category: "MEDIUM OPERATIONS",
-        description: "Synchronized dynamic sandbox battle teams and mastered competitive party synergy.",
-        itemUnlocked: "Simulation Gilded Token"
-      });
-    }
+    setChaosClaimed(true);
   };
 
   const handleChronoClaim = () => {
-    if (isCompleted && !chronoClaimed) {
-      playHaptic(30);
-      setChronoFlash(true);
-      setTimeout(() => {
-        setChronoFlash(false);
-      }, 1500);
-      setChronoClaimed(true);
-      localStorage.setItem(`pokethology_act_mchrono_${todayStr}`, 'claimed');
-      addBonusPoints(200, {
-        title: "Time Matrix Aligned",
-        category: "MEDIUM OPERATIONS",
-        description: "Calibrated systemic chronometers and successfully established synchronization with central Sinnoh servers.",
-        itemUnlocked: "Metronome Rhythm Sensor"
-      });
-    }
+    setChronoClaimed(true);
   };
 
   const handleRetryEasyTrivia = () => {
     setEasyTriviaStatus('unanswered');
     setEasyChosenOption(null);
-    localStorage.removeItem(`pokethology_act_etriv_${todayStr}`);
-    localStorage.removeItem(`pokethology_act_etriv_opt_${todayStr}`);
     try { sounds.scan(); } catch (_) {}
   };
 
   const handleRetryEasyTriviaB = () => {
     setEasyTriviaStatusB('unanswered');
     setEasyChosenOptionB(null);
-    localStorage.removeItem(`pokethology_act_etriv_b_${todayStr}`);
-    localStorage.removeItem(`pokethology_act_etriv_opt_b_${todayStr}`);
     try { sounds.scan(); } catch (_) {}
   };
 
   const handleRetryMedTrivia = () => {
     setMedTriviaStatus('unanswered');
     setMedChosenOption(null);
-    localStorage.removeItem(`pokethology_act_mtriv_${todayStr}`);
-    localStorage.removeItem(`pokethology_act_mtriv_opt_${todayStr}`);
     try { sounds.scan(); } catch (_) {}
   };
 
   const handleRetryMedTriviaB = () => {
     setMedTriviaStatusB('unanswered');
     setMedChosenOptionB(null);
-    localStorage.removeItem(`pokethology_act_mtriv_b_${todayStr}`);
-    localStorage.removeItem(`pokethology_act_mtriv_opt_b_${todayStr}`);
     try { sounds.scan(); } catch (_) {}
   };
 
   const handleRetryMasterExam = () => {
     setMasterExamStatus('unanswered');
     setMasterChosenOption(null);
-    localStorage.removeItem(`pokethology_act_hexam_${todayStr}`);
-    localStorage.removeItem(`pokethology_act_hexam_opt_${todayStr}`);
     try { sounds.scan(); } catch (_) {}
   };
 
   const handleRetryMasterExamB = () => {
     setMasterExamStatusB('unanswered');
     setMasterChosenOptionB(null);
-    localStorage.removeItem(`pokethology_act_hexam_b_${todayStr}`);
-    localStorage.removeItem(`pokethology_act_hexam_opt_b_${todayStr}`);
     try { sounds.scan(); } catch (_) {}
   };
 
@@ -1058,13 +799,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     if (inSweetSpot) {
       setGameResult('success');
       setCoreRechargeStatus('completed');
-      localStorage.setItem(`pokethology_act_mcore_${todayStr}`, 'completed');
-      addBonusPoints(120, {
-        title: "Magnetic Core Energized",
-        category: "MEDIUM OPERATIONS",
-        description: "Successfully locked the magnetic oscillator sweepers within the 42%-58% sweet spot to re-energize the central core grid.",
-        itemUnlocked: "Oscilloscope Resonance Plug"
-      });
     } else {
       setGameResult('failed');
       setTimeout(() => {
@@ -2173,162 +1907,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
           AGGREGATE OPERATIONAL POWER: {totalCompletedCount} ACTIVITIES COMPLETED
         </span>
       </div>
-
-      {/* Sparkly particles celebration effect */}
-      {showCelebration && (
-        <div className="absolute inset-0 pointer-events-none z-50 bg-cyan-400/5 rounded-2xl">
-          {[...Array(15)].map((_, i) => (
-            <motion.div
-              key={`sparkle-${i}`}
-              className="absolute w-1.5 h-1.5 bg-gradient-to-tr from-amber-400 via-yellow-300 to-cyan-300 rounded-full"
-              initial={{ 
-                x: Math.random() * 200 - 100, 
-                y: Math.random() * 100 - 30 + 80,
-                opacity: 1,
-                scale: 0.5
-              }}
-              animate={{ 
-                y: -220,
-                opacity: 0,
-                scale: [0.5, 2.5, 0]
-              }}
-              transition={{ 
-                duration: 2.5, 
-                delay: Math.random() * 0.4,
-                ease: "easeOut"
-              }}
-              style={{
-                left: `${15 + Math.random() * 70}%`,
-                top: '50%'
-              }}
-            />
-          ))}
-          <motion.div
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 0 }}
-            transition={{ duration: 1.8 }}
-            className="absolute inset-0 border-4 border-cyan-400 rounded-2xl pointer-events-none"
-            onAnimationComplete={() => setShowCelebration(false)}
-          />
-          <div className="absolute top-[40%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 bg-slate-950/90 border border-amber-500/30 font-hud text-amber-400 text-sm font-black px-4 py-2 rounded-xl flex items-center gap-2.5 shadow-2xl animate-bounce">
-            <Sparkle className="w-4 h-4 animate-spin text-amber-400" />
-            <span>EXAMINATION STATUS SECURED</span>
-          </div>
-        </div>
-      )}
-
-      {/* Dynamic Success Award Modal overlay */}
-      <AnimatePresence>
-        {successModal && successModal.isOpen && (
-          <motion.div
-            key="success-claim-modal-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/85 backdrop-blur-md z-[100] flex items-center justify-center p-4 overflow-y-auto"
-            onClick={() => setSuccessModal(null)}
-          >
-            <motion.div
-              key="success-claim-modal-container"
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ 
-                scale: 1, 
-                opacity: 1, 
-                y: 0,
-                transition: { type: "spring", stiffness: 300, damping: 25 }
-              }}
-              exit={{ scale: 0.95, opacity: 0, y: 15 }}
-              className="bg-zinc-950 border border-zinc-800 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative p-6 flex flex-col items-center text-center gap-5"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Retro HUD corners */}
-              <HUDCorners />
-
-              {/* Animated glowing badge placeholder with SVG / Lucide sparks */}
-              <div className="relative w-24 h-24 flex items-center justify-center mt-2">
-                <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/20 via-amber-500/10 to-teal-500/20 rounded-full animate-pulse blur-xl" />
-                
-                {/* Holographic golden spinning circle */}
-                <motion.div 
-                  animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
-                  className="absolute inset-0 border border-dashed border-amber-500/40 rounded-full p-2"
-                />
-                <motion.div 
-                  animate={{ rotate: -360 }}
-                  transition={{ repeat: Infinity, duration: 12, ease: "linear" }}
-                  className="absolute inset-2 border border-dotted border-cyan-500/30 rounded-full p-2"
-                />
-
-                <div className="relative w-16 h-16 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center shadow-inner">
-                  <Trophy className="w-8 h-8 text-amber-400 animate-bounce" />
-                </div>
-              </div>
-
-              {/* Title parameters */}
-              <div className="space-y-1">
-                <span className="text-[10px] font-mono tracking-widest text-amber-400 font-extrabold uppercase px-2.5 py-0.5 bg-amber-950/40 border border-amber-900/30 rounded-full">
-                  {successModal.categoryName || "BOUNTY CLAIMED"}
-                </span>
-                <h3 className="text-md sm:text-lg font-sans font-black tracking-wider text-zinc-100 uppercase pt-2.5">
-                  {successModal.title}
-                </h3>
-              </div>
-
-              {/* Description summary */}
-              <p className="text-[10.5px] text-zinc-400 font-sans leading-relaxed max-w-[280px]">
-                {successModal.description}
-              </p>
-
-              {/* Unlocked / gained resources list */}
-              <div className="w-full bg-zinc-900/50 border border-zinc-900 rounded-2xl p-4 space-y-3 px-3.5 divide-y divide-zinc-900/80">
-                <div className="flex flex-col items-center gap-1 pb-1">
-                  <span className="text-[9px] font-mono tracking-wider text-zinc-500 uppercase">Gained Grid Currency</span>
-                  <div className="flex items-center gap-1.5">
-                    <Zap className="w-5 h-5 text-yellow-400 animate-pulse" />
-                    <span className="text-xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-300 to-emerald-400">
-                      ACTIVITY RESOLVED
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center pt-3 text-[10px] font-mono">
-                  <span className="text-zinc-500 uppercase">Cognitive Insight</span>
-                  <span className="text-emerald-400 font-bold flex items-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                    +1 Crystal Node
-                  </span>
-                </div>
-
-                {successModal.itemUnlocked && (
-                  <div className="flex flex-col items-center gap-1.5 pt-3">
-                    <span className="text-[9px] font-mono tracking-wider text-zinc-500 uppercase">Tactical Item Unlocked</span>
-                    <div className="flex items-center gap-2 bg-cyan-950/30 border border-cyan-900/40 px-3 py-1.5 rounded-xl w-full justify-center">
-                      <Award className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                      <span className="text-cyan-300 font-sans text-[10px] font-extrabold uppercase tracking-wide truncate">
-                        {successModal.itemUnlocked}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Close Button */}
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => {
-                  setSuccessModal(null);
-                  try { sounds.scan(); } catch (_) {}
-                }}
-                className="w-full py-3 bg-zinc-100 hover:bg-white text-zinc-950 rounded-xl text-center text-[10px] font-sans font-black uppercase tracking-widest transition-all cursor-pointer shadow-lg shadow-zinc-950/50 mt-1"
-              >
-                DISMISS SYSTEM INTERFACE
-              </motion.button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 });
