@@ -565,17 +565,21 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
     return count;
   }, [lockedMap, userAnswersMap]);
 
+  const completedRegionsCount = useMemo(() => {
+    return allExams.filter(region => region.questions.every(q => lockedMap[q.id])).length;
+  }, [allExams, lockedMap]);
+
   const overallPercent = Math.round((answeredQuestionsCount / totalQuestionsCount) * 100) || 0;
 
-  const getAcademicRank = (correct: number, total: number) => {
-    if (correct === total) return { title: 'Arch-Theologian Deity', color: 'text-amber-400 font-black' };
-    if (correct >= 20) return { title: 'Master Lore Scholar', color: 'text-cyan-400 font-extrabold' };
-    if (correct >= 12) return { title: 'Regional Mythologist', color: 'text-emerald-400 font-bold' };
-    if (correct >= 5) return { title: 'Acolyte Pilgrim', color: 'text-purple-400 font-bold' };
-    return { title: 'Novice Student', color: 'text-slate-400 font-semibold' };
+  const getAcademicRank = (completedRegions: number, totalRegions: number) => {
+    if (completedRegions >= totalRegions) return { title: 'Master', color: 'text-amber-400 font-black' };
+    if (completedRegions >= 6) return { title: 'Expert', color: 'text-cyan-400 font-extrabold' };
+    if (completedRegions >= 4) return { title: 'Intermediate', color: 'text-emerald-400 font-bold' };
+    if (completedRegions >= 2) return { title: 'Beginner', color: 'text-purple-400 font-bold' };
+    return { title: 'Novice', color: 'text-slate-400 font-semibold' };
   };
 
-  const currentRank = getAcademicRank(correctAnswersCount, totalQuestionsCount);
+  const currentRank = getAcademicRank(completedRegionsCount, allExams.length);
 
   const handleSelectOption = (questionId: string, optionIdx: number) => {
     if (lockedMap[questionId]) return;
@@ -595,21 +599,6 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
       try { sounds.success(); } catch (_) {}
     } else {
       try { sounds.error(); } catch (_) {}
-    }
-  };
-
-  const handleResetExam = () => {
-    if (window.confirm('Reset all academic exam progress across all regions for today?')) {
-      setUserAnswersMap({});
-      setSelectedOptionMap({});
-      setLockedMap({});
-      if (todayStr) {
-        localStorage.removeItem(`pokethology_exam_answers_v2_${todayStr}`);
-        localStorage.removeItem(`pokethology_exam_locked_v2_${todayStr}`);
-      }
-      localStorage.removeItem('pokethology_exam_answers_v2');
-      localStorage.removeItem('pokethology_exam_locked_v2');
-      try { sounds.scan(); } catch (_) {}
     }
   };
 
@@ -651,15 +640,8 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-[10px] font-mono text-cyan-300 font-bold bg-cyan-950/60 border border-cyan-500/30 px-2.5 py-1 rounded-md">
-              {correctAnswersCount} / {answeredQuestionsCount} CORRECT ({answeredQuestionsCount}/{totalQuestionsCount} ANSWERED)
+              {answeredQuestionsCount} / {totalQuestionsCount} COMPLETED
             </span>
-            <button
-              onClick={handleResetExam}
-              className="p-1.5 rounded bg-slate-950 hover:bg-red-950/40 text-slate-400 hover:text-red-400 border border-slate-800 hover:border-red-500/30 transition-all text-[9px] font-mono flex items-center gap-1"
-              title="Reset Exam Progress"
-            >
-              <RotateCcw className="w-3 h-3" />
-            </button>
           </div>
         </div>
 

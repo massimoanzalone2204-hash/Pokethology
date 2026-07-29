@@ -6138,8 +6138,9 @@ export default function App() {
                                       </div>
                                     </div>
 
-                                    <div className={cn(
+                                    <div id="pokemon-stats-capture-zone" className={cn(
                                       "backdrop-blur-md rounded-2xl p-5 sm:p-7 border shadow-inner relative overflow-hidden group/statshud w-full max-w-full z-10 box-border",
+                                      
                                       isLightMode 
                                         ? "bg-white/95 border-slate-200" 
                                         : "bg-slate-900/60 border-cyan-900/40"
@@ -6294,7 +6295,7 @@ export default function App() {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -15 }}
                                     transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                                    className="w-full flex-1 flex flex-col gap-2 min-h-0 h-full overflow-hidden"
+                                    className="w-full max-w-4xl mx-auto flex-1 flex flex-col gap-2 min-h-0 h-full overflow-hidden"
                                   >
                                     <div className={cn(
                                       "chat-container flex-1 rounded-xl border overflow-hidden flex flex-col relative min-h-0",
@@ -8052,7 +8053,7 @@ export default function App() {
                                 <motion.div animate={{ rotate: 360, scale: [1, 1.15, 1] }} transition={{ repeat: Infinity, duration: 4, ease: "linear" }}>
                                   <BrainCircuit className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 filter drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]", isDailyQuizOpen ? "text-white font-black" : "text-purple-400")} />
                                 </motion.div>
-                                <span className="relative z-10 font-bold whitespace-nowrap">{t('THEOLOGICAL EXAM') || 'THEOLOGICAL EXAM'}</span>
+                                <span className="relative z-10 font-bold whitespace-nowrap">{t('THEORY EXAM') || 'THEORY EXAM'}</span>
                                 <span className="relative z-10 items-center gap-1 px-1.5 py-0.5 rounded-full bg-purple-500/20 border border-purple-400/50 text-[6.5px] sm:text-[7px] text-purple-300 font-extrabold tracking-wider uppercase shrink-0 shadow-[0_0_6px_rgba(168,85,247,0.4)] animate-pulse hidden xs:inline-flex">
                                   <span className="w-1 h-1 rounded-full bg-purple-400 animate-ping shrink-0" />
                                   READY

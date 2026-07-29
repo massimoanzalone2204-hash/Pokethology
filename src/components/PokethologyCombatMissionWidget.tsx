@@ -1104,12 +1104,11 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
   const totalCompletedCount = easyCompletedCount + medCompletedCount + hardCompletedCount;
 
   const operatorRank = useMemo(() => {
-    if (combatPoints >= 1500) return { title: 'Cosmic Prophet', color: 'text-amber-400 border-amber-500/30' };
-    if (combatPoints >= 1000) return { title: 'Elite Tactician', color: 'text-purple-400 border-purple-500/30' };
-    if (combatPoints >= 600) return { title: 'Master Strategist', color: 'text-emerald-400 border-emerald-500/30' };
-    if (combatPoints >= 300) return { title: 'Veteran Battler', color: 'text-cyan-400 border-cyan-500/30' };
-    return { title: 'Novice Pilgrim', color: 'text-slate-400 border-slate-700/50' };
-  }, [combatPoints]);
+    if (totalCompletedCount >= 3) return { title: 'Expert', color: 'text-amber-400 border-amber-500/30' };
+    if (totalCompletedCount >= 2) return { title: 'Intermediate', color: 'text-purple-400 border-purple-500/30' };
+    if (totalCompletedCount >= 1) return { title: 'Beginner', color: 'text-emerald-400 border-emerald-500/30' };
+    return { title: 'Novice', color: 'text-slate-400 border-slate-700/50' };
+  }, [totalCompletedCount]);
 
   if (isWidgetLoading) {
     return (
@@ -1193,7 +1192,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
           </p>
           <div className="flex items-center gap-2 mt-1">
             <div className="text-xl sm:text-2xl font-hud font-black text-white leading-none">
-              {combatPoints} <span className="text-xs text-cyan-400/60 font-bold">PTS</span>
+              {totalCompletedCount} <span className="text-xs text-cyan-400/60 font-bold">COMPLETED</span>
             </div>
           </div>
         </div>
@@ -1341,7 +1340,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                       <BrainCircuit className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
                       Activity 01 • Theory Challenge
                     </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Nectar of the Novices • +100 PTS</span>
+                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Nectar of the Novices </span>
                   </div>
                   {easyTriviaStatus === 'correct' ? (
                     <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
@@ -1414,7 +1413,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                       <BrainCircuit className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
                       Activity 02 • Theory II
                     </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Type Effectiveness Check • +120 PTS</span>
+                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Type Effectiveness Check </span>
                   </div>
                   {easyTriviaStatusB === 'correct' ? (
                     <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
@@ -1487,7 +1486,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                       <BrainCircuit className="w-3.5 h-3.5 text-amber-500 animate-spin" style={{ animationDuration: '6s' }} />
                       Activity 03 • Pokédex
                     </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Daily Pokédex Scan • +80 PTS</span>
+                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Daily Pokédex Scan </span>
                   </div>
                   {scanStatus === 'completed' ? (
                     <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
@@ -1531,7 +1530,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                   {scanStatus === 'completed' && (
                     <div className="w-full py-2 bg-emerald-950/20 border border-emerald-500/20 text-emerald-400 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5">
                       <Check className="w-3.5 h-3.5" />
-                      Pokédex scan completed (+80 pts)
+                      Pokédex scan completed 
                     </div>
                   )}
                 </div>
@@ -1549,7 +1548,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                       <Gauge className="w-3.5 h-3.5 text-amber-500" />
                       Activity 04 • Smart & Reactivity
                     </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Focus Meditation • +50 PTS</span>
+                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Focus Meditation </span>
                   </div>
                   {medCheckinStatus === 'completed' ? (
                     <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
@@ -1586,14 +1585,14 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                       className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-lg active:scale-95 animate-bounce"
                     >
                       <Trophy className="w-3.5 h-3.5" />
-                      Claim +50 PTS Reward!
+                      Claim  Reward!
                     </button>
                   )}
 
                   {medCheckinStatus === 'completed' && (
                     <div className="w-full py-2 bg-emerald-950/20 border border-emerald-500/20 text-emerald-400 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5 select-none opacity-80">
                       <Check className="w-3.5 h-3.5" />
-                      Completed (+50 pts)
+                      Completed 
                     </div>
                   )}
                 </div>
@@ -1616,7 +1615,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                       <BrainCircuit className="w-3.5 h-3.5 text-slate-400 animate-pulse" />
                       Activity 05 • Theory Challenge
                     </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Advanced Hermeneutics Exam • +150 PTS</span>
+                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Advanced Hermeneutics Exam </span>
                   </div>
                   {medTriviaStatus === 'correct' ? (
                     <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
@@ -1689,7 +1688,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                       <BrainCircuit className="w-3.5 h-3.5 text-slate-400 animate-pulse" />
                       Activity 06 • Theory II
                     </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Complex Move Strategy Check • +200 PTS</span>
+                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Complex Move Strategy Check </span>
                   </div>
                   {medTriviaStatusB === 'correct' ? (
                     <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
@@ -1765,7 +1764,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                       <BrainCircuit className="w-3.5 h-3.5 text-slate-400 animate-spin" style={{ animationDuration: '6s' }} />
                       Activity 07 • Pokédex
                     </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">High-Stat Defense Scanner • +200 PTS</span>
+                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">High-Stat Defense Scanner </span>
                   </div>
                   {chronoClaimed ? (
                     <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
@@ -1791,7 +1790,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                         className="w-full py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white text-[10px] font-hud font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md active:scale-95 animate-bounce"
                       >
                         <Trophy className="w-3.5 h-3.5 animate-pulse" />
-                        Claim +200 Database Points
+                        Claim Activity
                       </button>
                     )
                   ) : (
@@ -1812,7 +1811,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                       <Gauge className="w-3.5 h-3.5 text-slate-400" />
                       Activity 08 • Smart & Reactivity
                     </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Reflex Calibration Exercise • +120 PTS</span>
+                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Reflex Calibration Exercise </span>
                   </div>
                   {coreRechargeStatus === 'completed' ? (
                     <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
@@ -1881,7 +1880,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                   {coreRechargeStatus === 'completed' && (
                     <div className="w-full py-2 bg-emerald-950/20 border border-emerald-500/20 text-emerald-400 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5">
                       <Check className="w-3.5 h-3.5" />
-                      Grid Calibration Perfect (+120 pts)
+                      Grid Calibration Perfect 
                     </div>
                   )}
                 </div>
@@ -1904,7 +1903,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                       <BrainCircuit className="w-3.5 h-3.5 text-yellow-400 animate-pulse" />
                       Activity 09 • Theory Challenge
                     </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Master Strategist Theory Exam • +300 PTS</span>
+                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Master Strategist Theory Exam </span>
                   </div>
                   {masterExamStatus === 'correct' ? (
                     <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
@@ -1979,7 +1978,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                         <BrainCircuit className="w-3.5 h-3.5 text-yellow-400 animate-pulse" />
                         Activity 10 • Theory II
                       </h4>
-                      <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Legendary Lore • +300 PTS</span>
+                      <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Legendary Lore </span>
                     </div>
                     {masterExamStatusB === 'correct' ? (
                       <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
@@ -2052,7 +2051,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                         <BrainCircuit className="w-3.5 h-3.5 text-yellow-400 animate-spin" style={{ animationDuration: '6s' }} />
                         Activity 11 • Pokédex Puzzle
                       </h4>
-                      <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Grid Puzzle • +350 PTS</span>
+                      <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Grid Puzzle </span>
                     </div>
                     {matrixLockdownStatus === 'completed' ? (
                       <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
@@ -2112,7 +2111,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                         <Gauge className="w-3.5 h-3.5 text-yellow-400" />
                         Activity 12 • Smart & Reactivity
                       </h4>
-                      <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Speed Trial • +250 PTS</span>
+                      <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Speed Trial </span>
                     </div>
                     {speedTrialStatus === 'completed' ? (
                       <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">PASSED</span>
@@ -2171,7 +2170,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       {/* FOOTER GENERAL STATUS */}
       <div className="flex flex-col sm:flex-row justify-center items-center mt-3 border-t border-slate-900/80 pt-3 text-[9px] font-mono gap-2 text-center w-full px-2">
         <span className="text-cyan-400 font-extrabold uppercase tracking-widest text-[9.5px]">
-          AGGREGATE OPERATIONAL POWER: {combatPoints} PTS
+          AGGREGATE OPERATIONAL POWER: {totalCompletedCount} ACTIVITIES COMPLETED
         </span>
       </div>
 
@@ -2213,7 +2212,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
           />
           <div className="absolute top-[40%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 bg-slate-950/90 border border-amber-500/30 font-hud text-amber-400 text-sm font-black px-4 py-2 rounded-xl flex items-center gap-2.5 shadow-2xl animate-bounce">
             <Sparkle className="w-4 h-4 animate-spin text-amber-400" />
-            <span>EXAMINATION BONUS SECURED: +{celebrationPoints} PTS!</span>
+            <span>EXAMINATION STATUS SECURED</span>
           </div>
         </div>
       )}
@@ -2288,7 +2287,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                   <div className="flex items-center gap-1.5">
                     <Zap className="w-5 h-5 text-yellow-400 animate-pulse" />
                     <span className="text-xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-300 to-emerald-400">
-                      +{successModal.points} PTS
+                      ACTIVITY RESOLVED
                     </span>
                   </div>
                 </div>

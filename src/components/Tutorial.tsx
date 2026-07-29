@@ -161,7 +161,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Map className="w-4 h-4 animate-pulse" /> Multigenerational Pokédex Exploration
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    The core registry acts as your definitive database. Seamlessly navigate across all Generations of Pokémon right from the home dashboard. Use advanced filtering to quickly find exact species matches across regions and types.
+                    The core registry acts as your definitive database. Seamlessly navigate across all Generations of Pokémon right from the home dashboard. Use advanced filtering to quickly find exact species matches across regions.
                   </p>
                 </div>
                 
@@ -270,7 +270,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                   <motion.div whileHover={{ scale: 1.01 }} className="bg-slate-900/50 p-4 rounded-xl border border-red-500/20 flex gap-3 relative overflow-hidden group">
                     <Activity className="w-6 h-6 text-red-400 shrink-0 group-hover:animate-pulse transition-colors" />
                     <div>
-                      <span className="font-bold text-red-400 text-[11px] sm:text-xs uppercase font-hud tracking-wider">Algorithmic Chaos</span>
+                      <span className="font-bold text-red-400 text-[11px] sm:text-xs uppercase font-hud tracking-wider">Full Chaos Mode</span>
                       <p className="text-[10px] sm:text-[10.5px] text-slate-400 leading-normal font-sans mt-1">
                         Turn on auto-battling to instantly roll randomized moves based on STAB logic, tracking HP and stat degradation dynamically.
                       </p>
@@ -315,7 +315,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Calendar className="w-4 h-4 animate-bounce" /> Daily Hub & Activities
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Return every 24 hours to claim rewards, expand your theological knowledge, and view the featured cosmic scans. The Daily Hub tracks your streaks and integrates deeply into your progression.
+                    Return every 24 hours to expand your theory knowledge and view the featured cosmic scans.
                   </p>
                 </div>
                 
@@ -337,9 +337,9 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <Cpu className="w-5 h-5 text-orange-400" />
                     </div>
                     <div>
-                      <span className="font-bold text-orange-400 text-[11px] sm:text-xs uppercase font-hud tracking-wider">Theological Exam (Quiz)</span>
+                      <span className="font-bold text-orange-400 text-[11px] sm:text-xs uppercase font-hud tracking-wider">Theory Exam</span>
                       <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Test your intellect. The AI dynamically generates 3 rigorous questions based on biology, stats, and lore. Pass the exam to boost your daily streak.
+                        Test your intellect. The AI dynamically generates rigorous questions based on biology, stats, and lore.
                       </p>
                     </div>
                   </div>

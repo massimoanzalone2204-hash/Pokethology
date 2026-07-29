@@ -408,7 +408,7 @@
 .custom-scrollbar {
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
-  scrollbar-gutter: auto;
+  scrollbar-gutter: stable; padding-right: 8px;
 }
 
 /* Global scrollability optimizations for mobile devices */
@@ -625,7 +625,7 @@ p, li {
    ========================================================================== */
 
 .light {
-  background-color: transparent !important;
+  background-color: #f8fafc !important;
   color: #0f172a !important;
 }
 
@@ -701,14 +701,21 @@ p, li {
 .light .border-slate-705,
 .light .border-slate-700,
 .light .border-slate-800\/40,
-.light .border-slate-900\/50,
+.light .border-slate-900\/50 {
+  border-color: #94a3b8 !important; /* slate-400 */
+}
+
 .light .border-cyan-500\/10,
-.light .border-cyan-500\/20,
+.light .border-cyan-500\/20 {
+  border-color: rgba(2, 132, 199, 0.25) !important;
+}
+
 .light .border-emerald-500\/20 {
-  border-color: #cbd5e1 !important; /* slate-300 */
+  border-color: rgba(5, 150, 105, 0.25) !important;
 }
 
 .light .border-cyan-500\/30,
+.light .border-cyan-500\/35,
 .light .border-cyan-500\/40 {
   border-color: rgba(2, 132, 199, 0.3) !important; /* sky-600 */
 }
@@ -720,7 +727,7 @@ p, li {
 .light label,
 .light div:not([class*="bg-cyan-"], [class*="bg-red-"], [class*="bg-purple-"], [class*="bg-pink-"], [class*="bg-green-"], [class*="bg-emerald-"], [class*="bg-amber-"], [class*="bg-sky-"], button, button *),
 .light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
-  color: #0284c7;
+  color: #0f172a;
 }
 
 .light .text-white:not([class*="bg-cyan-"], [class*="bg-red-"], [class*="bg-purple-"], [class*="bg-pink-"], [class*="bg-green-"], [class*="bg-emerald-"], [class*="bg-amber-"], [class*="bg-sky-"], button, button *),

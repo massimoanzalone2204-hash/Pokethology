@@ -1,3 +1,4 @@
+import html2canvas from "html2canvas";
 import jsPDF from 'jspdf';
 
 const COPYRIGHT_DISCLAIMER_LINE1 = 'Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc. TM, ® and Pokémon character names are trademarks of Nintendo.';
@@ -128,250 +129,45 @@ function drawDocumentFooters(doc: jsPDF, docTitle: string) {
 /**
  * Export single Pokémon research dossier report including selected Pokédex entry & full stats
  */
-export function exportPokemonDetailPDF(
+export async function exportPokemonDetailPDF(
   pokemon: any,
-  options?: {
-    selectedEntryText?: string;
-    selectedGameVersion?: string;
-    selectedMoves?: any[];
-  }
+  options?: { selectedEntryText?: string; selectedGameVersion?: string; selectedMoves?: any[] }
 ) {
   try {
-    const doc = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4'
-    });
+    const el = document.getElementById('pokemon-stats-capture-zone');
+    if (el) {
+      const isLightMode = document.documentElement.classList.contains('light');
+      
+      const originalMaxHeight = el.style.maxHeight;
+      const originalOverflow = el.style.overflow;
+      el.style.maxHeight = 'none';
+      el.style.overflow = 'visible';
 
-    const code = `DOSSIER-${Date.now().toString().slice(-8)}`;
-    const todayDate = new Date().toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-
-    const name = (pokemon.name || 'UNKNOWN').toUpperCase().replace(/-/g, ' ');
-    const idFormatted = `#${String(pokemon.baseId || pokemon.id || 1).padStart(3, '0')}`;
-    const types = Array.isArray(pokemon.types)
-      ? pokemon.types.map((t: any) => (typeof t === 'string' ? t : t.type?.name || '')).filter(Boolean).join(' / ').toUpperCase()
-      : 'NORMAL';
-
-    drawHeaderBanner(doc, `SPECIMEN DOSSIER: ${idFormatted} ${name}`, 'FIELD DOSSIER', code, todayDate);
-
-    let y = 58;
-
-    // SECTION 1: SPECIMEN IDENTITY & CURRENTLY SELECTED POKEDEX ENTRY
-    doc.setLineWidth(0.4);
-    doc.setDrawColor(148, 163, 184);
-    doc.setFillColor(248, 250, 252);
-    doc.roundedRect(15, y, 180, 50, 3, 3, 'FD');
-
-    // Section 1 Header
-    doc.setFillColor(226, 232, 240);
-    doc.roundedRect(15, y, 180, 11, 3, 3, 'F');
-    doc.rect(15, y + 8, 180, 3, 'F');
-
-    doc.setTextColor(15, 23, 42);
-    doc.setFont('Helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.text('1. SPECIMEN IDENTITY & SELECTED POKÉDEX ENTRY', 20, y + 7.5);
-
-    // Version Badge
-    const gameVer = (options?.selectedGameVersion || 'Core Registry').toUpperCase().replace(/-/g, ' ');
-    doc.setFont('Helvetica', 'bold');
-    doc.setFontSize(8.5);
-    doc.setTextColor(14, 116, 144); // cyan-700
-    doc.text(`SELECTED VERSION ENTRY: [ ${gameVer} ]`, 20, y + 18);
-
-    // Entry Description
-    const entryText = options?.selectedEntryText || pokemon.description || 'No lore description recorded for this specimen unit.';
-    doc.setFont('Helvetica', 'italic');
-    doc.setFontSize(8.5);
-    doc.setTextColor(51, 65, 85);
-    const splitText = doc.splitTextToSize(`"${entryText}"`, 170);
-    doc.text(splitText, 20, y + 25);
-
-    // Types & Category info row
-    doc.setFont('Helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.setTextColor(15, 23, 42);
-    doc.text(`PRIMARY TYPE MATRIX: ${types}`, 20, y + 44);
-
-    y += 56;
-
-    // SECTION 2: FULL BASE STATS BREAKDOWN & COMBAT HUD
-    doc.setLineWidth(0.4);
-    doc.setDrawColor(148, 163, 184);
-    doc.setFillColor(248, 250, 252);
-    doc.roundedRect(15, y, 180, 84, 3, 3, 'FD');
-
-    doc.setFillColor(226, 232, 240);
-    doc.roundedRect(15, y, 180, 11, 3, 3, 'F');
-    doc.rect(15, y + 8, 180, 3, 'F');
-
-    doc.setTextColor(15, 23, 42);
-    doc.setFont('Helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.text('2. COMPLETE BASE STATS MATRIX & COMBAT HUD', 20, y + 7.5);
-
-    // Robust stat extractor
-    const extractStat = (stats: any, key: string, fallbackIdx: number): number => {
-      if (!stats) return 50;
-      if (Array.isArray(stats)) {
-        const found = stats.find((s: any) => 
-          s?.stat?.name === key || 
-          s?.name === key ||
-          s?.statName === key
-        );
-        if (found && typeof found.base_stat === 'number') return found.base_stat;
-        if (found && typeof found.val === 'number') return found.val;
-        if (stats[fallbackIdx] && typeof stats[fallbackIdx].base_stat === 'number') return stats[fallbackIdx].base_stat;
-      } else if (typeof stats === 'object') {
-        const val = stats[key] ?? stats[key.replace('-', '')];
-        if (typeof val === 'number') return val;
-      }
-      return 50;
-    };
-
-    const hp = extractStat(pokemon.stats, 'hp', 0);
-    const atk = extractStat(pokemon.stats, 'attack', 1);
-    const def = extractStat(pokemon.stats, 'defense', 2);
-    const spAtk = extractStat(pokemon.stats, 'special-attack', 3);
-    const spDef = extractStat(pokemon.stats, 'special-defense', 4);
-    const spd = extractStat(pokemon.stats, 'speed', 5);
-    const totalStat = Number(hp) + Number(atk) + Number(def) + Number(spAtk) + Number(spDef) + Number(spd);
-
-    const ratingGrade = totalStat >= 600 ? 'S-TIER (LEGENDARY CLASS)' : totalStat >= 500 ? 'A-TIER (ELITE CLASS)' : totalStat >= 400 ? 'B-TIER (STANDARD HIGH)' : 'C-TIER (STANDARD)';
-
-    const statRows = [
-      { name: 'HP (Hit Points)', val: hp, max: 255, color: [239, 68, 68], lv50: Math.floor(hp * 2 + 110), lv100: Math.floor(hp * 2 + 204) },
-      { name: 'Attack', val: atk, max: 190, color: [249, 115, 22], lv50: Math.floor((atk * 2 + 99) * 0.5 + 5), lv100: Math.floor(atk * 2 + 104) },
-      { name: 'Defense', val: def, max: 230, color: [234, 179, 8], lv50: Math.floor((def * 2 + 99) * 0.5 + 5), lv100: Math.floor(def * 2 + 104) },
-      { name: 'Special Attack', val: spAtk, max: 194, color: [59, 130, 246], lv50: Math.floor((spAtk * 2 + 99) * 0.5 + 5), lv100: Math.floor(spAtk * 2 + 104) },
-      { name: 'Special Defense', val: spDef, max: 230, color: [34, 197, 94], lv50: Math.floor((spDef * 2 + 99) * 0.5 + 5), lv100: Math.floor(spDef * 2 + 104) },
-      { name: 'Speed', val: spd, max: 200, color: [168, 85, 247], lv50: Math.floor((spd * 2 + 99) * 0.5 + 5), lv100: Math.floor(spd * 2 + 104) },
-    ];
-
-    // Table Subheader
-    doc.setFont('Helvetica', 'bold');
-    doc.setFontSize(7);
-    doc.setTextColor(100, 116, 139);
-    doc.text('STAT PARAMETER', 22, y + 17);
-    doc.text('BASE', 65, y + 17);
-    doc.text('PROGRESS BAR', 80, y + 17);
-    doc.text('LV.50 MAX', 142, y + 17);
-    doc.text('LV.100 MAX', 168, y + 17);
-
-    statRows.forEach((st, idx) => {
-      const rowY = y + 24 + idx * 8.5;
-      doc.setFont('Helvetica', 'bold');
-      doc.setFontSize(8);
-      doc.setTextColor(51, 65, 85);
-      doc.text(st.name, 22, rowY);
-
-      doc.setFont('Courier', 'bold');
-      doc.setTextColor(15, 23, 42);
-      doc.text(String(st.val), 65, rowY);
-
-      // Stat visual bar background
-      doc.setFillColor(226, 232, 240);
-      doc.rect(80, rowY - 3, 56, 3.8, 'F');
-      const barW = Math.min(56, Math.max(2, (st.val / st.max) * 56));
-      doc.setFillColor(st.color[0], st.color[1], st.color[2]);
-      doc.rect(80, rowY - 3, barW, 3.8, 'F');
-
-      doc.setFont('Courier', 'normal');
-      doc.setFontSize(7.5);
-      doc.setTextColor(71, 85, 105);
-      doc.text(`${st.lv50}`, 142, rowY);
-      doc.text(`${st.lv100}`, 168, rowY);
-    });
-
-    // Total Stats line & Rating Badge
-    doc.setFont('Helvetica', 'bold');
-    doc.setFontSize(8.5);
-    doc.setTextColor(14, 116, 144);
-    doc.text(`BASE STAT TOTAL (BST): ${totalStat}   |   CLASSIFICATION: ${ratingGrade}`, 22, y + 78);
-
-    y += 86;
-
-    // SECTION 3: PHYSICAL METRICS & ARTWORK SPECIFICATIONS
-    doc.setFillColor(248, 250, 252);
-    doc.setDrawColor(148, 163, 184);
-    doc.roundedRect(15, y, 180, 42, 3, 3, 'FD');
-
-    doc.setFillColor(226, 232, 240);
-    doc.roundedRect(15, y, 180, 11, 3, 3, 'F');
-    doc.rect(15, y + 8, 180, 3, 'F');
-
-    doc.setTextColor(15, 23, 42);
-    doc.setFont('Helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.text('3. PHYSICAL METRICS & ARTWORK SPECIFICATIONS', 20, y + 7.5);
-
-    doc.setFont('Helvetica', 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(51, 65, 85);
-
-    const heightM = pokemon.height ? (pokemon.height / 10).toFixed(1) + ' m (' + ((pokemon.height / 10) * 3.28084).toFixed(1) + ' ft)' : 'N/A';
-    const weightKg = pokemon.weight ? (pokemon.weight / 10).toFixed(1) + ' kg (' + ((pokemon.weight / 10) * 2.20462).toFixed(1) + ' lbs)' : 'N/A';
-    const baseExp = pokemon.baseExperience || pokemon.base_experience || 'N/A';
-    const abilitiesStr = Array.isArray(pokemon.abilities)
-      ? pokemon.abilities.map((a: any) => (typeof a === 'string' ? a : a.ability?.name || '')).filter(Boolean).join(', ').toUpperCase()
-      : 'N/A';
-
-    doc.text(`• Height: ${heightM}   |   Weight: ${weightKg}`, 22, y + 18);
-    doc.text(`• Base Experience Yield: ${baseExp} EXP`, 22, y + 25);
-    doc.text(`• Registered Abilities: ${abilitiesStr}`, 22, y + 32);
-
-    y += 48;
-
-    // SECTION 4: COMBAT HUD LOADOUT & EQUIPPED MOVES
-    const movesList = options?.selectedMoves && options.selectedMoves.length > 0 
-      ? options.selectedMoves 
-      : (Array.isArray(pokemon.moves) ? pokemon.moves.slice(0, 4) : []);
-
-    doc.setFillColor(248, 250, 252);
-    doc.setDrawColor(148, 163, 184);
-    doc.roundedRect(15, y, 180, 38, 3, 3, 'FD');
-
-    doc.setFillColor(226, 232, 240);
-    doc.roundedRect(15, y, 180, 11, 3, 3, 'F');
-    doc.rect(15, y + 8, 180, 3, 'F');
-
-    doc.setTextColor(15, 23, 42);
-    doc.setFont('Helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.text('4. COMBAT HUD LOADOUT & EQUIPPED MOVESET', 20, y + 7.5);
-
-    if (movesList.length > 0) {
-      movesList.slice(0, 4).forEach((m: any, idx: number) => {
-        const moveY = y + 18 + idx * 4.5;
-        const moveName = (typeof m === 'string' ? m : m.name || 'MOVE').toUpperCase().replace(/-/g, ' ');
-        const moveType = (m.type || 'NORMAL').toUpperCase();
-        const pwr = m.power || '--';
-        const acc = m.accuracy || '--';
-        const pp = m.pp || '15';
-
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(7.5);
-        doc.setTextColor(14, 116, 144);
-        doc.text(`SLOT ${idx + 1}: ${moveName}`, 22, moveY);
-
-        doc.setFont('Courier', 'normal');
-        doc.setTextColor(51, 65, 85);
-        doc.text(`[TYPE: ${moveType} | PWR: ${pwr} | ACC: ${acc} | PP: ${pp}]`, 95, moveY);
+      const canvas = await html2canvas(el, {
+        scale: 2,
+        backgroundColor: isLightMode ? '#ffffff' : '#020617',
+        useCORS: true,
+        logging: false
       });
-    } else {
-      doc.setFont('Helvetica', 'italic');
-      doc.setFontSize(8);
-      doc.setTextColor(100, 116, 139);
-      doc.text('Standard tactical moveset automatically assigned by Core Combat Engine.', 22, y + 20);
-    }
+      
+      el.style.maxHeight = originalMaxHeight;
+      el.style.overflow = originalOverflow;
 
-    drawDocumentFooters(doc, `Pokéthology Specimen Dossier — ${name}`);
-    doc.save(`Pokethology_Dossier_${name.replace(/\s+/g, '_')}_${code}.pdf`);
+      const imgData = canvas.toDataURL('image/png');
+      
+      const pdf = new jsPDF({
+        orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+        unit: 'px',
+        format: [canvas.width, canvas.height]
+      });
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      const name = (pokemon.name || 'Unknown').toUpperCase();
+      pdf.save(`Pokethology_Stats_Analysis_${name.replace(/\s+/g, '_')}.pdf`);
+      return;
+    } else {
+      console.warn("Stats capture zone not found, cannot capture PDF.");
+    }
   } catch (err) {
     console.error('Failed to generate Pokémon detail PDF report:', err);
   }
