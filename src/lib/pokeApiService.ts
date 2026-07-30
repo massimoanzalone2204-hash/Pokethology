@@ -9,7 +9,7 @@
  * - Targeted data extraction for cleaner application state.
  */
 
-
+import { recordApiUsage, checkQuotaAllowed } from "./quotaManager";
 
 const BASE_URL = 'https://pokeapi.co/api/v2';
 
@@ -113,7 +113,14 @@ class PokeApiService {
     const cached = this.getCache<T>(cacheKey);
     if (cached) return cached;
 
-
+    // Check quota before hitting network
+    const { allowed } = checkQuotaAllowed("pokeapi");
+    if (!allowed) {
+      return {
+        error: true,
+        message: "Local API Quota Exceeded for PokeAPI! Please reset quota or wait until tomorrow."
+      };
+    }
 
     const urlStr = `${BASE_URL}${endpoint}`;
     
@@ -161,7 +168,7 @@ class PokeApiService {
       }
     }
 
-
+    recordApiUsage("pokeapi", 1); // Record usage after attempt
 
     if (!res) {
       return {

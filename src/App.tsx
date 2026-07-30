@@ -1,5 +1,6 @@
 import React from 'react';
 import { idbGet, idbSet, idbGetAll, idbDelete, STORES } from "./lib/indexedDB";
+import { checkQuotaAllowed, recordApiUsage } from "./lib/quotaManager";
 import { BattleResultScreen } from './components/BattleResultScreen';
 import { useState, useEffect, useRef, useTransition, useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,8 +35,7 @@ import { AudioSettings } from './components/AudioSettings';
 import { AboutModal } from './components/AboutModal';
 import ReactPlayer from 'react-player';
 
-import { getCustomApiKey, getChatEngine, setCustomApiKey, setChatEngine } from './lib/chatSettings';
-import { processChatMessage } from './lib/pokedexBot';
+import { OfflineManagerModal } from './components/OfflineManagerModal';
 import { pokeApi, isApiError } from './lib/pokeApiService';
 
 const getShowdownName = (name: string, isFemale: boolean = false) => {
@@ -2786,9 +2786,8 @@ export default function App() {
   }, [scanHistory]);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [chatEngineState, setChatEngineState] = useState<"gemini" | "local">(getChatEngine());
-  const [customApiKeyState, setCustomApiKeyState] = useState(getCustomApiKey());
-    const [isDailyScanOpen, setIsDailyScanOpen] = useState(false);
+  const [isOfflineManagerOpen, setIsOfflineManagerOpen] = useState(false);
+  const [isDailyScanOpen, setIsDailyScanOpen] = useState(false);
   const [isDailyQuizOpen, setIsDailyQuizOpen] = useState(false);
   const [isBattleHistoryExpanded, setIsBattleHistoryExpanded] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
@@ -2965,20 +2964,17 @@ export default function App() {
         return;
       }
       
-      
-      
-      const customApiKey = getCustomApiKey();
-      const headers: any = { 
-        "Content-Type": "application/json",
-        "Accept-Language": navigator.language
-      };
-      if (customApiKey) {
-        headers["X-Custom-Gemini-Key"] = customApiKey;
+      const { allowed: strategyAllowed } = checkQuotaAllowed("gemini_ai");
+      if (!strategyAllowed) {
+        throw new Error("Local AI Quota Exceeded! Please reset quota or wait until tomorrow.");
       }
-      
+      recordApiUsage("gemini_ai", 1);
       const response = await fetch("/api/strategy", {
         method: "POST",
-        headers,
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept-Language": navigator.language
+        },
         body: JSON.stringify({ 
           battleData,
           lang: selectedLang === 'auto' ? navigator.language : selectedLang
@@ -2989,7 +2985,6 @@ export default function App() {
       if (response.status === 429 || data.isQuotaExhausted) {
         if (data.isQuotaExhausted || data.percentRemaining === 0) {
           setQuotaLimitReached(true);
-          
         }
         setLastQuotaError(data.error);
         if (data.strategy) {
@@ -4517,20 +4512,17 @@ export default function App() {
       };
 
       
-      
-      
-      const customApiKey = getCustomApiKey();
-      const headers: any = { 
-        "Content-Type": "application/json",
-        "Accept-Language": navigator.language
-      };
-      if (customApiKey) {
-        headers["X-Custom-Gemini-Key"] = customApiKey;
+      const { allowed: analyzeAllowed } = checkQuotaAllowed("gemini_ai");
+      if (!analyzeAllowed) {
+        throw new Error("Local AI Quota Exceeded! Please reset quota or wait until tomorrow.");
       }
-      
+      recordApiUsage("gemini_ai", 1);
       const response = await fetch("/api/analyze", {
         method: "POST",
-        headers,
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept-Language": navigator.language
+        },
         body: JSON.stringify({ 
           battleData,
           lang: selectedLang === 'auto' ? navigator.language : selectedLang
@@ -4541,7 +4533,6 @@ export default function App() {
       if (response.status === 429 || data.isQuotaExhausted) {
         if (data.isQuotaExhausted || data.percentRemaining === 0) {
           setQuotaLimitReached(true);
-          
         }
         setLastQuotaError(data.error);
         if (data.analysis) {
@@ -4587,6 +4578,7 @@ export default function App() {
 
     const userMessage = msg.trim();
 
+    // We do not block when quota is reached/missing, since the server has a beautiful offline multilingual local synthesis engine!
     setChatMessages(prev => [...prev, { role: 'user' as const, text: userMessage }]);
     setIsChatLoading(true);
     sounds.scan();
@@ -4621,46 +4613,18 @@ export default function App() {
 
     // Fallback REST endpoint execution
     try {
-      const chatEngine = getChatEngine();
-      const customApiKey = getCustomApiKey();
       
-      if (chatEngine === 'local') {
-         setIsAiTyping(true);
-         const botResponse = await processChatMessage(userMessage, allPokemonRef.current);
-         const finalMsg = { role: 'model' as const, text: botResponse.text };
-         setChatMessages(prev => [...prev, finalMsg]);
-         const typingInterval = setInterval(() => { if (Math.random() > 0.3) sounds.typing(); }, 150);
-         setTimeout(() => { clearInterval(typingInterval); setIsAiTyping(false); }, Math.min(botResponse.text.length * 15, 3000));
-         sounds.success();
-         setIsChatLoading(false);
-         return;
+      const { allowed: chatAllowed } = checkQuotaAllowed("gemini_ai");
+      if (!chatAllowed) {
+        throw new Error("Local AI Quota Exceeded! Please reset quota or wait until tomorrow.");
       }
-
-      if (quotaLimitReached) {
-        setIsAiTyping(true);
-        const botResponse = await processChatMessage(userMessage, allPokemonRef.current);
-        const finalMsg = { role: 'model' as const, text: botResponse.text };
-        setChatMessages(prev => [...prev, finalMsg]);
-        const typingInterval = setInterval(() => { if (Math.random() > 0.3) sounds.typing(); }, 150);
-        setTimeout(() => { clearInterval(typingInterval); setIsAiTyping(false); }, Math.min(botResponse.text.length * 15, 3000));
-        sounds.success();
-        setIsChatLoading(false);
-        return;
-      }
-      
-
-
-      const headers: any = { 
-        "Content-Type": "application/json",
-        "Accept-Language": navigator.language
-      };
-      if (customApiKey) {
-        headers["X-Custom-Gemini-Key"] = customApiKey;
-      }
-
+      recordApiUsage("gemini_ai", 1);
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers,
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept-Language": navigator.language
+        },
         body: JSON.stringify({ 
           messages: [...chatMessages, { role: 'user', text: userMessage }],
           context,
@@ -4670,22 +4634,29 @@ export default function App() {
 
       const data = await response.json();
       if (response.status === 429 || data.isQuota === true || data.isQuotaExhausted) {
-        if (data.isQuotaExhausted || data.percentRemaining === 0 || response.status === 429) {
+        if (data.isQuotaExhausted || data.percentRemaining === 0) {
           setQuotaLimitReached(true);
         }
-        
-        // Auto fallback to local mode
-        
-        
-        setIsAiTyping(true);
-        const botResponse = await processChatMessage(userMessage, allPokemonRef.current);
-        const finalMsg = { role: 'model' as const, text: botResponse.text };
-        setChatMessages(prev => [...prev, finalMsg]);
-        const typingInterval = setInterval(() => { if (Math.random() > 0.3) sounds.typing(); }, 150);
-        setTimeout(() => { clearInterval(typingInterval); setIsAiTyping(false); }, Math.min(botResponse.text.length * 15, 3000));
-        sounds.success();
-        setIsChatLoading(false);
-        return;
+        setLastQuotaError(data.error || "Gemini API Quota reached");
+        if (data.text) {
+          setIsAiTyping(true);
+          const finalMsg = { role: 'model' as const, text: data.text, groundingChunks: data.groundingChunks, groundingMetadata: data.groundingMetadata };
+          if (data.navigatePokemon) {
+            setChatMessages([{ role: 'model', text: finalMsg.text }]);
+            performSearch(data.navigatePokemon, false);
+          } else {
+            setChatMessages(prev => [...prev, finalMsg]);
+          }
+          const typingInterval = setInterval(() => {
+            if (Math.random() > 0.3) sounds.typing();
+          }, 150);
+          setTimeout(() => {
+            clearInterval(typingInterval);
+            setIsAiTyping(false);
+          }, Math.min(data.text.length * 15, 3000));
+          sounds.success();
+          return;
+        }
       }
       if (!response.ok) throw new Error(data.error || "Offline");
 
@@ -4857,9 +4828,8 @@ export default function App() {
           .then(async res => {
             const data = await res.json();
             if (res.status === 429 || data.isQuotaExhausted) {
-               if (data.isQuotaExhausted || data.percentRemaining === 0 || res.status === 429) {
+               if (data.isQuotaExhausted || data.percentRemaining === 0) {
                  setQuotaLimitReached(true);
-                 
                }
                setLastQuotaError(data.error);
                if (data.suggestion) {
@@ -9094,7 +9064,8 @@ export default function App() {
 
         {/* Settings Modal */}
         <AnimatePresence>
-          
+          <OfflineManagerModal key="offline-manager-modal" isOpen={isOfflineManagerOpen} onClose={() => setIsOfflineManagerOpen(false)} onPlaySound={sounds.hover} />
+
         {isSettingsOpen && (
             <motion.div
               key="settings-modal"
@@ -9175,8 +9146,6 @@ export default function App() {
                       {enableAnimations ? 'ACTIVE' : 'MUTED'}
                     </motion.button>
                   </div>
-
-
                 </div>
 
                 <div className="flex flex-col gap-2 w-full text-center">
@@ -9197,7 +9166,7 @@ export default function App() {
                         <Info className="w-4 h-4 shrink-0" />
                         <div className="flex flex-col text-left">
                           <span className="font-hud text-[8px] font-bold tracking-wider uppercase tracking-widest whitespace-nowrap">About & System Info</span>
-                          <span className="text-[7.5px] font-mono text-slate-400 leading-none mt-0.5">App version, build specs & bug report</span>
+                          <span className="text-[7.5px] font-mono text-slate-400 leading-none mt-0.5">App version, build specs & GitHub repo</span>
                         </div>
                       </div>
                       <span className="text-[7px] font-mono text-cyan-600 group-hover:text-cyan-300 uppercase tracking-widest">
@@ -9450,7 +9419,7 @@ export default function App() {
                       <div className="p-2 bg-slate-900 border border-cyan-900/30 rounded flex flex-col justify-between">
                         <span className="text-slate-500 text-[8px] uppercase tracking-wider">COGNITION ENGINE</span>
                         <span className="text-cyan-400 font-bold uppercase text-[9px]">
-                          {wsTelemetry?.offlineCoreMode ? "LOCAL OFFLINE CORE" : "GEMINI 3.1 FLASH LITE"}
+                          {wsTelemetry?.offlineCoreMode ? "LOCAL OFFLINE CORE" : "GEMINI 1.5 FLASH"}
                         </span>
                       </div>
                       <div className="p-2 bg-slate-900 border border-cyan-900/30 rounded flex flex-col justify-between">

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Info, X, ShieldCheck, Bug, Send, Cpu, CheckCircle2, Sparkles, ExternalLink, Terminal } from 'lucide-react';
+import { Info, X, Cpu, ExternalLink, Github, MessageSquare } from 'lucide-react';
 import { sounds } from '../lib/sounds';
 
 interface AboutModalProps {
@@ -38,10 +38,11 @@ export function AboutModal({ isOpen, onClose, isLightMode = false }: AboutModalP
                     POKÉTHOLOGY CORE OS
                   </h3>
                   <p className="text-[10px] font-mono text-slate-400">
-                    SYSTEM INFO & MAINTENANCE TERMINAL
+                    SYSTEM INFO & REPOSITORY TERMINAL
                   </p>
                 </div>
               </div>
+
               <button
                 onClick={() => {
                   onClose();
@@ -61,41 +62,50 @@ export function AboutModal({ isOpen, onClose, isLightMode = false }: AboutModalP
                   <span className="text-cyan-400 font-bold">v2.5.0 Core OS</span>
                 </div>
                 <div className="flex justify-between items-center text-slate-300">
-                  <span className="text-slate-400">Current Build Date:</span>
-                  <span className="text-emerald-400 font-bold">July 2026 (Rev 10.4)</span>
+                  <span className="text-slate-400">Core Neural Registry:</span>
+                  <span className="text-amber-400 font-bold">Generations I - IX (1025 Units)</span>
                 </div>
                 <div className="flex justify-between items-center text-slate-300">
-                  <span className="text-slate-400">Core Neural Registry:</span>
-                  <span className="text-amber-400 font-bold">Generation I - IX (1025 Units)</span>
+                  <span className="text-slate-400">AI Cognition Engine:</span>
+                  <span className="text-emerald-400 font-bold">Gemini 1.5 Flash</span>
                 </div>
                 <div className="flex justify-between items-center text-slate-300">
                   <span className="text-slate-400">Audio Synth Engine:</span>
-                  <span className="text-cyan-300 font-bold">WebAudio Dual-Oscillator</span>
+                  <span className="text-cyan-300 font-bold">WebAudio Dual-Oscillator + Legacy Cries</span>
                 </div>
               </div>
 
               {/* About Description */}
-              <p className="text-[11px] leading-relaxed text-slate-300 font-sans">
-                <strong className="text-cyan-400 font-hud">Pokéthology Core OS</strong> is an advanced, responsive tactical Pokémon research index and combat simulation terminal. Designed with real-time stat analyzers, damage calculators, and move matrix engines.
-              </p>
+              <div className="space-y-2 text-[11px] leading-relaxed text-slate-300 font-sans">
+                <p>
+                  <strong className="text-cyan-400 font-hud">Pokéthology Core OS</strong> is an advanced tactical Pokémon research index and real-time combat simulation system. Built with authentic PokeAPI data, dynamic damage calculators, speed tier analysis, and Gemini-powered tactical coaching.
+                </p>
+              </div>
 
-                            {/* Quick Bug Report / GitHub Banner */}
-              <div className="p-3.5 rounded-xl bg-slate-900/40 border border-slate-700 flex flex-col items-center text-center gap-3">
-                <div className="flex items-center gap-2">
-                  <ExternalLink className="w-4 h-4 text-slate-300" />
-                  <span className="text-[11px] font-mono text-slate-300">
-                    Found an anomaly, glitch, or have questions?
-                  </span>
+              {/* GitHub Repository & Bug Reporting / Feedback Section */}
+              <div className="p-3.5 rounded-xl bg-slate-900/70 border border-cyan-500/30 space-y-2.5">
+                <div className="flex items-start gap-2.5">
+                  <MessageSquare className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                  <p className="text-[10.5px] leading-normal text-slate-300 font-sans">
+                    Encountered an anomaly, want to report a bug, or discuss new features for Pokéthology? Visit our official GitHub repository to open issues or join discussions!
+                  </p>
                 </div>
+
                 <a
                   href="https://github.com/massimoanzalone2204-hash/Pokethology"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => sounds.scan()}
-                  className="w-full px-3 py-2.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-hud uppercase text-[10px] font-black tracking-wider transition-all flex items-center justify-center gap-2"
+                  className="flex items-center justify-between p-3 rounded-lg bg-slate-950 hover:bg-slate-800 border border-cyan-500/40 hover:border-cyan-400 text-cyan-400 transition-all group shadow-md shadow-cyan-950/50"
                 >
-                  <Bug className="w-3.5 h-3.5" />
-                  Visit GitHub Repository
+                  <div className="flex items-center gap-2.5">
+                    <Github className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
+                    <div className="flex flex-col text-left">
+                      <span className="font-hud text-[10px] font-black tracking-wider uppercase">Open GitHub Repository</span>
+                      <span className="text-[8.5px] font-mono text-slate-400">massimoanzalone2204-hash/Pokethology</span>
+                    </div>
+                  </div>
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-300 transition-colors" />
                 </a>
               </div>
 
