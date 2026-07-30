@@ -1,6 +1,6 @@
 import { savePokemonToCache, getPokemonFromCache } from "./cacheManager";
-import { recordApiUsage, checkQuotaAllowed } from "./quotaManager";
 import { Pokemon, Ability, EvolutionNode, Move } from '../types';
+import { pokeApi, isApiError } from './pokeApiService';
 
 export const ALL_GAME_VERSIONS = [
   'red', 'blue', 'yellow', 'gold', 'silver', 'crystal', 
@@ -13,63 +13,22 @@ export const ALL_GAME_VERSIONS = [
   'legends-arceus', 'scarlet', 'violet', 'legends-z-a'
 ];
 
-const originalFetch = globalThis.fetch;
 const fetch = async (url: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
   const urlStr = typeof url === "string" ? url : (url instanceof URL ? url.toString() : (url as any).url || "");
   
-  if (urlStr && urlStr.startsWith("https://pokeapi.co/")) {
-    const { allowed } = checkQuotaAllowed("pokeapi");
-    if (!allowed) {
-      throw new Error("Local API Quota Exceeded for PokeAPI! Please reset quota or wait until tomorrow.");
+  if (urlStr && urlStr.startsWith("https://pokeapi.co/api/v2")) {
+    const endpoint = urlStr.replace("https://pokeapi.co/api/v2", "");
+    const cacheKey = `proxy_${endpoint.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const data = await pokeApi.fetchWithCache<any>(endpoint, cacheKey);
+    
+    if (isApiError(data)) {
+      return new Response(JSON.stringify(data), { status: data.status || 404, statusText: data.message });
     }
-    recordApiUsage("pokeapi", 1);
+    return new Response(JSON.stringify(data), { status: 200, headers: { 'Content-Type': 'application/json' }});
   }
 
-  if (!urlStr || (!urlStr.startsWith("https://pokeapi.co/") && !urlStr.startsWith("https://api.pokemontcg.io/"))) {
-    return originalFetch(url, init);
-  }
-
-  // Determine an aggressive but reasonable timeout based on endpoint importance & size
-  const timeoutMs = urlStr.includes('/pokemon?')
-    ? 8000
-    : urlStr.includes('/pokemon/')
-    ? 5000
-    : 2000;
-
-  let lastError: any;
-  // Reduce to 2 quick retries to avoid long sequential stalls on slow networks
-  for (let i = 0; i < 2; i++) {
-    const controller = new AbortController();
-    const tId = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const res = await originalFetch(url, { ...init, signal: controller.signal });
-      clearTimeout(tId);
-      if (res.ok || res.status === 404) return res;
-    } catch (err) {
-      clearTimeout(tId);
-      lastError = err;
-      if (i < 1) {
-        await new Promise(r => setTimeout(r, 150));
-      }
-    }
-  }
-
-  // Fall back immediately to local server-side proxy which acts as a secondary cache & network gateway
-  const proxyController = new AbortController();
-  const proxyTimeoutId = setTimeout(() => proxyController.abort(), timeoutMs + 1000);
-  try {
-    const proxyUrl = `/api/proxy?url=${encodeURIComponent(urlStr)}`;
-    const res = await originalFetch(proxyUrl, { ...init, signal: proxyController.signal });
-    clearTimeout(proxyTimeoutId);
-    if (res.ok) return res;
-  } catch (proxyErr) {
-    clearTimeout(proxyTimeoutId);
-    console.error("Proxy fetch also failed for:", urlStr, proxyErr);
-  }
-
-  throw lastError || new Error("Failed to fetch");
+  return globalThis.fetch(url, init);
 };
-
 
 let cachedAllForms: any[] | null = null;
 let pokemonFormsPromise: Promise<any[]> | null = null;
@@ -80,9 +39,8 @@ async function getAllFormsList(): Promise<any[]> {
 
   pokemonFormsPromise = (async () => {
     try {
-      const allRes = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=10000`);
-      if (!allRes.ok) return [];
-      const allData = await allRes.json();
+      const allData = await pokeApi.fetchWithCache<any>('/pokemon?limit=10000', 'all_forms_10000');
+      if (isApiError(allData)) return [];
       cachedAllForms = allData.results || [];
       return cachedAllForms;
     } catch (err) {

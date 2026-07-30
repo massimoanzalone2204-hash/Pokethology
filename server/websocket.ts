@@ -17,7 +17,7 @@ try {
 }
 
 const getApiKey = () => process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-const LITE_MODEL = "gemini-3.1-flash-lite";
+const LITE_MODEL = "gemini-1.5-flash-8b";
 
 const ai = new GoogleGenAI({
   apiKey: getApiKey(),

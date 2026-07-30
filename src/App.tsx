@@ -1,6 +1,5 @@
 import React from 'react';
 import { idbGet, idbSet, idbGetAll, idbDelete, STORES } from "./lib/indexedDB";
-import { checkQuotaAllowed, recordApiUsage } from "./lib/quotaManager";
 import { BattleResultScreen } from './components/BattleResultScreen';
 import { useState, useEffect, useRef, useTransition, useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +25,6 @@ import { MoveModal } from './components/MoveModal';
 import { TypeBadge } from './components/TypeBadge';
 import { BattleErrorBoundary } from './components/BattleErrorBoundary';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { ApiQuotaMonitor } from './components/ApiQuotaMonitor';
 
 import { StatRadar } from './components/StatRadar';
 import { SingleStatRadar } from './components/SingleStatRadar';
@@ -36,7 +34,9 @@ import { AudioSettings } from './components/AudioSettings';
 import { AboutModal } from './components/AboutModal';
 import ReactPlayer from 'react-player';
 
-import { OfflineManagerModal } from './components/OfflineManagerModal';
+import { getCustomApiKey, getChatEngine, setCustomApiKey, setChatEngine } from './lib/chatSettings';
+import { processChatMessage } from './lib/pokedexBot';
+import { pokeApi, isApiError } from './lib/pokeApiService';
 
 const getShowdownName = (name: string, isFemale: boolean = false) => {
   if (!name) return '';
@@ -1110,61 +1110,28 @@ const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: string;
 
 TerrainEffect.displayName = "TerrainEffect";
 
-const tcgCache: Record<string, string> = {};
-
 const PokemonTcgCard = memo(({ displayId, pokemonName, className }: { displayId: string; pokemonName: string; className?: string }) => {
-    const [imgSrc, setImgSrc] = useState<string | null>(tcgCache[displayId] || null);
   const [error, setError] = useState(false);
-
-  useEffect(() => {
-    if (tcgCache[displayId]) {
-      setImgSrc(tcgCache[displayId]);
-      return;
-    }
-
-    let isMounted = true;
-    
-    // Stagger requests to avoid rate limits
-    const timer = setTimeout(() => {
-      fetch(`https://api.pokemontcg.io/v2/cards?q=nationalPokedexNumbers:${displayId}&orderBy=-set.releaseDate&pageSize=1`)
-        .then(r => r.json())
-        .then(d => {
-          if (isMounted) {
-            if (d.data && d.data.length > 0) {
-              const url = d.data[0].images.small;
-              tcgCache[displayId] = url;
-              setImgSrc(url);
-            } else {
-              setError(true);
-            }
-          }
-        })
-        .catch(e => {
-          if (isMounted) setError(true);
-        });
-    }, Math.random() * 800);
-
-    return () => {
-      isMounted = false;
-      clearTimeout(timer);
-    };
-  }, [displayId]);
+  const artworkUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${displayId}.png`;
 
   if (error) {
     return (
-      <div className={cn(className, "border border-red-500/50 bg-red-950 flex justify-center items-center rounded text-[8px] text-red-500 font-mono text-center p-2")}>
-        Card Not Found
+      <div className={cn(className, "border border-slate-700 bg-slate-900/50 flex justify-center items-center rounded text-[8px] text-slate-400 font-mono text-center p-2")}>
+        {pokemonName}
       </div>
     );
   }
 
-  if (!imgSrc) {
-    return (
-      <div className={cn(className, "animate-pulse bg-slate-800/50 rounded border border-slate-700 w-full h-full")}></div>
-    );
-  }
-
-  return <img src={imgSrc} alt={pokemonName} className={cn(className, "object-contain rounded shadow-[0_0_15px_rgba(0,0,0,0.5)]")} referrerPolicy="no-referrer" draggable={false} onError={(e) => (e.currentTarget.style.display = 'none')} />;
+  return (
+    <img
+      src={artworkUrl}
+      alt={pokemonName}
+      className={cn(className, "object-contain rounded filter drop-shadow-[0_0_12px_rgba(34,211,238,0.3)]")}
+      referrerPolicy="no-referrer"
+      draggable={false}
+      onError={() => setError(true)}
+    />
+  );
 });
 
 const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny }: { pokemonName: string; id: string | undefined; className: string; isShiny?: boolean }) => {
@@ -1924,10 +1891,11 @@ export default function App() {
   const allPokemonRef = useRef<string[]>([]);
   const arenaRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    fetch('https://pokeapi.co/api/v2/pokemon?limit=1302')
-      .then(r => r.json())
+    pokeApi.getPokemonList(1302)
       .then(data => {
-        allPokemonRef.current = data.results.map((r: any) => r.name);
+        if (!isApiError(data)) {
+          allPokemonRef.current = data.results.map((r: any) => r.name);
+        }
       })
       .catch(e => console.error("Could not load suggest list", e));
   }, []);
@@ -2818,8 +2786,9 @@ export default function App() {
   }, [scanHistory]);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isOfflineManagerOpen, setIsOfflineManagerOpen] = useState(false);
-  const [isDailyScanOpen, setIsDailyScanOpen] = useState(false);
+  const [chatEngineState, setChatEngineState] = useState<"gemini" | "local">(getChatEngine());
+  const [customApiKeyState, setCustomApiKeyState] = useState(getCustomApiKey());
+    const [isDailyScanOpen, setIsDailyScanOpen] = useState(false);
   const [isDailyQuizOpen, setIsDailyQuizOpen] = useState(false);
   const [isBattleHistoryExpanded, setIsBattleHistoryExpanded] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
@@ -2996,17 +2965,20 @@ export default function App() {
         return;
       }
       
-      const { allowed: strategyAllowed } = checkQuotaAllowed("gemini_ai");
-      if (!strategyAllowed) {
-        throw new Error("Local AI Quota Exceeded! Please reset quota or wait until tomorrow.");
+      
+      
+      const customApiKey = getCustomApiKey();
+      const headers: any = { 
+        "Content-Type": "application/json",
+        "Accept-Language": navigator.language
+      };
+      if (customApiKey) {
+        headers["X-Custom-Gemini-Key"] = customApiKey;
       }
-      recordApiUsage("gemini_ai", 1);
+      
       const response = await fetch("/api/strategy", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Accept-Language": navigator.language
-        },
+        headers,
         body: JSON.stringify({ 
           battleData,
           lang: selectedLang === 'auto' ? navigator.language : selectedLang
@@ -3017,6 +2989,7 @@ export default function App() {
       if (response.status === 429 || data.isQuotaExhausted) {
         if (data.isQuotaExhausted || data.percentRemaining === 0) {
           setQuotaLimitReached(true);
+          
         }
         setLastQuotaError(data.error);
         if (data.strategy) {
@@ -4544,17 +4517,20 @@ export default function App() {
       };
 
       
-      const { allowed: analyzeAllowed } = checkQuotaAllowed("gemini_ai");
-      if (!analyzeAllowed) {
-        throw new Error("Local AI Quota Exceeded! Please reset quota or wait until tomorrow.");
+      
+      
+      const customApiKey = getCustomApiKey();
+      const headers: any = { 
+        "Content-Type": "application/json",
+        "Accept-Language": navigator.language
+      };
+      if (customApiKey) {
+        headers["X-Custom-Gemini-Key"] = customApiKey;
       }
-      recordApiUsage("gemini_ai", 1);
+      
       const response = await fetch("/api/analyze", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Accept-Language": navigator.language
-        },
+        headers,
         body: JSON.stringify({ 
           battleData,
           lang: selectedLang === 'auto' ? navigator.language : selectedLang
@@ -4565,6 +4541,7 @@ export default function App() {
       if (response.status === 429 || data.isQuotaExhausted) {
         if (data.isQuotaExhausted || data.percentRemaining === 0) {
           setQuotaLimitReached(true);
+          
         }
         setLastQuotaError(data.error);
         if (data.analysis) {
@@ -4610,7 +4587,6 @@ export default function App() {
 
     const userMessage = msg.trim();
 
-    // We do not block when quota is reached/missing, since the server has a beautiful offline multilingual local synthesis engine!
     setChatMessages(prev => [...prev, { role: 'user' as const, text: userMessage }]);
     setIsChatLoading(true);
     sounds.scan();
@@ -4645,18 +4621,46 @@ export default function App() {
 
     // Fallback REST endpoint execution
     try {
+      const chatEngine = getChatEngine();
+      const customApiKey = getCustomApiKey();
       
-      const { allowed: chatAllowed } = checkQuotaAllowed("gemini_ai");
-      if (!chatAllowed) {
-        throw new Error("Local AI Quota Exceeded! Please reset quota or wait until tomorrow.");
+      if (chatEngine === 'local') {
+         setIsAiTyping(true);
+         const botResponse = await processChatMessage(userMessage, allPokemonRef.current);
+         const finalMsg = { role: 'model' as const, text: botResponse.text };
+         setChatMessages(prev => [...prev, finalMsg]);
+         const typingInterval = setInterval(() => { if (Math.random() > 0.3) sounds.typing(); }, 150);
+         setTimeout(() => { clearInterval(typingInterval); setIsAiTyping(false); }, Math.min(botResponse.text.length * 15, 3000));
+         sounds.success();
+         setIsChatLoading(false);
+         return;
       }
-      recordApiUsage("gemini_ai", 1);
+
+      if (quotaLimitReached) {
+        setIsAiTyping(true);
+        const botResponse = await processChatMessage(userMessage, allPokemonRef.current);
+        const finalMsg = { role: 'model' as const, text: botResponse.text };
+        setChatMessages(prev => [...prev, finalMsg]);
+        const typingInterval = setInterval(() => { if (Math.random() > 0.3) sounds.typing(); }, 150);
+        setTimeout(() => { clearInterval(typingInterval); setIsAiTyping(false); }, Math.min(botResponse.text.length * 15, 3000));
+        sounds.success();
+        setIsChatLoading(false);
+        return;
+      }
+      
+
+
+      const headers: any = { 
+        "Content-Type": "application/json",
+        "Accept-Language": navigator.language
+      };
+      if (customApiKey) {
+        headers["X-Custom-Gemini-Key"] = customApiKey;
+      }
+
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Accept-Language": navigator.language
-        },
+        headers,
         body: JSON.stringify({ 
           messages: [...chatMessages, { role: 'user', text: userMessage }],
           context,
@@ -4666,29 +4670,22 @@ export default function App() {
 
       const data = await response.json();
       if (response.status === 429 || data.isQuota === true || data.isQuotaExhausted) {
-        if (data.isQuotaExhausted || data.percentRemaining === 0) {
+        if (data.isQuotaExhausted || data.percentRemaining === 0 || response.status === 429) {
           setQuotaLimitReached(true);
         }
-        setLastQuotaError(data.error || "Gemini API Quota reached");
-        if (data.text) {
-          setIsAiTyping(true);
-          const finalMsg = { role: 'model' as const, text: data.text, groundingChunks: data.groundingChunks, groundingMetadata: data.groundingMetadata };
-          if (data.navigatePokemon) {
-            setChatMessages([{ role: 'model', text: finalMsg.text }]);
-            performSearch(data.navigatePokemon, false);
-          } else {
-            setChatMessages(prev => [...prev, finalMsg]);
-          }
-          const typingInterval = setInterval(() => {
-            if (Math.random() > 0.3) sounds.typing();
-          }, 150);
-          setTimeout(() => {
-            clearInterval(typingInterval);
-            setIsAiTyping(false);
-          }, Math.min(data.text.length * 15, 3000));
-          sounds.success();
-          return;
-        }
+        
+        // Auto fallback to local mode
+        
+        
+        setIsAiTyping(true);
+        const botResponse = await processChatMessage(userMessage, allPokemonRef.current);
+        const finalMsg = { role: 'model' as const, text: botResponse.text };
+        setChatMessages(prev => [...prev, finalMsg]);
+        const typingInterval = setInterval(() => { if (Math.random() > 0.3) sounds.typing(); }, 150);
+        setTimeout(() => { clearInterval(typingInterval); setIsAiTyping(false); }, Math.min(botResponse.text.length * 15, 3000));
+        sounds.success();
+        setIsChatLoading(false);
+        return;
       }
       if (!response.ok) throw new Error(data.error || "Offline");
 
@@ -4860,8 +4857,9 @@ export default function App() {
           .then(async res => {
             const data = await res.json();
             if (res.status === 429 || data.isQuotaExhausted) {
-               if (data.isQuotaExhausted || data.percentRemaining === 0) {
+               if (data.isQuotaExhausted || data.percentRemaining === 0 || res.status === 429) {
                  setQuotaLimitReached(true);
+                 
                }
                setLastQuotaError(data.error);
                if (data.suggestion) {
@@ -9096,8 +9094,7 @@ export default function App() {
 
         {/* Settings Modal */}
         <AnimatePresence>
-          <OfflineManagerModal key="offline-manager-modal" isOpen={isOfflineManagerOpen} onClose={() => setIsOfflineManagerOpen(false)} onPlaySound={sounds.hover} />
-
+          
         {isSettingsOpen && (
             <motion.div
               key="settings-modal"
@@ -9179,11 +9176,7 @@ export default function App() {
                     </motion.button>
                   </div>
 
-                  {/* API Quota Usage Progress Bar */}
-                  <ApiQuotaMonitor 
-                    quotaLimitReached={quotaLimitReached} 
-                    onQuotaLimitChange={setQuotaLimitReached} 
-                  />
+
                 </div>
 
                 <div className="flex flex-col gap-2 w-full text-center">

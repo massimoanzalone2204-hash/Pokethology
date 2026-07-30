@@ -3,13 +3,13 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const DEFAULT_MODEL = "gemini-2.5-flash";
-const LITE_MODEL = "gemini-2.5-flash-lite";
+const DEFAULT_MODEL = "gemini-1.5-flash";
+const LITE_MODEL = "gemini-1.5-flash-8b";
 
 const getApiKey = () => process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 
-function getAiClient() {
-  const key = getApiKey();
+function getAiClient(customApiKey?: string) {
+  const key = customApiKey || getApiKey();
   return new GoogleGenAI({
     apiKey: key,
     httpOptions: {
@@ -44,29 +44,21 @@ export function isQuotaError(error: any) {
   );
 }
 
-let apiCallRecorder: ((isQuotaError?: boolean) => void) | null = null;
 
-export function registerApiCallRecorder(recorder: (isQuotaError?: boolean) => void) {
-  apiCallRecorder = recorder;
-}
 
-export async function generateWithRetry(params: any, retries = 2, delay = 2000): Promise<any> {
-    if (apiCallRecorder) {
-      apiCallRecorder(false);
-    }
+export async function generateWithRetry(params: any, retries = 2, delay = 2000, customApiKey?: string): Promise<any> {
+    
     try {
-      return await getAiClient().models.generateContent(params);
+      return await getAiClient(customApiKey).models.generateContent(params);
     } catch (error: any) {
       const isQuota = isQuotaError(error);
-      if (isQuota && apiCallRecorder) {
-        apiCallRecorder(true);
-      }
+      
       
       // Attempt LITE model if quota/rate limit error hit on primary model
       if (isQuota && params.model && params.model !== LITE_MODEL) {
         try {
-          if (apiCallRecorder) apiCallRecorder(false);
-          return await getAiClient().models.generateContent({
+          
+          return await getAiClient(customApiKey).models.generateContent({
             ...params,
             model: LITE_MODEL
           });
@@ -88,7 +80,7 @@ export async function generateWithRetry(params: any, retries = 2, delay = 2000):
         };
         delete strippedParams.config.tools;
         try {
-          return await getAiClient().models.generateContent(strippedParams);
+          return await getAiClient(customApiKey).models.generateContent(strippedParams);
         } catch (toolError: any) {
           // Keep moving down the pipeline
         }

@@ -11,7 +11,7 @@ import fs from "fs";
 import { getEditDistance, extractSuggestedPokemon } from "./server/utils/stringUtils";
 import { strategies } from "./server/utils/battleUtils";
 import { handleApiError } from "./server/utils/errorHandling";
-import { generateWithRetry, isQuotaError, registerApiCallRecorder } from "./server/services/geminiService";
+import { generateWithRetry as originalGenerateWithRetry, isQuotaError } from "./server/services/geminiService";
 import { typeAdvantageMap, suggestions } from "./server/constants";
 import { initializeWebSocketServer } from "./server/websocket";
 
@@ -29,10 +29,13 @@ try {
 const extractSuggestedPokemonWrapper = (text: string) => extractSuggestedPokemon(text, pokemonNamesList);
 
 const app = express();
+import { AsyncLocalStorage } from "async_hooks";
+const asyncLocalStorage = new AsyncLocalStorage();
+app.use((req, res, next) => asyncLocalStorage.run(req, next));
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Custom-Gemini-Key']
 }));
 app.use(express.json());
 app.use(cookieParser());
@@ -55,6 +58,16 @@ const ai = new GoogleGenAI({
     }
   }
 });
+
+
+async function generateWithRetry(params: any, retries = 2, delay = 2000) {
+  let customApiKey;
+  try {
+    const req = asyncLocalStorage.getStore() as any;
+    if (req && req.headers) customApiKey = req.headers["x-custom-gemini-key"];
+  } catch (e) {}
+  return originalGenerateWithRetry(params, retries, delay, customApiKey);
+}
 
 const DEFAULT_MODEL = "gemini-2.5-flash-lite";
 const LITE_MODEL = "gemini-2.5-flash-lite";
@@ -585,256 +598,7 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-// --- SERVER-SIDE REAL-TIME QUOTA TRACKING ENGINE ---
-let dailyRequestCount = 18; // Default seed
-let lastQuotaDayReset = new Date().getUTCDate();
-const requestTimestamps: number[] = []; // Timestamps in ms for RPM calculation
-const DAILY_CAPACITY_LIMIT = 1500; // Gemini Free tier standard daily quota
-const RPM_LIMIT = 15; // Gemini Requests Per Minute standard limit
-let quotaExhaustedUntilMs: number | null = null;
 
-function updateQuotaDayIfNeeded() {
-  const currentDay = new Date().getUTCDate();
-  if (currentDay !== lastQuotaDayReset) {
-    dailyRequestCount = 0;
-    lastQuotaDayReset = currentDay;
-    quotaExhaustedUntilMs = null;
-  }
-}
-
-function recordServerApiCall(isExhaustedError = false) {
-  updateQuotaDayIfNeeded();
-  const now = Date.now();
-  requestTimestamps.push(now);
-  dailyRequestCount++;
-
-  // Clean old timestamps (> 60s)
-  while (requestTimestamps.length > 0 && requestTimestamps[0] < now - 60000) {
-    requestTimestamps.shift();
-  }
-
-  if (isExhaustedError) {
-    // 60-second cooldown on 429
-    quotaExhaustedUntilMs = now + 60000;
-  }
-}
-
-registerApiCallRecorder(recordServerApiCall);
-
-function getQuotaStatusPayload() {
-  updateQuotaDayIfNeeded();
-  const now = Date.now();
-
-  // Clean old timestamps
-  while (requestTimestamps.length > 0 && requestTimestamps[0] < now - 60000) {
-    requestTimestamps.shift();
-  }
-
-  const currentRpm = requestTimestamps.length;
-  const isExhausted = dailyRequestCount >= DAILY_CAPACITY_LIMIT;
-  
-  let cooldownSec = 0;
-  if (quotaExhaustedUntilMs !== null && now < quotaExhaustedUntilMs) {
-    cooldownSec = Math.ceil((quotaExhaustedUntilMs - now) / 1000);
-  } else if (quotaExhaustedUntilMs !== null && now >= quotaExhaustedUntilMs) {
-    quotaExhaustedUntilMs = null;
-  }
-
-  // Calculate time until UTC midnight
-  const tomorrow = new Date();
-  tomorrow.setUTCHours(24, 0, 0, 0);
-  const diffMs = Math.max(0, tomorrow.getTime() - now);
-  const hours = Math.floor(diffMs / (1000 * 60 * 60));
-  const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-  const secs = Math.floor((diffMs % (1000 * 60)) / 1000);
-  const timeUntilDailyResetStr = `${hours.toString().padStart(2, '0')}h ${mins.toString().padStart(2, '0')}m ${secs.toString().padStart(2, '0')}s`;
-
-  const rawPercent = (dailyRequestCount / DAILY_CAPACITY_LIMIT) * 100;
-  const percentUsed = Math.min(100, Math.round(rawPercent));
-  const percentRemaining = Math.max(0, 100 - percentUsed);
-
-  return {
-    requestsToday: dailyRequestCount,
-    dailyCapacity: DAILY_CAPACITY_LIMIT,
-    rpm: currentRpm,
-    rpmLimit: RPM_LIMIT,
-    percentUsed: percentUsed,
-    percentRemaining: percentRemaining,
-    isQuotaExhausted: isExhausted,
-    cooldownSecondsRemaining: cooldownSec,
-    timeUntilDailyReset: timeUntilDailyResetStr,
-    resetTimestampMs: tomorrow.getTime(),
-    hasCustomApiKey: Boolean(getApiKey())
-  };
-}
-
-app.get("/api/quota", (req, res) => {
-  res.json(getQuotaStatusPayload());
-});
-
-app.post("/api/quota/test", async (req, res) => {
-  recordServerApiCall(false);
-  const payload = getQuotaStatusPayload();
-  res.json({
-    success: true,
-    message: "Test API call recorded successfully. Live quota metrics updated.",
-    quota: payload
-  });
-});
-
-app.post("/api/quota/reset-metrics", (req, res) => {
-  dailyRequestCount = 0;
-  quotaExhaustedUntilMs = null;
-  requestTimestamps.length = 0;
-  res.json({
-    success: true,
-    message: "API quota metrics reset to 0.",
-    quota: getQuotaStatusPayload()
-  });
-});
-
-app.get("/api/missions", async (req, res) => {
-  const dateStr = (req.query.date as string) || new Date().toISOString().split('T')[0];
-
-  // Return from in-memory cache instantly if available! This drastically speeds up operations.
-  if (missionsCache.has(dateStr)) {
-    console.log(`[Cache Hit] Serving cached daily combat missions for Date: ${dateStr}`);
-    return res.json(missionsCache.get(dateStr));
-  }
-
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    return res.json({
-      success: true,
-      mode: "offline",
-      easyTrivia: null,
-      easyTriviaB: null,
-      medTrivia: null,
-      medTriviaB: null,
-      hardTrivia: null,
-      hardTriviaB: null,
-    });
-  }
-
-  try {
-    const response = await generateWithRetry({
-      model: DEFAULT_MODEL,
-      contents: `You are the Grandmaster of Pokétheology, Sinnoh cosmology, and competitive Pokémon battling.
-      Generate exactly 6 distinct multiple-choice trivia questions for Sinnoh Core Operations daily bulletin on date ${dateStr}.
-      
-      The questions must be structured as:
-      - easy: General type matchup, simple status effect, or straightforward Kanto mechanics.
-      - easyB: Another distinct beginner friendly mechanic or status challenge.
-      - medium: Weather mechanics, speed tier manipulations, complex status conditions, or items like Eviolite/Life Orb.
-      - mediumB: Another mid-level competitive question on ability synergies, terrain effects, or STAB.
-      - hard: Deep legendary mythology (Arceus, Origin Forme, Creation trio, Sinnoh folk tales) or advanced mechanical details.
-      - hardB: Another high-register theory question on Sinnoh space-time distortions or ultimate strategic items like Assault Vest.
-
-      Each question must have exactly 4 uppercase options, a correct answer index (0-3), and a short human explanation. Output must be valid JSON matching the schema.`,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            easy: {
-              type: Type.OBJECT,
-              properties: {
-                question: { type: Type.STRING },
-                options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                answerIndex: { type: Type.INTEGER },
-                explanation: { type: Type.STRING }
-              },
-              required: ["question", "options", "answerIndex", "explanation"]
-            },
-            easyB: {
-              type: Type.OBJECT,
-              properties: {
-                question: { type: Type.STRING },
-                options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                answerIndex: { type: Type.INTEGER },
-                explanation: { type: Type.STRING }
-              },
-              required: ["question", "options", "answerIndex", "explanation"]
-            },
-            medium: {
-              type: Type.OBJECT,
-              properties: {
-                question: { type: Type.STRING },
-                options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                answerIndex: { type: Type.INTEGER },
-                explanation: { type: Type.STRING }
-              },
-              required: ["question", "options", "answerIndex", "explanation"]
-            },
-            mediumB: {
-              type: Type.OBJECT,
-              properties: {
-                question: { type: Type.STRING },
-                options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                answerIndex: { type: Type.INTEGER },
-                explanation: { type: Type.STRING }
-              },
-              required: ["question", "options", "answerIndex", "explanation"]
-            },
-            hard: {
-              type: Type.OBJECT,
-              properties: {
-                question: { type: Type.STRING },
-                options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                answerIndex: { type: Type.INTEGER },
-                explanation: { type: Type.STRING }
-              },
-              required: ["question", "options", "answerIndex", "explanation"]
-            },
-            hardB: {
-              type: Type.OBJECT,
-              properties: {
-                question: { type: Type.STRING },
-                options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                answerIndex: { type: Type.INTEGER },
-                explanation: { type: Type.STRING }
-              },
-              required: ["question", "options", "answerIndex", "explanation"]
-            }
-          },
-          required: ["easy", "easyB", "medium", "mediumB", "hard", "hardB"]
-        }
-      }
-    });
-
-    let rawText = response.text || "";
-    if (rawText.startsWith("```")) {
-      rawText = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
-    }
-    const parsed = JSON.parse(rawText.trim());
-    const result = {
-      success: true,
-      mode: "dynamic",
-      easyTrivia: parsed.easy,
-      easyTriviaB: parsed.easyB,
-      medTrivia: parsed.medium,
-      medTriviaB: parsed.mediumB,
-      hardTrivia: parsed.hard,
-      hardTriviaB: parsed.hardB,
-    };
-    
-    // Save to cache
-    missionsCache.set(dateStr, result);
-    return res.json(result);
-  } catch (err: any) {
-    console.error("Failed to generate dynamic combat missions:", err);
-    return res.json({
-      success: true,
-      mode: "offline",
-      easyTrivia: null,
-      easyTriviaB: null,
-      medTrivia: null,
-      medTriviaB: null,
-      hardTrivia: null,
-      hardTriviaB: null,
-    });
-  }
-});
 
 app.get("/api/proxy", async (req, res) => {
   const targetUrl = req.query.url as string;
@@ -842,8 +606,8 @@ app.get("/api/proxy", async (req, res) => {
     return res.status(400).json({ error: "Missing url parameter" });
   }
 
-  // Validate the target URL to ensure it is only for PokeAPI or PokemonTCG to avoid open-proxy vulnerability
-  if (!targetUrl.startsWith("https://pokeapi.co/") && !targetUrl.startsWith("https://api.pokemontcg.io/")) {
+  // Validate the target URL to ensure it is only for PokeAPI to avoid open-proxy vulnerability
+  if (!targetUrl.startsWith("https://pokeapi.co/")) {
     return res.status(400).json({ error: "Invalid proxy target" });
   }
 
@@ -986,7 +750,7 @@ app.get("/api/quiz", async (req, res) => {
   const themeIndex = Math.abs(seed) % QUIZ_THEMES.length;
   const currentTheme = QUIZ_THEMES[themeIndex];
 
-  const apiKey = getApiKey();
+  const apiKey = req.headers["x-custom-gemini-key"] as string || getApiKey();
   if (!apiKey) {
     const offlineSet = getOfflineQuizSet();
     const fallbackResponse = { date: currentDateStr, questions: offlineSet, isFallback: true };
@@ -1059,10 +823,10 @@ const getOfflineNewsSet = (dateStr: string) => ({
       tag: "GAME UPDATE"
     },
     {
-      title: "The Official Pokémon TCG Website",
-      description: "Explore the official home of the Pokémon Trading Card Game. Stay up to date with new expansions, physical card releases, deck strategies, and the digital Pokémon TCG Live experience.",
-      url: "https://tcg.pokemon.com",
-      tag: "TRADING CARD"
+      title: "The Official Pokémon Competitive Strategy Hub",
+      description: "Explore the official home of Pokémon battle formats, competitive rulings, regional tournaments, and battle strategy guides.",
+      url: "https://www.pokemon.com/us/play-pokemon",
+      tag: "COMPETITIVE"
     },
     {
       title: "The Official Pokémon Animation Series Portal",
@@ -1082,7 +846,7 @@ app.get("/api/news", (req, res) => {
     news: response.news,
     groundingSources: [
       { title: "Pokémon Official Portal", url: "https://www.pokemon.com" },
-      { title: "Pokémon TCG Hub", url: "https://tcg.pokemon.com" },
+      { title: "Pokémon Competitive Hub", url: "https://www.pokemon.com/us/play-pokemon" },
       { title: "Pokémon Watch TV", url: "https://watch.pokemon.com" }
     ],
     searchQueries: ["official pokemon outlets"],
@@ -1093,7 +857,7 @@ app.get("/api/news", (req, res) => {
 app.post("/api/chat", async (req, res) => {
   recordServerApiCall(false);
   const { messages, context } = req.body;
-  const apiKey = getApiKey();
+  const apiKey = req.headers["x-custom-gemini-key"] as string || getApiKey();
   const userText = messages[messages.length - 1]?.text || "";
   const lang = getRequestLanguage(req, userText);
   const suggestedPokemon = extractSuggestedPokemonWrapper(userText);
@@ -1198,7 +962,7 @@ app.post("/api/chat", async (req, res) => {
 
 app.post("/api/analyze", async (req, res) => {
   const { battleData } = req.body;
-  const apiKey = getApiKey();
+  const apiKey = req.headers["x-custom-gemini-key"] as string || getApiKey();
   const lang = getRequestLanguage(req);
 
   if (!apiKey) {
@@ -1249,7 +1013,7 @@ app.post("/api/analyze", async (req, res) => {
 
 app.post("/api/suggest", async (req, res) => {
   const { pokemonName } = req.body;
-  const apiKey = getApiKey();
+  const apiKey = req.headers["x-custom-gemini-key"] as string || getApiKey();
   const lang = getRequestLanguage(req);
 
   if (!apiKey) {
@@ -1298,7 +1062,7 @@ app.post("/api/suggest", async (req, res) => {
 
 app.post("/api/strategy", async (req, res) => {
   const { battleData } = req.body;
-  const apiKey = getApiKey();
+  const apiKey = req.headers["x-custom-gemini-key"] as string || getApiKey();
   const lang = getRequestLanguage(req);
 
   if (!apiKey) {

@@ -1,4 +1,6 @@
-import React from 'react';
+const fs = require('fs');
+
+let fileContent = `import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Info, X, ShieldCheck, Bug, Send, Cpu, CheckCircle2, Sparkles, ExternalLink, Terminal } from 'lucide-react';
 import { sounds } from '../lib/sounds';
@@ -18,11 +20,11 @@ export function AboutModal({ isOpen, onClose, isLightMode = false }: AboutModalP
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className={`relative w-full max-w-lg rounded-2xl border p-5 sm:p-6 shadow-2xl overflow-hidden ${
+            className={\`relative w-full max-w-lg rounded-2xl border p-5 sm:p-6 shadow-2xl overflow-hidden \${
               isLightMode
                 ? 'bg-white/95 border-slate-200 text-slate-800'
                 : 'bg-slate-950/90 border-cyan-500/30 text-slate-100'
-            }`}
+            }\`}
           >
             {/* Top decorative line */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-emerald-500 to-amber-500" />
@@ -79,26 +81,6 @@ export function AboutModal({ isOpen, onClose, isLightMode = false }: AboutModalP
                 <strong className="text-cyan-400 font-hud">Pokéthology Core OS</strong> is an advanced, responsive tactical Pokémon research index and combat simulation terminal. Designed with real-time stat analyzers, damage calculators, and move matrix engines.
               </p>
 
-                            {/* Quick Bug Report / GitHub Banner */}
-              <div className="p-3.5 rounded-xl bg-slate-900/40 border border-slate-700 flex flex-col items-center text-center gap-3">
-                <div className="flex items-center gap-2">
-                  <ExternalLink className="w-4 h-4 text-slate-300" />
-                  <span className="text-[11px] font-mono text-slate-300">
-                    Found an anomaly, glitch, or have questions?
-                  </span>
-                </div>
-                <a
-                  href="https://github.com/massimoanzalone2204-hash/Pokethology"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => sounds.scan()}
-                  className="w-full px-3 py-2.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-hud uppercase text-[10px] font-black tracking-wider transition-all flex items-center justify-center gap-2"
-                >
-                  <Bug className="w-3.5 h-3.5" />
-                  Visit GitHub Repository
-                </a>
-              </div>
-
               {/* Copyright Footnote */}
               <div className="text-[9px] font-mono text-slate-500 text-center pt-2 border-t border-slate-800">
                 Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc. TM, ® and Pokémon character names are trademarks of Nintendo.
@@ -112,3 +94,6 @@ export function AboutModal({ isOpen, onClose, isLightMode = false }: AboutModalP
     </AnimatePresence>
   );
 }
+`;
+
+fs.writeFileSync('src/components/AboutModal.tsx', fileContent);
