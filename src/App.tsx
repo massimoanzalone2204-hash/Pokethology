@@ -4,7 +4,7 @@ import { checkQuotaAllowed, recordApiUsage } from "./lib/quotaManager";
 import { BattleResultScreen } from './components/BattleResultScreen';
 import { useState, useEffect, useRef, useTransition, useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Download, Search, Loader2, Database, Sparkles, Volume2, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff } from 'lucide-react';
+import { Download, Search, Loader2, Database, Sparkles, Volume2, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram } from 'lucide-react';
 
 import { PokethologyLogo } from './components/PokethologyLogo';
 import { PokeballIcon } from './components/PokeballIcon';
@@ -350,8 +350,11 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
     const shinyPath = isShiny ? 'shiny/' : '';
     
     if (effectiveLevel === 4) {
-      // Official artwork doesn't normally have female endpoint via direct URL structure here, just return default
-      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shinyPath}${idNum}.png`;
+      let spriteId = idNum;
+      if (isShiny && (idNum === '10309' || idNum === 10309 || pokemon.name?.includes('garchomp-mega-z'))) {
+        spriteId = '10058';
+      }
+      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shinyPath}${spriteId}.png`;
     }
     
     return isBack 
@@ -1146,7 +1149,11 @@ const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny }: { pokem
     const cleanName = getShowdownName(pokemonName);
     
     if (lvl === 0) {
-      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shinyPath}${id}.png`;
+      let artworkId = id;
+      if (isShiny && (id === '10309' || pokemonName?.includes('garchomp-mega-z'))) {
+        artworkId = '10058';
+      }
+      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shinyPath}${artworkId}.png`;
     }
     if (lvl === 1) {
       // Showdown 2D png fallback (good for megas and gmax)
@@ -5114,7 +5121,7 @@ export default function App() {
                 <div className="w-28 h-28 xs:w-36 xs:h-36 sm:w-60 sm:h-60 relative flex items-center justify-center shrink-0">
                   <div className="absolute inset-0 bg-cyan-500/15 rounded-full blur-2xl animate-pulse" />
                   <img 
-                    src={(isShiny ? pokemon?.sprites?.other?.home?.front_shiny : pokemon?.sprites?.other?.home?.front_default) || pokemon?.sprites?.other?.home?.front_default || pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.front_default || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'} 
+                    src={(isShiny ? (pokemon?.sprites?.other?.['official-artwork']?.front_shiny || pokemon?.sprites?.other?.home?.front_shiny) : (pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.other?.home?.front_default)) || pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.other?.home?.front_default || pokemon?.sprites?.front_default || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'} 
                     alt={pokemon?.name} 
                     className="max-w-full max-h-full object-contain scale-x-[-1] filter drop-shadow-[0_8px_20px_rgba(6,182,212,0.5)] relative z-10 transition-transform hover:scale-105" 
                     referrerPolicy="no-referrer"
@@ -5176,7 +5183,7 @@ export default function App() {
                 <div className="w-28 h-28 xs:w-36 xs:h-36 sm:w-60 sm:h-60 relative flex items-center justify-center shrink-0">
                   <div className="absolute inset-0 bg-red-500/15 rounded-full blur-2xl animate-pulse" />
                   <img 
-                    src={(isOpponentShiny ? battleOpponent?.sprites?.other?.home?.front_shiny : battleOpponent?.sprites?.other?.home?.front_default) || battleOpponent?.sprites?.other?.home?.front_default || battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.front_default || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'} 
+                    src={(isOpponentShiny ? (battleOpponent?.sprites?.other?.['official-artwork']?.front_shiny || battleOpponent?.sprites?.other?.home?.front_shiny) : (battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.other?.home?.front_default)) || battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.other?.home?.front_default || battleOpponent?.sprites?.front_default || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'} 
                     alt={battleOpponent?.name} 
                     className="max-w-full max-h-full object-contain filter drop-shadow-[0_8px_20px_rgba(239,68,68,0.5)] relative z-10 transition-transform hover:scale-105" 
                     referrerPolicy="no-referrer"
@@ -6949,7 +6956,7 @@ export default function App() {
                                                 <div className="flex flex-col items-center gap-1">
                                                   <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-slate-950 border-2 border-cyan-500/30 flex items-center justify-center overflow-hidden">
                                                     <img
-                                                      src={pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.other?.home?.front_default || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon?.id}.png`}
+                                                      src={(isShiny ? (pokemon?.sprites?.other?.['official-artwork']?.front_shiny || pokemon?.sprites?.other?.home?.front_shiny) : (pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.other?.home?.front_default)) || pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.other?.home?.front_default || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${isShiny ? 'shiny/' : ''}${pokemon?.id}.png`}
                                                       alt={pokemon?.name}
                                                       className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
                                                       referrerPolicy="no-referrer"
@@ -6962,7 +6969,7 @@ export default function App() {
                                                 <div className="flex flex-col items-center gap-1">
                                                   <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-slate-950 border-2 border-red-500/30 flex items-center justify-center overflow-hidden">
                                                     <img
-                                                      src={battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.other?.home?.front_default || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${battleOpponent?.id}.png`}
+                                                      src={(isOpponentShiny ? (battleOpponent?.sprites?.other?.['official-artwork']?.front_shiny || battleOpponent?.sprites?.other?.home?.front_shiny) : (battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.other?.home?.front_default)) || battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.other?.home?.front_default || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${isOpponentShiny ? 'shiny/' : ''}${battleOpponent?.id}.png`}
                                                       alt={battleOpponent?.name}
                                                       className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
                                                       referrerPolicy="no-referrer"
@@ -8653,11 +8660,12 @@ export default function App() {
             const abilitiesStr = activePokemonData.abilities?.map((a: any) => (a.ability?.name || a.name || '').replace(/-/g, ' ')).join(', ') || 'None';
 
             const preferHome = activePokemonData?.id >= 10000 || activePokemonData?.name?.includes('mega') || activePokemonData?.name?.includes('tatsugiri');
-            const artworkUrl = (preferHome ? activePokemonData?.sprites?.other?.home?.front_default : activePokemonData?.sprites?.other?.['official-artwork']?.front_default)
+            const artworkUrl = (isShiny ? (activePokemonData?.sprites?.other?.['official-artwork']?.front_shiny || activePokemonData?.sprites?.other?.home?.front_shiny) : null)
+              || (preferHome ? (activePokemonData?.sprites?.other?.home?.front_default || activePokemonData?.sprites?.other?.['official-artwork']?.front_default) : activePokemonData?.sprites?.other?.['official-artwork']?.front_default)
               || activePokemonData?.sprites?.other?.['official-artwork']?.front_default 
               || activePokemonData?.sprites?.other?.home?.front_default 
               || activePokemonData?.sprites?.front_default 
-              || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${activePokemonData?.id}.png`;
+              || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${isShiny ? 'shiny/' : ''}${activePokemonData?.id}.png`;
 
             const getStatPercent = (val: number) => Math.min(100, Math.round((val / 160) * 100));
 
@@ -9157,6 +9165,47 @@ export default function App() {
                       whileTap={{ scale: 0.98 }}
                       onClick={() => {
                         setIsSettingsOpen(false);
+                        setIsTutorialOpen(true);
+                        sounds.scan();
+                      }}
+                      className="flex items-center justify-between p-3.5 bg-slate-950/40 hover:bg-slate-950/80 border border-cyan-900/30 hover:border-cyan-500/40 rounded-xl transition-all group w-full"
+                    >
+                      <div className="flex items-center gap-2 text-cyan-400">
+                        <BookOpen className="w-4 h-4 shrink-0" />
+                        <div className="flex flex-col text-left">
+                          <span className="font-hud text-[8px] font-bold tracking-wider uppercase tracking-widest whitespace-nowrap">Tutorial</span>
+                          <span className="text-[7.5px] font-mono text-slate-400 leading-none mt-0.5">Interactive guide & controls walkthrough</span>
+                        </div>
+                      </div>
+                      <span className="text-[7px] font-mono text-cyan-600 group-hover:text-cyan-300 uppercase tracking-widest">
+                        Open
+                      </span>
+                    </motion.button>
+
+                    <a
+                      href="https://www.instagram.com/__.pokethology.__?igsh=YjZrejluMDd5dHoz"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => sounds.scan()}
+                      className="flex items-center justify-between p-3.5 bg-gradient-to-r from-purple-950/40 via-pink-950/40 to-slate-950/40 hover:from-purple-900/60 hover:to-slate-900/80 border border-pink-500/30 hover:border-pink-400/60 rounded-xl transition-all group w-full text-pink-400"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Instagram className="w-4 h-4 shrink-0 text-pink-400 group-hover:scale-110 transition-transform" />
+                        <div className="flex flex-col text-left">
+                          <span className="font-hud text-[8px] font-bold tracking-wider uppercase tracking-widest whitespace-nowrap">Pokéthology Instagram</span>
+                          <span className="text-[7.5px] font-mono text-pink-300/70 leading-none mt-0.5">Follow @__.pokethology.__ on Instagram</span>
+                        </div>
+                      </div>
+                      <span className="text-[7px] font-mono text-pink-400 group-hover:text-pink-200 uppercase tracking-widest">
+                        Visit
+                      </span>
+                    </a>
+
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        setIsSettingsOpen(false);
                         setIsAboutOpen(true);
                         sounds.scan();
                       }}
@@ -9165,28 +9214,9 @@ export default function App() {
                       <div className="flex items-center gap-2 text-cyan-400">
                         <Info className="w-4 h-4 shrink-0" />
                         <div className="flex flex-col text-left">
-                          <span className="font-hud text-[8px] font-bold tracking-wider uppercase tracking-widest whitespace-nowrap">About & System Info</span>
-                          <span className="text-[7.5px] font-mono text-slate-400 leading-none mt-0.5">App version, build specs & GitHub repo</span>
+                          <span className="font-hud text-[8px] font-bold tracking-wider uppercase tracking-widest whitespace-nowrap">Pokéthology Core Info</span>
+                          <span className="text-[7.5px] font-mono text-slate-400 leading-none mt-0.5">App version, build specs & system info</span>
                         </div>
-                      </div>
-                      <span className="text-[7px] font-mono text-cyan-600 group-hover:text-cyan-300 uppercase tracking-widest">
-                        Open
-                      </span>
-                    </motion.button>
-
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        setIsSettingsOpen(false);
-                        setIsTutorialOpen(true);
-                        sounds.scan();
-                      }}
-                      className="flex items-center justify-between p-3.5 bg-slate-950/40 hover:bg-slate-950/80 border border-cyan-900/30 hover:border-cyan-500/40 rounded-xl transition-all group w-full"
-                    >
-                      <div className="flex items-center gap-2 text-cyan-400">
-                        <BookOpen className="w-4 h-4" />
-                        <span className="font-hud text-[8px] font-bold tracking-wider uppercase tracking-widest whitespace-nowrap">Tutorial</span>
                       </div>
                       <span className="text-[7px] font-mono text-cyan-600 group-hover:text-cyan-300 uppercase tracking-widest">
                         Open
@@ -9204,7 +9234,7 @@ export default function App() {
                     <div className="flex items-center gap-2.5 text-red-400">
                       <RotateCcw className={cn("w-4 h-4", isRebooting && "animate-spin")} />
                       <span className="font-hud text-[9px] font-black tracking-wider uppercase tracking-widest">
-                        {isRebooting ? 'SYNCING POKÉDEX...' : 'RESET POKÉDEX SYSTEM'}
+                        {isRebooting ? 'REBOOTING POKÉDEX...' : 'RESTART POKÉDEX SYSTEM'}
                       </span>
                     </div>
                     <span className="text-[8px] font-mono text-red-600 group-hover:text-red-300 uppercase tracking-widest">

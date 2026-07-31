@@ -79,10 +79,29 @@ class PokeApiService {
     try {
       const stored = localStorage.getItem(`pokeapi_cache_${key}`);
       if (stored) {
-        const parsed = JSON.parse(stored) as T;
+        const parsed = JSON.parse(stored);
+        let actualData: T;
+        
+        if (parsed && typeof parsed === 'object' && 'timestamp' in parsed && 'data' in parsed) {
+          // Check TTL (7 days)
+          const TTL = 7 * 24 * 60 * 60 * 1000;
+          if (Date.now() - parsed.timestamp > TTL) {
+            localStorage.removeItem(`pokeapi_cache_${key}`);
+            return null;
+          }
+          // Update timestamp for LRU access tracking
+          parsed.timestamp = Date.now();
+          localStorage.setItem(`pokeapi_cache_${key}`, JSON.stringify(parsed));
+          actualData = parsed.data as T;
+        } else {
+          // Legacy cache data, convert to new format
+          actualData = parsed as T;
+          localStorage.setItem(`pokeapi_cache_${key}`, JSON.stringify({ data: actualData, timestamp: Date.now() }));
+        }
+
         // Backfill memory cache
-        this.inMemoryCache.set(key, parsed);
-        return parsed;
+        this.inMemoryCache.set(key, actualData);
+        return actualData;
       }
     } catch (e) {
       console.warn("Failed to read from localStorage cache", e);
@@ -98,11 +117,82 @@ class PokeApiService {
     // 1. Write to Memory
     this.inMemoryCache.set(key, data);
     
-    // 2. Write to LocalStorage (with quota exception handling)
+    // 2. Write to LocalStorage (with quota exception handling & auto-pruning)
+    const entry = { data, timestamp: Date.now() };
     try {
-      localStorage.setItem(`pokeapi_cache_${key}`, JSON.stringify(data));
-    } catch (e) {
-      console.warn("Failed to write to localStorage cache (possibly full). Using in-memory only.", e);
+      localStorage.setItem(`pokeapi_cache_${key}`, JSON.stringify(entry));
+    } catch (e: any) {
+      // Clear older entries when quota is exceeded
+      if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED' || e.message?.includes('quota')) {
+        this.pruneCache();
+        try {
+          localStorage.setItem(`pokeapi_cache_${key}`, JSON.stringify(entry));
+        } catch (err) {
+          // Fallback silently to memory-only if storage remains full
+        }
+      } else {
+        this.pruneCache();
+        try {
+          localStorage.setItem(`pokeapi_cache_${key}`, JSON.stringify(entry));
+        } catch (err) {}
+      }
+    }
+  }
+
+  /**
+   * Prune oldest cache entries to free up space based on timestamp
+   */
+  private pruneCache(): void {
+    try {
+      const cacheEntries: { key: string; timestamp: number }[] = [];
+      
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('pokeapi_cache_')) {
+          try {
+            const stored = localStorage.getItem(k);
+            if (stored) {
+              const parsed = JSON.parse(stored);
+              // Use timestamp if exists, otherwise assign 0 to prioritize removal
+              const timestamp = (parsed && typeof parsed === 'object' && 'timestamp' in parsed) ? parsed.timestamp : 0;
+              cacheEntries.push({ key: k, timestamp });
+            }
+          } catch(e) {}
+        }
+      }
+
+      // Sort ascending by timestamp (oldest first)
+      cacheEntries.sort((a, b) => a.timestamp - b.timestamp);
+
+      // Remove half of the oldest cached API responses from localStorage
+      const removeCount = Math.ceil(cacheEntries.length / 2);
+      for (let i = 0; i < removeCount; i++) {
+        localStorage.removeItem(cacheEntries[i].key);
+      }
+    } catch (err) {
+      console.warn("Failed to prune localStorage cache", err);
+    }
+  }
+
+  /**
+   * Clears the entire PokeAPI cache from both memory and localStorage.
+   */
+  public clearCache(): void {
+    this.inMemoryCache.clear();
+    try {
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('pokeapi_cache_')) {
+          keysToRemove.push(k);
+        }
+      }
+      for (const k of keysToRemove) {
+        localStorage.removeItem(k);
+      }
+      console.log(`Cleared ${keysToRemove.length} cache entries.`);
+    } catch(e) {
+      console.warn("Failed to clear localStorage cache", e);
     }
   }
 

@@ -10,6 +10,7 @@ import {
   idbDelete, 
   getStoreByteSize 
 } from './indexedDB';
+import { pokeApi } from './pokeApiService';
 
 export interface StorageUsageReport {
   totalBytes: number;
@@ -384,4 +385,11 @@ export async function clearAllLocalCaches(): Promise<void> {
   const tx = db.transaction([STORES.POKEMON_CACHE, STORES.IMAGE_CACHE], 'readwrite');
   tx.objectStore(STORES.POKEMON_CACHE).clear();
   tx.objectStore(STORES.IMAGE_CACHE).clear();
+
+  // Clear PokeAPI localStorage caches
+  try {
+    pokeApi.clearCache();
+  } catch (e) {
+    console.warn("Failed to clear localStorage caches", e);
+  }
 }

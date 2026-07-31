@@ -82,7 +82,7 @@ export function AboutModal({ isOpen, onClose, isLightMode = false }: AboutModalP
                 </p>
               </div>
 
-              {/* GitHub Repository & Bug Reporting / Feedback Section */}
+              {/* GitHub Repository Section */}
               <div className="p-3.5 rounded-xl bg-slate-900/70 border border-cyan-500/30 space-y-2.5">
                 <div className="flex items-start gap-2.5">
                   <MessageSquare className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
@@ -96,16 +96,16 @@ export function AboutModal({ isOpen, onClose, isLightMode = false }: AboutModalP
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => sounds.scan()}
-                  className="flex items-center justify-between p-3 rounded-lg bg-slate-950 hover:bg-slate-800 border border-cyan-500/40 hover:border-cyan-400 text-cyan-400 transition-all group shadow-md shadow-cyan-950/50"
+                  className="flex items-center justify-between p-3.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-cyan-500/40 hover:border-cyan-400 text-cyan-400 transition-all group shadow-md shadow-cyan-950/50"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Github className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
+                    <Github className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform shrink-0" />
                     <div className="flex flex-col text-left">
-                      <span className="font-hud text-[10px] font-black tracking-wider uppercase">Open GitHub Repository</span>
+                      <span className="font-hud text-[10px] font-black tracking-wider uppercase">GitHub repository</span>
                       <span className="text-[8.5px] font-mono text-slate-400">massimoanzalone2204-hash/Pokethology</span>
                     </div>
                   </div>
-                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-300 transition-colors" />
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-300 transition-colors shrink-0" />
                 </a>
               </div>
 

@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, BookOpen, Sparkles, Swords, Cpu, Newspaper, Info, Globe, ExternalLink, Calendar, Link, MessageSquare, ArrowUp, Activity, Database, Radar, Brain, Shield, Crosshair, Map, Volume2, RotateCcw } from 'lucide-react';
+import { X, BookOpen, Sparkles, Swords, Cpu, Newspaper, Info, Globe, ExternalLink, Calendar, Link, MessageSquare, ArrowUp, Activity, Database, Radar, Brain, Shield, Crosshair, Map, Volume2, RotateCcw, Share2, Github, Instagram } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { HUDCorners } from './HUDCorners';
 
 export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  const [activeTab, setActiveTab] = useState<'pokedex' | 'pokethology' | 'combat' | 'daily' | 'news'>('pokedex');
+  const [activeTab, setActiveTab] = useState<'pokedex' | 'pokethology' | 'combat' | 'daily' | 'social' | 'news'>('pokedex');
   const [pokemonNews, setPokemonNews] = useState<any[]>([]);
   const [groundingSources, setGroundingSources] = useState<any[]>([]);
   const [searchQueries, setSearchQueries] = useState<string[]>([]);
@@ -101,12 +101,13 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 
           {/* Tab Selection Row */}
           <div className="flex gap-1.5 overflow-x-auto custom-scrollbar no-scrollbar px-3 py-2.5 border-b border-slate-900 bg-slate-900/40 shrink-0 select-none justify-start sm:justify-center">
-            {(['pokedex', 'pokethology', 'combat', 'daily', 'news'] as const).map(tab => {
+            {(['pokedex', 'pokethology', 'combat', 'daily', 'social', 'news'] as const).map(tab => {
               const icons = {
                 pokedex: <Database className="w-3 h-3 text-emerald-400" />,
                 pokethology: <Brain className="w-3 h-3 text-purple-400" />,
                 combat: <Swords className="w-3 h-3 text-red-400" />,
                 daily: <Calendar className="w-3 h-3 text-amber-400" />,
+                social: <Share2 className="w-3 h-3 text-pink-400" />,
                 news: <Newspaper className="w-3 h-3 text-cyan-400" />
               };
               const titles = {
@@ -114,6 +115,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 pokethology: 'POKÉTHOLOGY',
                 combat: 'COMBAT',
                 daily: 'DAILY',
+                social: 'SOCIAL',
                 news: 'NEWS'
               };
 
@@ -343,6 +345,62 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       </p>
                     </div>
                   </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* TAB: SOCIAL & COMMUNITY */}
+            {activeTab === 'social' && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }} 
+                animate={{ opacity: 1, scale: 1 }}
+                className="space-y-6 max-w-xl mx-auto text-left"
+              >
+                <div className="p-4 bg-pink-950/20 border-l-4 border-pink-500 rounded-r-xl space-y-2 text-left relative overflow-hidden">
+                  <h3 className="font-hud font-black text-pink-400 uppercase text-sm flex items-center gap-2">
+                    <Share2 className="w-4 h-4 animate-pulse" /> Pokéthology Community & Social
+                  </h3>
+                  <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
+                    Connect directly with the Pokéthology ecosystem! Whether you want to inspect our open-source codebase, report bugs, discuss new features, or stay updated with daily Pokémon content, check out our official channels below.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                  {/* GitHub Button */}
+                  <a
+                    href="https://github.com/massimoanzalone2204-hash/Pokethology"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-3.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-cyan-500/40 hover:border-cyan-400 text-cyan-400 transition-all group shadow-md shadow-cyan-950/50 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Github className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform shrink-0" />
+                      <div className="flex flex-col text-left">
+                        <span className="font-hud text-[10px] font-black tracking-wider uppercase">GitHub repository</span>
+                        <span className="text-[8.5px] font-mono text-slate-400">massimoanzalone2204-hash/Pokethology</span>
+                      </div>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-300 transition-colors shrink-0" />
+                  </a>
+
+                  {/* Instagram Button */}
+                  <a
+                    href="https://www.instagram.com/__.pokethology.__?igsh=YjZrejluMDd5dHoz"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-purple-950/80 via-pink-950/80 to-slate-900/90 hover:from-purple-900/90 hover:to-slate-800 border border-pink-500/40 hover:border-pink-400 text-pink-400 transition-all group shadow-lg shadow-pink-950/40 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <div className="p-2 rounded-lg bg-slate-950 border border-pink-500/30 text-pink-400 group-hover:scale-105 transition-transform shrink-0">
+                        <Instagram className="w-5 h-5" />
+                      </div>
+                      <div className="flex flex-col text-left overflow-hidden">
+                        <span className="font-hud text-[10px] sm:text-[11px] font-black tracking-wider uppercase truncate">Official Instagram</span>
+                        <span className="text-[8.5px] font-mono text-pink-300/80 truncate">@__.pokethology.__</span>
+                      </div>
+                    </div>
+                    <ExternalLink className="w-4 h-4 text-pink-400/70 group-hover:text-pink-300 transition-colors shrink-0" />
+                  </a>
                 </div>
               </motion.div>
             )}

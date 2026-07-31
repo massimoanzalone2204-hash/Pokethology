@@ -260,6 +260,31 @@ export async function searchPokemon(query: string, lang: string = 'en'): Promise
   }
   // --- END MASTER FALLBACK ---
 
+  // Ensure official-artwork is populated for sprites, including shiny artwork from pokeAPI
+  if (data && data.sprites) {
+    if (!data.sprites.other) data.sprites.other = {};
+    if (!data.sprites.other['official-artwork']) {
+      data.sprites.other['official-artwork'] = {
+        front_default: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${data.id}.png`,
+        front_shiny: (data.id === 10309 || data.name === 'garchomp-mega-z')
+          ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/10058.png`
+          : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/${data.id}.png`
+      };
+    } else {
+      const offArt = data.sprites.other['official-artwork'];
+      if (!offArt.front_default) {
+        offArt.front_default = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${data.id}.png`;
+      }
+      if (!offArt.front_shiny) {
+        if (data.id === 10309 || data.name === 'garchomp-mega-z') {
+          offArt.front_shiny = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/10058.png`;
+        } else {
+          offArt.front_shiny = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/${data.id}.png`;
+        }
+      }
+    }
+  }
+
   // Fetch abilities
   const abilities: Ability[] = (data.abilities && data.abilities.length > 0) ? await Promise.all(
     data.abilities.map(async (a: any) => {
