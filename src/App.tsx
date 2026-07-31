@@ -5121,12 +5121,12 @@ export default function App() {
                 <div className="w-28 h-28 xs:w-36 xs:h-36 sm:w-60 sm:h-60 relative flex items-center justify-center shrink-0">
                   <div className="absolute inset-0 bg-cyan-500/15 rounded-full blur-2xl animate-pulse" />
                   <img 
-                    src={(isShiny ? (pokemon?.sprites?.other?.['official-artwork']?.front_shiny || pokemon?.sprites?.other?.home?.front_shiny) : (pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.other?.home?.front_default)) || pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.other?.home?.front_default || pokemon?.sprites?.front_default || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'} 
+                    src={(isShiny ? (pokemon?.sprites?.other?.home?.front_shiny || pokemon?.sprites?.other?.['official-artwork']?.front_shiny) : (pokemon?.sprites?.other?.home?.front_default || pokemon?.sprites?.other?.['official-artwork']?.front_default)) || pokemon?.sprites?.other?.home?.front_default || pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.front_default || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'} 
                     alt={pokemon?.name} 
                     className="max-w-full max-h-full object-contain scale-x-[-1] filter drop-shadow-[0_8px_20px_rgba(6,182,212,0.5)] relative z-10 transition-transform hover:scale-105" 
                     referrerPolicy="no-referrer"
                     onError={(e) => {
-                      const fallback = pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.front_default;
+                      const fallback = pokemon?.sprites?.other?.home?.front_default || pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.front_default;
                       if (fallback && e.currentTarget.src !== fallback) {
                         e.currentTarget.src = fallback;
                       } else {
@@ -5183,12 +5183,12 @@ export default function App() {
                 <div className="w-28 h-28 xs:w-36 xs:h-36 sm:w-60 sm:h-60 relative flex items-center justify-center shrink-0">
                   <div className="absolute inset-0 bg-red-500/15 rounded-full blur-2xl animate-pulse" />
                   <img 
-                    src={(isOpponentShiny ? (battleOpponent?.sprites?.other?.['official-artwork']?.front_shiny || battleOpponent?.sprites?.other?.home?.front_shiny) : (battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.other?.home?.front_default)) || battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.other?.home?.front_default || battleOpponent?.sprites?.front_default || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'} 
+                    src={(isOpponentShiny ? (battleOpponent?.sprites?.other?.home?.front_shiny || battleOpponent?.sprites?.other?.['official-artwork']?.front_shiny) : (battleOpponent?.sprites?.other?.home?.front_default || battleOpponent?.sprites?.other?.['official-artwork']?.front_default)) || battleOpponent?.sprites?.other?.home?.front_default || battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.front_default || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'} 
                     alt={battleOpponent?.name} 
                     className="max-w-full max-h-full object-contain filter drop-shadow-[0_8px_20px_rgba(239,68,68,0.5)] relative z-10 transition-transform hover:scale-105" 
                     referrerPolicy="no-referrer"
                     onError={(e) => {
-                      const fallback = battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.front_default;
+                      const fallback = battleOpponent?.sprites?.other?.home?.front_default || battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.front_default;
                       if (fallback && e.currentTarget.src !== fallback) {
                         e.currentTarget.src = fallback;
                       } else {
@@ -5978,30 +5978,30 @@ export default function App() {
                                       {/* active game version badge */}
                                     </div>
 
-                                    <div className="flex justify-center gap-4 text-xs font-sans shrink-0 w-full max-w-sm mx-auto">
+                                    <div className="grid grid-cols-2 gap-2 sm:gap-4 text-xs font-sans shrink-0 w-full max-w-md mx-auto mb-4">
                                       <div className={cn(
-                                        "flex-1 p-2 sm:p-3 rounded-xl text-center border shadow-sm transition-colors flex flex-col items-center justify-center gap-1",
-                                        isLightMode 
-                                          ? "bg-white border-slate-200" 
-                                          : "bg-slate-900/40 border-slate-800"
+                                        "p-2 sm:p-3 rounded-xl text-center border shadow-sm transition-colors flex flex-col items-center justify-center gap-1",
+                                        isLightMode
+                                           ? "bg-white border-slate-200"
+                                           : "bg-slate-900/40 border-slate-800"
                                       )}>
-                                        <p className={cn("mb-0.5 uppercase tracking-wider text-[10px] font-bold", isLightMode ? "text-slate-500" : "text-slate-400")}>Weight</p>
-                                        <p className={cn("text-[13px] sm:text-[14px] font-bold leading-none", isLightMode ? "text-slate-800" : "text-slate-200")}>{(pokemon.weight / 10).toFixed(1)} KG</p>
-                                        <p className={cn("text-[10px] text-slate-500 leading-none")}>{((pokemon.weight / 10) * 2.20462).toFixed(1)} lbs</p>
+                                        <p className={cn("mb-0.5 uppercase tracking-wider text-[9px] sm:text-[10px] font-bold", isLightMode ? "text-slate-500" : "text-slate-400")}>Weight</p>
+                                        <p className={cn("text-[12px] sm:text-[14px] font-bold leading-none", isLightMode ? "text-slate-800" : "text-slate-200")}>{(pokemon.weight / 10).toFixed(1)} KG</p>
+                                        <p className={cn("text-[9px] sm:text-[10px] text-slate-500 leading-none")}>{((pokemon.weight / 10) * 2.20462).toFixed(1)} lbs</p>
                                       </div>
                                       <div className={cn(
-                                        "flex-1 p-2 sm:p-3 rounded-xl text-center border shadow-sm transition-colors flex flex-col items-center justify-center gap-1",
-                                        isLightMode 
-                                          ? "bg-white border-slate-200" 
-                                          : "bg-slate-900/40 border-slate-800"
+                                        "p-2 sm:p-3 rounded-xl text-center border shadow-sm transition-colors flex flex-col items-center justify-center gap-1",
+                                        isLightMode
+                                           ? "bg-white border-slate-200"
+                                           : "bg-slate-900/40 border-slate-800"
                                       )}>
-                                        <p className={cn("mb-0.5 uppercase tracking-wider text-[10px] font-bold", isLightMode ? "text-slate-500" : "text-slate-400")}>Height</p>
-                                        <p className={cn("text-[13px] sm:text-[14px] font-bold leading-none", isLightMode ? "text-slate-800" : "text-slate-200")}>{(pokemon.height / 10).toFixed(1)} M</p>
-                                        <p className={cn("text-[10px] text-slate-500 leading-none")}>{Math.floor((pokemon.height / 10) * 3.28084)}'{Math.round(((pokemon.height / 10) * 3.28084 - Math.floor((pokemon.height / 10) * 3.28084)) * 12)}"</p>
+                                        <p className={cn("mb-0.5 uppercase tracking-wider text-[9px] sm:text-[10px] font-bold", isLightMode ? "text-slate-500" : "text-slate-400")}>Height</p>
+                                        <p className={cn("text-[12px] sm:text-[14px] font-bold leading-none", isLightMode ? "text-slate-800" : "text-slate-200")}>{(pokemon.height / 10).toFixed(1)} M</p>
+                                        <p className={cn("text-[9px] sm:text-[10px] text-slate-500 leading-none")}>{Math.floor((pokemon.height / 10) * 3.28084)}'{Math.round(((pokemon.height / 10) * 3.28084 - Math.floor((pokemon.height / 10) * 3.28084)) * 12)}"</p>
                                       </div>
                                     </div>
-
-                                    {/* Abilities */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+{/* Abilities */}
                                     <div className={cn(
                                       "rounded-xl p-4 border-2 shadow-[0_4px_22px_rgba(0,0,0,0.03)]",
                                       isLightMode ? "bg-white border-slate-200" : "bg-slate-950/60 border-cyan-900/40 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
@@ -6088,6 +6088,7 @@ export default function App() {
                                       </div>
                                     </div>
 
+                                    </div>
                                     <div className={cn(
                                       "backdrop-blur-md rounded-2xl p-5 sm:p-7 border shadow-inner relative overflow-hidden group/statshud w-full max-w-full z-10 box-border",
                                       isLightMode 
@@ -6573,9 +6574,9 @@ export default function App() {
                                   >
                                     {/* ─── DUAL MODEL MATCHUP PREVIEW REMOVED (THE ARENA ONLY IS SUFFICIENT) ─── */}
 
-                                    <div className="w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-start max-w-full pb-2 sm:pb-3">
+                                    <div className="w-full flex-1 grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 items-start max-w-full pb-2 sm:pb-3">
                                       {/* Left Column (Arena, Actions) */}
-                                      <div className="lg:col-span-8 flex flex-col w-full min-w-0">
+                                      <div className="md:col-span-7 lg:col-span-8 flex flex-col w-full min-w-0">
                                         
                                         <div 
                                           ref={arenaRef}
@@ -6956,7 +6957,7 @@ export default function App() {
                                                 <div className="flex flex-col items-center gap-1">
                                                   <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-slate-950 border-2 border-cyan-500/30 flex items-center justify-center overflow-hidden">
                                                     <img
-                                                      src={(isShiny ? (pokemon?.sprites?.other?.['official-artwork']?.front_shiny || pokemon?.sprites?.other?.home?.front_shiny) : (pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.other?.home?.front_default)) || pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.other?.home?.front_default || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${isShiny ? 'shiny/' : ''}${pokemon?.id}.png`}
+                                                      src={(isShiny ? (pokemon?.sprites?.other?.home?.front_shiny || pokemon?.sprites?.other?.['official-artwork']?.front_shiny) : (pokemon?.sprites?.other?.home?.front_default || pokemon?.sprites?.other?.['official-artwork']?.front_default)) || pokemon?.sprites?.other?.home?.front_default || pokemon?.sprites?.other?.['official-artwork']?.front_default || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${isShiny ? 'shiny/' : ''}${pokemon?.id}.png`}
                                                       alt={pokemon?.name}
                                                       className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
                                                       referrerPolicy="no-referrer"
@@ -6969,7 +6970,7 @@ export default function App() {
                                                 <div className="flex flex-col items-center gap-1">
                                                   <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-slate-950 border-2 border-red-500/30 flex items-center justify-center overflow-hidden">
                                                     <img
-                                                      src={(isOpponentShiny ? (battleOpponent?.sprites?.other?.['official-artwork']?.front_shiny || battleOpponent?.sprites?.other?.home?.front_shiny) : (battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.other?.home?.front_default)) || battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.other?.home?.front_default || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${isOpponentShiny ? 'shiny/' : ''}${battleOpponent?.id}.png`}
+                                                      src={(isOpponentShiny ? (battleOpponent?.sprites?.other?.home?.front_shiny || battleOpponent?.sprites?.other?.['official-artwork']?.front_shiny) : (battleOpponent?.sprites?.other?.home?.front_default || battleOpponent?.sprites?.other?.['official-artwork']?.front_default)) || battleOpponent?.sprites?.other?.home?.front_default || battleOpponent?.sprites?.other?.['official-artwork']?.front_default || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${isOpponentShiny ? 'shiny/' : ''}${battleOpponent?.id}.png`}
                                                       alt={battleOpponent?.name}
                                                       className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
                                                       referrerPolicy="no-referrer"
@@ -8747,7 +8748,7 @@ export default function App() {
                   </div>
 
                   {/* Scrollable Content Body Container */}
-                  <div className="daily-scans-container flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 flex flex-col lg:grid lg:grid-cols-2 gap-5 min-h-0 overscroll-contain touch-pan-y items-start">
+                  <div className="daily-scans-container flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 flex flex-col md:grid md:grid-cols-2 gap-5 min-h-0 overscroll-contain touch-pan-y items-start">
                     
                     {/* Left Column - Holographic Specimen Container & Metrics */}
                     <div className="w-full shrink-0 bg-slate-900/95 border-2 border-amber-500/30 rounded-xl p-4 sm:p-5 flex flex-col items-center gap-4 relative shadow-lg text-center">

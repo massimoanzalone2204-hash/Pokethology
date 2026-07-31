@@ -120,6 +120,31 @@ export const EvolutionNodeComponent = memo(({
                  />
                </>
              )}
+             
+             {/* Evolution Details tooltip container */}
+             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-8 flex flex-col items-center group/tooltip z-30 opacity-60 hover:opacity-100 transition-opacity">
+               <div className="bg-slate-900 border border-slate-700 rounded-md px-1.5 py-0.5 text-[8px] sm:text-[9px] font-mono text-slate-300 font-bold tracking-widest whitespace-nowrap cursor-help flex items-center gap-1">
+                 <span>INFO</span>
+               </div>
+               
+               {/* Hover Details Card */}
+               {node.evolves_to[0]?.evolution_details && node.evolves_to[0].evolution_details.length > 0 && (
+                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-48 bg-slate-950 border border-cyan-500/40 rounded-lg p-2 opacity-0 pointer-events-none group-hover/tooltip:opacity-100 group-hover/tooltip:pointer-events-auto transition-all duration-200 shadow-2xl z-50">
+                    {node.evolves_to[0].evolution_details.map((detail, dIdx) => (
+                      <div key={dIdx} className="mb-2 last:mb-0 space-y-0.5 text-[9px] sm:text-[10px] text-cyan-100 font-medium">
+                        <div className="font-hud text-[8px] text-cyan-500 mb-1 pb-1 border-b border-cyan-900/50 uppercase tracking-widest font-black">Method {dIdx + 1}</div>
+                        {detail.trigger && <div>Trigger: <span className="text-cyan-300 font-mono capitalize">{detail.trigger.name.replace('-', ' ')}</span></div>}
+                        {detail.min_level && <div>Level: <span className="text-amber-400 font-mono">≥ {detail.min_level}</span></div>}
+                        {detail.item && <div>Item: <span className="text-amber-400 capitalize font-mono">{detail.item.name.replace('-', ' ')}</span></div>}
+                        {detail.min_happiness && <div>Happiness: <span className="text-emerald-400 font-mono">≥ {detail.min_happiness}</span></div>}
+                        {detail.time_of_day && <div>Time: <span className="text-blue-300 font-mono capitalize">{detail.time_of_day}</span></div>}
+                        {detail.location && <div>Location: <span className="text-purple-300 capitalize font-mono">{detail.location.name.replace('-', ' ')}</span></div>}
+                        {detail.trade_species && <div>Trade with: <span className="text-rose-400 capitalize font-mono">{detail.trade_species.name.replace('-', ' ')}</span></div>}
+                      </div>
+                    ))}
+                 </div>
+               )}
+             </div>
 
              <ChevronRight className={cn(
                "w-4 h-4 sm:w-6 sm:h-6 shrink-0 z-10 translate-x-4 sm:translate-x-8 rounded-full transition-colors",

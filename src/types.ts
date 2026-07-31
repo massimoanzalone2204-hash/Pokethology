@@ -14,11 +14,30 @@ export interface GameStat {
   }[];
 }
 
+export interface EvolutionDetail {
+  min_level?: number;
+  min_happiness?: number;
+  item?: { name: string };
+  trigger?: { name: string };
+  time_of_day?: string;
+  location?: { name: string };
+  known_move?: { name: string };
+  known_move_type?: { name: string };
+  min_affection?: number;
+  min_beauty?: number;
+  trade_species?: { name: string };
+  party_species?: { name: string };
+  party_type?: { name: string };
+  needs_overworld_rain?: boolean;
+  turn_upside_down?: boolean;
+}
+
 export interface EvolutionNode {
   id: number;
   name: string;
   image: string;
   evolves_to: EvolutionNode[];
+  evolution_details?: EvolutionDetail[];
 }
 
 export interface Move {
@@ -112,10 +131,14 @@ export interface Pokemon {
   }[];
   stats: {
     base_stat: number;
+    effort?: number;
     stat: {
       name: string;
     };
   }[];
+  base_experience?: number;
+  capture_rate?: number;
+  growth_rate?: string;
   gameStats?: GameStat[];
   weight: number;
   height: number;

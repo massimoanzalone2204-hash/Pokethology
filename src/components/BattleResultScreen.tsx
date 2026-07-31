@@ -56,8 +56,8 @@ export function BattleResultScreen({
 
   const getSprite = (p: any) => {
     if (!p) return '';
-    return p.sprites?.other?.['official-artwork']?.front_default ||
-           p.sprites?.other?.home?.front_default ||
+    return p.sprites?.other?.home?.front_default ||
+           p.sprites?.other?.['official-artwork']?.front_default ||
            p.sprites?.front_default ||
            p.sprite ||
            p.image ||
