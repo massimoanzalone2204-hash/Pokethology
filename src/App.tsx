@@ -5655,15 +5655,15 @@ export default function App() {
                           )}
 
                           <div className={cn(
-                            "flex-1 flex flex-col lg:flex-row lg:gap-6 min-h-0 h-full custom-scrollbar",
-                            activeTab === 'chat' ? "overflow-hidden items-stretch pb-0 lg:pb-0" : "overflow-y-auto lg:items-start pb-8 sm:pb-12"
+                            "flex-1 flex flex-col md:flex-row md:gap-6 min-h-0 h-full custom-scrollbar",
+                            activeTab === 'chat' ? "overflow-hidden items-stretch pb-0" : "overflow-y-auto md:items-start pb-8 sm:pb-12"
                           )} 
                           ref={detailsContainerRef}
                           onScroll={(e) => setShowDetailsScrollTop(e.currentTarget.scrollTop > 150)}
                           >
                             <div className={cn(
-                              "flex flex-col items-center lg:w-[35%] xl:w-[30%] lg:sticky lg:top-0 shrink-0",
-                              activeTab === 'chat' && "hidden lg:flex",
+                              "flex flex-col items-center md:w-[40%] lg:w-[35%] xl:w-[30%] md:sticky md:top-0 shrink-0",
+                              activeTab === 'chat' && "hidden md:flex",
                               activeTab === 'battle' && "hidden"
                             )}>
                               <div className="relative w-44 h-44 sm:w-56 sm:h-56 mb-4 group shrink-0">
@@ -7186,7 +7186,7 @@ export default function App() {
                                      </div> {/* End of Left Column Wrapper */}
 
                                       {/* Right Column: logs, tactical advice, records, and setup */}
-                                      <div className="lg:col-span-4 flex flex-col gap-4 w-full min-w-0 select-none pb-0 z-20">
+                                      <div className="md:col-span-5 lg:col-span-4 flex flex-col gap-4 w-full min-w-0 select-none pb-0 z-20">
                                         <AnimatePresence>
                                           {isBattling && <BattleLog log={battleLog} enableAnimations={enableAnimations} turn={turn || 'player'} isBattling={isBattling} />}
                                         </AnimatePresence>
