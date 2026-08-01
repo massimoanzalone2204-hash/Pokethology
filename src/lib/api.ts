@@ -190,16 +190,34 @@ export async function searchPokemon(query: string, lang: string = 'en'): Promise
   let data;
 
   if (!pokeRes.ok) {
-    // If specific form not found, try progressively shorter base forms (e.g., tatsugiri-curly-mega -> tatsugiri-curly -> tatsugiri)
-    const parts = formattedQuery.split('-');
-    for (let i = parts.length - 1; i > 0; i--) {
-      const baseQuery = parts.slice(0, i).join('-');
-      const baseRes = await fetch(`https://pokeapi.co/api/v2/pokemon/${baseQuery}`);
-      if (baseRes.ok) {
-        pokeRes = baseRes;
-        data = await baseRes.json();
-        data.name = formattedQuery; // Preserve the requested form name
-        break;
+    // 1. Try species endpoint (handles cases like "basculin", "meowstic", "wormadam", "pumpkaboo", etc. where species name differs from default variety endpoint name)
+    try {
+      const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${formattedQuery}`);
+      if (speciesRes.ok) {
+        const speciesData = await speciesRes.json();
+        const defaultVar = speciesData.varieties?.find((v: any) => v.is_default) || speciesData.varieties?.[0];
+        if (defaultVar && defaultVar.pokemon?.url) {
+          const varRes = await fetch(defaultVar.pokemon.url);
+          if (varRes.ok) {
+            pokeRes = varRes;
+            data = await varRes.json();
+          }
+        }
+      }
+    } catch (_) {}
+
+    // 2. If species fallback didn't resolve it, try progressively shorter base forms (e.g., tatsugiri-curly-mega -> tatsugiri-curly -> tatsugiri)
+    if (!data) {
+      const parts = formattedQuery.split('-');
+      for (let i = parts.length - 1; i > 0; i--) {
+        const baseQuery = parts.slice(0, i).join('-');
+        const baseRes = await fetch(`https://pokeapi.co/api/v2/pokemon/${baseQuery}`);
+        if (baseRes.ok) {
+          pokeRes = baseRes;
+          data = await baseRes.json();
+          data.name = formattedQuery; // Preserve the requested form name
+          break;
+        }
       }
     }
   }

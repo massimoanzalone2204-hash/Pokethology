@@ -5625,6 +5625,8 @@ export default function App() {
                                   setBattleOpponent(null);
                                   resetSimulation();
                                   setListMode('home');
+                                  setArenaArtworkMode('home');
+                                  try { localStorage.setItem('pokethology_arena_artwork_mode', 'home'); } catch(_) {}
                                   sounds.scan();
                                 }}
                                 className={cn(hudButtonClass(false, 'cyan'), "!py-1 !px-3 !text-[10px] font-bold tracking-wider flex items-center gap-1 cursor-pointer")}
@@ -6192,9 +6194,9 @@ export default function App() {
                                     </div>
 
                                     {/* Evolution Line & Methods Section (Only for standard 1025 Pokémon) */}
-                                     {isStandard1025Pokemon(pokemon) && pokemon.evolutionChain && (
+                                     {isStandard1025Pokemon(pokemon) && pokemon.evolutionChain && pokemon.evolutionChain.evolves_to && pokemon.evolutionChain.evolves_to.length > 0 && (
                                        <div className={cn(
-                                         "rounded-xl p-4 sm:p-5 border-2 shadow-[0_4px_22px_rgba(0,0,0,0.03)] overflow-x-auto custom-scrollbar relative mb-4",
+                                         "rounded-xl p-4 sm:p-5 border-2 shadow-[0_4px_22px_rgba(0,0,0,0.03)] overflow-x-auto custom-scrollbar relative mb-4 touch-pan-x touch-pan-y [touch-action:pan-x_pan-y]",
                                          isLightMode ? "bg-white border-slate-200" : "bg-slate-950/60 border-cyan-900/40 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
                                        )}>
                                          <h3 className={cn(
@@ -6205,10 +6207,10 @@ export default function App() {
                                              <GitFork className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                                              <span>Evolution Line & Methods</span>
                                            </div>
-                                           <span className={cn("text-[9px] font-bold tracking-wider font-mono", isLightMode ? "text-slate-500" : "text-cyan-500 font-bold")}>SPECIES LINEAGE</span>
+                                           
                                          </h3>
 
-                                         <div className="flex items-center justify-start min-w-max pb-1 pt-2">
+                                         <div className="flex items-center justify-start min-w-max pb-1 pt-2 touch-pan-x touch-pan-y [touch-action:pan-x_pan-y]">
                                            <EvolutionNodeComponent 
                                              node={pokemon.evolutionChain}
                                              currentPokemonName={pokemon.name}
