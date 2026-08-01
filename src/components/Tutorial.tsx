@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, BookOpen, Sparkles, Swords, Cpu, Newspaper, Info, Globe, ExternalLink, Calendar, Link, MessageSquare, ArrowUp, Activity, Database, Radar, Brain, Shield, Crosshair, Map, Volume2, RotateCcw, Share2, Github, Instagram } from 'lucide-react';
+import { X, BookOpen, Sparkles, Swords, Cpu, Newspaper, Info, Globe, ExternalLink, Calendar, Link, MessageSquare, ArrowUp, Activity, Database, Radar, Brain, Shield, Crosshair, Map, Volume2, RotateCcw, Share2, Github, Instagram, Image, Gamepad2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { HUDCorners } from './HUDCorners';
 
@@ -280,6 +280,31 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                   </motion.div>
                 </div>
 
+                {/* Artwork Mode Toggle Note */}
+                <motion.div 
+                  whileHover={{ scale: 1.01 }} 
+                  className="bg-cyan-950/25 p-3 rounded-xl border border-cyan-500/35 flex items-start gap-3 relative overflow-hidden group shadow-[0_0_15px_rgba(6,182,212,0.15)] text-left"
+                >
+                  <div className="p-2 bg-cyan-900/40 rounded-lg border border-cyan-500/35 text-cyan-400 shrink-0 flex items-center gap-1">
+                    <Image className="w-3.5 h-3.5 text-cyan-400" />
+                    <span className="text-[9px] font-mono font-bold text-slate-500">/</span>
+                    <Gamepad2 className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-cyan-400 text-[10px] sm:text-[11px] uppercase font-hud tracking-wider flex items-center gap-1.5">
+                        <Image className="w-3 h-3 text-cyan-300" /> Artwork & Sprite Mode Toggle
+                      </span>
+                      <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[6.5px] font-mono uppercase tracking-widest font-extrabold">
+                        NEW FEATURE
+                      </span>
+                    </div>
+                    <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-relaxed font-sans">
+                      Use the <span className="text-cyan-300 font-bold font-hud">[Art / Sprite]</span> button in the arena header or before the Shiny button in the Pokédex to switch combat visual rendering between official HD Sugimori Artwork (<span className="text-cyan-400 font-semibold">Art</span>) and retro 2D Pixel Sprites (<span className="text-amber-400 font-semibold">Sprite</span>). Small Pokémon 2D pixel sprites are automatically boosted in scale so they remain crisp and clearly visible during intense battle sequences!
+                    </p>
+                  </div>
+                </motion.div>
+
                 {/* Interactive Artwork Arena Note */}
                 <motion.div 
                   whileHover={{ scale: 1.01 }} 
@@ -317,7 +342,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Calendar className="w-4 h-4 animate-bounce" /> Daily Hub & Activities
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Return every 24 hours to expand your theological knowledge and view the featured cosmic scans and daily activities.
+                    Return every 24 hours to view the featured daily scan and participate in daily activities.
                   </p>
                 </div>
                 
@@ -327,9 +352,9 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <Sparkles className="w-5 h-5 text-amber-400" />
                     </div>
                     <div>
-                      <span className="font-bold text-amber-400 text-[11px] sm:text-xs uppercase font-hud tracking-wider">Daily Cosmic Scan</span>
+                      <span className="font-bold text-amber-400 text-[11px] sm:text-xs uppercase font-hud tracking-wider">Daily Scan</span>
                       <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        A unique, randomly featured Pokémon every single day, complete with exclusive AI-generated theological and academic lore you won't find anywhere else.
+                        A unique, randomly featured Pokémon every single day, complete with official Pokédex entry and live academic analysis.
                       </p>
                     </div>
                   </div>

@@ -318,8 +318,6 @@ export async function searchPokemon(query: string, lang: string = 'en'): Promise
   let evolutionChain: EvolutionNode | null = null;
   let description = 'No description available.';
   let gameDescriptions: { version: string; flavor_text: string }[] = [];
-  let capture_rate: number | undefined;
-  let growth_rate: string | undefined;
   let varieties: Pokemon['varieties'] = [];
   let baseId = data.id;
   try {
@@ -338,8 +336,6 @@ export async function searchPokemon(query: string, lang: string = 'en'): Promise
       }));
     
     baseId = speciesData.id;
-    capture_rate = speciesData.capture_rate;
-    growth_rate = speciesData.growth_rate?.name;
     
     let entry = speciesData.flavor_text_entries.find((e: any) => e.language.name === baseLang);
     if (!entry) {
@@ -444,34 +440,11 @@ export async function searchPokemon(query: string, lang: string = 'en'): Promise
 
     const parseEvoChain = (chain: any): EvolutionNode => {
       const id = parseInt(chain.species.url.split('/').filter(Boolean).pop() || '0', 10);
-      
-      let evolution_details = undefined;
-      if (chain.evolution_details && chain.evolution_details.length > 0) {
-        evolution_details = chain.evolution_details.map((d: any) => ({
-          min_level: d.min_level,
-          min_happiness: d.min_happiness,
-          item: d.item ? { name: d.item.name } : undefined,
-          trigger: d.trigger ? { name: d.trigger.name } : undefined,
-          time_of_day: d.time_of_day,
-          location: d.location ? { name: d.location.name } : undefined,
-          known_move: d.known_move ? { name: d.known_move.name } : undefined,
-          known_move_type: d.known_move_type ? { name: d.known_move_type.name } : undefined,
-          min_affection: d.min_affection,
-          min_beauty: d.min_beauty,
-          trade_species: d.trade_species ? { name: d.trade_species.name } : undefined,
-          party_species: d.party_species ? { name: d.party_species.name } : undefined,
-          party_type: d.party_type ? { name: d.party_type.name } : undefined,
-          needs_overworld_rain: d.needs_overworld_rain,
-          turn_upside_down: d.turn_upside_down,
-        }));
-      }
-
       const current: EvolutionNode = {
         name: chain.species.name,
         id,
         image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
-        evolves_to: [],
-        evolution_details
+        evolves_to: []
       };
       if (chain.evolves_to && chain.evolves_to.length > 0) {
         current.evolves_to = chain.evolves_to.map((next: any) => parseEvoChain(next));
@@ -593,8 +566,6 @@ export async function searchPokemon(query: string, lang: string = 'en'): Promise
     ...data,
     name: REV_MALE_BASE_FORMS[data.name] || data.name,
     baseId,
-    capture_rate,
-    growth_rate,
     abilities,
     evolutionChain,
     weaknesses,

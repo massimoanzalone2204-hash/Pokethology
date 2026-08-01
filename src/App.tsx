@@ -4,7 +4,7 @@ import { checkQuotaAllowed, recordApiUsage } from "./lib/quotaManager";
 import { BattleResultScreen } from './components/BattleResultScreen';
 import { useState, useEffect, useRef, useTransition, useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Download, Search, Loader2, Database, Sparkles, Volume2, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram } from 'lucide-react';
+import { Download, Search, Loader2, Database, Sparkles, Volume2, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2 } from 'lucide-react';
 
 import { PokethologyLogo } from './components/PokethologyLogo';
 import { PokeballIcon } from './components/PokeballIcon';
@@ -270,21 +270,71 @@ const TypewriterText = memo(({ text, delay = 12, onComplete }: { text: string; d
 TypewriterText.displayName = "TypewriterText";
 
 // Custom Sprite Component for perfect Battle Arena sizing and Showdown fallbacks
-const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, className, onClick, arenaMode = false, flip, scaleMultiplier = 1, isPlayer = false }: any) => {
+const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, className, onClick, arenaMode = false, flip, scaleMultiplier = 1, isPlayer = false, use2dSprite = false }: any) => {
   const [fallbackLevel, setFallbackLevel] = useState(0);
   const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     setFallbackLevel(0);
     setImageLoaded(false);
-  }, [pokemon?.name, isShiny, isFemale]);
+  }, [pokemon?.name, isShiny, isFemale, use2dSprite]);
 
   const generateSrc = (level: number) => {
     if (!pokemon) return '';
     const cleanName = getShowdownName(pokemon?.name, isFemale);
     const effectiveLevel = level;
+    const idNum = pokemon.id || pokemon.url?.split('/').filter(Boolean).pop() || pokemon.name;
+    const shinyPath = isShiny ? 'shiny/' : '';
 
-    // If the pokemon has sprites preloaded, try to use them!
+    if (use2dSprite) {
+      // 2D PIXEL ART SPRITE MODE (PokéAPI 2D pixel art for every Pokémon: base, mega, gmax, regional, alternative forms)
+      if (effectiveLevel === 0 && pokemon.sprites) {
+        if (isFemale) {
+          const fem = isBack 
+            ? (isShiny ? (pokemon.sprites.back_shiny_female || pokemon.sprites.back_female || pokemon.sprites.back_default) : (pokemon.sprites.back_female || pokemon.sprites.back_default))
+            : (isShiny ? (pokemon.sprites.front_shiny_female || pokemon.sprites.front_female || pokemon.sprites.front_default) : (pokemon.sprites.front_female || pokemon.sprites.front_default));
+          if (fem) return fem;
+        }
+        const spr = isBack 
+          ? (isShiny ? (pokemon.sprites.back_shiny || pokemon.sprites.back_default || pokemon.sprites.front_default) : (pokemon.sprites.back_default || pokemon.sprites.front_default))
+          : (isShiny ? (pokemon.sprites.front_shiny || pokemon.sprites.front_default) : pokemon.sprites.front_default);
+        if (spr) return spr;
+      }
+
+      // Level 1: Direct PokéAPI raw 2D pixel art sprite URL (covers 10000+ IDs for megas, gmax, regional forms!)
+      if (effectiveLevel <= 1) {
+        if (isFemale) {
+          return isBack 
+            ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/female/${shinyPath}${idNum}.png`
+            : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/${shinyPath}${idNum}.png`;
+        }
+        return isBack 
+          ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${shinyPath}${idNum}.png`
+          : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyPath}${idNum}.png`;
+      }
+
+      // Level 2: Showdown static 2D sprite
+      if (effectiveLevel === 2) {
+        const basePath = isBack ? `gen5-back${isShiny ? '-shiny' : ''}` : `gen5${isShiny ? '-shiny' : ''}`;
+        return `https://play.pokemonshowdown.com/sprites/${basePath}/${cleanName}.png`;
+      }
+
+      // Level 3: Showdown animated 2D sprite
+      if (effectiveLevel === 3) {
+        const basePath = isBack ? `ani-back${isShiny ? '-shiny' : ''}` : `ani${isShiny ? '-shiny' : ''}`;
+        return `https://play.pokemonshowdown.com/sprites/${basePath}/${cleanName}.gif`;
+      }
+
+      // Level 4: PokéAPI front 2D sprite fallback if back was requested but missing
+      if (effectiveLevel === 4) {
+        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyPath}${idNum}.png`;
+      }
+
+      // Level 5: Official artwork fallback
+      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shinyPath}${idNum}.png`;
+    }
+
+    // HOME 3D ARTWORK MODE (Default)
     if (effectiveLevel === 0 && pokemon.sprites) {
       if (arenaMode && pokemon.sprites.other?.home) {
         const home = pokemon.sprites.other.home;
@@ -346,8 +396,6 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
     }
 
     // Fallback URL generation
-    const idNum = pokemon.id || pokemon.url?.split('/').filter(Boolean).pop() || pokemon.name;
-    const shinyPath = isShiny ? 'shiny/' : '';
     
     if (effectiveLevel === 4) {
       let spriteId = idNum;
@@ -374,7 +422,7 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
     if (!pokemon) return 1;
     if (!arenaMode) {
       // In database details view, keep a consistent beautiful size that never clips
-      return isMegaOrGmax ? 0.92 : 0.95;
+      return use2dSprite ? (isMegaOrGmax ? 1.05 : 1.1) : (isMegaOrGmax ? 0.92 : 0.95);
     }
     const h = pokemon.height || 10; // default 1.0m
     let baseScale = 1.35;
@@ -384,11 +432,21 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
     else if (h <= 60) baseScale = 1.65;   // Huge
     else baseScale = 1.75;                // Giant (e.g. Steelix, Wailord) is clamped to fit perfectly
     
-    if (isMegaOrGmax) {
-      baseScale *= 1.15; // Megas and G-Max forms share the exact same grand dimension
+    if (use2dSprite) {
+      // Small & little Pokémon 2D pixel sprites (height <= 8) get boosted dimensions so they remain visible and clear in arena
+      if (h <= 4) {
+        baseScale = 1.95; // Extra boost for tiny 2D pixel sprites (e.g. Joltik, Flabébé, Cosmog)
+      } else if (h <= 9) {
+        baseScale = 1.80; // Boost for small 2D pixel sprites (e.g. Pikachu, Eevee, Diglett)
+      }
+      baseScale *= (isMegaOrGmax ? 1.05 : 1.20);
+    } else {
+      if (isMegaOrGmax) {
+        baseScale *= 1.15; // Megas and G-Max forms share the exact same grand dimension
+      }
     }
     return baseScale * scaleMultiplier;
-  }, [pokemon?.height, pokemon?.name, isMega, isGmax, isMegaOrGmax, arenaMode, scaleMultiplier]);
+  }, [pokemon?.height, pokemon?.name, isMega, isGmax, isMegaOrGmax, arenaMode, scaleMultiplier, use2dSprite]);
 
   
   const [clickAura, setClickAura] = useState(false);
@@ -407,7 +465,7 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
     setImageLoaded(false);
     if (!currentSrc || fallbackLevel >= 5) return;
 
-    const img = new Image();
+    const img = new window.Image();
     img.src = currentSrc;
     img.referrerPolicy = "no-referrer";
     img.onload = () => {
@@ -508,6 +566,7 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
           }}
           className={cn(
             "object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]",
+            use2dSprite ? "[image-rendering:pixelated]" : "",
             "max-w-[85vw] sm:max-w-[90%] max-h-[90%]"
           )}
           style={{
@@ -1137,16 +1196,30 @@ const PokemonTcgCard = memo(({ displayId, pokemonName, className }: { displayId:
   );
 });
 
-const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny }: { pokemonName: string; id: string | undefined; className: string; isShiny?: boolean }) => {
+const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny, use2dSprite }: { pokemonName: string; id: string | undefined; className: string; isShiny?: boolean; use2dSprite?: boolean }) => {
     const [fallbackLvl, setFallbackLvl] = useState(0);
 
   useEffect(() => {
     setFallbackLvl(0);
-  }, [pokemonName, isShiny]);
+  }, [pokemonName, isShiny, use2dSprite]);
 
   const getSrcAtLevel = (lvl: number): string => {
     const shinyPath = isShiny ? 'shiny/' : '';
     const cleanName = getShowdownName(pokemonName);
+    const displayId = id || pokemonName;
+
+    if (use2dSprite) {
+      if (lvl === 0) {
+        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyPath}${displayId}.png`;
+      }
+      if (lvl === 1) {
+        return `https://play.pokemonshowdown.com/sprites/gen5${isShiny ? '-shiny' : ''}/${cleanName}.png`;
+      }
+      if (lvl === 2) {
+        return `https://play.pokemonshowdown.com/sprites/ani${isShiny ? '-shiny' : ''}/${cleanName}.gif`;
+      }
+      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shinyPath}${displayId}.png`;
+    }
     
     if (lvl === 0) {
       let artworkId = id;
@@ -1175,7 +1248,7 @@ const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny }: { pokem
       alt={pokemonName}
       referrerPolicy="no-referrer"
       draggable={false}
-      className={cn(className, "w-full h-full object-contain scale-[1.1] group-hover:scale-[1.3] drop-shadow-[0_10px_15px_rgba(34,211,238,0.2)]")}
+      className={cn(className, use2dSprite ? "[image-rendering:pixelated]" : "", "w-full h-full object-contain scale-[1.1] group-hover:scale-[1.3] drop-shadow-[0_10px_15px_rgba(34,211,238,0.2)]")}
       loading="lazy"
       onError={(e) => {
         if (fallbackLvl < 3) {
@@ -1188,7 +1261,7 @@ const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny }: { pokem
   );
 });
 
-const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations, onClick, isShiny, isCardView, isLightMode }: any) => {
+const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations, onClick, isShiny, isCardView, isLightMode, use2dSprite }: any) => {
     const id = p.url.split('/').filter(Boolean).pop();
   const displayId = p.displayId || p.baseId || id;
   const isSpecial = parseInt(id || "0") > 1025 && !p.displayId;
@@ -1405,6 +1478,7 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
             pokemonName={p.name}
             id={id}
             isShiny={isShiny}
+            use2dSprite={use2dSprite}
             className={spriteClasses}
           />
         )}
@@ -1482,7 +1556,7 @@ if (typeof window !== 'undefined') {
 // PokethologyQuizWidget is imported from ./components/PokethologyQuizWidget
 
 
-const PokemonGrid = memo(({ list, displayLimit, selectedName, opponentName, enableAnimations, onClick, isShiny, isCardView, isLightMode }: any) => {
+const PokemonGrid = memo(({ list, displayLimit, selectedName, opponentName, enableAnimations, onClick, isShiny, isCardView, isLightMode, use2dSprite }: any) => {
   return (
     <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-4 py-2 px-1">
       {list.slice(0, displayLimit).map((p: any, i: number) => (
@@ -1496,6 +1570,7 @@ const PokemonGrid = memo(({ list, displayLimit, selectedName, opponentName, enab
           isShiny={isShiny}
           isCardView={isCardView}
           isLightMode={isLightMode}
+          use2dSprite={use2dSprite}
         />
       ))}
     </div>
@@ -2802,6 +2877,8 @@ export default function App() {
   const [isLightMode, setIsLightMode] = useState<boolean>(() => {
     return localStorage.getItem('isLightMode') === 'true';
   });
+
+  const [arenaArtworkMode, setArenaArtworkMode] = useState<'home' | '2d'>('home');
 
   useEffect(() => {
     if (isLightMode) {
@@ -5655,15 +5732,15 @@ export default function App() {
                           )}
 
                           <div className={cn(
-                            "flex-1 flex flex-col md:flex-row md:gap-6 min-h-0 h-full custom-scrollbar",
-                            activeTab === 'chat' ? "overflow-hidden items-stretch pb-0" : "overflow-y-auto md:items-start pb-8 sm:pb-12"
+                            "flex-1 flex flex-col lg:flex-row lg:gap-6 min-h-0 h-full custom-scrollbar",
+                            activeTab === 'chat' ? "overflow-hidden items-stretch pb-0 lg:pb-0" : "overflow-y-auto lg:items-start pb-8 sm:pb-12"
                           )} 
                           ref={detailsContainerRef}
                           onScroll={(e) => setShowDetailsScrollTop(e.currentTarget.scrollTop > 150)}
                           >
                             <div className={cn(
-                              "flex flex-col items-center md:w-[40%] lg:w-[35%] xl:w-[30%] md:sticky md:top-0 shrink-0",
-                              activeTab === 'chat' && "hidden md:flex",
+                              "flex flex-col items-center lg:w-[35%] xl:w-[30%] lg:sticky lg:top-0 shrink-0",
+                              activeTab === 'chat' && "hidden lg:flex",
                               activeTab === 'battle' && "hidden"
                             )}>
                               <div className="relative w-44 h-44 sm:w-56 sm:h-56 mb-4 group shrink-0">
@@ -5675,6 +5752,7 @@ export default function App() {
                                     isBack={false}
                                     isShiny={isShiny}
                                     isFemale={isFemale}
+                                    use2dSprite={false}
                                     className="w-full h-full object-contain transition-all duration-500 select-none will-change-transform filter drop-shadow-[0_0_15px_rgba(34,211,238,0.4)] group-hover:scale-105 group-hover:drop-shadow-[0_0_25px_rgba(34,211,238,0.65)]"
                                     onClick={() => sounds.playCry(pokemon?.name, pokemon.cries?.latest, pokemon?.name?.includes('-gmax'))}
                                   />
@@ -5978,30 +6056,30 @@ export default function App() {
                                       {/* active game version badge */}
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-2 sm:gap-4 text-xs font-sans shrink-0 w-full max-w-md mx-auto mb-4">
+                                    <div className="flex justify-center gap-4 text-xs font-sans shrink-0 w-full max-w-sm mx-auto">
                                       <div className={cn(
-                                        "p-2 sm:p-3 rounded-xl text-center border shadow-sm transition-colors flex flex-col items-center justify-center gap-1",
-                                        isLightMode
-                                           ? "bg-white border-slate-200"
-                                           : "bg-slate-900/40 border-slate-800"
+                                        "flex-1 p-2 sm:p-3 rounded-xl text-center border shadow-sm transition-colors flex flex-col items-center justify-center gap-1",
+                                        isLightMode 
+                                          ? "bg-white border-slate-200" 
+                                          : "bg-slate-900/40 border-slate-800"
                                       )}>
-                                        <p className={cn("mb-0.5 uppercase tracking-wider text-[9px] sm:text-[10px] font-bold", isLightMode ? "text-slate-500" : "text-slate-400")}>Weight</p>
-                                        <p className={cn("text-[12px] sm:text-[14px] font-bold leading-none", isLightMode ? "text-slate-800" : "text-slate-200")}>{(pokemon.weight / 10).toFixed(1)} KG</p>
-                                        <p className={cn("text-[9px] sm:text-[10px] text-slate-500 leading-none")}>{((pokemon.weight / 10) * 2.20462).toFixed(1)} lbs</p>
+                                        <p className={cn("mb-0.5 uppercase tracking-wider text-[10px] font-bold", isLightMode ? "text-slate-500" : "text-slate-400")}>Weight</p>
+                                        <p className={cn("text-[13px] sm:text-[14px] font-bold leading-none", isLightMode ? "text-slate-800" : "text-slate-200")}>{(pokemon.weight / 10).toFixed(1)} KG</p>
+                                        <p className={cn("text-[10px] text-slate-500 leading-none")}>{((pokemon.weight / 10) * 2.20462).toFixed(1)} lbs</p>
                                       </div>
                                       <div className={cn(
-                                        "p-2 sm:p-3 rounded-xl text-center border shadow-sm transition-colors flex flex-col items-center justify-center gap-1",
-                                        isLightMode
-                                           ? "bg-white border-slate-200"
-                                           : "bg-slate-900/40 border-slate-800"
+                                        "flex-1 p-2 sm:p-3 rounded-xl text-center border shadow-sm transition-colors flex flex-col items-center justify-center gap-1",
+                                        isLightMode 
+                                          ? "bg-white border-slate-200" 
+                                          : "bg-slate-900/40 border-slate-800"
                                       )}>
-                                        <p className={cn("mb-0.5 uppercase tracking-wider text-[9px] sm:text-[10px] font-bold", isLightMode ? "text-slate-500" : "text-slate-400")}>Height</p>
-                                        <p className={cn("text-[12px] sm:text-[14px] font-bold leading-none", isLightMode ? "text-slate-800" : "text-slate-200")}>{(pokemon.height / 10).toFixed(1)} M</p>
-                                        <p className={cn("text-[9px] sm:text-[10px] text-slate-500 leading-none")}>{Math.floor((pokemon.height / 10) * 3.28084)}'{Math.round(((pokemon.height / 10) * 3.28084 - Math.floor((pokemon.height / 10) * 3.28084)) * 12)}"</p>
+                                        <p className={cn("mb-0.5 uppercase tracking-wider text-[10px] font-bold", isLightMode ? "text-slate-500" : "text-slate-400")}>Height</p>
+                                        <p className={cn("text-[13px] sm:text-[14px] font-bold leading-none", isLightMode ? "text-slate-800" : "text-slate-200")}>{(pokemon.height / 10).toFixed(1)} M</p>
+                                        <p className={cn("text-[10px] text-slate-500 leading-none")}>{Math.floor((pokemon.height / 10) * 3.28084)}'{Math.round(((pokemon.height / 10) * 3.28084 - Math.floor((pokemon.height / 10) * 3.28084)) * 12)}"</p>
                                       </div>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-{/* Abilities */}
+
+                                    {/* Abilities */}
                                     <div className={cn(
                                       "rounded-xl p-4 border-2 shadow-[0_4px_22px_rgba(0,0,0,0.03)]",
                                       isLightMode ? "bg-white border-slate-200" : "bg-slate-950/60 border-cyan-900/40 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
@@ -6088,7 +6166,6 @@ export default function App() {
                                       </div>
                                     </div>
 
-                                    </div>
                                     <div className={cn(
                                       "backdrop-blur-md rounded-2xl p-5 sm:p-7 border shadow-inner relative overflow-hidden group/statshud w-full max-w-full z-10 box-border",
                                       isLightMode 
@@ -6574,9 +6651,9 @@ export default function App() {
                                   >
                                     {/* ─── DUAL MODEL MATCHUP PREVIEW REMOVED (THE ARENA ONLY IS SUFFICIENT) ─── */}
 
-                                    <div className="w-full flex-1 grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 items-start max-w-full pb-2 sm:pb-3">
+                                    <div className="w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-start max-w-full pb-2 sm:pb-3">
                                       {/* Left Column (Arena, Actions) */}
-                                      <div className="md:col-span-7 lg:col-span-8 flex flex-col w-full min-w-0">
+                                      <div className="lg:col-span-8 flex flex-col w-full min-w-0">
                                         
                                         <div 
                                           ref={arenaRef}
@@ -6654,6 +6731,35 @@ export default function App() {
                                               {turn === 'player' ? 'PLAYER' : "ENEMY"}
                                             </div>
                                           )}
+
+                                          <button 
+                                            onClick={() => {
+                                              const nextMode = arenaArtworkMode === 'home' ? '2d' : 'home';
+                                              setArenaArtworkMode(nextMode);
+                                              try { localStorage.setItem('pokethology_arena_artwork_mode', nextMode); } catch(_) {}
+                                              try { sounds.scan(); } catch(_) {}
+                                              playHaptic();
+                                            }}
+                                            title={`Switch Combat Arena Visuals (Current: ${arenaArtworkMode === 'home' ? '3D Home Artwork' : '2D Pixel Sprite'})`}
+                                            className={cn(
+                                              hudButtonClass(arenaArtworkMode === '2d', 'cyan'),
+                                              "shadow-sm whitespace-nowrap transition-all duration-300 shrink-0 flex items-center gap-1 font-hud font-bold",
+                                              "!py-0.5 !px-1.5 sm:!py-1 sm:!px-2.5 !text-[7px] sm:!text-[10px]",
+                                              arenaArtworkMode === '2d' ? "bg-amber-500/20 border-amber-400 text-amber-300 shadow-amber-500/20" : ""
+                                            )}
+                                          >
+                                            {arenaArtworkMode === 'home' ? (
+                                              <>
+                                                <Image className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-400 shrink-0" />
+                                                <span>Art</span>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <Gamepad2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400 shrink-0 animate-pulse" />
+                                                <span>Sprite</span>
+                                              </>
+                                            )}
+                                          </button>
 
                                           <button 
                                             onClick={() => setIsMusicOpen(true)}
@@ -6788,6 +6894,7 @@ export default function App() {
                                                   isShiny={isOpponentShiny}
                                                   isFemale={isOpponentFemale}
                                                   arenaMode={true}
+                                                  use2dSprite={arenaArtworkMode === '2d'}
                                                   flip={opponentSpriteFlip}
                                                   scaleMultiplier={arenaScale}
                                                   isPlayer={false}
@@ -6865,6 +6972,7 @@ export default function App() {
                                                   isShiny={isShiny}
                                                   isFemale={isFemale}
                                                   arenaMode={true}
+                                                  use2dSprite={arenaArtworkMode === '2d'}
                                                   scaleMultiplier={arenaScale}
                                                   isPlayer={true}
                                                   className="cursor-pointer transition-all duration-300 pointer-events-auto hover:scale-105 hover:-translate-y-1 active:scale-[0.98]"
@@ -7186,7 +7294,7 @@ export default function App() {
                                      </div> {/* End of Left Column Wrapper */}
 
                                       {/* Right Column: logs, tactical advice, records, and setup */}
-                                      <div className="md:col-span-5 lg:col-span-4 flex flex-col gap-4 w-full min-w-0 select-none pb-0 z-20">
+                                      <div className="lg:col-span-4 flex flex-col gap-4 w-full min-w-0 select-none pb-0 z-20">
                                         <AnimatePresence>
                                           {isBattling && <BattleLog log={battleLog} enableAnimations={enableAnimations} turn={turn || 'player'} isBattling={isBattling} />}
                                         </AnimatePresence>
@@ -8084,7 +8192,34 @@ export default function App() {
                                   </span>
                                 </div>
 
-                                <div className="flex gap-1.5 shrink-0">
+                                <div className="flex gap-1 sm:gap-1.5 shrink-0 items-center">
+                                  <button
+                                    onClick={() => {
+                                      const nextMode = arenaArtworkMode === 'home' ? '2d' : 'home';
+                                      setArenaArtworkMode(nextMode);
+                                      try { localStorage.setItem('pokethology_arena_artwork_mode', nextMode); } catch(_) {}
+                                      try { sounds.scan(); } catch(_) {}
+                                      playHaptic();
+                                    }}
+                                    className={cn(
+                                      hudButtonClass(arenaArtworkMode === '2d', 'cyan'),
+                                      "!py-0.5 !px-1 sm:!px-1.5 !text-[7px] sm:!text-[7.5px] font-bold tracking-wider flex items-center gap-1 font-hud shrink-0",
+                                      arenaArtworkMode === '2d' ? "bg-amber-500/20 border-amber-400 text-amber-300 shadow-amber-500/20" : ""
+                                    )}
+                                    title={`Switch Artwork Mode (Current: ${arenaArtworkMode === 'home' ? 'Art' : 'Sprite'})`}
+                                  >
+                                    {arenaArtworkMode === 'home' ? (
+                                      <>
+                                        <Image className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
+                                        <span>Art</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Gamepad2 className="w-2.5 h-2.5 text-amber-400 shrink-0 animate-pulse" />
+                                        <span>Sprite</span>
+                                      </>
+                                    )}
+                                  </button>
                                   <button
                                     onClick={() => {
                                       setIsShiny(!isShiny);
@@ -8092,12 +8227,13 @@ export default function App() {
                                     }}
                                     className={cn(
                                       hudButtonClass(isShiny, 'amber'), 
-                                      "!p-1.5 !text-[8px] font-bold tracking-wider",
+                                      "!py-0.5 !px-1 sm:!px-1.5 !text-[7.5px] font-bold tracking-wider flex items-center gap-1 shrink-0",
                                       isShiny ? "animate-pulse" : "opacity-60"
                                     )}
                                     title="Toggle Shiny"
                                   >
-                                    <Sparkles className="w-3 h-3" />
+                                    <Sparkles className="w-2.5 h-2.5 text-amber-400 shrink-0" />
+                                    <span>Shiny</span>
                                   </button>
                                   <button
                                     onClick={() => {
@@ -8188,6 +8324,7 @@ export default function App() {
                               isShiny={isShiny}
                               isCardView={isCardView}
                               isLightMode={isLightMode}
+                              use2dSprite={arenaArtworkMode === '2d'}
                             />
                             {displayLimit < sortedAndFilteredList.length && (
                               <div className="flex justify-center mt-4 mb-8">
@@ -8748,7 +8885,7 @@ export default function App() {
                   </div>
 
                   {/* Scrollable Content Body Container */}
-                  <div className="daily-scans-container flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 flex flex-col md:grid md:grid-cols-2 gap-5 min-h-0 overscroll-contain touch-pan-y items-start">
+                  <div className="daily-scans-container flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 flex flex-col lg:grid lg:grid-cols-2 gap-5 min-h-0 overscroll-contain touch-pan-y items-start">
                     
                     {/* Left Column - Holographic Specimen Container & Metrics */}
                     <div className="w-full shrink-0 bg-slate-900/95 border-2 border-amber-500/30 rounded-xl p-4 sm:p-5 flex flex-col items-center gap-4 relative shadow-lg text-center">
@@ -8931,18 +9068,12 @@ export default function App() {
                       <div className="bg-slate-900/95 border-2 border-slate-800/90 rounded-xl p-3.5 sm:p-4 flex flex-col gap-2.5 relative shadow-lg text-left max-w-full">
                         <HUDCorners />
                         <div className="flex items-center gap-1.5 text-xs font-hud font-black text-amber-400 tracking-wider border-b border-slate-800/80 pb-2 uppercase">
-                          <Info className="w-4 h-4 shrink-0 animate-pulse text-amber-400" /> Academic & Theological Lore Analysis
+                          <Info className="w-4 h-4 shrink-0 animate-pulse text-amber-400" /> Lore Analysis
                         </div>
                         <div className="bg-slate-950/80 p-2.5 rounded-lg border border-slate-800/80">
-                          <strong className="text-cyan-300 block mb-1 font-hud uppercase tracking-widest text-[9px] sm:text-[10px]">Pokédex Entry (Scarlet & Violet)</strong>
+                          <strong className="text-cyan-300 block mb-1 font-hud uppercase tracking-widest text-[9px] sm:text-[10px]">Pokédex Entry</strong>
                           <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans font-medium break-words whitespace-pre-line" style={{ overflowWrap: 'anywhere' }}>
                             {activePokemonData.description}
-                          </p>
-                        </div>
-                        <div className="bg-slate-950/80 p-2.5 rounded-lg border border-slate-800/80">
-                          <strong className="text-amber-400/90 block mb-1 uppercase tracking-widest text-[9px] sm:text-[10px] font-hud">Theological Note</strong>
-                          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans font-medium break-words whitespace-pre-line" style={{ overflowWrap: 'anywhere' }}>
-                            {getDailyTheologicalNote(activePokemonData.types)}
                           </p>
                         </div>
                       </div>
