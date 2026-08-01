@@ -35,6 +35,8 @@ export const SingleStatRadar = ({ stats, color = "#22d3ee" }: { stats: any[], co
           strokeWidth={3}
           dot={{ r: 3, fill: '#0f172a', stroke: color, strokeWidth: 2 }}
           isAnimationActive={true}
+          animationDuration={750}
+          animationEasing="ease-in-out"
           style={{ filter: `drop-shadow(0px 0px 8px ${color})` }}
         />
       </RadarChart>

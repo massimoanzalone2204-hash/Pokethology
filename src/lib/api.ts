@@ -438,12 +438,94 @@ export async function searchPokemon(query: string, lang: string = 'en'): Promise
     const evoRes = await fetch(speciesData.evolution_chain.url);
     const evoData = await evoRes.json();
 
+    const formatEvolutionDetails = (detailsArr: any[]) => {
+      if (!detailsArr || detailsArr.length === 0) return '';
+      const detail = detailsArr[0];
+      const parts: string[] = [];
+
+      if (detail.min_level) {
+        parts.push(`Lv. ${detail.min_level}`);
+      }
+
+      if (detail.trigger?.name === 'use-item' && detail.item?.name) {
+        parts.push(`Use ${detail.item.name.replace(/-/g, ' ')}`);
+      } else if (detail.item?.name) {
+        parts.push(detail.item.name.replace(/-/g, ' '));
+      }
+
+      if (detail.held_item?.name) {
+        parts.push(`Hold ${detail.held_item.name.replace(/-/g, ' ')}`);
+      }
+
+      if (detail.min_happiness) {
+        parts.push(`High Friendship`);
+      }
+      if (detail.min_affection) {
+        parts.push(`High Affection`);
+      }
+      if (detail.min_beauty) {
+        parts.push(`High Beauty`);
+      }
+
+      if (detail.gender === 1) parts.push('♀');
+      if (detail.gender === 2) parts.push('♂');
+
+      if (detail.time_of_day) {
+        parts.push(detail.time_of_day.charAt(0).toUpperCase() + detail.time_of_day.slice(1));
+      }
+
+      if (detail.location?.name) {
+        parts.push(`at ${detail.location.name.replace(/-/g, ' ')}`);
+      }
+
+      if (detail.known_move?.name) {
+        parts.push(`knows ${detail.known_move.name.replace(/-/g, ' ')}`);
+      }
+
+      if (detail.known_move_type?.name) {
+        parts.push(`knows ${detail.known_move_type.name} move`);
+      }
+
+      if (detail.relative_physical_stats === 1) parts.push('Atk > Def');
+      if (detail.relative_physical_stats === -1) parts.push('Def > Atk');
+      if (detail.relative_physical_stats === 0) parts.push('Atk = Def');
+
+      if (detail.needs_overworld_rain) parts.push('Rain');
+      if (detail.turn_upside_down) parts.push('Turn Upside Down');
+
+      if (detail.trigger?.name === 'trade') {
+        if (!parts.some(p => p.toLowerCase().includes('trade'))) {
+          parts.unshift('Trade');
+        }
+      }
+
+      if (detail.trigger?.name === 'shed') {
+        parts.push('Empty Spot');
+      }
+
+      if (detail.trigger?.name === 'spin') {
+        parts.push('Spin Trainer');
+      }
+
+      if (parts.length === 0) {
+        if (detail.trigger?.name === 'level-up') {
+          return 'Level Up';
+        } else if (detail.trigger?.name) {
+          return detail.trigger.name.replace(/-/g, ' ');
+        }
+      }
+
+      return parts.join(' + ');
+    };
+
     const parseEvoChain = (chain: any): EvolutionNode => {
       const id = parseInt(chain.species.url.split('/').filter(Boolean).pop() || '0', 10);
+      const min_details = formatEvolutionDetails(chain.evolution_details);
       const current: EvolutionNode = {
         name: chain.species.name,
         id,
         image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
+        min_details,
         evolves_to: []
       };
       if (chain.evolves_to && chain.evolves_to.length > 0) {

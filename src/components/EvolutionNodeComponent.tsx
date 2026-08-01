@@ -9,11 +9,13 @@ interface EvolutionNodeComponentProps {
   depth?: number;
   currentPokemonName?: string;
   onSearch: (name: string) => void;
+  isLightMode?: boolean;
 }
 
 const doesNodeLeadTo = (node: EvolutionNode, targetName: string): boolean => {
+  if (!node) return false;
   if (node.name === targetName) return true;
-  if (!node.evolves_to) return false;
+  if (!node.evolves_to || node.evolves_to.length === 0) return false;
   return node.evolves_to.some(child => doesNodeLeadTo(child, targetName));
 };
 
@@ -21,33 +23,39 @@ export const EvolutionNodeComponent = memo(({
   node, 
   depth = 0, 
   currentPokemonName, 
-  onSearch 
+  onSearch,
+  isLightMode = false
 }: EvolutionNodeComponentProps) => {
   const hasChildren = node.evolves_to && node.evolves_to.length > 0;
   const isCurrent = node.name === currentPokemonName;
   const inActivePath = currentPokemonName ? doesNodeLeadTo(node, currentPokemonName) : false;
   
   return (
-    <div className="flex flex-row items-center justify-start py-2 shrink-0">
+    <div className="flex flex-row items-center justify-center py-2 shrink-0 my-auto">
+      {/* Node Avatar */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ delay: depth * 0.1 }}
-        className="flex flex-col items-center shrink-0"
+        transition={{ delay: depth * 0.08, duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+        className="flex flex-col items-center shrink-0 my-auto"
       >
         <button 
           type="button"
           onClick={() => onSearch(node.name)}
           className="flex flex-col items-center group cursor-pointer w-20 sm:w-28 focus:outline-none relative"
         >
-          {/* Detailed Circular Backdrop */}
+          {/* Circular Backdrop */}
           <div className={cn(
             "w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center p-2 rounded-full transition-all duration-300 relative",
             isCurrent 
-              ? "bg-gradient-to-b from-cyan-500/20 to-blue-900/40 ring-2 ring-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.4)]" 
+              ? "bg-gradient-to-b from-cyan-500/25 to-blue-900/40 ring-2 ring-cyan-400 shadow-[0_0_22px_rgba(34,211,238,0.45)]" 
               : inActivePath 
-                ? "bg-gradient-to-b from-cyan-900/40 to-slate-800/80 ring-1 ring-cyan-700/50 group-hover:bg-cyan-900/60 group-hover:ring-cyan-500/50 shadow-lg backdrop-blur-sm"
-                : "bg-gradient-to-b from-slate-800/80 to-slate-900/90 ring-1 ring-slate-700/80 group-hover:bg-slate-800 group-hover:ring-cyan-500/50 shadow-lg backdrop-blur-sm"
+                ? isLightMode
+                  ? "bg-cyan-50 border border-cyan-400/60 ring-2 ring-cyan-400/50 shadow-md"
+                  : "bg-gradient-to-b from-cyan-900/40 to-slate-800/80 ring-1 ring-cyan-700/50 group-hover:bg-cyan-900/60 group-hover:ring-cyan-500/50 shadow-lg backdrop-blur-sm"
+                : isLightMode
+                  ? "bg-slate-100 border border-slate-300 group-hover:bg-cyan-50 group-hover:border-cyan-300 shadow-sm"
+                  : "bg-gradient-to-b from-slate-800/80 to-slate-900/90 ring-1 ring-slate-700/80 group-hover:bg-slate-800 group-hover:ring-cyan-500/50 shadow-lg backdrop-blur-sm"
           )}>
             {/* Inner tech ring */}
             <div className={cn(
@@ -55,9 +63,9 @@ export const EvolutionNodeComponent = memo(({
                isCurrent ? "border-cyan-300 rotate-180" : inActivePath ? "border-cyan-500/50" : "border-slate-500 group-hover:border-cyan-500/50 group-hover:rotate-45"
             )} />
 
-            {/* Micro data point */}
+            {/* Active micro badge */}
             {isCurrent && (
-               <div className="absolute -top-1 -right-1 w-3 h-3 bg-slate-900 rounded-full flex items-center justify-center border border-cyan-500 shrink-0 z-20">
+               <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-slate-950 rounded-full flex items-center justify-center border border-cyan-400 shrink-0 z-20 shadow-[0_0_8px_rgba(34,211,238,0.8)]">
                   <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
                </div>
             )}
@@ -68,77 +76,98 @@ export const EvolutionNodeComponent = memo(({
               referrerPolicy="no-referrer" 
               className={cn(
                 "w-full h-full object-contain transition-transform duration-300 relative z-10",
-                isCurrent ? "scale-110 drop-shadow-[0_2px_5px_rgba(34,211,238,0.5)]" : "group-hover:scale-110 drop-shadow-md"
+                isCurrent ? "scale-110 drop-shadow-[0_2px_8px_rgba(34,211,238,0.6)]" : "group-hover:scale-110 drop-shadow-md"
               )} 
               loading="lazy"
             />
           </div>
           
-          <div className="flex flex-col items-center mt-2.5 space-y-0.5">
+          <div className="flex flex-col items-center mt-2 space-y-0.5 max-w-[100px]">
              <span className={cn(
-               "text-[9px] sm:text-xs font-bold uppercase tracking-widest transition-colors w-full text-center truncate",
-               isCurrent ? "text-cyan-400 drop-shadow-[0_0_4px_rgba(34,211,238,0.6)]" : inActivePath ? "text-cyan-500/80 group-hover:text-cyan-400" : "text-slate-300 group-hover:text-cyan-300"
+               "text-[9.5px] sm:text-xs font-black uppercase tracking-wider transition-colors w-full text-center truncate",
+               isCurrent 
+                 ? isLightMode ? "text-cyan-700 font-extrabold" : "text-cyan-400 drop-shadow-[0_0_6px_rgba(34,211,238,0.6)]" 
+                 : inActivePath 
+                   ? isLightMode ? "text-cyan-800" : "text-cyan-400 group-hover:text-cyan-300" 
+                   : isLightMode ? "text-slate-700 group-hover:text-cyan-700" : "text-slate-300 group-hover:text-cyan-300"
              )}>
-               {node.name.replace('-', ' ')}
+               {node.name.replace(/-/g, ' ')}
              </span>
              {isCurrent && (
-               <div className="flex items-center gap-1 text-cyan-600 mt-0.5">
+               <div className="flex items-center gap-1 text-cyan-500 mt-0.5">
                  <Database className="w-2.5 h-2.5" />
-                 <span className="text-[6px] sm:text-[7px] font-mono tracking-widest font-black uppercase">Active</span>
+                 <span className="text-[6.5px] sm:text-[7.5px] font-mono tracking-widest font-black uppercase">Current</span>
                </div>
              )}
           </div>
         </button>
       </motion.div>
 
+      {/* Children Branches */}
       {hasChildren && (
-        <div className="flex flex-row items-center shrink-0">
-          <div className="relative flex items-center justify-center w-8 sm:w-16 shrink-0 z-0">
-             {/* Base line */}
-             <div className="absolute w-full h-[2px] bg-gradient-to-r from-slate-700 to-slate-800" />
-             
-             {/* Active Path line (Solid) */}
-             {!isCurrent && inActivePath && (
-               <div className="absolute left-0 w-full h-[2px] bg-gradient-to-r from-cyan-600 to-cyan-900 origin-left" />
-             )}
-             
-             {/* Animated path if it's the current pokemon */}
-             {isCurrent && (
-               <>
-                 <div className="absolute w-full h-[2px] bg-gradient-to-r from-cyan-500/30 to-blue-500/10" />
-                 <motion.div 
-                   className="absolute left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent origin-left"
-                   animate={{ 
-                     x: ["-100%", "100%"],
-                     opacity: [0, 1, 0]
-                   }}
-                   transition={{ 
-                     duration: 1.5, 
-                     repeat: Infinity, 
-                     ease: "easeInOut" 
-                   }}
-                 />
-               </>
-             )}
+        <div className="flex flex-col gap-5 sm:gap-6 justify-center shrink-0 my-auto">
+          {node.evolves_to.map((child, idx) => {
+            const childInPath = currentPokemonName ? doesNodeLeadTo(child, currentPokemonName) : false;
+            
+            return (
+              <div key={`${child.id || child.name || idx}-${idx}`} className="flex flex-row items-center justify-center shrink-0 my-auto">
+                {/* Method & Connector Arrow to Child */}
+                <div className="flex flex-col items-center justify-center min-w-[85px] sm:min-w-[120px] max-w-[150px] px-1 sm:px-2 relative shrink-0 z-10 my-auto">
+                  
+                  {/* Evolution Method Badge */}
+                  <div className={cn(
+                    "mb-1.5 px-2 py-0.5 rounded-full text-[8px] sm:text-[9.5px] font-mono font-bold tracking-wider uppercase text-center shadow-sm border transition-all duration-300 z-20 max-w-full truncate",
+                    childInPath
+                      ? isLightMode
+                        ? "bg-cyan-600 text-white border-cyan-500 shadow-[0_2px_8px_rgba(6,182,212,0.3)] font-black"
+                        : "bg-cyan-950/90 text-cyan-300 border-cyan-500/60 shadow-[0_0_12px_rgba(34,211,238,0.35)]"
+                      : isLightMode
+                        ? "bg-slate-100 text-amber-900 border-amber-300/80 font-bold"
+                        : "bg-slate-900/90 text-amber-300 border-amber-500/40"
+                  )}>
+                    {child.min_details || "Level Up"}
+                  </div>
 
-             <ChevronRight className={cn(
-               "w-4 h-4 sm:w-6 sm:h-6 shrink-0 z-10 translate-x-4 sm:translate-x-8 rounded-full transition-colors",
-               isCurrent ? "text-cyan-300 bg-slate-900 border border-cyan-500/50 drop-shadow-[0_0_6px_rgba(34,211,238,0.8)]" :
-               inActivePath ? "text-cyan-600 bg-slate-900" : "text-slate-500 bg-slate-900"
-             )} />
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 shrink-0 pl-4 sm:pl-6">
-            {node.evolves_to.map((child, idx) => (
-              <EvolutionNodeComponent 
-                key={`${child.id || child.name || idx}-${idx}`}
-                node={child} 
-                depth={depth + 1} 
-                currentPokemonName={currentPokemonName} 
-                onSearch={onSearch} 
-              />
-            ))}
-          </div>
+                  {/* Horizontal Connector Line + Arrow */}
+                  <div className="relative w-full flex items-center justify-center h-4">
+                    {/* Background Line */}
+                    <div className={cn(
+                      "absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px]",
+                      isLightMode ? "bg-slate-300" : "bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700"
+                    )} />
+                    
+                    {/* Active Path Line */}
+                    {childInPath && (
+                      <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] bg-gradient-to-r from-cyan-500 to-blue-500 shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
+                    )}
+
+                    {/* Chevron Arrow Icon */}
+                    <div className={cn(
+                      "relative z-10 p-0.5 rounded-full border transition-all duration-300",
+                      childInPath
+                        ? isLightMode
+                          ? "bg-cyan-500 text-white border-cyan-400 shadow-md"
+                          : "bg-slate-950 text-cyan-300 border-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"
+                        : isLightMode
+                          ? "bg-white text-slate-400 border-slate-300"
+                          : "bg-slate-900 text-slate-400 border-slate-700"
+                    )}>
+                      <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recursive Child Node */}
+                <EvolutionNodeComponent 
+                  node={child} 
+                  depth={depth + 1} 
+                  currentPokemonName={currentPokemonName} 
+                  onSearch={onSearch} 
+                  isLightMode={isLightMode}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

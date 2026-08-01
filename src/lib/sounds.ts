@@ -54,6 +54,8 @@ function playTone(freq: number, type: OscillatorType, duration: number, vol: num
   }
 }
 
+let lastScanSoundTime = 0;
+
 export const sounds = {
   setTempoMultiplier: (mult: number) => {
     tempoMultiplier = mult;
@@ -118,6 +120,9 @@ export const sounds = {
     }
   },
   scan: () => {
+    const nowTime = Date.now();
+    if (nowTime - lastScanSoundTime < 35) return;
+    lastScanSoundTime = nowTime;
     try {
       const ctx = getAudioContext();
       const now = ctx.currentTime;

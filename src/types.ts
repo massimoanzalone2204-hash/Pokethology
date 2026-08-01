@@ -18,6 +18,7 @@ export interface EvolutionNode {
   id: number;
   name: string;
   image: string;
+  min_details?: string;
   evolves_to: EvolutionNode[];
 }
 

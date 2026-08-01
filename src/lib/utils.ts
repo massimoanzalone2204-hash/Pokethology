@@ -4,9 +4,15 @@ import { twMerge } from 'tailwind-merge';
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+let lastHapticTime = 0;
 export const playHaptic = (duration: number = 20) => {
+  const now = Date.now();
+  if (now - lastHapticTime < 35) return;
+  lastHapticTime = now;
   if (typeof navigator !== 'undefined' && navigator.vibrate) {
-    navigator.vibrate(duration);
+    try {
+      navigator.vibrate(duration);
+    } catch (_) {}
   }
 };
 

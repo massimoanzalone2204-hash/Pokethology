@@ -4,7 +4,8 @@ import { checkQuotaAllowed, recordApiUsage } from "./lib/quotaManager";
 import { BattleResultScreen } from './components/BattleResultScreen';
 import { useState, useEffect, useRef, useTransition, useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Download, Search, Loader2, Database, Sparkles, Volume2, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2 } from 'lucide-react';
+import { Download, Search, Loader2, Database, Sparkles, Volume2, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork } from 'lucide-react';
+import { EvolutionNodeComponent } from './components/EvolutionNodeComponent';
 
 import { PokethologyLogo } from './components/PokethologyLogo';
 import { PokeballIcon } from './components/PokeballIcon';
@@ -433,13 +434,17 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
     else baseScale = 1.75;                // Giant (e.g. Steelix, Wailord) is clamped to fit perfectly
     
     if (use2dSprite) {
-      // Small & little Pokémon 2D pixel sprites (height <= 8) get boosted dimensions so they remain visible and clear in arena
+      // Improved dimensions for 2D pixel sprites in combat arena so they are larger and crisp
       if (h <= 4) {
-        baseScale = 1.95; // Extra boost for tiny 2D pixel sprites (e.g. Joltik, Flabébé, Cosmog)
+        baseScale = 2.45; // Extra boost for tiny 2D pixel sprites (e.g. Joltik, Flabébé, Cosmog)
       } else if (h <= 9) {
-        baseScale = 1.80; // Boost for small 2D pixel sprites (e.g. Pikachu, Eevee, Diglett)
+        baseScale = 2.25; // Boost for small 2D pixel sprites (e.g. Pikachu, Eevee, Diglett)
+      } else if (h <= 20) {
+        baseScale = 2.05; // Medium 2D pixel sprites
+      } else {
+        baseScale = 2.15; // Large/giant 2D pixel sprites
       }
-      baseScale *= (isMegaOrGmax ? 1.05 : 1.20);
+      baseScale *= (isMegaOrGmax ? 1.20 : 1.35);
     } else {
       if (isMegaOrGmax) {
         baseScale *= 1.15; // Megas and G-Max forms share the exact same grand dimension
@@ -2075,6 +2080,24 @@ export default function App() {
   useEffect(() => {
     setInspectingOpponent(false);
   }, [pokemon?.name]);
+
+  // Universal haptic + button click sound feedback on EVERY button across the application
+  useEffect(() => {
+    const handleGlobalButtonClick = (e: MouseEvent | TouchEvent | PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const button = target.closest('button, [role="button"], input[type="button"], input[type="submit"]');
+      if (button && !button.hasAttribute('disabled')) {
+        try { sounds.scan(); } catch (_) {}
+        try { playHaptic(20); } catch (_) {}
+      }
+    };
+
+    window.addEventListener('pointerdown', handleGlobalButtonClick, { capture: true, passive: true });
+    return () => {
+      window.removeEventListener('pointerdown', handleGlobalButtonClick, { capture: true });
+    };
+  }, []);
 
   const handleTabChange = useCallback((tab: 'data' | 'chat' | 'battle') => {
     setActiveTab(tab);
@@ -5071,6 +5094,30 @@ export default function App() {
     sounds.typing();
   };
 
+  const isStandard1025Pokemon = useCallback((p: any): boolean => {
+    if (!p) return false;
+    const idNum = typeof p.baseId === 'number' ? p.baseId : (typeof p.id === 'number' ? p.id : parseInt(p.id, 10));
+    if (!idNum || isNaN(idNum) || idNum < 1 || idNum > 1025) return false;
+    const name = (p.name || '').toLowerCase();
+    if (
+      name.includes('-mega') || 
+      name.includes('-gmax') || 
+      name.includes('-alola') || 
+      name.includes('-galar') || 
+      name.includes('-hisui') || 
+      name.includes('-paldea') ||
+      name.includes('-totem') ||
+      name.includes('-primal') ||
+      name.includes('-origin') ||
+      name.includes('-therian') ||
+      name.includes('-crowned') ||
+      name.includes('-eternamax')
+    ) {
+      return false;
+    }
+    return true;
+  }, []);
+
   const handleClear = () => {
     setQuery('');
     setInputValue('');
@@ -5966,10 +6013,10 @@ export default function App() {
                                 {activeTab === 'data' ? (
                                   <motion.div
                                     key="data"
-                                    initial={{ opacity: 0, y: 15 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -15 }}
-                                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                                    initial={{ opacity: 0, y: 12, scale: 0.99 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: -12, scale: 0.99 }}
+                                    transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                                     className="w-full space-y-4"
                                   >
                                     {/* Pokedex Entry Description */}
@@ -6039,17 +6086,26 @@ export default function App() {
                                               : "bg-slate-900/50 border-slate-700/50"
                                           )}>
                                             <div className="absolute top-2 left-2 text-4xl opacity-20 font-serif leading-none">"</div>
-                                            <p className={cn(
-                                              "text-[13px] sm:text-[14px] font-sans italic leading-relaxed min-h-[60px] relative z-10 pl-4",
-                                              isLightMode ? "text-slate-700" : "text-slate-300"
-                                            )}>
+                                            <AnimatePresence mode="wait">
+                                            <motion.p
+                                              key={`flavor-${selectedGameDescIndex}-${pokemon?.name}`}
+                                              initial={{ opacity: 0, y: 6 }}
+                                              animate={{ opacity: 1, y: 0 }}
+                                              exit={{ opacity: 0, y: -6 }}
+                                              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                                              className={cn(
+                                                "text-[13px] sm:text-[14px] font-sans italic leading-relaxed min-h-[60px] relative z-10 pl-4",
+                                                isLightMode ? "text-slate-700" : "text-slate-300"
+                                              )}
+                                            >
                                               <TypewriterText 
                                                 text={pokemon.gameDescriptions && pokemon.gameDescriptions[selectedGameDescIndex] 
                                                   ? pokemon.gameDescriptions[selectedGameDescIndex].flavor_text 
                                                   : (pokemon.description || "No data available for this unit.")}
                                                 delay={12}
                                               />
-                                            </p>
+                                            </motion.p>
+                                          </AnimatePresence>
                                           </div>
                                       </div>
 
@@ -6135,18 +6191,47 @@ export default function App() {
                                       </div>
                                     </div>
 
-                                    {/* Weaknesses */}
-                                    <div className={cn(
-                                      "rounded-xl p-4 border-2 shadow-[0_4px_22px_rgba(0,0,0,0.03)]",
-                                      isLightMode ? "bg-white border-slate-200" : "bg-slate-950/60 border-cyan-900/40 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
-                                    )}>
-                                      <h3 className={cn(
-                                        "font-hud text-[11px] uppercase tracking-[0.3em] mb-4 border-b pb-2 flex items-center gap-2",
-                                        isLightMode ? "text-cyan-800 border-slate-200" : "text-cyan-500 border-cyan-900/40"
-                                      )}>
-                                        <Shield className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                                        <span>Type Weaknesses</span>
-                                      </h3>
+                                    {/* Evolution Line & Methods Section (Only for standard 1025 Pokémon) */}
+                                     {isStandard1025Pokemon(pokemon) && pokemon.evolutionChain && (
+                                       <div className={cn(
+                                         "rounded-xl p-4 sm:p-5 border-2 shadow-[0_4px_22px_rgba(0,0,0,0.03)] overflow-x-auto custom-scrollbar relative mb-4",
+                                         isLightMode ? "bg-white border-slate-200" : "bg-slate-950/60 border-cyan-900/40 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
+                                       )}>
+                                         <h3 className={cn(
+                                           "font-hud text-[11px] uppercase tracking-[0.3em] mb-4 border-b pb-2 flex items-center justify-between shrink-0",
+                                           isLightMode ? "text-cyan-800 border-slate-200" : "text-cyan-400 border-cyan-900/40"
+                                         )}>
+                                           <div className="flex items-center gap-2">
+                                             <GitFork className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                                             <span>Evolution Line & Methods</span>
+                                           </div>
+                                           <span className={cn("text-[9px] font-bold tracking-wider font-mono", isLightMode ? "text-slate-500" : "text-cyan-500 font-bold")}>SPECIES LINEAGE</span>
+                                         </h3>
+
+                                         <div className="flex items-center justify-start min-w-max pb-1 pt-2">
+                                           <EvolutionNodeComponent 
+                                             node={pokemon.evolutionChain}
+                                             currentPokemonName={pokemon.name}
+                                             onSearch={(searchName) => {
+                                               performSearch(searchName);
+                                             }}
+                                           />
+                                         </div>
+                                       </div>
+                                     )}
+
+                                     {/* Weaknesses */}
+                                     <div className={cn(
+                                       "rounded-xl p-4 border-2 shadow-[0_4px_22px_rgba(0,0,0,0.03)]",
+                                       isLightMode ? "bg-white border-slate-200" : "bg-slate-950/60 border-cyan-900/40 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
+                                     )}>
+                                       <h3 className={cn(
+                                         "font-hud text-[11px] uppercase tracking-[0.3em] mb-4 border-b pb-2 flex items-center gap-2",
+                                         isLightMode ? "text-cyan-800 border-slate-200" : "text-cyan-500 border-cyan-900/40"
+                                       )}>
+                                         <Shield className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                                         <span>Type Weaknesses</span>
+                                       </h3>
                                       <div className="flex flex-wrap gap-2.5">
                                         {pokemon.weaknesses && pokemon.weaknesses.length > 0 ? (
                                           pokemon.weaknesses.map((w, idx) => (
@@ -6202,6 +6287,7 @@ export default function App() {
                                               <motion.div 
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${Math.min(100, (s.base_stat / 255) * 100)}%` }}
+                                                transition={{ type: "spring", stiffness: 140, damping: 22 }}
                                                 className="h-full bg-gradient-to-r from-cyan-900 via-cyan-500 to-cyan-300 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.6)]"
                                               />
                                             </div>
@@ -6318,10 +6404,10 @@ export default function App() {
                                 ) : activeTab === 'chat' ? (
                                   <motion.div
                                     key="chat"
-                                    initial={{ opacity: 0, y: 15 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -15 }}
-                                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                                    initial={{ opacity: 0, y: 12, scale: 0.99 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: -12, scale: 0.99 }}
+                                    transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                                     className="w-full flex-1 flex flex-col gap-2 min-h-0 h-full overflow-hidden"
                                   >
                                     <div className={cn(
@@ -6643,10 +6729,10 @@ export default function App() {
                                   <motion.div
                                     key="battle"
                                     ref={battleScrollRef}
-                                    initial={{ opacity: 0, y: 15 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -15 }}
-                                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                                    initial={{ opacity: 0, y: 12, scale: 0.99 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: -12, scale: 0.99 }}
+                                    transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                                     className="w-full flex-1 min-h-0 overflow-y-auto custom-scrollbar max-w-full"
                                   >
                                     {/* ─── DUAL MODEL MATCHUP PREVIEW REMOVED (THE ARENA ONLY IS SUFFICIENT) ─── */}
@@ -8364,9 +8450,10 @@ export default function App() {
               className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90"
             >
               <motion.div
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 20 }}
+                initial={{ scale: 0.94, y: 12, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.94, y: 12, opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                 className="bg-slate-900 border-2 border-red-500/50 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(239,68,68,0.3)]"
               >
                 <div className="p-4 border-b border-red-900/30 flex justify-between items-center bg-slate-950 shrink-0">
@@ -8467,9 +8554,10 @@ export default function App() {
               className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/90"
             >
               <motion.div
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 20 }}
+                initial={{ scale: 0.94, y: 12, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.94, y: 12, opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                 className="bg-slate-950 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.3)]"
               >
                 <div className="p-4 sm:p-6 border-b border-cyan-900/30 bg-cyan-950/20">
@@ -8599,9 +8687,10 @@ export default function App() {
               className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80"
             >
               <motion.div
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 20 }}
+                initial={{ scale: 0.94, y: 12, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.94, y: 12, opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                 className="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.2)]"
               >
                 <div className={cn(
@@ -8736,13 +8825,14 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md overflow-hidden"
+              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto custom-scrollbar"
             >
               <motion.div
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 20 }}
-                className="bg-slate-950 border-2 border-cyan-500/50 rounded-2xl w-full max-w-4xl max-h-[92vh] shadow-[0_0_50px_rgba(34,211,238,0.2)] p-4 sm:p-6 flex flex-col gap-3 relative overflow-hidden"
+                initial={{ scale: 0.94, y: 12, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.94, y: 12, opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-slate-950 border-2 border-cyan-500/50 rounded-2xl w-full max-w-4xl max-h-[92dvh] sm:max-h-[88vh] shadow-[0_0_50px_rgba(34,211,238,0.2)] p-4 sm:p-6 flex flex-col gap-3 relative my-auto mx-auto overflow-hidden"
               >
                 {/* Clean inline top header with touch-safe close action */}
                 <div className="flex justify-between items-center pb-2.5 border-b border-cyan-900/40 relative z-30 shrink-0">
@@ -9110,13 +9200,13 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md overflow-hidden"
+              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto custom-scrollbar"
             >
               <motion.div
                 initial={{ scale: 0.9, y: 30 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 30 }}
-                className="bg-slate-950 border-2 border-cyan-500/50 rounded-2xl w-full max-w-2xl max-h-[90vh] shadow-[0_0_50px_rgba(6,182,212,0.25)] flex flex-col relative p-4 sm:p-6 overflow-hidden"
+                className="bg-slate-950 border-2 border-cyan-500/50 rounded-2xl w-full max-w-2xl max-h-[90dvh] sm:max-h-[85vh] shadow-[0_0_50px_rgba(6,182,212,0.25)] flex flex-col relative p-4 sm:p-6 my-auto mx-auto overflow-hidden"
               >
                 <div className="flex justify-between items-center border-b border-cyan-900/30 pb-3 mb-3 shrink-0">
                   <h2 className="text-xs sm:text-base font-hud text-cyan-400 font-black uppercase tracking-widest flex items-center gap-2 min-w-0">
@@ -9212,13 +9302,14 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className={cn("fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md")}
+              className={cn("fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto custom-scrollbar")}
             >
               <motion.div
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 20 }}
-                className="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md max-h-[92dvh] sm:max-h-[85vh] overflow-hidden overflow-x-hidden shadow-[0_0_50px_rgba(34,211,238,0.3)] p-4 sm:p-6 flex flex-col gap-4 text-center items-center"
+                initial={{ scale: 0.94, y: 12, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.94, y: 12, opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md max-h-[92dvh] sm:max-h-[85vh] overflow-hidden overflow-x-hidden shadow-[0_0_50px_rgba(34,211,238,0.3)] p-4 sm:p-6 flex flex-col gap-4 text-center items-center my-auto mx-auto"
               >
                 <div className="flex justify-between items-center border-b border-cyan-900/20 pb-3 w-full shrink-0">
                   <div className="w-6" /> {/* Spacer to center heading truly */}
@@ -9387,13 +9478,13 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
+              className="fixed inset-0 z-[140] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto custom-scrollbar"
             >
               <motion.div
                 initial={{ scale: 0.92, y: 15 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.92, y: 15 }}
-                className="bg-slate-900 border-2 border-red-500/60 rounded-2xl w-full max-w-sm overflow-hidden shadow-[0_0_40px_rgba(239,68,68,0.25)] p-5 sm:p-6 flex flex-col gap-5 relative"
+                className="bg-slate-900 border-2 border-red-500/60 rounded-2xl w-full max-w-sm overflow-hidden shadow-[0_0_40px_rgba(239,68,68,0.25)] p-5 sm:p-6 flex flex-col gap-5 relative my-auto mx-auto"
               >
                 {/* Visual Accent/Glow behind the warning icon */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-24 bg-red-500/10 rounded-full blur-xl pointer-events-none" />
@@ -9452,13 +9543,14 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+              className="fixed inset-0 z-[130] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto custom-scrollbar"
             >
               <motion.div
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 20 }}
-                className="bg-slate-900 border-2 border-red-500/50 rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_0_50px_rgba(239,68,68,0.2)]"
+                initial={{ scale: 0.94, y: 12, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.94, y: 12, opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-slate-900 border-2 border-red-500/50 rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_0_50px_rgba(239,68,68,0.2)] my-auto mx-auto"
               >
                 <div className="p-4 border-b border-red-900/30 flex justify-between items-center bg-slate-950">
                    <h2 className="text-base sm:text-xl font-hud text-red-400 uppercase tracking-widest text-center">How to Battle</h2>
@@ -9502,14 +9594,14 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md"
+              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-slate-950/90 backdrop-blur-md overflow-y-auto custom-scrollbar"
             >
               <motion.div
                 initial={{ scale: 0.95, y: 15 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.95, y: 15 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                className="bg-slate-900/60 backdrop-blur-xl rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_15px_60px_rgba(0,0,0,0.6),0_0_40px_rgba(6,182,212,0.15)] flex flex-col max-h-[90vh]"
+                className="bg-slate-900/60 backdrop-blur-xl rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_15px_60px_rgba(0,0,0,0.6),0_0_40px_rgba(6,182,212,0.15)] flex flex-col max-h-[90dvh] my-auto mx-auto"
               >
                 <div className="p-5 sm:p-7 border-b border-white/5 bg-slate-900/40 relative">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
@@ -9666,13 +9758,14 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto custom-scrollbar"
             >
               <motion.div
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 20 }}
-                className="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.2)] p-4 sm:p-6"
+                initial={{ scale: 0.94, y: 12, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.94, y: 12, opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.2)] p-4 sm:p-6 my-auto mx-auto"
               >
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-hud text-cyan-400 uppercase tracking-widest">Combat Options</h2>
