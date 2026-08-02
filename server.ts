@@ -223,19 +223,19 @@ function getOpponentPrediction(player: any, opponent: any, lang: 'it' | 'es' | '
 }
 
 function generateOfflineChatResponse(messages: any[], context: any, lang: 'it' | 'es' | 'fr' | 'de' | 'en'): string {
-  return "In Development";
+  return "In Development ⚙️\nUntil the Chatbot it's completely ready, you can search your information about this Pokémon under in these sources!";
 }
 
 function generateOfflineAnalysis(battleData: any, lang: 'it' | 'es' | 'fr' | 'de' | 'en'): string {
-  return "In Development";
+  return "In Development ⚙️\nUntil the Chatbot it's completely ready, you can search your information about this Pokémon under in these sources!";
 }
 
 function generateOfflineSuggestion(pokemonName: string, lang: 'it' | 'es' | 'fr' | 'de' | 'en'): string {
-  return "In Development";
+  return "In Development ⚙️\nUntil the Chatbot it's completely ready, you can search your information about this Pokémon under in these sources!";
 }
 
 function generateOfflineStrategy(battleData: any, lang: 'it' | 'es' | 'fr' | 'de' | 'en'): string {
-  return "In Development";
+  return "In Development ⚙️\nUntil the Chatbot it's completely ready, you can search your information about this Pokémon under in these sources!";
 }
 
 // API routes

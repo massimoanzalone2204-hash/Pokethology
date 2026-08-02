@@ -53,7 +53,7 @@ function detectLanguage(text: string): 'it' | 'es' | 'fr' | 'de' | 'en' {
 
 // Generate offline fallback responses
 function generateOfflineChatResponse(messages: any[], context: any, lang: 'it' | 'es' | 'fr' | 'de' | 'en'): string {
-  return "In Development";
+  return "In Development ⚙️\nUntil the Chatbot it's completely ready, you can search your information about this Pokémon under in these sources!";
 }
 
 // Global active client count
