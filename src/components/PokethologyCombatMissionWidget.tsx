@@ -201,6 +201,51 @@ const MEDIUM_TRIVIA_QUESTIONS: TriviaQuestion[] = [
     options: ["ELECTRIC TERRAIN", "GRASSY TERRAIN", "PSYCHIC TERRAIN", "MISTY TERRAIN"],
     answerIndex: 3,
     explanation: "Misty Terrain! Grounded units standing on Misty Terrain cannot be statused or confused, protecting them from classic status plays."
+  },
+  {
+    question: "Which battle item doubles the effective Speed stat of the holder in combat, but restricts them to executing only the first move selected?",
+    options: ["CHOICE SCARF", "CHOICE BAND", "CHOICE SPECS", "LIFE ORB"],
+    answerIndex: 0,
+    explanation: "Choice Scarf boosts Speed by 50% (1.5x) but locks the user into the selected move until switched out!"
+  },
+  {
+    question: "What occurs when Shedinja (ability Wonder Guard) is struck by a direct move that is NOT super-effective against Bug/Ghost?",
+    options: [
+      "IT TAKES ABSOLUTELY ZERO DAMAGE FROM THE DIRECT ATTACK",
+      "IT TAKES HALF DAMAGE",
+      "IT TAKES MINIMUM 1 HP DAMAGE",
+      "THE ATTACK IS REFLECTED BACK"
+    ],
+    answerIndex: 0,
+    explanation: "Wonder Guard blocks all direct attack damage except moves that deal super-effective damage!"
+  },
+  {
+    question: "What beneficial stat multiplier is bestowed by the held item 'Eviolite' when equipped on a Pokémon species that is NOT fully evolved?",
+    options: [
+      "BOOSTS BOTH DEFENSE AND SPECIAL DEFENSE BY 50%",
+      "BOOSTS MAXIMUM HP BY 50%",
+      "BOOSTS ATTACK AND SPEED BY 30%",
+      "DOUBLES SPECIAL ATTACK"
+    ],
+    answerIndex: 0,
+    explanation: "Eviolite increases the Defense and Special Defense of unevolved species by 1.5x (50%), making Pokémon like Chansey and Dusclops exceptionally bulky!"
+  },
+  {
+    question: "Which entry hazard inflicts direct percentage damage on switch-in to Flying-type or Levitate Pokémon that are immune to Spikes?",
+    options: ["STEALTH ROCK", "TOXIC SPIKES", "STICKY WEB", "SHADOW TRAP"],
+    answerIndex: 0,
+    explanation: "Stealth Rock deals Rock-type hazard damage on switch-in regardless of whether the target is grounded or airborne!"
+  },
+  {
+    question: "What is the primary effect of Psychic Terrain on grounded Pokémon when active on the field?",
+    options: [
+      "BLOCKS INCREASED PRIORITY MOVES TARGETING GROUNDED ALLIES AND BOOSTS PSYCHIC POWER BY 30%",
+      "PREVENTS ALL STATUS CONDITIONS AND BOOSTS SPEED",
+      "RECOVERS 1/16 HP PER TURN FOR ALL UNITS",
+      "DOUBLES CRITICAL HIT RATIO FOR PSYCHIC SPECIES"
+    ],
+    answerIndex: 0,
+    explanation: "Psychic Terrain prevents targeted priority moves (like Extreme Speed or Aqua Jet) from striking grounded Pokémon and increases Psychic move power!"
   }
 ];
 
@@ -292,6 +337,56 @@ const HARD_TRIVIA_QUESTIONS: TriviaQuestion[] = [
     ],
     answerIndex: 1,
     explanation: "The Red Chain! Combining the mystical crystals of the Lake Trio, Cyrus forged the Red Chain to directly constrain Palkia and Dialga without standard PokeBall trapping mechanics."
+  },
+  {
+    question: "How does the ability 'Supreme Overlord' (Kingambit) dynamically scale damage in competitive battles?",
+    options: [
+      "GAINS +10% DAMAGE FOR EACH FAINTED ALLY IN THE PARTY",
+      "GAINS +20% ATTACK PER FAINTED OPPONENT",
+      "DOUBLES CRITICAL RATE WHEN HP IS BELOW 25%",
+      "GAINS +50% SPEED IF KINGAMBIT IS THE LAST REMAINING POKÉMON"
+    ],
+    answerIndex: 0,
+    explanation: "Supreme Overlord grants a 10% damage increase for every fainted party member, capping out at a 50% boost when 5 allies have fallen!"
+  },
+  {
+    question: "What is the exact STAB (Same Type Attack Bonus) multiplier for a Pokémon possessing the 'Adaptability' ability?",
+    options: ["2.0X MULTIPLIER", "1.5X MULTIPLIER", "1.75X MULTIPLIER", "2.5X MULTIPLIER"],
+    answerIndex: 0,
+    explanation: "Adaptability elevates the standard STAB multiplier from 1.5x to a massive 2.0x for moves matching the user's typing!"
+  },
+  {
+    question: "Which capability defines the 'Pixilate', 'Refrigerate', and 'Aerilate' abilities?",
+    options: [
+      "TURNS NORMAL-TYPE MOVES INTO FAIRY/ICE/FLYING AND BOOSTS THEIR POWER BY 20%",
+      "GRANTS IMMUNITY TO FAIRY/ICE/FLYING ATTACKS AND HEALS HP",
+      "DOUBLES STAB DAMAGE FOR RELEVANT TYPES",
+      "ALLOWS MOVES TO HIT GHOST TYPES FOR SUPER-EFFECTIVE DAMAGE"
+    ],
+    answerIndex: 0,
+    explanation: "Galvanize/Pixilate/Refrigerate/Aerilate convert Normal-type moves to their respective element and grant an extra 20% power boost!"
+  },
+  {
+    question: "How does the Ghost-type move 'Hex' behave when targeting an opponent suffering from a major status condition?",
+    options: [
+      "BASE POWER DOUBLES FROM 65 TO 130",
+      "CRITICAL HIT CHANCE BECOMES 100%",
+      "RECOVERS 50% OF DAMAGE DEALT AS HP",
+      "BYPASSES ALL DEFENSIVE STAT MODIFIERS"
+    ],
+    answerIndex: 0,
+    explanation: "Hex doubles its base power from 65 to 130 if the target is afflicted with burn, poison, paralysis, sleep, or freeze!"
+  },
+  {
+    question: "In Generation 9 Terastallization mechanics, what happens to STAB when a Pokémon Terastallizes into a Tera type that matches one of its ORIGINAL base types?",
+    options: [
+      "STAB MULTIPLIER INCREASES FROM 1.5X TO 2.0X FOR THAT TYPE",
+      "STAB MULTIPLIER REMAINS EXACTLY 1.5X WITHOUT CHANGE",
+      "STAB MULTIPLIER BECOMES 3.0X FOR PHYSICAL MOVES ONLY",
+      "BASE POWER OF ALL MOVES OF THAT TYPE IS INCREASED BY 50 BASE POWER"
+    ],
+    answerIndex: 0,
+    explanation: "Terastallizing into a Tera Type matching an original base type boosts the STAB bonus for that type from 1.5x to 2.0x!"
   }
 ];
 

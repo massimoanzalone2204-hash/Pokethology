@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { idbGet, idbSet, idbGetAll, idbDelete, STORES } from "./lib/indexedDB";
 import { checkQuotaAllowed, recordApiUsage } from "./lib/quotaManager";
-import { BattleResultScreen } from './components/BattleResultScreen';
 import { useState, useEffect, useRef, useTransition, useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download, Search, Loader2, Database, Sparkles, Volume2, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork } from 'lucide-react';
@@ -12,7 +11,6 @@ import { PokeballIcon } from './components/PokeballIcon';
 import { BattleMessage } from './components/BattleMessage';
 import { StatChangeEffect } from './components/StatChangeEffect';
 import { FloatingText } from './components/FloatingText';
-import { Tutorial } from './components/Tutorial';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { searchPokemon, getPokemonList, getPokemonByType, GENERATIONS } from './lib/api';
 import { useBattleSimulation } from './hooks/useBattleSimulation';
@@ -20,24 +18,28 @@ import { Pokemon, EvolutionNode, Move, LogEntry } from './types';
 import { sounds } from './lib/sounds';
 import { cn, abbreviateType, hudButtonClass, playHaptic } from './lib/utils';
 import { PokethologyCombatMissionWidget, getDailyCombatMission, COMBAT_MISSIONS, getRequiredCount } from './components/PokethologyCombatMissionWidget';
-import { PokethologyQuizWidget } from './components/PokethologyQuizWidget';
 import { generateCompetitiveMoveset } from './utils/moveset';
 import { OpponentStatusBar, PlayerStatusBar } from './components/BattleStatusBars';
-import { MoveModal } from './components/MoveModal';
 import { TypeBadge } from './components/TypeBadge';
 import { BattleErrorBoundary } from './components/BattleErrorBoundary';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 import { StatRadar } from './components/StatRadar';
 import { SingleStatRadar } from './components/SingleStatRadar';
-import { BattleHistory } from './components/BattleHistory';
 import Markdown from 'react-markdown';
 import { AudioSettings } from './components/AudioSettings';
-import { AboutModal } from './components/AboutModal';
 import ReactPlayer from 'react-player';
 
-import { OfflineManagerModal } from './components/OfflineManagerModal';
 import { pokeApi, isApiError } from './lib/pokeApiService';
+
+// Lazy loaded heavy UI and modal chunks via dynamic import()
+const BattleResultScreen = React.lazy(() => import('./components/BattleResultScreen').then(m => ({ default: m.BattleResultScreen })));
+const Tutorial = React.lazy(() => import('./components/Tutorial').then(m => ({ default: m.Tutorial })));
+const PokethologyQuizWidget = React.lazy(() => import('./components/PokethologyQuizWidget').then(m => ({ default: m.PokethologyQuizWidget })));
+const MoveModal = React.lazy(() => import('./components/MoveModal').then(m => ({ default: m.MoveModal })));
+const BattleHistory = React.lazy(() => import('./components/BattleHistory').then(m => ({ default: m.BattleHistory })));
+const AboutModal = React.lazy(() => import('./components/AboutModal').then(m => ({ default: m.AboutModal })));
+const OfflineManagerModal = React.lazy(() => import('./components/OfflineManagerModal').then(m => ({ default: m.OfflineManagerModal })));
 
 const getShowdownName = (name: string, isFemale: boolean = false) => {
   if (!name) return '';
@@ -5149,7 +5151,8 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-    <div className={cn(
+      <Suspense fallback={null}>
+        <div className={cn(
       "w-full h-screen h-[100dvh] flex items-stretch justify-center transition-colors duration-300 ease-out bg-slate-950 relative overflow-hidden overflow-x-hidden",
       "bg-[linear-gradient(to_right,rgba(6,182,212,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(6,182,212,0.015)_1px,transparent_1px)] bg-[size:48px_48px]",
       isLightMode && "light bg-slate-50 bg-[linear-gradient(to_right,rgba(15,23,42,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.015)_1px,transparent_1px)]"
@@ -6686,7 +6689,7 @@ export default function App() {
                                         )}
                                         {(pokemon 
                                           ? [`Lore: ${pokemon?.name}`, `Counter for ${pokemon?.name}?`, `Battle usage?`, `Moveset?`]
-                                          : ["Strongest Pokemon?", "Mega Evolutions?", "Chaos Match Tips?", "Who is Arceus?"]
+                                          : ["Strongest Pokemon?", "Mega Evolutions?", "Chaos Mode Tips?", "Who is Arceus?"]
                                         ).map((s, idx) => (
                                           <button 
                                             key={`suggested-${s}-${idx}`} 
@@ -7234,7 +7237,7 @@ export default function App() {
                                                         setOpponentHP(oMax);
                                                         setTurnNumber(1);
                                                         sounds.battleStart();
-                                                        setBattleLog([{ text: 'Starting Chaos Match...', type: 'critical' }]);
+                                                        setBattleLog([{ text: 'Starting Chaos Mode...', type: 'critical' }]);
                                                         setBattleState('battling');
                                                         setIsBattling(true);
                                                         setIsChaosMatchSetup(false);
@@ -7564,7 +7567,7 @@ export default function App() {
                                               
                                               <div className="relative flex items-center justify-center gap-3">
                                                 <span className="text-white font-hud text-xs sm:text-sm font-black tracking-[0.3em] uppercase drop-shadow-[0_0_5px_rgba(34,211,238,1)]">
-                                                  Full Chaos Match
+                                                  Chaos Mode
                                                 </span>
                                               </div>
 
@@ -10064,6 +10067,7 @@ export default function App() {
           isLightMode={isLightMode}
         />
       </div>
+      </Suspense>
     </ErrorBoundary>
   );
 }
