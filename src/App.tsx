@@ -2212,7 +2212,12 @@ export default function App() {
     if (!opponentStatus) statusStartTurnRef.current.opponent = null;
   }, [pokemonStatus, opponentStatus, turnNumber]);
   const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<{role: 'user' | 'model', text: string, groundingChunks?: any[], groundingMetadata?: any}[]>([]);
+  const [chatMessages, setChatMessages] = useState<{role: 'user' | 'model', text: string, groundingChunks?: any[], groundingMetadata?: any}[]>([
+    {
+      role: 'model',
+      text: "In Development ⚙️\nUntil the Chatbot it's completely ready, you can search your information about this Pokémon under in these sources!"
+    }
+  ]);
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [battleLog, setBattleLog] = useState<(LogEntry & { turn?: number })[]>([]);
   const [isBattling, setIsBattling] = useState(false);
@@ -3277,7 +3282,12 @@ export default function App() {
       
       // 4. Interface State
       setActiveTab('data');
-      setChatMessages([]);
+      setChatMessages([
+        {
+          role: 'model',
+          text: "In Development ⚙️\nUntil the Chatbot it's completely ready, you can search your information about this Pokémon under in these sources!"
+        }
+      ]);
       setIsSelectingOpponent(false);
       
       // 5. Battle & Chaos Reset
@@ -6455,7 +6465,12 @@ export default function App() {
                                               <span className="text-[6.5px] font-mono font-bold text-rose-400 uppercase">Clear?</span>
                                               <button
                                                 onClick={() => {
-                                                  setChatMessages([]);
+                                                  setChatMessages([
+                                                    {
+                                                      role: 'model',
+                                                      text: "In Development ⚙️\nUntil the Chatbot it's completely ready, you can search your information about this Pokémon under in these sources!"
+                                                    }
+                                                  ]);
                                                   setShowClearChatConfirm(false);
                                                   try { sounds.scan(); } catch(_) {}
                                                 }}
@@ -7989,9 +8004,7 @@ export default function App() {
                         key="home"
                         initial={{ opacity: 0, scale: 0.98, y: 12 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.98, y: -12 }}
-                        transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-                        className="flex-1 flex flex-col items-center justify-center gap-4 sm:gap-5 md:gap-6 py-4 px-4 text-center relative overflow-y-auto md:overflow-hidden select-none w-full h-full my-auto"
+                                      className="flex-1 flex flex-col items-center justify-center gap-4 sm:gap-5 md:gap-6 py-4 px-4 text-center relative overflow-y-auto select-none w-full h-full my-auto"
                       >
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/5 to-transparent pointer-events-none"></div>
                         
@@ -8002,11 +8015,11 @@ export default function App() {
                           <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 75%)' }}></div>
                           <PokethologyLogo className="w-full h-full object-contain filter drop-shadow-[0_0_30px_rgba(6,182,212,0.5)]" />
                         </motion.div>
-
+ 
                         <div className="flex flex-col gap-2.5 sm:gap-3.5 relative z-10 shrink-0 w-full max-w-4xl px-2 sm:px-4">
-                          <h1 className={cn("flex flex-row flex-wrap items-center justify-center gap-2 sm:gap-3 lg:gap-4 text-4xl xxs:text-5xl xs:text-6xl sm:text-6xl md:text-6xl lg:text-6xl xl:text-7xl font-hud font-black tracking-[0.03em] sm:tracking-[0.05em] md:tracking-[0.08em] leading-tight text-center w-full break-words py-1 px-2 overflow-visible", isLightMode ? 'text-slate-900' : 'bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]')}>
+                          <h1 className={cn("flex flex-row flex-wrap items-center justify-center gap-2 sm:gap-3 lg:gap-4 text-3xl xxs:text-4xl xs:text-5xl sm:text-6xl md:text-6xl lg:text-6xl xl:text-7xl font-hud font-black tracking-[0.03em] sm:tracking-[0.05em] md:tracking-[0.08em] leading-tight text-center w-full break-words py-1 px-2 overflow-visible", isLightMode ? 'text-slate-900' : 'bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]')}>
                             <span className="inline-block py-0.5">POKÉTHOLOGY</span>
-                            <span className="text-cyan-400 text-3xl xxs:text-4xl xs:text-5xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-6xl font-black text-glow inline-block py-0.5" style={{ textShadow: isLightMode ? 'none' : '0 0 16px rgba(34,211,238,0.7)' }}>OS</span>
+                            <span className="text-cyan-400 text-2xl xxs:text-3xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-6xl font-black text-glow inline-block py-0.5" style={{ textShadow: isLightMode ? 'none' : '0 0 16px rgba(34,211,238,0.7)' }}>OS</span>
                           </h1>
                           <p className="font-serif italic text-xs xxs:text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl text-cyan-400 select-none px-4 mt-0.5 tracking-wider whitespace-normal break-words text-center drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">
                             "Where dreams and adventures begin!"
@@ -8447,19 +8460,19 @@ export default function App() {
       </div>
 
          <AnimatePresence>
-           {isTypeChartOpen && (
+          {isTypeChartOpen && (
              <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90"
+              className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-black/90 overflow-y-auto custom-scrollbar"
             >
               <motion.div
                 initial={{ scale: 0.94, y: 12, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
                 exit={{ scale: 0.94, y: 12, opacity: 0 }}
                 transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-slate-900 border-2 border-red-500/50 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(239,68,68,0.3)]"
+                className="bg-slate-900 border-2 border-red-500/50 rounded-2xl w-full max-w-4xl max-h-[92dvh] sm:max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(239,68,68,0.3)] my-auto mx-auto"
               >
                 <div className="p-4 border-b border-red-900/30 flex justify-between items-center bg-slate-950 shrink-0">
                   <div className="flex items-center gap-2 sm:gap-3">
@@ -8556,14 +8569,14 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/90"
+              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/90 overflow-y-auto custom-scrollbar"
             >
               <motion.div
                 initial={{ scale: 0.94, y: 12, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
                 exit={{ scale: 0.94, y: 12, opacity: 0 }}
                 transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-slate-950 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.3)]"
+                className="bg-slate-950 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.3)] my-auto mx-auto"
               >
                 <div className="p-4 sm:p-6 border-b border-cyan-900/30 bg-cyan-950/20">
                   <h2 className="text-cyan-400 font-hud text-xl uppercase tracking-widest text-center">
@@ -8689,14 +8702,14 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80"
+              className="fixed inset-0 z-[110] flex items-center justify-center p-2 sm:p-4 bg-black/80 overflow-y-auto custom-scrollbar"
             >
               <motion.div
                 initial={{ scale: 0.94, y: 12, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
                 exit={{ scale: 0.94, y: 12, opacity: 0 }}
                 transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.2)]"
+                className="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.2)] my-auto mx-auto"
               >
                 <div className={cn(
                   "p-4 sm:p-6 flex justify-between items-start relative overflow-hidden w-full border-b border-cyan-500/30",
@@ -8953,7 +8966,7 @@ export default function App() {
                   initial={{ scale: 0.92, y: 20 }}
                   animate={{ scale: 1, y: 0 }}
                   exit={{ scale: 0.92, y: 20 }}
-                  className="bg-slate-950 border-2 border-amber-500/60 rounded-2xl w-full max-w-6xl h-[88dvh] max-h-[880px] shadow-[0_0_60px_rgba(245,158,11,0.3)] flex flex-col relative my-auto overflow-hidden mx-auto"
+                  className="bg-slate-950 border-2 border-amber-500/60 rounded-2xl w-full max-w-6xl max-h-[92dvh] sm:max-h-[88dvh] h-auto shadow-[0_0_60px_rgba(245,158,11,0.3)] flex flex-col relative my-auto overflow-hidden mx-auto"
                 >
                   <HUDCorners />
 
