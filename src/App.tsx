@@ -2047,6 +2047,14 @@ export default function App() {
     return saved ? parseInt(saved, 10) : 0;
   });
   
+  const [battleDifficulty, setBattleDifficulty] = useState<'Casual' | 'Hard' | 'Challenge'>(() => {
+    try {
+      const saved = localStorage.getItem('pokethology_battle_difficulty');
+      if (saved === 'Casual' || saved === 'Hard' || saved === 'Challenge') return saved;
+    } catch (_) {}
+    return 'Hard';
+  });
+  
   const [activePlayerIndex, setActivePlayerIndex] = useState(0);
   const [opponentTeam, setOpponentTeam] = useState<Pokemon[]>([]);
   const [activeOpponentIndex, setActiveOpponentIndex] = useState(0);
@@ -4250,13 +4258,23 @@ export default function App() {
           await new Promise(resolve => setTimeout(resolve, 650));
         }
 
-        // Master Competitive Opponent AI Move Selection
+        // Master Opponent AI Move Selection based on battleDifficulty
         const chooseOptimalMove = () => {
           if (!opponentMoves || opponentMoves.length === 0) return battleOpponent.moves[0];
 
           // Filter moves with available PP
           const availableMoves = opponentMoves.filter(m => (m.currentPP ?? m.pp) > 0);
           if (availableMoves.length === 0) return opponentMoves[0];
+
+          // 1. Casual Mode: Random & unpredictable decision-making
+          if (battleDifficulty === 'Casual') {
+            if (Math.random() < 0.70) {
+              const randomIndex = Math.floor(Math.random() * availableMoves.length);
+              return availableMoves[randomIndex];
+            } else {
+              return availableMoves.reduce((best, cur) => ((cur.power || 0) > (best.power || 0) ? cur : best), availableMoves[0]);
+            }
+          }
 
           let bestMove = availableMoves[0];
           let highestScore = -1000000;
@@ -4280,6 +4298,7 @@ export default function App() {
 
           const opponentIsFaster = oppSpe >= playerSpe;
           const isFaintingSoon = opponentHealthPercent < 22;
+          const isChallenge = battleDifficulty === 'Challenge';
 
           for (const move of availableMoves) {
             let score = 0;
@@ -4318,63 +4337,59 @@ export default function App() {
               const accuracy = move.accuracy || 100;
               const expectedDamage = Math.floor(baseDamage * effectiveness * (accuracy / 100));
 
-              score += expectedDamage * 15;
+              score += expectedDamage * (isChallenge ? 22 : 15);
 
-              // 1. GUARANTEED KO FINISHER (Prefer 100% accuracy move if multiple moves KO)
+              // 1. GUARANTEED KO FINISHER
               if (expectedDamage >= pokemonHP) {
-                let koBonus = opponentIsFaster || (move.priority || 0) > 0 ? 600000 : 350000;
-                // Prefer reliable 100% accuracy over risky move for KO
+                let koBonus = opponentIsFaster || (move.priority || 0) > 0 ? (isChallenge ? 900000 : 600000) : (isChallenge ? 500000 : 350000);
                 if (accuracy >= 95) koBonus += 50000;
                 score += koBonus;
               }
 
               // Multi-hit bonus if player has Substitute active
               if (playerSubstitute > 0 && isMultiHit) {
-                score += 45000; // Multi-hit breaks Substitute!
+                score += isChallenge ? 65000 : 45000;
               }
 
               // 2. PRIORITY STRIKE TACTICS
               const movePriority = move.priority || 0;
               if (movePriority > 0) {
-                // If player is faster and can finish off AI, or player HP is low, use priority!
                 if (!opponentIsFaster && (playerHealthPercent < 35 || isFaintingSoon)) {
-                  score += expectedDamage >= pokemonHP ? 500000 : 55000;
+                  score += expectedDamage >= pokemonHP ? (isChallenge ? 700000 : 500000) : (isChallenge ? 85000 : 55000);
                 } else {
-                  score += 12000;
+                  score += isChallenge ? 25000 : 12000;
                 }
               }
 
-              // 3. TYPE MATCHUP & DEFENSIVE WEAKNESS EXPLOITATION
+              // 3. TYPE MATCHUP EXPLOITATION
               if (effectiveness >= 2) {
-                score += 8000 * effectiveness;
+                score += (isChallenge ? 14000 : 8000) * effectiveness;
               } else if (effectiveness < 1) {
-                score -= 4000; // Avoid resisted attacks
+                score -= isChallenge ? 8000 : 4000;
               }
 
               // Target physical/special defense weakness
               if (move.damage_class === 'physical' && playerDef < playerSpD * 0.8) {
-                score += 4500; // Exploit weak Physical Defense
+                score += isChallenge ? 7500 : 4500;
               } else if (move.damage_class === 'special' && playerSpD < playerDef * 0.8) {
-                score += 4500; // Exploit weak Special Defense
+                score += isChallenge ? 7500 : 4500;
               }
 
               // 4. DRAIN / RECOIL SYNERGY
               if (move.meta?.drain && move.meta.drain > 0 && opponentHealthPercent < 75) {
-                score += 18000; // Great sustain
+                score += isChallenge ? 28000 : 18000;
               }
               if (move.meta?.drain && move.meta.drain < 0 && opponentHealthPercent < 30) {
-                score -= 12000; // Avoid suicidal recoil when low
+                score -= isChallenge ? 22000 : 12000;
               }
 
               // 5. ABOUT TO FAINT: ATTACK HARD WITH FASTEST/HIGHEST POWER MOVE
               if (isFaintingSoon) {
-                score += 35000;
+                score += isChallenge ? 55000 : 35000;
               }
 
             } else {
               // STATUS, SETUP, RECOVERY & UTILITY AI
-
-              // If player has a Substitute active, status & stat-lowering moves WILL FAIL!
               if (playerSubstitute > 0) {
                 if (move.meta?.ailment || (move.stat_changes && move.stat_changes.some(c => c.change < 0))) {
                   score = -300000;
@@ -4386,7 +4401,6 @@ export default function App() {
                 }
               }
 
-              // If AI is low on HP, penalize non-damaging utility moves heavily (except healing)
               if (isFaintingSoon && !(move.meta?.healing && move.meta.healing > 0) && !moveNameLower.includes('recover') && !moveNameLower.includes('roost')) {
                 score = -100000;
                 if (score > highestScore) {
@@ -4400,11 +4414,9 @@ export default function App() {
               if (move.meta?.ailment && move.meta.ailment.name !== 'none') {
                 const ailment = move.meta.ailment.name.toLowerCase();
 
-                // Do not re-inflict status if target already afflicted
                 if (pokemonStatus) {
                   score = -300000;
                 } else {
-                  // Immunity checks
                   const isImmuneParalysis = (ailment === 'paralysis' && playerTypes.includes('electric')) ||
                     (ailment === 'paralysis' && moveType === 'electric' && playerTypes.includes('ground'));
                   const isImmuneBurn = ailment === 'burn' && playerTypes.includes('fire');
@@ -4415,13 +4427,13 @@ export default function App() {
                     score = -300000;
                   } else if (opponentHealthPercent > 30) {
                     if (ailment === 'sleep' || ailment === 'freeze') {
-                      score += 48000; // Complete turn shutdown
+                      score += isChallenge ? 68000 : 48000;
                     } else if (ailment === 'burn' && playerAtk >= playerSpA) {
-                      score += 38000; // Halve physical threat's Attack!
+                      score += isChallenge ? 52000 : 38000;
                     } else if (ailment === 'paralysis' && !opponentIsFaster) {
-                      score += 35000; // Steal turn speed control!
+                      score += isChallenge ? 48000 : 35000;
                     } else if (ailment === 'poison' || ailment === 'toxic') {
-                      score += 28000; // Inevitable wear down
+                      score += isChallenge ? 38000 : 28000;
                     } else {
                       score += 18000;
                     }
@@ -4431,7 +4443,7 @@ export default function App() {
                 }
               }
 
-              // B. Competitive Stat Buffing (Setup Sweeper)
+              // B. Competitive Stat Buffing
               if (move.stat_changes && move.stat_changes.length > 0) {
                 if (opponentHealthPercent > 45 && turnNumber < 8) {
                   let setupBonus = 0;
@@ -4441,9 +4453,9 @@ export default function App() {
                       const cur = opponentStatStages[statName] || 0;
                       if (cur < 3) {
                         if ((statName === 'attack' && oppAtk >= oppSpA) || (statName === 'special-attack' && oppSpA >= oppAtk)) {
-                          setupBonus += change.change * 20000; // Primary damage buff!
+                          setupBonus += change.change * (isChallenge ? 30000 : 20000);
                         } else if (statName === 'speed' && !opponentIsFaster) {
-                          setupBonus += change.change * 16000; // Speed control setup!
+                          setupBonus += change.change * (isChallenge ? 24000 : 16000);
                         } else {
                           setupBonus += change.change * 9000;
                         }
@@ -4462,16 +4474,16 @@ export default function App() {
               // C. Critical Recovery & Healing Logic
               if (move.meta?.healing && move.meta.healing > 0 || moveNameLower.includes('recover') || moveNameLower.includes('roost') || moveNameLower.includes('soft-boiled') || moveNameLower.includes('synthesis')) {
                 if (opponentHealthPercent < 55 && opponentHealthPercent > 18) {
-                  score += 45000; // Vital recovery priority
+                  score += isChallenge ? 60000 : 45000;
                 } else if (opponentHealthPercent >= 80) {
-                  score = -100000; // Don't waste heal when healthy
+                  score = -100000;
                 }
               }
 
               // D. Substitute Tactical Usage
               if (moveNameLower === 'substitute') {
                 if (opponentSubstitute === 0 && opponentHealthPercent > 35) {
-                  score += 38000; // Create protective puppet!
+                  score += isChallenge ? 52000 : 38000;
                 } else {
                   score = -200000;
                 }
@@ -4481,14 +4493,14 @@ export default function App() {
               if (moveNameLower === 'protect' || moveNameLower === 'detect') {
                 if (!opponentProtected) {
                   if (pokemonStatus === 'PSN' || pokemonStatus === 'BRN') {
-                    score += 32000; // Stall to let residual status deal damage!
+                    score += isChallenge ? 45000 : 32000;
                   } else if (opponentHealthPercent < 25) {
                     score += 22000;
                   } else {
-                    score -= 15000; // Don't spam protect randomly
+                    score -= 15000;
                   }
                 } else {
-                  score = -300000; // Consecutive Protect usually fails
+                  score = -300000;
                 }
               }
 
@@ -4497,7 +4509,7 @@ export default function App() {
               }
             }
 
-            score += Math.random() * 5; // Slight tie-breaking variance
+            score += Math.random() * (isChallenge ? 2 : 5);
 
             if (score > highestScore) {
               highestScore = score;
@@ -6205,8 +6217,8 @@ export default function App() {
                                                 </div>
                                                 <p className={cn("text-[10px] leading-relaxed tracking-tight", isLightMode ? "text-slate-600 font-medium" : "text-cyan-100")}>{a.description}</p>
                                               </div>
-                                            ))}
-                                          </div>
+                                              ))}
+                                            </div>
                                         ) : (
                                           <p className={cn("text-[9px] font-bold tracking-wider uppercase tracking-widest text-center py-2", isLightMode ? "text-slate-400" : "text-cyan-500")}>No abilities detected</p>
                                         )}
@@ -6795,8 +6807,8 @@ export default function App() {
                                         animate={screenShake ? { x: [-10, 10, -10, 10, 0] } : {}}
                                         transition={{ duration: 0.5 }}
                                         className={cn(
-                                          "flex flex-row justify-between items-center bg-slate-900/80 rounded-xl border border-cyan-500/30 relative z-20 shadow-lg shrink-0 transition-all duration-300 w-full overflow-hidden flex-nowrap",
-                                          "p-1.5 sm:p-2.5 mb-2.5"
+                                          "flex flex-row justify-between items-center bg-slate-950/90 rounded-t-2xl rounded-b-none border-b border-cyan-500/40 relative z-20 shadow-md shrink-0 transition-all duration-300 w-full overflow-hidden flex-nowrap",
+                                          "px-2.5 sm:px-4 py-2 sm:py-2.5 mb-0"
                                         )}>
                                         <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink">
                                           <PokeballIcon className={cn(
@@ -6843,6 +6855,45 @@ export default function App() {
                                             >
                                               {turn === 'player' ? 'PLAYER' : "ENEMY"}
                                             </div>
+                                          )}
+
+                                          {/* AI Difficulty Selector - Hidden during battles */}
+                                          {!isBattling && (
+                                            <div className={cn(
+                                            "flex items-center gap-0.5 p-0.5 sm:p-1 rounded-lg border transition-all shrink-0",
+                                            isLightMode ? "bg-white/80 border-cyan-300/80 shadow-sm" : "bg-slate-950/80 border-cyan-500/30 shadow-md"
+                                          )}>
+                                            <span className={cn(
+                                              "text-[6px] sm:text-[8px] font-hud font-black uppercase px-1 hidden md:inline-block",
+                                              isLightMode ? "text-slate-600" : "text-cyan-400"
+                                            )}>
+                                              AI:
+                                            </span>
+                                            {(['Casual', 'Hard', 'Challenge'] as const).map(diff => (
+                                              <button
+                                                key={diff}
+                                                onClick={() => {
+                                                  setBattleDifficulty(diff);
+                                                  try { localStorage.setItem('pokethology_battle_difficulty', diff); } catch(_) {}
+                                                  try { sounds.scan(); } catch(_) {}
+                                                  playHaptic(20);
+                                                }}
+                                                title={`AI Difficulty: ${diff} Mode`}
+                                                className={cn(
+                                                  "px-1 py-0.5 sm:px-2 sm:py-1 rounded text-[6px] sm:text-[9px] font-hud font-extrabold uppercase transition-all duration-300 whitespace-nowrap",
+                                                  battleDifficulty === diff
+                                                    ? diff === 'Casual'
+                                                      ? "bg-emerald-500/25 border border-emerald-400 text-emerald-600 dark:text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.4)] font-black"
+                                                      : diff === 'Hard'
+                                                        ? "bg-amber-500/25 border border-amber-400 text-amber-600 dark:text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.4)] font-black"
+                                                        : "bg-red-500/25 border border-red-400 text-red-600 dark:text-red-300 shadow-[0_0_8px_rgba(239,68,68,0.4)] font-black"
+                                                    : isLightMode ? "text-slate-500 hover:text-slate-800 border border-transparent" : "text-slate-400 hover:text-cyan-300 border border-transparent"
+                                                )}
+                                              >
+                                                {diff}
+                                              </button>
+                                            ))}
+                                          </div>
                                           )}
 
                                           <button 
