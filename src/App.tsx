@@ -3973,33 +3973,40 @@ export default function App() {
     setShowVSScreen(true);
     sounds.battleStart();
 
-    // 2. Play Pokémon cries at specific sequential times during the VS screen intro
-    if (vsPlayerCryTimeoutRef.current) clearTimeout(vsPlayerCryTimeoutRef.current);
-    if (vsOpponentCryTimeoutRef.current) clearTimeout(vsOpponentCryTimeoutRef.current);
-
-    if (pokemon?.cries?.latest) {
-      vsPlayerCryTimeoutRef.current = setTimeout(() => {
-        sounds.playCry(pokemon?.name ?? '', pokemon.cries.latest, pokemon?.name?.includes('-gmax') ?? false);
-      }, 300);
-    }
-
-    if (battleOpponent?.cries?.latest) {
-      vsOpponentCryTimeoutRef.current = setTimeout(() => {
-        sounds.playCry(battleOpponent?.name ?? '', battleOpponent.cries.latest, battleOpponent?.name?.includes('-gmax') ?? false);
-      }, 1600);
-    }
-
-    // 2. Clear previous active animations
+    // 2. Clear previous active animations and timeouts
     setAttackerAnimation('none');
     setDefenderAnimation('none');
     setMoveAnimation('none');
 
-    // 3. Defer the actual state shift until the VS screen finishes (snappy transition)
     if (vsTimeoutRef.current) clearTimeout(vsTimeoutRef.current);
-    
-    vsTimeoutRef.current = setTimeout(() => {
-      skipVSScreen();
-    }, 5200);
+    if (vsPlayerCryTimeoutRef.current) clearTimeout(vsPlayerCryTimeoutRef.current);
+    if (vsOpponentCryTimeoutRef.current) clearTimeout(vsOpponentCryTimeoutRef.current);
+
+    // 3. Play Pokémon cries sequentially to completion during the VS screen intro
+    vsPlayerCryTimeoutRef.current = setTimeout(async () => {
+      // Play user's Pokémon cry with allowOverlap: true so it completes fully without interruption
+      let playerDur = 1200;
+      if (pokemon?.cries?.latest) {
+        playerDur = await sounds.playCry(pokemon?.name ?? '', pokemon.cries.latest, pokemon?.name?.includes('-gmax') ?? false, true);
+      } else {
+        playerDur = await sounds.playCry(pokemon?.name ?? '', undefined, pokemon?.name?.includes('-gmax') ?? false, true);
+      }
+
+      // After user's cry finishes completely, wait a brief 200ms gap and play opponent's cry to completion
+      vsOpponentCryTimeoutRef.current = setTimeout(async () => {
+        let opponentDur = 1200;
+        if (battleOpponent?.cries?.latest) {
+          opponentDur = await sounds.playCry(battleOpponent?.name ?? '', battleOpponent.cries.latest, battleOpponent?.name?.includes('-gmax') ?? false, true);
+        } else {
+          opponentDur = await sounds.playCry(battleOpponent?.name ?? '', undefined, battleOpponent?.name?.includes('-gmax') ?? false, true);
+        }
+
+        // Once opponent's cry has also finished completely, wait 500ms before finishing the VS screen transition
+        vsTimeoutRef.current = setTimeout(() => {
+          skipVSScreen();
+        }, Math.max(400, (opponentDur || 1000) > 0 ? 500 : 700));
+      }, Math.max(150, 250));
+    }, 300);
   };
 
   const applyEndOfTurnEffects = async (isPlayer: boolean) => {
