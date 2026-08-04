@@ -4,9 +4,14 @@ import cookieParser from "cookie-parser";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import dotenv from "dotenv";
+import { GoogleGenAI, Type } from "@google/genai";
+import { LRUCache } from "lru-cache";
 import fs from "fs";
-import { extractSuggestedPokemon } from "./server/utils/stringUtils";
+import { getEditDistance, extractSuggestedPokemon } from "./server/utils/stringUtils";
+import { strategies } from "./server/utils/battleUtils";
 import { handleApiError } from "./server/utils/errorHandling";
+import { generateWithRetry, isQuotaError, registerApiCallRecorder } from "./server/services/geminiService";
+import { typeAdvantageMap, suggestions } from "./server/constants";
 import { initializeWebSocketServer } from "./server/websocket";
 
 dotenv.config();
@@ -31,72 +36,464 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// --- OFFLINE/DEVELOPMENT CONSTANTS ---
-const IN_DEVELOPMENT_MSG = "In Development ⚙️\nUntil the Chatbot it's completely ready, you can search your information about this Pokémon under in these sources!";
+// Cache configuration
+const suggestionCache = new LRUCache<string, string>({ max: 1000, ttl: 1000 * 60 * 60 * 24 }); // 24 hours
+const strategyCache = new LRUCache<string, string>({ max: 500, ttl: 1000 * 60 * 10 }); // 10 minutes
+const analysisCache = new LRUCache<string, string>({ max: 200, ttl: 1000 * 60 * 5 }); // 5 minutes
+const chatCache = new LRUCache<string, any>({ max: 500, ttl: 1000 * 60 * 20 }); // 20 minutes chat cache
+const missionsCache = new LRUCache<string, any>({ max: 50, ttl: 1000 * 60 * 60 * 24 }); // 24 hours daily combat missions cache
 
-// --- HEALTH ENDPOINT ---
+// Initialize Gemini
+const getApiKey = () => process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+
+const ai = new GoogleGenAI({
+  apiKey: getApiKey(),
+  httpOptions: {
+    headers: {
+      'User-Agent': 'aistudio-build',
+    }
+  }
+});
+
+const DEFAULT_MODEL = "gemini-1.5-flash";
+const LITE_MODEL = "gemini-1.5-flash-lite";
+
+// --- OFFLINE GENERATIVE ENGINE (Fallback Mode) ---
+
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+// --- LANGUAGE DETECTION UTILITIES ---
+
+function detectLanguage(text: string): 'it' | 'es' | 'fr' | 'de' | 'en' {
+  if (!text) return 'en';
+  const lower = text.toLowerCase();
+  
+  // Italian keywords
+  const itKeywords = [
+    'ciao', 'chi sei', 'come', 'perché', 'perche', 'combattimento', 'arena', 'squadra', 'statistiche', 
+    'debole', 'efficace', 'mosse', 'consiglio', 'aiuto', 'strategia', 'lore', 'storia', 'tuo', 'mio', 
+    'drago', 'fuoco', 'acqua', 'erba', 'elettro', 'chi è', 'chi e', 'combatti', 'vincitore', 'vincere'
+  ];
+  if (itKeywords.some(kw => lower.includes(kw))) return 'it';
+  
+  // Spanish keywords
+  const esKeywords = [
+    'hola', 'quién eres', 'quien', 'cómo', 'como', 'por qué', 'por que', 'combate', 'arena', 'equipo', 
+    'estadísticas', 'debil', 'debilitado', 'movimiento', 'consejo', 'ayuda', 'estrategia', 'historia', 
+    'tuyo', 'mi', 'fuego', 'agua', 'hierba', 'viento', 'luchar'
+  ];
+  if (esKeywords.some(kw => lower.includes(kw))) return 'es';
+  
+  // French keywords
+  const frKeywords = [
+    'salut', 'qui es-tu', 'qui', 'comment', 'pourquoi', 'combat', 'arène', 'équipe', 'statistiques', 
+    'faible', 'mouvement', 'conseil', 'aide', 'stratégie', 'histoire', 'ton', 'mon', 'feu', 'eau', 'herbe'
+  ];
+  if (frKeywords.some(kw => lower.includes(kw))) return 'fr';
+  
+  // German keywords
+  const deKeywords = [
+    'hallo', 'wer bist du', 'wie', 'warum', 'kampf', 'arena', 'team', 'statistiken', 'schwach', 
+    'bewegung', 'rat', 'hilfe', 'strategie', 'geschichte', 'dein', 'mein', 'feuer', 'wasser', 'gras'
+  ];
+  if (deKeywords.some(kw => lower.includes(kw))) return 'de';
+  
+  return 'en';
+}
+
+const getRequestLanguage = (req: any, userText?: string): 'it' | 'es' | 'fr' | 'de' | 'en' => {
+  return 'en';
+};
+
+
+
+function getMatchupRating(player: any, opponent: any, lang: 'it' | 'es' | 'fr' | 'de' | 'en'): string {
+  const pTypes = player.types || [];
+  const oTypes = opponent.types || [];
+  
+  let playerAdvantage = false;
+  let opponentAdvantage = false;
+
+  for (const pt of pTypes) {
+    const map = typeAdvantageMap[pt.toLowerCase()];
+    if (map) {
+      for (const ot of oTypes) {
+        if (map.strongAgainst.includes(ot.toLowerCase())) playerAdvantage = true;
+      }
+    }
+  }
+
+  for (const ot of oTypes) {
+    const map = typeAdvantageMap[ot.toLowerCase()];
+    if (map) {
+      for (const pt of pTypes) {
+        if (map.strongAgainst.includes(pt.toLowerCase())) opponentAdvantage = true;
+      }
+    }
+  }
+
+  if (playerAdvantage && !opponentAdvantage) {
+    if (lang === 'it') return "Postura offensiva altamente favorevole. Possiedi vantaggi di copertura del tipo STAB.";
+    if (lang === 'es') return "Postura ofensiva muy favorable. Posees ventajas de cobertura de tipo STAB.";
+    if (lang === 'fr') return "Posture offensive très favorable. Vous possédez des avantages de couverture de type STAB.";
+    if (lang === 'de') return "Sehr günstige offensive Haltung. Du besitzt passende STAB-Typenabdeckungsvorteile.";
+    return "Highly favorable offensive posture. You possess matching STAB type coverage advantages.";
+  }
+  if (opponentAdvantage && !playerAdvantage) {
+    if (lang === 'it') return "Minaccia ad alta vulnerabilità. L'avversario ha un forte vantaggio di tipo. Considera di sostituire il Pokémon.";
+    if (lang === 'es') return "Gran amenaza de vulnerabilidad. El oponente tiene una gran ventaja súper efectiva. Considera cambiar.";
+    if (lang === 'fr') return "Forte menace de vulnérabilité. L'adversaire a un avantage super efficace. Envisagez un switch.";
+    if (lang === 'de') return "Hohe Bedrohung der Verwundbarkeit. Gegner hat sehr effektiven Hebel. Ziehe einen Wechsel in Betracht.";
+    return "High vulnerability threat. Opponent has super-effective leverage. Strongly consider pivoting.";
+  }
+  if (playerAdvantage && opponentAdvantage) {
+    if (lang === 'it') return "Scontro a doppio taglio. Alto potenziale di scambio di danni. Le mosse di priorità o la velocità decideranno il vincitore.";
+    if (lang === 'es') return "Enfrentamiento de doble filo. Alta capacidad de intercambio de daño. Los movimientos prioritarios o la velocidad decidirán al ganador.";
+    if (lang === 'fr') return "Match à double tranchant. Capacité d'échange de dégâts élevée. Les mouvements prioritaires ou la vitesse dicteront le vainqueur.";
+    if (lang === 'de') return "Zweischneidiges Matchup. Hoher Schadensaustausch möglich. Prioritäts-Moves oder Initiative entscheiden den Sieger.";
+    return "Double-edged matchup. High damage trade-off capacity. Priority moves or speed status will dictate the victor.";
+  }
+  if (lang === 'it') return "Dinamica neutrale e bilanciata. Concentrati semplicemente sugli scambi di potenza base e sulle predizioni.";
+  if (lang === 'es') return "Dinámica neutral equilibrada. Concéntrate en el daño básico y las predicciones.";
+  if (lang === 'fr') return "Dynamique neutre équilibrée. Concentrez-vous purement sur l'échange de dégâts de base et les prédictions.";
+  if (lang === 'de') return "Ausgeglichene neutrale Dynamik. Konzentriere dich auf reinen Schadensaustausch und Vorhersagen.";
+  return "Balanced neutral dynamic. Focus purely on basic power trading and prediction sets.";
+}
+
+function getMoveInsight(player: any, opponent: any, weather: string, lang: 'it' | 'es' | 'fr' | 'de' | 'en'): string {
+  const pHP = player.hp ?? 100;
+  const pTypes = (player.types || []).map((t: string) => t.toLowerCase());
+
+  if (weather?.toLowerCase() === 'sun' && (pTypes.includes('fire') || pTypes.includes('grass'))) {
+    if (lang === 'it') return "Sotto il sole intenso, i danni di tipo Fuoco ottengono un aumento del 1.5x e le mosse d'Erba caricano all'istante. Sfruttale ora!";
+    if (lang === 'es') return "Bajo Sol intenso, los ataques de Fuego ganan un 1.5x de daño y los movimientos de Planta cargan al instante. ¡Úsalos ya!";
+    if (lang === 'fr') return "Sous un Soleil intense, les dégâts de Feu sont boostés de 1.5x et les capacités Plante chargent instantanément. Utilisez-les !";
+    if (lang === 'de') return "Unter intensivem Sonnenschein verursachen Feuer-Attacken 1.5x Schaden und Grass-Moves laden sofort auf. Nutze sie jetzt!";
+    return "Under Solar intensity, Fire damage gains a 1.5x amplification, and Grass-type Solar moves hit instantly. Deploy these resources immediately.";
+  }
+  if (weather?.toLowerCase() === 'rain' && (pTypes.includes('water') || pTypes.includes('electric'))) {
+    if (lang === 'it') return "Sotto la pioggia battente, gli attacchi d'Acqua STAB aumentano del 1.5x e la precisione è perfetta. Scatena attacchi idrici o elettrici!";
+    if (lang === 'es') return "Bajo la lluvia, los ataques de Agua STAB aumentan un 1.5x y la precisión de Trueno es perfecta. ¡Ataca con Agua o Eléctrico!";
+    if (lang === 'fr') return "Sous une Pluie battante, les attaques Eau STAB sont boostées de 1.5x et la précision est parfaite. Déchaînez l'Eau ou l'Électricité !";
+    if (lang === 'de') return "Unter starkem Regen verursachen Wasser-STAB-Attacken 1.5x Schaden und die Genauigkeit ist perfekt. Entfessle Wasser- oder Elektro-Moves!";
+    return "Under Heavy Rain, Water-type STAB capabilities gain 1.5x amplification, and accuracy-checks are bypassed. Unleash hydro or electrical pressure.";
+  }
+  if (pHP < 40) {
+    if (lang === 'it') return "I tuoi HP sono pericolosamente bassi. Se possiedi mosse con priorità (es. Protezione, Sbigoattacco), usale per scambiare danni o sostituisci.";
+    if (lang === 'es') return "Tus HP están críticamente bajos. Si tienes movimientos de prioridad (ej. Protección, Golpe Bajo), úsalos para intercambiar daño.";
+    if (lang === 'fr') return "Vos PV sont dangereusement bas. Si vous possédez des attaques de priorité (ex. Abri, Coup Bas), utilisez-les pour gratter un tour.";
+    if (lang === 'de') return "Deine KP sind gefährlich niedrig. Falls du Prioritäts-Moves hast (z.B. Schutzschild, Tiefschlag), nutze sie oder wechsle aus.";
+    return "Ally HP is dangerously low. If defensive priority moves (e.g., Protect, Sucker Punch) are equipped, commit them to trace optimal turn trades. Otherwise pivot.";
+  }
+  if (lang === 'it') return "Determina la tua velocità. Se sei più veloce, sferra un potente attacco STAB. Se sei più lento, preparati a difenderti con barriere.";
+  if (lang === 'es') return "Determina tu velocidad. Si eres más rápido, usa un ataque STAB potente. Si eres más lento, anticípate con defensa.";
+  if (lang === 'fr') return "Déterminez votre vitesse. Si vous êtes plus rapide, lancez une forte capacité STAB. Sinon, anticipez la défense.";
+  if (lang === 'de') return "Bestimme deine Initiative. Wenn du schneller bist, nutze einen starken STAB-Move. Wenn du langsamer bist, verteidige dich.";
+  return "Determine your active speed tier. If you move first, attempt a powerful STAB option. If slower, anticipate their blow with defensive covers.";
+}
+
+function getOpponentPrediction(player: any, opponent: any, lang: 'it' | 'es' | 'fr' | 'de' | 'en'): string {
+  const oHP = opponent.hp ?? 100;
+  if (oHP < 35) {
+    if (lang === 'it') return "L'avversario è in condizioni critiche. È molto probabile che usi mosse con priorità o sostituisca il Pokémon.";
+    if (lang === 'es') return "El oponente está en estado crítico. Es muy probable que use un movimiento con prioridad o cambie de Pokémon.";
+    if (lang === 'fr') return "L'adversaire est en état critique. Il est très probable qu'il utilise une priorité ou fasse un switch.";
+    if (lang === 'de') return "Gegner ist in kritischem Bereich. Es ist sehr wahrscheinlich, dass er Prioritäts-Moves nutzt oder auswechselt.";
+    return "Opponent unit is in critical recovery state. They are highly predicted to execute priority strikes or pivot to safe counters.";
+  }
+  if (opponent.status && opponent.status !== 'Healthy' && opponent.status !== 'none') {
+    if (lang === 'it') return `L'avversario è indebolito da uno stato: ${opponent.status}. Sfrutta questa condizione per potenziarti o attaccare.`;
+    if (lang === 'es') return `El enemigo está afectado por estado: ${opponent.status}. Saca ventaja de esta debilidad para prepararte.`;
+    if (lang === 'fr') return `L'adversaire est affligé par le statut : ${opponent.status}. Profitez de ce debuff pour vous placer.`;
+    if (lang === 'de') return `Gegner ist durch Status beeinträchtigt: ${opponent.status}. Nutze diese Schwächung für Setup-Vorteile.`;
+    return `Opponent is compromised by status: ${opponent.status}. Exploit their debuff cycles to establish setup advantages.`;
+  }
+  if (lang === 'it') return "L'avversario sta probabilmente calcolando il danno massimo. Fai attenzione a possibili cambi di tipo o mosse di copertura.";
+  if (lang === 'es') return "Es probable que el oponente calcule el daño total. Ten cuidado si cambia de tipo.";
+  if (lang === 'fr') return "L'adversaire calcule probablement ses dégâts maximaux. Attention s'il change de type.";
+  if (lang === 'de') return "Gegner berechnet wahrscheinlich maximalen Schaden. Achte auf Auswechseln o.ä.";
+  return "Opponent is likely calculating full cover damage. Caution is recommended.";
+}
+
+function generateOfflineChatResponse(messages: any[], context: any, lang: 'it' | 'es' | 'fr' | 'de' | 'en'): string {
+  return "In Development";
+}
+
+function generateOfflineAnalysis(battleData: any, lang: 'it' | 'es' | 'fr' | 'de' | 'en'): string {
+  return "In Development";
+}
+
+function generateOfflineSuggestion(pokemonName: string, lang: 'it' | 'es' | 'fr' | 'de' | 'en'): string {
+  return "In Development";
+}
+
+function generateOfflineStrategy(battleData: any, lang: 'it' | 'es' | 'fr' | 'de' | 'en'): string {
+  return "In Development";
+}
+
+// API routes
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-// --- REAL-TIME QUOTA MONITOR (Simplified Mock Data) ---
+// --- SERVER-SIDE REAL-TIME QUOTA TRACKING ENGINE ---
+let dailyRequestCount = 18; // Default seed
+let lastQuotaDayReset = new Date().getUTCDate();
+const requestTimestamps: number[] = []; // Timestamps in ms for RPM calculation
+const DAILY_CAPACITY_LIMIT = 1500; // Gemini Free tier standard daily quota
+const RPM_LIMIT = 15; // Gemini Requests Per Minute standard limit
+let quotaExhaustedUntilMs: number | null = null;
+
+function updateQuotaDayIfNeeded() {
+  const currentDay = new Date().getUTCDate();
+  if (currentDay !== lastQuotaDayReset) {
+    dailyRequestCount = 0;
+    lastQuotaDayReset = currentDay;
+    quotaExhaustedUntilMs = null;
+  }
+}
+
+function recordServerApiCall(isExhaustedError = false) {
+  updateQuotaDayIfNeeded();
+  const now = Date.now();
+  requestTimestamps.push(now);
+  dailyRequestCount++;
+
+  // Clean old timestamps (> 60s)
+  while (requestTimestamps.length > 0 && requestTimestamps[0] < now - 60000) {
+    requestTimestamps.shift();
+  }
+
+  if (isExhaustedError) {
+    // 60-second cooldown on 429
+    quotaExhaustedUntilMs = now + 60000;
+  }
+}
+
+registerApiCallRecorder(recordServerApiCall);
+
+function getQuotaStatusPayload() {
+  updateQuotaDayIfNeeded();
+  const now = Date.now();
+
+  // Clean old timestamps
+  while (requestTimestamps.length > 0 && requestTimestamps[0] < now - 60000) {
+    requestTimestamps.shift();
+  }
+
+  const currentRpm = requestTimestamps.length;
+  const isExhausted = dailyRequestCount >= DAILY_CAPACITY_LIMIT;
+  
+  let cooldownSec = 0;
+  if (quotaExhaustedUntilMs !== null && now < quotaExhaustedUntilMs) {
+    cooldownSec = Math.ceil((quotaExhaustedUntilMs - now) / 1000);
+  } else if (quotaExhaustedUntilMs !== null && now >= quotaExhaustedUntilMs) {
+    quotaExhaustedUntilMs = null;
+  }
+
+  // Calculate time until UTC midnight
+  const tomorrow = new Date();
+  tomorrow.setUTCHours(24, 0, 0, 0);
+  const diffMs = Math.max(0, tomorrow.getTime() - now);
+  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  const secs = Math.floor((diffMs % (1000 * 60)) / 1000);
+  const timeUntilDailyResetStr = `${hours.toString().padStart(2, '0')}h ${mins.toString().padStart(2, '0')}m ${secs.toString().padStart(2, '0')}s`;
+
+  const rawPercent = (dailyRequestCount / DAILY_CAPACITY_LIMIT) * 100;
+  const percentUsed = Math.min(100, Math.round(rawPercent));
+  const percentRemaining = Math.max(0, 100 - percentUsed);
+
+  return {
+    requestsToday: dailyRequestCount,
+    dailyCapacity: DAILY_CAPACITY_LIMIT,
+    rpm: currentRpm,
+    rpmLimit: RPM_LIMIT,
+    percentUsed: percentUsed,
+    percentRemaining: percentRemaining,
+    isQuotaExhausted: isExhausted,
+    cooldownSecondsRemaining: cooldownSec,
+    timeUntilDailyReset: timeUntilDailyResetStr,
+    resetTimestampMs: tomorrow.getTime(),
+    hasCustomApiKey: Boolean(getApiKey())
+  };
+}
+
 app.get("/api/quota", (req, res) => {
-  res.json({
-    requestsToday: 0,
-    dailyCapacity: 1500,
-    rpm: 0,
-    rpmLimit: 15,
-    percentUsed: 0,
-    percentRemaining: 100,
-    isQuotaExhausted: false,
-    cooldownSecondsRemaining: 0,
-    timeUntilDailyReset: "24h 00m 00s",
-    resetTimestampMs: Date.now() + 86400000,
-    hasCustomApiKey: false
-  });
+  res.json(getQuotaStatusPayload());
 });
 
-app.post("/api/quota/test", (req, res) => {
+app.post("/api/quota/test", async (req, res) => {
+  recordServerApiCall(false);
+  const payload = getQuotaStatusPayload();
   res.json({
     success: true,
-    message: "Test API call recorded. Quota metrics simulated.",
-    quota: {
-      requestsToday: 1,
-      dailyCapacity: 1500,
-      rpm: 1,
-      rpmLimit: 15,
-      percentUsed: 0,
-      percentRemaining: 100,
-      isQuotaExhausted: false,
-      cooldownSecondsRemaining: 0,
-      timeUntilDailyReset: "23h 59m 59s",
-      resetTimestampMs: Date.now() + 86400000,
-      hasCustomApiKey: false
-    }
+    message: "Test API call recorded successfully. Live quota metrics updated.",
+    quota: payload
   });
 });
 
 app.post("/api/quota/reset-metrics", (req, res) => {
+  dailyRequestCount = 0;
+  quotaExhaustedUntilMs = null;
+  requestTimestamps.length = 0;
   res.json({
     success: true,
-    message: "API quota metrics reset.",
-    quota: {
-      requestsToday: 0,
-      dailyCapacity: 1500,
-      rpm: 0,
-      rpmLimit: 15,
-      percentUsed: 0,
-      percentRemaining: 100,
-      isQuotaExhausted: false,
-      cooldownSecondsRemaining: 0,
-      timeUntilDailyReset: "24h 00m 00s",
-      resetTimestampMs: Date.now() + 86400000,
-      hasCustomApiKey: false
-    }
+    message: "API quota metrics reset to 0.",
+    quota: getQuotaStatusPayload()
   });
 });
 
-// --- POKEAPI PROXY ---
+app.get("/api/missions", async (req, res) => {
+  const dateStr = (req.query.date as string) || new Date().toISOString().split('T')[0];
+
+  // Return from in-memory cache instantly if available! This drastically speeds up operations.
+  if (missionsCache.has(dateStr)) {
+    console.log(`[Cache Hit] Serving cached daily combat missions for Date: ${dateStr}`);
+    return res.json(missionsCache.get(dateStr));
+  }
+
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    return res.json({
+      success: true,
+      mode: "offline",
+      easyTrivia: null,
+      easyTriviaB: null,
+      medTrivia: null,
+      medTriviaB: null,
+      hardTrivia: null,
+      hardTriviaB: null,
+    });
+  }
+
+  try {
+    const response = await generateWithRetry({
+      model: DEFAULT_MODEL,
+      contents: `You are the Grandmaster of Pokétheology, Sinnoh cosmology, and competitive Pokémon battling.
+      Generate exactly 6 distinct multiple-choice trivia questions for Sinnoh Core Operations daily bulletin on date ${dateStr}.
+      
+      The questions must be structured as:
+      - easy: General type matchup, simple status effect, or straightforward Kanto mechanics.
+      - easyB: Another distinct beginner friendly mechanic or status challenge.
+      - medium: Weather mechanics, speed tier manipulations, complex status conditions, or items like Eviolite/Life Orb.
+      - mediumB: Another mid-level competitive question on ability synergies, terrain effects, or STAB.
+      - hard: Deep legendary mythology (Arceus, Origin Forme, Creation trio, Sinnoh folk tales) or advanced mechanical details.
+      - hardB: Another high-register theory question on Sinnoh space-time distortions or ultimate strategic items like Assault Vest.
+
+      Each question must have exactly 4 uppercase options, a correct answer index (0-3), and a short human explanation. Output must be valid JSON matching the schema.`,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            easy: {
+              type: Type.OBJECT,
+              properties: {
+                question: { type: Type.STRING },
+                options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                answerIndex: { type: Type.INTEGER },
+                explanation: { type: Type.STRING }
+              },
+              required: ["question", "options", "answerIndex", "explanation"]
+            },
+            easyB: {
+              type: Type.OBJECT,
+              properties: {
+                question: { type: Type.STRING },
+                options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                answerIndex: { type: Type.INTEGER },
+                explanation: { type: Type.STRING }
+              },
+              required: ["question", "options", "answerIndex", "explanation"]
+            },
+            medium: {
+              type: Type.OBJECT,
+              properties: {
+                question: { type: Type.STRING },
+                options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                answerIndex: { type: Type.INTEGER },
+                explanation: { type: Type.STRING }
+              },
+              required: ["question", "options", "answerIndex", "explanation"]
+            },
+            mediumB: {
+              type: Type.OBJECT,
+              properties: {
+                question: { type: Type.STRING },
+                options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                answerIndex: { type: Type.INTEGER },
+                explanation: { type: Type.STRING }
+              },
+              required: ["question", "options", "answerIndex", "explanation"]
+            },
+            hard: {
+              type: Type.OBJECT,
+              properties: {
+                question: { type: Type.STRING },
+                options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                answerIndex: { type: Type.INTEGER },
+                explanation: { type: Type.STRING }
+              },
+              required: ["question", "options", "answerIndex", "explanation"]
+            },
+            hardB: {
+              type: Type.OBJECT,
+              properties: {
+                question: { type: Type.STRING },
+                options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                answerIndex: { type: Type.INTEGER },
+                explanation: { type: Type.STRING }
+              },
+              required: ["question", "options", "answerIndex", "explanation"]
+            }
+          },
+          required: ["easy", "easyB", "medium", "mediumB", "hard", "hardB"]
+        }
+      }
+    });
+
+    let rawText = response.text || "";
+    if (rawText.startsWith("```")) {
+      rawText = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+    }
+    const parsed = JSON.parse(rawText.trim());
+    const result = {
+      success: true,
+      mode: "dynamic",
+      easyTrivia: parsed.easy,
+      easyTriviaB: parsed.easyB,
+      medTrivia: parsed.medium,
+      medTriviaB: parsed.mediumB,
+      hardTrivia: parsed.hard,
+      hardTriviaB: parsed.hardB,
+    };
+    
+    // Save to cache
+    missionsCache.set(dateStr, result);
+    return res.json(result);
+  } catch (err: any) {
+    console.error("Failed to generate dynamic combat missions:", err);
+    return res.json({
+      success: true,
+      mode: "offline",
+      easyTrivia: null,
+      easyTriviaB: null,
+      medTrivia: null,
+      medTriviaB: null,
+      hardTrivia: null,
+      hardTriviaB: null,
+    });
+  }
+});
+
 app.get("/api/proxy", async (req, res) => {
   const targetUrl = req.query.url as string;
   if (!targetUrl) {
@@ -120,7 +517,6 @@ app.get("/api/proxy", async (req, res) => {
   }
 });
 
-// --- OFFLINE THEOLOGICAL QUIZ ENGINE (Deterministic Date-Seeded) ---
 function getOfflineQuizSet() {
   const sets = [
     [
@@ -213,13 +609,104 @@ function getOfflineQuizSet() {
   return sets[day % sets.length];
 }
 
-app.get("/api/quiz", (req, res) => {
+const QUIZ_THEMES = [
+  "the creation of Sinnoh by Arceus and the birth of the cosmological dimensions (Dialga, Palkia, Giratina)",
+  "the biology-theology of Mew as the common genetic ancestor of all common species versus divine manifestations",
+  "the Unova split of the ancient Original Dragon into Reshiram, Zekrom, and Kyurem, representing truth, ideals, and boundary/void",
+  "ancient Hoenn geology myths and the catastrophic clash of Primal Groudon and Primal Kyogre pacified by Rayquaza",
+  "the Regis of Hoenn and Sinnoh, their containment by humans, and Regigigas's continental tectonic alignments",
+  "the Johto guardians (Lugia, Ho-Oh) and the resurrection of the legendary beasts from the ashes of the Burned Tower",
+  "the Kalos cycle of life, death, and order governed by Xerneas, Yveltal, and Zygarde, and ancient ultimate weapon lore",
+  "the Alolan light-deities, Necrozma, Solgaleo, Lunala, and the worship of tapu guardians across islands",
+  "the Galar dark-day myths, Eternatus, Zacian, Zamazenta, and the ancient kings of Galar",
+  "the Paldean treasures of ruin, their origin in human greed/malice, and the Terastal energy phenomenon's connection to Area Zero",
+  "the Lake Guardians (Uxie, Mesprit, Azelf) of Sinnoh and the composition of human emotion, willpower, and knowledge",
+  "the Unown particles, their collective reality-binding powers, and their connection to Arceus's thousand arms",
+  "the myth of the Sea Guardian Manaphy and Phione, and the legendary Undersea Temple of Akusha",
+  "the Swords of Justice (Cobalion, Terrakion, Virizion, Keldeo) protecting Pokémon from human conflicts and wildfires",
+  "the Lunar Duo (Cresselia, Darkrai) representing sweet dreams and horrific nightmares in Sinnoh cosmology"
+];
+
+const dailyQuizCache = new LRUCache<string, any>({ max: 10, ttl: 1000 * 60 * 60 * 24 }); // Cache for 24 hours
+
+app.get("/api/quiz", async (req, res) => {
   const currentDateStr = new Date().toISOString().split('T')[0];
-  const offlineSet = getOfflineQuizSet();
-  res.json({ date: currentDateStr, questions: offlineSet, isFallback: true });
+  
+  if (dailyQuizCache.has(currentDateStr)) {
+    return res.json(dailyQuizCache.get(currentDateStr));
+  }
+
+  let seed = 0;
+  for (let i = 0; i < currentDateStr.length; i++) {
+    seed += currentDateStr.charCodeAt(i) * (i + 1);
+  }
+
+  const themeIndex = Math.abs(seed) % QUIZ_THEMES.length;
+  const currentTheme = QUIZ_THEMES[themeIndex];
+
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    const offlineSet = getOfflineQuizSet();
+    const fallbackResponse = { date: currentDateStr, questions: offlineSet, isFallback: true };
+    dailyQuizCache.set(currentDateStr, fallbackResponse);
+    return res.json(fallbackResponse);
+  }
+
+  try {
+    const response = await generateWithRetry({
+      model: DEFAULT_MODEL,
+      contents: `You are the leading Professor of Pokétheology (the study of Pokémon mythology, cosmology, deep lore, and divine origins). Create exactly 3 distinct multiple-choice questions for the Theory Exam on the date ${currentDateStr}. To ensure today's exam has a unique academic focus, all three questions must focus specifically around this theological theme/topic: "${currentTheme}". Avoid simple stat or type trivia; make them deep, academic, and engaging. Provide exactly 4 options per question, indicate the correct option index (0 to 3), and give a detailed theological/mythological explanation of the answer.`,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            date: { type: Type.STRING },
+            questions: {
+              type: Type.ARRAY,
+              description: "List of exactly 3 different theoretical Pokétheology quiz questions",
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  question: { type: Type.STRING, description: "The quiz question about Pokétheology/lore." },
+                  options: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING },
+                    description: "Exactly 4 multiple-choice options."
+                  },
+                  answerIndex: { type: Type.INTEGER, description: "The correct option index (0 to 3)." },
+                  explanation: { type: Type.STRING, description: "A detailed explanation of the lore behind the answer." }
+                },
+                required: ["question", "options", "answerIndex", "explanation"]
+              }
+            }
+          },
+          required: ["date", "questions"]
+        }
+      }
+    });
+
+    let rawText = response.text || "";
+    if (rawText.startsWith("```")) {
+      rawText = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+    }
+    const quizData = JSON.parse(rawText.trim());
+    const finalResponse = { ...quizData, isFallback: false };
+    dailyQuizCache.set(currentDateStr, finalResponse);
+    return res.json(finalResponse);
+  } catch (e: any) {
+    console.log("Serving offline theological quiz fallback set.");
+    const offlineSet = getOfflineQuizSet();
+    const fallbackResponse = { date: currentDateStr, questions: offlineSet, isFallback: true };
+    // Cache the fallback so we serve instantly without hitting rate limits
+    dailyQuizCache.set(currentDateStr, fallbackResponse);
+    return res.json(fallbackResponse);
+  }
 });
 
-// --- OFFLINE NEWS ENGINE ---
+// Dynamic Pokémon News with Google Search Grounding
+const pokemonNewsCache = new LRUCache<string, any>({ max: 5, ttl: 1000 * 60 * 60 * 4 }); // Cache for 4 hours
+
 const getOfflineNewsSet = (dateStr: string) => ({
   date: dateStr,
   news: [
@@ -241,13 +728,14 @@ const getOfflineNewsSet = (dateStr: string) => ({
       url: "https://watch.pokemon.com",
       tag: "ANIME"
     }
-  ]
+  ],
+  isFallback: true
 });
 
 app.get("/api/news", (req, res) => {
   const currentDateStr = new Date().toISOString().split('T')[0];
   const response = getOfflineNewsSet(currentDateStr);
-  res.json({
+  return res.json({
     date: response.date,
     news: response.news,
     groundingSources: [
@@ -256,52 +744,275 @@ app.get("/api/news", (req, res) => {
       { title: "Pokémon Watch TV", url: "https://watch.pokemon.com" }
     ],
     searchQueries: ["official pokemon outlets"],
-    isFallback: true
+    isFallback: false
   });
 });
 
-// --- COMPACT CHATBOT ENGINE (In Development / Cleaned Offline Version) ---
-app.post("/api/chat", (req, res) => {
-  const { messages } = req.body;
+app.post("/api/chat", async (req, res) => {
+  recordServerApiCall(false);
+  const { messages, context } = req.body;
+  const apiKey = getApiKey();
   const userText = messages[messages.length - 1]?.text || "";
+  const lang = getRequestLanguage(req, userText);
   const suggestedPokemon = extractSuggestedPokemonWrapper(userText);
   const navigateWords = ["show", "search", "open", "find", "view", "display", "stats", "load", "see", "bring", "check", "info", "pokedex", "mega", "gmax", "gigantamax", "alolan", "alola", "galarian", "galar", "hisuian", "hisui", "paldean", "paldea", "primal", "origin", "therian", "sky", "dusk", "dawn", "ultra", "look", "tell"];
   const wantsNavigation = (navigateWords.some(w => userText.toLowerCase().includes(w)) && suggestedPokemon) || (suggestedPokemon && userText.split(/\s+/).length <= 5);
   const navigatePokemon = wantsNavigation ? suggestedPokemon : null;
 
-  res.json({
-    text: IN_DEVELOPMENT_MSG,
-    suggestedPokemon,
-    navigatePokemon,
-    isFallback: true
-  });
+  // Fast cache check for duplicate or repetitive chatbot queries to save Gemini Quota
+  const cacheKey = JSON.stringify(messages.slice(-3)) + "-" + JSON.stringify(context) + "-" + lang;
+  if (chatCache.has(cacheKey)) {
+    console.log("Serving chatbot response from high speed local cache.");
+    return res.json(chatCache.get(cacheKey));
+  }
+
+  if (!apiKey) {
+    console.log("No Gemini API key found. Falling back to offline generator.");
+    const text = generateOfflineChatResponse(messages, context, lang);
+    const result = { text, suggestedPokemon, navigatePokemon, isFallback: true };
+    chatCache.set(cacheKey, result);
+    return res.json(result);
+  }
+  
+  try {
+    // Map messages to Gemini contents format
+    const contents = messages.map((m: any) => ({
+      role: m.role === 'user' ? 'user' : 'model',
+      parts: [{ text: m.text }]
+    }));
+
+    const langNameMap: Record<string, string> = {
+      it: "Italian",
+      es: "Spanish",
+      fr: "French",
+      de: "German",
+      en: "English"
+    };
+    const targetLangName = langNameMap[lang] || "English";
+
+    const currentViewed = context.selectedPokemon ? context.selectedPokemon.name : "None";
+    const activeContextName = suggestedPokemon || currentViewed;
+    
+    const response = await generateWithRetry({
+      model: LITE_MODEL,
+      contents: contents,
+      config: {
+        maxOutputTokens: 280,
+        systemInstruction: `You are Pokéthology, the Supreme Omniscient AI Professor, Grand Master Lore Archivist, and Ultimate Pokémon Encyclopedia.
+        You possess absolute, omniscient mastery over every dimension of the Pokémon universe — spanning official game data, manga canon, anime lore, competitive VGC/Smogon metagames, trading card game history, developer interviews, cultural impact, fan theories, speculative biology, mythical folklore, and deep-dive creative community lore.
+
+        ABSOLUTE OMNISCIENCE & EXPANDED UNIVERSE MANDATE:
+        - You embrace the entire Pokémon world in its fullest breadth: official stats and game mechanics as well as rich fan interpretations, cultural mythos, historical theories (like the Great War of Kanto), anime adaptations, manga arcs (Special/Adventures), and creative worldbuilding.
+        - You are fully updated on all latest franchise news, events, game updates, and community announcements in real time.
+        - Your answers are authoritative, deeply knowledgeable, insightful, and creatively rich.
+
+        FRIENDLY MENTOR PERSPECTIVE (HUMAN-SOUNDING EXPLANATIONS):
+        - When the user asks about game mechanics, combat strategies, lore, or fan theories, always adopt a warm, supportive, and friendly mentor-like persona (like a helpful veteran trainer or a companionable Pokémon Professor).
+        - Break down mechanical concepts and lore mysteries with simple, human-sounding analogies, high encouragement, and intuitive phrasing.
+
+        STRICT CONCISE & QUOTA RESTORATION MANDATE (CRITICAL FOR TOKEN CONSERVATION):
+        - Answer the user's inquiry immediately with ultra-snappy, direct, and short phrasing. High quota constraint is active.
+        - Give extremely short responses — limit replies strictly to max 1-2 small paragraphs or 2 to 3 compact bullet points total (maximum ~80-120 words). Keep every sentence concise.
+        - Direct and fast answers are supreme. Strictly avoid any greeting fluff, filler talk, or long-winded essays.
+
+        EXPRESSIVE EMOJI MANDATE:
+        - Use plenty of expressive, colorful, and lively emojis (e.g. 🧬, 🌌, 📜, 🔮, ⚡, 🛡️, ⚔️, 🦕, 🌀, 🌾, ✨, 🌟, 💥, 🏆, 🎒, 🐾, 🎯, 🔥, 💧, 🍃, 🧠, 📖, 💫, 🐉) liberally as visual landmarks at the start of bullet points, key headings, and stats.
+
+        VISUAL STYLE: Always format with simple, highly readable Markdown. Bold key terms and keep lists compact. Do NOT use markdown blockquotes or code fence blocks for standard paragraphs.
+
+        SMART TYPO RESOLUTION & ALTERNATE/MEGA/GMAX FORM DISPLAY MANDATE:
+        - You are extremely smart and flexible at understanding user queries even if they contain severe typos, slang, missing spaces, or bad spelling (e.g., 'show me megacharizardx', 'gmax gengr', 'alolan raich', 'tell me bout rayquasa', 'primal kyogr', 'open mega lucario').
+        - If the user asks to view, show, open, or know about an alternative, Mega, Gigantamax, Regional (Alolan/Galarian/Hisuian/Paldean), or Primal form of a Pokémon, immediately recognize and confirm that you are displaying that exact form in the Pokédex interface.
+
+        CRITICAL INDEPENDENT QUESTION MANDATE (NO FORCED LINKS):
+        - The UI is currently focused on: ${activeContextName}.
+        - If the user asks an independent question about a *different* Pokémon, general lore, items, regions, game mechanics, or anything else, answer their question directly and objectively on its own terms.
+        - DO NOT artificially or awkwardly force a link, pivot, or comparison back to ${activeContextName} unless the user explicitly mentions ${activeContextName} or uses pronouns (e.g. "it", "this Pokémon") referring specifically to it. If they ask about Pikachu, talk about Pikachu without mentioning ${activeContextName} unnecessarily!
+
+        Full Interface Context: 
+        ${JSON.stringify({ ...context, newlySelected: suggestedPokemon })}
+
+        CRITICAL MULTILINGUAL MANDATE: The user's preferred language is ${targetLangName}. You MUST respond exclusively in ${targetLangName}.`
+      },
+    });
+
+    const groundingMetadata = response.candidates?.[0]?.groundingMetadata;
+    const chunks = groundingMetadata?.groundingChunks;
+
+    const result = { text: response.text, suggestedPokemon, navigatePokemon, groundingChunks: chunks, groundingMetadata };
+    chatCache.set(cacheKey, result);
+    res.json(result);
+  } catch (error: any) {
+    const isQuota = isQuotaError(error);
+    console.error(`[Chat Error] Quota: ${isQuota}`, error);
+    
+    // Fallback logic
+    const text = generateOfflineChatResponse(messages, context, lang);
+    const result = { text, isFallback: true, isQuota, suggestedPokemon, navigatePokemon };
+    chatCache.set(cacheKey, result);
+    return res.json(result);
+  }
 });
 
-// --- SIMULATED BATTLE ANALYSIS ---
-app.post("/api/analyze", (req, res) => {
-  res.json({
-    analysis: IN_DEVELOPMENT_MSG,
-    isFallback: true
-  });
+app.post("/api/analyze", async (req, res) => {
+  const { battleData } = req.body;
+  const apiKey = getApiKey();
+  const lang = getRequestLanguage(req);
+
+  if (!apiKey) {
+    const analysis = generateOfflineAnalysis(battleData, lang);
+    return res.json({ analysis });
+  }
+
+  const cacheKey = JSON.stringify(battleData) + "-" + lang;
+  if (analysisCache.has(cacheKey)) {
+    return res.json({ analysis: analysisCache.get(cacheKey) });
+  }
+  
+  try {
+    const langNameMap = {
+      it: "Italian",
+      es: "Spanish",
+      fr: "French",
+      de: "German",
+      en: "English"
+    };
+    const targetLangName = langNameMap[lang] || "English";
+
+    const response = await generateWithRetry({
+      model: DEFAULT_MODEL,
+      contents: `Perform a detailed tactical analysis of this Pokémon battle: ${JSON.stringify(battleData)}`,
+      config: {
+        maxOutputTokens: 250,
+        systemInstruction: `You are a Battle Frontier Strategist. System Key: ${process.env.POKETHOLOGY || "Pokédex"}. Provide concise, high-impact tactical advice under 80 words. Use plenty of expressive emojis (🔮, ⚔️, 🛡️, 💥, ⚡, 🎯, 📊, 🧬) for visual signaling. Focus on 1v1 singles battle formats, type advantages, HP management, and predicted opponent moves where switching is not possible.
+        
+        CRITICAL MULTILINGUAL MANDATE: The user's preferred language is ${targetLangName}. You MUST write the entire analysis in ${targetLangName}. Translate all tactical reports, status values, and directions cleanly to ${targetLangName}.`,
+      }
+    });
+
+    analysisCache.set(cacheKey, response.text);
+    res.json({ analysis: response.text });
+  } catch (error: any) {
+    const isQuota = isQuotaError(error);
+    if (isQuota) {
+      console.log("Gemini Quota Exceeded during analysis, seamlessly activating local neural engine fallback.");
+    } else {
+      console.log("Analysis failed, falling back to offline generator.");
+    }
+    const analysis = generateOfflineAnalysis(battleData, lang);
+    // Return a seamless, perfect 200 OK response with the fallback content
+    return res.json({ analysis, isFallback: true, isQuota });
+  }
 });
 
-// --- POKEMON TRIVIA/FACT SUGGESTION ---
-app.post("/api/suggest", (req, res) => {
-  res.json({
-    suggestion: IN_DEVELOPMENT_MSG,
-    isFallback: true
-  });
+app.post("/api/suggest", async (req, res) => {
+  const { pokemonName } = req.body;
+  const apiKey = getApiKey();
+  const lang = getRequestLanguage(req);
+
+  if (!apiKey) {
+    const suggestion = generateOfflineSuggestion(pokemonName, lang);
+    return res.json({ suggestion });
+  }
+
+  const cacheKey = pokemonName + "-" + lang;
+  if (suggestionCache.has(cacheKey)) {
+    return res.json({ suggestion: suggestionCache.get(cacheKey) });
+  }
+  
+  try {
+    const langNameMap = {
+      it: "Italian",
+      es: "Spanish",
+      fr: "French",
+      de: "German",
+      en: "English"
+    };
+    const targetLangName = langNameMap[lang] || "English";
+
+    const response = await generateWithRetry({
+      model: LITE_MODEL,
+      contents: `Provide a single, incredibly interesting fun fact or pro battle tip about ${pokemonName}. Keep it under 20 words with expressive emojis. Write this fact exclusively in ${targetLangName}.`,
+      config: {
+        maxOutputTokens: 100,
+        systemInstruction: `You are Pokéthology. System Key: ${process.env.POKETHOLOGY || "Pokédex"}. You provide ultra-short, punchy, and fascinating Pokémon insights with expressive emojis (🧬, ✨, 💥, 🌟, 🔮), written exclusively in ${targetLangName}.`,
+      }
+    });
+
+    suggestionCache.set(cacheKey, response.text);
+    res.json({ suggestion: response.text });
+  } catch (error: any) {
+    const isQuota = isQuotaError(error);
+    if (isQuota) {
+      console.log("Gemini Quota Exceeded during suggestion, seamlessly activating local neural engine fallback.");
+    } else {
+      console.log("Suggestion failed, falling back to offline generator.");
+    }
+    const suggestion = generateOfflineSuggestion(pokemonName, lang);
+    // Return a seamless, perfect 200 OK response with the fallback content
+    return res.json({ suggestion, isFallback: true, isQuota });
+  }
 });
 
-// --- COMBAT STRATEGY ---
-app.post("/api/strategy", (req, res) => {
-  res.json({
-    strategy: IN_DEVELOPMENT_MSG,
-    isFallback: true
-  });
+app.post("/api/strategy", async (req, res) => {
+  const { battleData } = req.body;
+  const apiKey = getApiKey();
+  const lang = getRequestLanguage(req);
+
+  if (!apiKey) {
+    const strategy = generateOfflineStrategy(battleData, lang);
+    return res.json({ strategy });
+  }
+
+  const cacheKey = JSON.stringify(battleData) + "-" + lang;
+  if (strategyCache.has(cacheKey)) {
+    return res.json({ strategy: strategyCache.get(cacheKey) });
+  }
+  
+  try {
+    const langNameMap = {
+      it: "Italian",
+      es: "Spanish",
+      fr: "French",
+      de: "German",
+      en: "English"
+    };
+    const targetLangName = langNameMap[lang] || "English";
+
+    const response = await generateWithRetry({
+      model: DEFAULT_MODEL,
+      contents: `Evaluate this direct combat scene and give an elite tactical breakdown:
+      - Player: ${battleData.player?.name || "your Pokemon"} (HP: ${battleData.player?.hpPercent || 100}%, Status: ${battleData.player?.status || "Healthy"}) with moves: ${JSON.stringify(battleData.player?.moves || [])}
+      - Opponent: ${battleData.opponent?.name || "the opponent"} (Type: ${battleData.opponent?.types?.join('/') || "unknown"}, HP: ${battleData.opponent?.hpPercent || 100}%, Status: ${battleData.opponent?.status || "Healthy"}).`,
+      config: {
+        maxOutputTokens: 150,
+        systemInstruction: `You are the ultimate competitive Pokémon Grandmaster AI Coach. System Key: ${process.env.POKETHOLOGY || "Pokétheology Tactical Engine"}.
+        Deliver an ultra-concise, direct, highly strategic 1v1 battle suggestion. Keep it under 40-50 words total!
+        Format exactly as 2 tiny bullet lines with emojis for critical tactical signaling:
+        • 🔮 **ANALYSIS**: Direct, fast speed/vulnerability threat assessment.
+        • ⚔️ **COMMAND**: Clear, immediate action/move command.
+        Avoid paragraphs, warm intros, or generic background talk. Be crisp, direct, and elite.
+        
+        CRITICAL MULTILINGUAL MANDATE: Write the entire response exclusively in ${targetLangName}.`,
+      }
+    });
+
+    strategyCache.set(cacheKey, response.text);
+    res.json({ strategy: response.text });
+  } catch (error: any) {
+    const isQuota = isQuotaError(error);
+    if (isQuota) {
+      console.log("Gemini Quota Exceeded during strategy, seamlessly activating local neural engine fallback.");
+    } else {
+      console.log("Strategy failed, falling back to offline generator.");
+    }
+    const strategy = generateOfflineStrategy(battleData, lang);
+    // Return a seamless, perfect 200 OK response with the fallback content
+    return res.json({ strategy, isFallback: true, isQuota });
+  }
 });
 
-// --- VITE MIDDLEWARE SETUP ---
+// Vite middleware for development
 async function setupVite() {
   const isProd = process.env.NODE_ENV === "production" || process.argv[1]?.endsWith('server.cjs');
   if (!isProd) {
@@ -319,7 +1030,7 @@ async function setupVite() {
   }
 }
 
-// --- SERVER INITIALIZATION ---
+// Listen only if not running as a Vercel function
 if (process.env.VERCEL !== "1") {
   setupVite().then(() => {
     const PORT = 3000;

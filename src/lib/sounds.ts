@@ -354,20 +354,16 @@ export const sounds = {
     }
   },
   _currentCry: null as HTMLAudioElement | null,
-  playCry: async (pokemonName: string, pokeApiUrl?: string, isGmax: boolean = false, allowOverlap: boolean = false): Promise<number> => {
+  playCry: async (pokemonName: string, pokeApiUrl?: string, isGmax: boolean = false) => {
     try {
-      if (!allowOverlap && sounds._currentCry) {
-        try {
-          sounds._currentCry.pause();
-          sounds._currentCry.src = ""; 
-        } catch (_) {}
+      if (sounds._currentCry) {
+        sounds._currentCry.pause();
+        sounds._currentCry.src = ""; 
         sounds._currentCry = null;
       }
 
       const audio = new Audio();
-      if (!allowOverlap) {
-        sounds._currentCry = audio;
-      }
+      sounds._currentCry = audio;
       audio.volume = 0.5 * sfxVolume;
 
       const cleanName = pokemonName.toLowerCase().replace(/[^a-z0-9-]/g, '');
@@ -400,7 +396,7 @@ export const sounds = {
       };
 
       for (const url of urls) {
-        if (!allowOverlap && sounds._currentCry !== audio) return 0;
+        if (sounds._currentCry !== audio) return;
 
         try {
           audio.src = url;
@@ -424,7 +420,7 @@ export const sounds = {
             setTimeout(() => { cleanup(); reject(new Error("Timeout")); }, 2000);
           });
 
-          if (!allowOverlap && sounds._currentCry !== audio) return 0;
+          if (sounds._currentCry !== audio) return;
 
           const lowerName = pokemonName.toLowerCase();
           if (isGmax || lowerName.includes('eternamax')) {
@@ -435,32 +431,13 @@ export const sounds = {
           }
 
           await audio.play();
-
-          const rawDur = (audio.duration && !isNaN(audio.duration) && audio.duration > 0) ? audio.duration : 1.2;
-          const rate = audio.playbackRate || 1;
-          const playTimeMs = (rawDur / rate) * 1000;
-
-          await new Promise<void>((resolve) => {
-            let doneCalled = false;
-            const done = () => {
-              if (doneCalled) return;
-              doneCalled = true;
-              audio.removeEventListener('ended', done);
-              audio.removeEventListener('error', done);
-              resolve();
-            };
-            audio.addEventListener('ended', done);
-            audio.addEventListener('error', done);
-            setTimeout(done, Math.max(800, playTimeMs + 400));
-          });
-
-          return playTimeMs;
+          return;
         } catch (e) {
-          if (!allowOverlap && sounds._currentCry !== audio) return 0;
+          if (sounds._currentCry !== audio) return;
         }
       }
       
-      if (allowOverlap || sounds._currentCry === audio) {
+      if (sounds._currentCry === audio) {
         console.warn(`All cry sources failed, generating procedural retro synth cry for: ${pokemonName}`);
         // Beautiful fallback procedural cry
         const hash = pokemonName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -468,14 +445,9 @@ export const sounds = {
         const duration = 0.3 + ((hash % 10) / 20);
         playTone(freqBase, 'sawtooth', duration, 0.08);
         setTimeout(() => playTone(freqBase * 1.3, 'triangle', duration * 0.7, 0.05), 50);
-        const synthMs = (duration + 0.15) * 1000;
-        await new Promise(r => setTimeout(r, synthMs));
-        return synthMs;
       }
-      return 1000;
     } catch (e) {
       console.error("Audio playback failed", e);
-      return 1000;
     }
   },
   attack: () => {

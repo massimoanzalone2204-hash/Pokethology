@@ -1,191 +1,475 @@
-                                      </motion.div>
-                                      </BattleErrorBoundary>
-                                      
-                                      {/* Action Bar (Mobile & Desktop) */}
-                                      <AnimatePresence>
-                                         {isBattling && turn === 'player' && !isAnimating && (
-                                        <motion.div
-                                           key="battle-action-bar-holder"
-                                           initial={{ opacity: 0, y: 25, scale: 0.98 }}
-                                           animate={{ opacity: 1, y: 0, scale: 1 }}
-                                           exit={{ opacity: 0, y: 25, scale: 0.98 }}
-                                           transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                                           className="mt-2 sm:mt-4 shrink-0 w-full bg-slate-950/60 backdrop-blur-sm rounded-xl p-2 sm:p-4 border border-cyan-500/20 shadow-xl relative z-20"
-                                         >
-                                          <HUDCorners />
-                                          
-                                           <div className="flex gap-3 relative z-10 w-full">
-                                             <button
-                                               onClick={() => { sounds.scan(); setIsCombatMoveModalOpen(true); }}
-                                               onMouseEnter={() => sounds.hover()}
-                                               className="flex-1 py-3 px-4 rounded-xl transition-all border-2 border-cyan-500/40 bg-cyan-950/70 hover:bg-cyan-900/80 text-cyan-300 hover:text-white active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.25)] flex items-center justify-center gap-2 font-hud font-black text-xs uppercase tracking-widest relative overflow-hidden group/choose btn-breathe cursor-pointer"
-                                             >
-                                               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent -translate-x-full group-hover/choose:translate-x-full transition-transform duration-1000" />
-                                               <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping absolute left-4 sm:left-6"></span>
-                                               <span className="w-2 h-2 rounded-full bg-cyan-500 absolute left-4 sm:left-6"></span>
-                                               CHOOSE MOVE ({selectedMoves.length})
-                                             </button>
-                                             
-                                             <button
-                                               onClick={() => { sounds.scan(); setPendingAction('flee'); setShowExitConfirmation(true); }}
-                                               onMouseEnter={() => sounds.hover()}
-                                               className="py-3 px-6 rounded-xl transition-all border border-red-900/40 bg-red-950/40 text-red-400 hover:text-red-300 hover:bg-red-900/30 hover:border-red-500/30 active:scale-95 text-xs font-hud font-black uppercase tracking-widest flex items-center justify-center gap-1.5 cursor-pointer"
-                                             >
-                                               FINISH
-                                             </button>
-                                           </div>
-                                         </motion.div>
-                                       )}
-                                      </AnimatePresence>
+  const executeMove = useCallback(async (attacker: Pokemon, defender: Pokemon, move: Move, isPlayer: boolean) => {
+    if (isAnimating) return 0;
+    setIsAnimating(true);
+    const log = (msg: string, type: LogEntry['type'] = 'normal') => setBattleLog(prev => [...prev, { text: msg, type, turn: turnNumber }].slice(-50));
+    const battleDelay = (ms: number) => {
+      if (!enableAnimations) return delay(Math.max(10, ms / 12));
+      const speedFactor = battleSpeed === 'normal' ? 0.95 : battleSpeed === 'fast' ? 0.5 : 0.25;
+      return delay(ms * speedFactor);
+    };
 
-                                      {/* Combat Move Selection Overlay Modal */}
-                                      <AnimatePresence>
-                                        {isBattling && turn === 'player' && !isAnimating && isCombatMoveModalOpen && (
-                                          <>
-                                            {/* Backdrop overlay */}
-                                            <motion.div
-                                              key="combat-move-modal-backdrop"
-                                              initial={{ opacity: 0 }}
-                                              animate={{ opacity: 1 }}
-                                              exit={{ opacity: 0 }}
-                                              className="fixed inset-0 bg-black/75 z-[150] backdrop-blur-md pointer-events-auto cursor-default"
-                                              onClick={() => { sounds.scan(); setIsCombatMoveModalOpen(false); }}
-                                            />
-                                            {/* Modal container */}
-                                            <motion.div
-                                              key="combat-move-modal-dialog"
-                                              initial={{ opacity: 0, scale: 0.95, y: 15 }}
-                                              animate={{ opacity: 1, scale: 1, y: 0 }}
-                                              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-                                              transition={{ type: "spring", duration: 0.4 }}
-                                              className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-[160] bg-slate-950/95 border-2 border-cyan-500/50 rounded-2xl p-4 sm:p-6 shadow-[0_0_50px_rgba(6,182,212,0.3)] w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col pointer-events-auto select-none"
-                                            >
-                                              <HUDCorners />
-                                              <div className="flex justify-between items-center mb-4 shrink-0 border-b border-cyan-500/20 pb-3">
-                                                <div className="flex flex-col gap-0.5">
-                                                  <span className="text-[10px] font-mono text-cyan-500/60 uppercase tracking-[0.2em] font-bold">Arena Combat Actions</span>
-                                                  <h2 className="text-xs sm:text-sm font-hud font-black text-cyan-400 uppercase tracking-widest flex items-center gap-2">
-                                                    ⚔️ Choose a Battle Move
-                                                  </h2>
-                                                </div>
-                                                <button 
-                                                  onClick={() => { sounds.scan(); setIsCombatMoveModalOpen(false); }}
-                                                  className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-cyan-500 text-slate-400 hover:text-white transition-all hover:scale-105 active:scale-95 cursor-pointer"
-                                                >
-                                                  <X className="w-4 h-4" />
-                                                </button>
-                                              </div>
+    // Turn anomaly roll in Chaos Mode
+    // Effect removed.
+    
+    const attackerStatus = isPlayer ? pokemonStatus : opponentStatus;
+    
+    // Check for flinch
+    if (isPlayer && pokemonFlinched) {
+      setPokemonFlinched(false);
+      log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
+      setBattleMessage({ text: "FLINCHED!", type: 'status' });
+      await battleDelay(800);
+      setBattleMessage(null);
+      return 0;
+    } else if (!isPlayer && opponentFlinched) {
+      setOpponentFlinched(false);
+      log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
+      setBattleMessage({ text: "FLINCHED!", type: 'status' });
+      await battleDelay(800);
+      setBattleMessage(null);
+      return 0;
+    }
 
-                                              <div className="overflow-y-auto pr-1 flex-1 flex flex-col gap-2.5 custom-scrollbar max-h-[60vh]">
-                                                {selectedMoves.map(move => {
-                                                  const opponentTypes = battleOpponent?.types?.map((t: any) => t.type.name) || [];
-                                                  const effectiveness = getTypeEffectiveness(move.type, opponentTypes);
-                                                  
-                                                  let effectivenessLabel = '';
-                                                  let effectivenessBadgeColor = 'bg-slate-800 border-slate-700 text-slate-400';
-                                                  if (effectiveness > 1) {
-                                                    effectivenessLabel = `SUPER EFFECTIVE (x${effectiveness})`;
-                                                    effectivenessBadgeColor = 'bg-green-950/80 border-green-500/30 text-green-400';
-                                                  } else if (effectiveness < 1 && effectiveness > 0) {
-                                                    effectivenessLabel = `NOT VERY EFFECTIVE (x${effectiveness})`;
-                                                    effectivenessBadgeColor = 'bg-red-950/80 border-red-500/30 text-red-400';
-                                                  } else if (effectiveness === 0) {
-                                                    effectivenessLabel = `NO EFFECT (x0)`;
-                                                    effectivenessBadgeColor = 'bg-slate-900 border-slate-850 text-slate-500';
-                                                  } else {
-                                                    effectivenessLabel = `NORMAL EFFECT (x1)`;
-                                                    effectivenessBadgeColor = 'bg-slate-900 border-slate-800 text-slate-300';
-                                                  }
+    // Check for status effects that prevent moving
+    if (attackerStatus === 'PAR' && Math.random() < 0.25) {
+      log(`${attacker.name.toUpperCase()} is paralyzed! It can't move!`, 'status-effect');
+      setBattleMessage({ text: "PARALYZED", type: 'status' });
+      sounds.statusParalysis();
+      await battleDelay(800);
+      setBattleMessage(null);
+      return 0;
+    }
+    if (attackerStatus === 'FRZ') {
+      if (Math.random() < 0.2) {
+        log(`${attacker.name.toUpperCase()} thawed out!`, 'status-effect');
+        setBattleMessage({ text: "THAWED!", type: 'status' });
+        if (isPlayer) setPokemonStatus(null); else setOpponentStatus(null);
+        await battleDelay(600);
+        setBattleMessage(null);
+      } else {
+        log(`${attacker.name.toUpperCase()} is frozen solid!`, 'status-effect');
+        setBattleMessage({ text: "FROZEN!", type: 'status' });
+        sounds.statusFreeze();
+        await battleDelay(800);
+        setBattleMessage(null);
+        return 0;
+      }
+    }
+    if (attackerStatus === 'SLP') {
+      log(`${attacker.name.toUpperCase()} is fast asleep...`, 'status-effect');
+      setBattleMessage({ text: "ASLEEP", type: 'status' });
+      sounds.statusSleep();
+      await battleDelay(800);
+      setBattleMessage(null);
+      return 0;
+    }
 
-                                                  const isOutOfPP = (move.currentPP ?? move.pp) === 0;
+    if (attackerStatus === 'CON') {
+      if (Math.random() < 0.25) {
+        log(`${attacker.name.toUpperCase()} snapped out of its confusion!`, 'status-effect');
+        setBattleMessage({ text: "SNAPPED OUT!", type: 'status' });
+        if (isPlayer) setPokemonStatus(null); else setOpponentStatus(null);
+        await battleDelay(600);
+        setBattleMessage(null);
+      } else {
+        log(`${attacker.name.toUpperCase()} is confused!`, 'status-effect');
+        if (Math.random() < 0.33) {
+          log(`It hurt itself in its confusion!`, 'status-effect');
+          setBattleMessage({ text: "HURT SELF!", type: 'status' });
+                    sounds.hit();
+          
+          const level = 50;
+          const a = getEffectiveStat(attacker, 'attack', isPlayer);
+          const d = getEffectiveStat(attacker, 'defense', isPlayer);
+          const confusionDamage = Math.max(1, Math.floor((((2 * level / 5 + 2) * 40 * (a / d)) / 50) + 2));
+          
+          if (isPlayer) {
+            setPokemonHP(prev => Math.max(0, prev - confusionDamage));
+            setAttackerAnimation('hit');
+            await battleDelay(400);
+            setAttackerAnimation('none');
+          } else {
+            setOpponentHP(prev => Math.max(0, prev - confusionDamage));
+            setDefenderAnimation('hit');
+            await battleDelay(400);
+            setDefenderAnimation('none');
+          }
+          
+          await battleDelay(600);
+          setBattleMessage(null);
+          return 0;
+        }
+      }
+    }
 
-                                                  return (
-                                                    <button
-                                                      key={move.name}
-                                                      onClick={() => {
-                                                        if (!isOutOfPP) {
-                                                          handlePlayerMove(move);
-                                                          setIsCombatMoveModalOpen(false);
-                                                        }
-                                                      }}
-                                                      onMouseEnter={() => sounds.hover()}
-                                                      disabled={isOutOfPP}
-                                                      className={cn(
-                                                        "w-full text-left p-3 sm:p-3.5 rounded-xl border-2 transition-all relative overflow-hidden flex flex-col gap-1.5 cursor-pointer",
-                                                        (move.name === recommendedMove) && "ring-2 ring-yellow-400 ring-offset-2 ring-offset-slate-950 shadow-[0_0_15px_rgba(250,204,21,0.35)]",
-                                                        isOutOfPP 
-                                                          ? "bg-slate-950/60 text-slate-600 border-slate-900/60 cursor-not-allowed opacity-40" 
-                                                          : cn(
-                                                              "hover:scale-[1.01] active:scale-98 shadow-md",
-                                                              typeColors[move.type] 
-                                                                ? `${typeColors[move.type]} border-white/10 hover:border-white/30 text-white` 
-                                                                : "bg-slate-900 border-cyan-900/40 hover:border-cyan-500/60 text-cyan-300 hover:text-white"
-                                                            )
-                                                      )}
-                                                    >
-                                                      {/* Highlight strip for recommended move */}
-                                                      {move.name === recommendedMove && (
-                                                        <div className="absolute top-0 right-0 bg-yellow-400 text-slate-950 text-[7px] font-hud font-black px-2 py-0.5 rounded-bl uppercase tracking-widest shadow">
-                                                          ★ RECOMMENDED
-                                                        </div>
-                                                      )}
+    // Accuracy check
+    if (move.accuracy && Math.random() * 100 > move.accuracy) {
+      log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+      log(`But it missed!`, 'normal');
+      setBattleMessage({ text: "MISSED!", type: 'status' });
+            sounds.notVeryEffective();
+      await battleDelay(800);
+      setBattleMessage(null);
+      return 0;
+    }
 
-                                                      <div className="flex justify-between items-start w-full">
-                                                        <div className="flex flex-col">
-                                                          <span className="text-[11px] sm:text-xs font-hud font-black uppercase tracking-wider">
-                                                            {move.name.replace('-', ' ')}
-                                                          </span>
-                                                          <span className="text-[8px] sm:text-[9px] font-mono opacity-80 uppercase mt-0.5">
-                                                            Type: {move.type}
-                                                          </span>
-                                                        </div>
-                                                        <div className="flex flex-col items-end shrink-0">
-                                                          <span className={cn(
-                                                            "text-[9px] sm:text-[10px] font-mono font-bold",
-                                                            isOutOfPP ? "text-red-500" : "text-white/80"
-                                                          )}>
-                                                            PP: {move.currentPP ?? move.pp}/{move.pp}
-                                                          </span>
-                                                          {move.power && (
-                                                            <span className="text-[8px] sm:text-[9px] font-mono text-white/60">
-                                                              PWR: {move.power}
-                                                            </span>
-                                                          )}
-                                                        </div>
-                                                      </div>
+    // Special handling for Transform
+    if (move.name.toLowerCase() === 'transform') {
+      log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+      setBattleMessage({ text: "TRANSFORM!", type: 'move' });
+      sounds.playMoveSound('normal', true);
+      await battleDelay(600);
+      
+      log(`${attacker.name.toUpperCase()} transformed into ${defender.name.toUpperCase()}!`, 'system');
+      setBattleMessage({ text: "TRANSFORMED!", type: 'move' });
+            
+      const transformedData: Pokemon = {
+        ...attacker,
+        name: defender.name,
+        types: [...defender.types],
+        stats: attacker.stats.map(s => {
+          if (s.stat.name === 'hp') return s;
+          const targetStat = defender.stats.find(ts => ts.stat.name === s.stat.name);
+          return targetStat ? { ...targetStat } : s;
+        }),
+        sprites: { ...defender.sprites },
+        moves: [...defender.moves],
+        cries: defender.cries ? { ...defender.cries } : attacker.cries,
+      };
 
-                                                      {/* Effectiveness and Action Info */}
-                                                      <div className="flex items-center justify-between gap-2 mt-0.5 border-t border-white/5 pt-1.5 w-full">
-                                                        <span className={cn("text-[8px] font-mono font-bold px-1.5 py-0.5 rounded border uppercase tracking-wider", effectivenessBadgeColor)}>
-                                                          {effectivenessLabel}
-                                                        </span>
-                                                        {isOutOfPP ? (
-                                                          <span className="text-[8px] font-mono font-bold text-red-500 uppercase">OUT OF PP</span>
-                                                        ) : (
-                                                          <span className="text-[8px] font-mono font-bold text-white/40 uppercase">Select Move →</span>
-                                                        )}
-                                                      </div>
-                                                    </button>
-                                                  );
-                                                })}
-                                              </div>
-                                            </motion.div>
-                                          </>
-                                        )}
-                                      </AnimatePresence>
+      if (isPlayer) {
+        setPokemon(transformedData);
+        setSelectedMoves([...opponentMoves]);
+        setPlayerStatStages({...opponentStatStages});
+      } else {
+        setBattleOpponent(transformedData);
+        setOpponentMoves([...selectedMoves]);
+        setOpponentStatStages({...playerStatStages});
+      }
+      
+      await battleDelay(800);
+      setBattleMessage(null);
+      return 0;
+    }
 
-                                      <div className="hidden">
-                                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2 relative z-10">
-                                             {selectedMoves.map(move => {
-                                               const opponentTypes = battleOpponent?.types?.map((t: any) => t.type.name) || [];
-                                               const effectiveness = getTypeEffectiveness(move.type, opponentTypes);
-                                               
-                                               let effectivenessLabel = '';
-                                               let effectivenessClass = '';
-                                               if (effectiveness > 1) {
-                                                 effectivenessLabel = `x${effectiveness}`;
-                                                 effectivenessClass = 'text-green-300 font-extrabold shadow-[1px_1px_2px_rgba(0,0,0,0.6)]';
-                                               } else if (effectiveness < 1 && effectiveness > 0) {
-                                                 effectivenessLabel = `x${effectiveness}`;
-                                                 effectivenessClass = 'text-red-300 font-bold';
-                                               } else if (effectiveness === 0) {
+    // Add Accuracy mechanics!
+    const moveAccuracy = move.accuracy;
+    const doesHit = moveAccuracy === null || (Math.random() * 100) <= moveAccuracy;
+
+    // Disabled dialog bubble quotes to prevent overlapping text and clutter
+    const speakQuote = getOpponentMoveQuote(attacker.name, move.name, selectedLang);
+    /* 
+    if (isPlayer) {
+      setPlayerDialogue(speakQuote);
+      setTimeout(() => setPlayerDialogue(null), 3000);
+    } else {
+      setOpponentDialogue(speakQuote);
+      setTimeout(() => setOpponentDialogue(null), 3000);
+    }
+    */
+
+    log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
+    setBattleMessage({ text: move.name.toUpperCase(), type: 'move' });
+    
+    // Determine Damage Class precisely from the API
+    const isSpecial = move.damage_class === 'special';
+    sounds.playMoveSound(move.type, isSpecial);
+
+    // Turn Reset logic for volatile states
+    if (isPlayer) setPlayerProtected(false);
+    else setOpponentProtected(false);
+
+    // Custom Protection Engine
+    const isDefenderProtected = isPlayer ? opponentProtected : playerProtected;
+    const isProtectMove = move.name === 'protect' || move.name === 'detect' || move.name === 'spiky-shield' || move.name === 'kings-shield';
+    if (isProtectMove) {
+      if (isPlayer) setPlayerProtected(true);
+      else setOpponentProtected(true);
+      log(`${attacker.name.toUpperCase()} protected itself!`, 'stat-boost');
+      setBattleMessage({ text: "PROTECTED!", type: 'status' });
+            await battleDelay(800);
+      setBattleMessage(null);
+      return 0; // successfully protected this turn
+    }
+
+    if (isDefenderProtected && (move.power !== null && move.power > 0 || (move.stat_changes && move.stat_changes.some(s => s.change < 0)))) {
+       await battleDelay(400);
+       log(`${defender.name.toUpperCase()} protected itself!`, 'normal');
+       setBattleMessage({ text: "BLOCKED!", type: 'status' });
+              await battleDelay(800);
+       setBattleMessage(null);
+       return 0;
+    }
+    
+    // Custom Substitute Engine (Creation)
+    if (move.name === 'substitute') {
+      const currentAttackerHP = isPlayer ? pokemonHP : opponentHP;
+      const attackerMaxHP = isPlayer ? pokemonMaxHP : opponentMaxHP;
+      const subCost = Math.floor(attackerMaxHP * 0.25);
+      
+      if (currentAttackerHP <= subCost) {
+        log(`But it failed! Not enough HP.`, 'not-effective');
+        addFloatingText("FAILED", 'not-effective', isPlayer);
+      } else {
+        if (isPlayer) {
+          setPokemonHP(prev => prev - subCost);
+          setPlayerSubstitute(subCost);
+        } else {
+          setOpponentHP(prev => prev - subCost);
+          setOpponentSubstitute(subCost);
+        }
+        log(`${attacker.name.toUpperCase()} sacrificed HP to make a substitute!`, 'system');
+        setBattleMessage({ text: "SUBSTITUTE!", type: 'status' });
+              }
+      await battleDelay(800);
+      setBattleMessage(null);
+      return 0;
+    }
+
+    if (!doesHit) {
+      await battleDelay(600);
+      log(`${attacker.name.toUpperCase()}'s attack missed!`, 'normal');
+      setBattleMessage({ text: "MISSED!", type: 'status' });
+            await battleDelay(800);
+      setBattleMessage(null);
+      return 0; // Turn ends on miss!
+    }
+
+    // Calculate type effectiveness for both damaging and status moves
+    const targetTypes = defender.types.map(t => t.type.name);
+    const attackerTypes = attacker.types.map(t => t.type.name);
+    const effectiveness = getTypeEffectiveness(move.type, targetTypes);
+
+    const isDamaging = move.power !== null && move.power > 0;
+    let totalDamage = 0;
+    let anyCrit = false;
+    let turnOutcomeMessages: string[] = [];
+    let highestMsgType: any = "move";
+
+    if (effectiveness === 0) {
+      log(`It had no effect on ${defender.name.toUpperCase()}...`, 'not-effective');
+      addFloatingText("NO EFFECT", 'not-effective', isPlayer);
+      turnOutcomeMessages.push("NO EFFECT!");
+      highestMsgType = 'status';
+      await battleDelay(350);
+    } else if (isDamaging) {
+      // Determine number of hits
+      const minHits = move.meta?.min_hits || 1;
+      const maxHits = move.meta?.max_hits || 1;
+      const numHits = Math.floor(Math.random() * (maxHits - minHits + 1)) + minHits;
+      
+      for (let i = 0; i < numHits; i++) {
+        // Critical Hit (6.25% chance)
+        const isCrit = Math.random() < 0.0625;
+        if (isCrit) anyCrit = true;
+        const critMultiplier = isCrit ? 1.5 : 1;
+        const stabMultiplier = attackerTypes.includes(move.type) ? 1.5 : 1;
+        
+        // Determine if move is physical or special
+        const attackStat = isSpecial ? getEffectiveStat(attacker, 'special-attack', isPlayer) : getEffectiveStat(attacker, 'attack', isPlayer);
+        const defenseStat = isSpecial ? getEffectiveStat(defender, 'special-defense', !isPlayer) : getEffectiveStat(defender, 'defense', !isPlayer);
+        
+        const baseDamage = move.power || 40;
+        const randomMultiplier = 0.85 + Math.random() * 0.15;
+        const weatherMultiplier = 1;
+
+        const damage = Math.max(1, Math.floor((((baseDamage * (attackStat / defenseStat) * effectiveness * critMultiplier * stabMultiplier * weatherMultiplier) / 5) + 2) * randomMultiplier));
+        totalDamage += damage;
+        
+        sounds.hit();
+        let dmgType: any = 'damage'; if (critMultiplier > 1) dmgType = 'crit-damage'; else if (effectiveness > 1) dmgType = 'super-damage'; else if (effectiveness < 1) dmgType = 'weak-damage'; addFloatingText(damage.toString(), dmgType, isPlayer);
+        
+        // Trigger visual effect
+        if (enableAnimations) {
+          const animationType = isSpecial ? 'special' : 'physical';
+          
+          setMoveAnimation(animationType);
+          
+          if (isPlayer) {
+            setAttackerAnimation(isSpecial ? 'attack_special' : 'attack_physical');
+            await battleDelay(80);
+            setAttackerAnimation('none');
+            
+            setDefenderAnimation('hit');
+            await battleDelay(200);
+            setDefenderAnimation('none');
+          } else {
+            setDefenderAnimation(isSpecial ? 'attack_special' : 'attack_physical');
+            await battleDelay(80);
+            setDefenderAnimation('none');
+            
+            setAttackerAnimation('hit');
+            await battleDelay(200);
+            setAttackerAnimation('none');
+          }
+          
+          setMoveAnimation('none');
+        }
+
+        // Visual feedback for move execution
+        if (numHits > 1) {
+          setBattleMessage({ text: `${move.name.toUpperCase()} (Hit ${i + 1})`, type: 'move' });
+        }
+        await battleDelay(250);
+        setBattleMessage(null);
+
+        // Detailed Logging
+        let damageDetails = `Damage: ${damage}`;
+        if (isCrit) {
+          damageDetails += " - Critical Hit!";
+          sounds.criticalHit();
+          playHaptic(100);
+          setArenaCriticalNotify(true);
+          setTimeout(() => {
+            setArenaCriticalNotify(false);
+          }, 1200);
+          if (enableAnimations) {
+            if (isPlayer) {
+              setDefenderAnimation('hit_critical');
+              await battleDelay(300);
+              setDefenderAnimation('none');
+            } else {
+              setAttackerAnimation('hit_critical');
+              await battleDelay(300);
+              setAttackerAnimation('none');
+            }
+          }
+        }
+        log(damageDetails, isCrit ? 'critical' : 'normal');
+      }
+
+      if (numHits > 1) {
+        log(`Hit ${numHits} times!`, 'normal');
+        setBattleMessage(null);
+      }
+
+      if (effectiveness > 1) {
+        log("It's super effective!", 'effective');
+        if (isPlayer) {
+          setUsedSuperEffectiveCurrentBattle(true);
+        }
+      } else if (effectiveness < 1 && effectiveness > 0) {
+        log("It's not very effective...", 'not-effective');
+      }
+      
+      // Unified aesthetic battle message for hits
+      let hitMsg = "";
+      let hitType = 'default';
+      
+      if (anyCrit && effectiveness > 1) {
+          hitMsg = "CRITICAL & EFFECTIVE!";
+          hitType = 'critical';
+      } else if (anyCrit && effectiveness < 1 && effectiveness > 0) {
+          hitMsg = "CRITICAL (RESISTED)";
+          hitType = 'critical';
+      } else if (anyCrit) {
+          hitMsg = "CRITICAL HIT!";
+          hitType = 'critical';
+      } else if (effectiveness > 1) {
+          hitMsg = "SUPER EFFECTIVE!";
+          hitType = 'effective';
+      } else if (effectiveness < 1 && effectiveness > 0) {
+          hitMsg = "NOT VERY EFFECTIVE...";
+          hitType = 'status';
+      }
+      
+      if (hitMsg) {
+        turnOutcomeMessages.push(hitMsg);
+        if (hitType === 'critical') highestMsgType = 'critical';
+        else if (hitType === 'effective' && highestMsgType !== 'critical') highestMsgType = 'effective';
+        else if (hitType === 'status' && highestMsgType === 'move') highestMsgType = 'status';
+      }
+
+      let hpDamageRemaining = totalDamage;
+      const setDefenderSubstitute = isPlayer ? setOpponentSubstitute : setPlayerSubstitute;
+      const defenderSubstitute = isPlayer ? opponentSubstitute : playerSubstitute;
+
+      if (defenderSubstitute > 0) {
+        if (totalDamage >= defenderSubstitute) {
+          log(`The substitute broke from the damage!`, 'status-effect');
+          sounds.hit();
+          setDefenderSubstitute(0);
+          hpDamageRemaining = 0; // Does not overflow
+        } else {
+          log(`The substitute took the damage for ${defender.name.toUpperCase()}!`, 'normal');
+          addFloatingText("BLOCKED DECOY", 'not-effective', !isPlayer);
+          setDefenderSubstitute(prev => prev - totalDamage);
+          hpDamageRemaining = 0;
+        }
+      }
+
+      if (isPlayer) {
+        setOpponentHP(prev => {
+          const next = Math.max(0, prev - hpDamageRemaining);
+          if (next === 0 && prev > 0) {
+            sounds.faint();
+            setScreenShake(true);
+            setTimeout(() => setScreenShake(false), 500);
+            setDefenderAnimation('faint');
+          }
+          return next;
+        });
+      } else {
+        setPokemonHP(prev => {
+          const next = Math.max(0, prev - hpDamageRemaining);
+          if (next === 0 && prev > 0) {
+            sounds.faint();
+            playHaptic(200);
+            setScreenShake(true);
+            setTimeout(() => setScreenShake(false), 500);
+            setAttackerAnimation('faint');
+          }
+          return next;
+        });
+      }
+      await battleDelay(300);
+      setBattleMessage(null);
+    } else {
+      await battleDelay(300);
+      setBattleMessage(null);
+    }
+
+    // Chance to apply status effects (only if not immune)
+    const defenderStatus = isPlayer ? opponentStatus : pokemonStatus;
+    const setDefenderStatus = isPlayer ? setOpponentStatus : setPokemonStatus;
+    let applied = false;
+
+    // Handle Healing Moves
+    if (move.meta?.healing && move.meta.healing > 0) {
+      const attackerMaxHP = isPlayer ? pokemonMaxHP : opponentMaxHP;
+      const healAmount = Math.floor(attackerMaxHP * (move.meta.healing / 100));
+      if (isPlayer) {
+        setPokemonHP(prev => Math.min(pokemonMaxHP, prev + healAmount));
+        log(`${attacker.name.toUpperCase()} recovered HP!`, 'system');
+        addFloatingText(`+${healAmount}`, 'boost', !isPlayer);
+      } else {
+        setOpponentHP(prev => Math.min(opponentMaxHP, prev + healAmount));
+        log(`${attacker.name.toUpperCase()} recovered HP!`, 'system');
+        addFloatingText(`+${healAmount}`, 'boost', !isPlayer);
+      }
+      sounds.statBoost();
+      await battleDelay(350);
+    }
+
+    // Handle Drain Moves
+    if (move.meta?.drain && move.meta.drain !== 0 && totalDamage > 0) {
+      const drainAmount = Math.floor(totalDamage * (move.meta.drain / 100));
+      if (drainAmount > 0) {
+        if (isPlayer) setPokemonHP(prev => Math.min(pokemonMaxHP, prev + drainAmount));
+        else setOpponentHP(prev => Math.min(opponentMaxHP, prev + drainAmount));
+        log(`${attacker.name.toUpperCase()} drained health!`, 'system');
+        addFloatingText(`+${drainAmount}`, 'boost', !isPlayer);
+      } else if (drainAmount < 0) {
+        // Recoil
+        const recoil = Math.abs(drainAmount);
+        if (isPlayer) setPokemonHP(prev => Math.max(0, prev - recoil));
+        else setOpponentHP(prev => Math.max(0, prev - recoil));
+        log(`${attacker.name.toUpperCase()} was hit by recoil!`, 'normal');
+        addFloatingText(`-${recoil}`, 'damage', !isPlayer);
+      }
+      await battleDelay(350);
+    }
+    
+    // Apply stat changes (only if not immune when targeting opponent)
+    if (move.stat_changes) {
+      for (const change of move.stat_changes) {

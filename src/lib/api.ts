@@ -41,7 +41,10 @@ async function getAllFormsList(): Promise<any[]> {
     try {
       const allData = await pokeApi.fetchWithCache<any>('/pokemon?limit=10000', 'all_forms_10000');
       if (isApiError(allData)) return [];
-      cachedAllForms = allData.results || [];
+      cachedAllForms = (allData.results || []).filter((f: any) => {
+        if (!f.name) return true;
+        return !f.name.startsWith('koraidon-') && !f.name.startsWith('miraidon-');
+      });
       return cachedAllForms;
     } catch (err) {
       console.error("Failed to fetch forms cache", err);
@@ -168,8 +171,8 @@ export function getZAEntry(pokemonName: string): string | null {
 export async function searchPokemon(query: string, lang: string = 'en'): Promise<Pokemon> {
   let formattedQuery = query.trim().toLowerCase();
 
-  // Block removed Tatsugiri megas
-  if (formattedQuery === 'tatsugiri-curly-mega' || formattedQuery === 'tatsugiri-droopy-mega') {
+  // Block removed Tatsugiri megas and Koraidon/Miraidon alternative forms
+  if (formattedQuery === 'tatsugiri-curly-mega' || formattedQuery === 'tatsugiri-droopy-mega' || (formattedQuery.startsWith('koraidon-') && formattedQuery !== 'koraidon') || (formattedQuery.startsWith('miraidon-') && formattedQuery !== 'miraidon')) {
     throw new Error("Pokemon " + formattedQuery + " not found!");
   }
 
@@ -344,7 +347,7 @@ export async function searchPokemon(query: string, lang: string = 'en'): Promise
     
     // Original variety mapping
     varieties = speciesData.varieties
-      .filter((v: any) => v.pokemon.name !== 'tatsugiri-curly-mega' && v.pokemon.name !== 'tatsugiri-droopy-mega')
+      .filter((v: any) => v.pokemon.name !== 'tatsugiri-curly-mega' && v.pokemon.name !== 'tatsugiri-droopy-mega' && !v.pokemon.name.startsWith('koraidon-') && !v.pokemon.name.startsWith('miraidon-'))
       .map((v: any) => ({
         ...v,
         pokemon: {

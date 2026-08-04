@@ -280,34 +280,6 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                   </motion.div>
                 </div>
 
-                {/* AI Difficulty Settings Card */}
-                <motion.div 
-                  whileHover={{ scale: 1.01 }} 
-                  className="bg-red-950/25 p-3.5 rounded-xl border border-red-500/35 flex items-start gap-3 relative overflow-hidden group shadow-[0_0_15px_rgba(239,68,68,0.15)] text-left"
-                >
-                  <div className="p-2 bg-red-900/40 rounded-lg border border-red-500/35 text-red-400 shrink-0 flex items-center justify-center">
-                    <Brain className="w-4 h-4 text-red-400 animate-pulse" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-red-400 text-[10.5px] sm:text-[11.5px] uppercase font-hud tracking-wider">
-                        AI Opponent Difficulty Settings
-                      </span>
-                      <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 text-[6.5px] font-mono uppercase tracking-widest font-extrabold">
-                        NEW
-                      </span>
-                    </div>
-                    <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-relaxed font-sans">
-                      Tailor the battle arena challenge using the <span className="text-red-300 font-bold font-hud">[AI: Casual | Hard | Challenge]</span> selector in the Combat Arena header:
-                    </p>
-                    <ul className="text-[9.5px] sm:text-[10px] text-slate-400 space-y-1 font-sans pl-1">
-                      <li><strong className="text-emerald-400 font-hud">Casual Mode:</strong> Opponent AI makes unpredictable move choices with random decision-making variance.</li>
-                      <li><strong className="text-amber-400 font-hud">Hard Mode:</strong> Opponent AI evaluates move power, STAB, type matchups, and status moves with standard competitive heuristics.</li>
-                      <li><strong className="text-red-400 font-hud">Challenge Mode:</strong> Opponent AI employs ruthless master tactics—prioritizing KO finishes, priority moves, substitute shields, stat setups, and optimal status ailments.</li>
-                    </ul>
-                  </div>
-                </motion.div>
-
                 {/* Artwork Mode Toggle Note */}
                 <motion.div 
                   whileHover={{ scale: 1.01 }} 

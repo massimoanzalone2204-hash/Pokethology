@@ -1,5 +1,9 @@
 import { WebSocketServer, WebSocket } from "ws";
 import * as http from "http";
+import * as os from "os";
+import { generateWithRetry, isQuotaError } from "./services/geminiService";
+import { GoogleGenAI } from "@google/genai";
+import { LRUCache } from "lru-cache";
 import fs from "fs";
 import path from "path";
 import { extractSuggestedPokemon } from "./utils/stringUtils";
@@ -12,7 +16,45 @@ try {
   console.log("WebSocket engine: Could not load pokemon_names.json", e);
 }
 
-const IN_DEVELOPMENT_MSG = "In Development ⚙️\nUntil the Chatbot it's completely ready, you can search your information about this Pokémon under in these sources!";
+const getApiKey = () => process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+const LITE_MODEL = "gemini-1.5-flash";
+
+const ai = new GoogleGenAI({
+  apiKey: getApiKey(),
+  httpOptions: {
+    headers: {
+      'User-Agent': 'aistudio-build-ws',
+    }
+  }
+});
+
+// Offline text generator imports and copy
+import { typeAdvantageMap } from "./constants";
+
+// Language detection
+function detectLanguage(text: string): 'it' | 'es' | 'fr' | 'de' | 'en' {
+  if (!text) return 'en';
+  const lower = text.toLowerCase();
+  
+  const itKeywords = ['ciao', 'chi sei', 'come', 'perché', 'perche', 'combattimento', 'arena', 'squadra', 'statistiche'];
+  if (itKeywords.some(kw => lower.includes(kw))) return 'it';
+  
+  const esKeywords = ['hola', 'quién eres', 'cómo', 'por qué', 'combate', 'arena', 'equipo', 'estadísticas'];
+  if (esKeywords.some(kw => lower.includes(kw))) return 'es';
+  
+  const frKeywords = ['salut', 'qui es-tu', 'comment', 'pourquoi', 'combat', 'arène', 'équipe'];
+  if (frKeywords.some(kw => lower.includes(kw))) return 'fr';
+  
+  const deKeywords = ['hallo', 'wer bist du', 'wie', 'warum', 'kampf', 'arena', 'team'];
+  if (deKeywords.some(kw => lower.includes(kw))) return 'de';
+  
+  return 'en';
+}
+
+// Generate offline fallback responses
+function generateOfflineChatResponse(messages: any[], context: any, lang: 'it' | 'es' | 'fr' | 'de' | 'en'): string {
+  return "In Development";
+}
 
 // Global active client count
 let clientCounter = 0;
@@ -21,6 +63,7 @@ export function initializeWebSocketServer(server: http.Server) {
   const wss = new WebSocketServer({ noServer: true });
 
   server.on("upgrade", (request, socket, head) => {
+    // Only handle paths starting with /ws or fallback
     const url = request.url || "";
     if (url.startsWith("/ws") || url.includes("socket")) {
       wss.handleUpgrade(request, socket, head, (ws) => {
@@ -47,7 +90,7 @@ export function initializeWebSocketServer(server: http.Server) {
         memoryHeapTotal: Math.round(memoryInfo.heapTotal / 1024 / 1024),
         neuralEngineLoad: Math.round(Math.min(95, 10 + (wss.clients.size * 5) + (Math.random() * 8))),
         apiLatencies: Math.round(150 + Math.random() * 80),
-        offlineCoreMode: true,
+        offlineCoreMode: !getApiKey(),
         serverTime: new Date().toLocaleTimeString()
       }
     };
@@ -73,7 +116,7 @@ export function initializeWebSocketServer(server: http.Server) {
         clientId: `PROT-${clientCounter}`,
         protocolVersion: "WS-2.40",
         telemetryFrequencyMs: 7000,
-        apiState: "OFFLINE_NEURAL_SYNTHESIS"
+        apiState: getApiKey() ? "GEMINI_COGNITIVE_LIVE" : "OFFLINE_NEURAL_SYNTHESIS"
       }
     }));
 
@@ -93,8 +136,9 @@ export function initializeWebSocketServer(server: http.Server) {
 
         // 2. CHATBOT QUERY OVER WS
         if (type === "chat:message") {
-          const { messages } = payload;
+          const { messages, context, lang: userLang } = payload;
           const userText = messages[messages.length - 1]?.text || "";
+          const lang = userLang || detectLanguage(userText);
           const suggestedPokemon = extractSuggestedPokemon(userText, pokemonNamesList);
           const navigateWords = ["show", "search", "open", "find", "view", "display", "stats", "load"];
           const wantsNavigation = navigateWords.some(w => userText.toLowerCase().includes(w)) && suggestedPokemon;
@@ -103,37 +147,139 @@ export function initializeWebSocketServer(server: http.Server) {
           // Typing notification sent immediately
           ws.send(JSON.stringify({ type: "chat:typing", payload: { isTyping: true } }));
 
-          // Simulated delay & word-by-word streaming of under-development fallback text
-          setTimeout(() => {
-            const words = IN_DEVELOPMENT_MSG.split(" ");
-            let currentSentText = "";
-            let wordIndex = 0;
+          const apiKey = getApiKey();
+          if (!apiKey) {
+            // Offline fallback
+            setTimeout(() => {
+              const fullText = generateOfflineChatResponse(messages, context, lang);
+              
+              // Let's stream the fallback text letter by letter (simulated streaming) over WS
+              let currentSentText = "";
+              const words = fullText.split(" ");
+              let wordIndex = 0;
 
-            const streamInterval = setInterval(() => {
-              if (wordIndex < words.length) {
-                currentSentText += (wordIndex === 0 ? "" : " ") + words[wordIndex];
+              const streamInterval = setInterval(() => {
+                if (wordIndex < words.length) {
+                  currentSentText += (wordIndex === 0 ? "" : " ") + words[wordIndex];
+                  ws.send(JSON.stringify({
+                    type: "chat:stream_chunk",
+                    payload: { text: currentSentText, suggestedPokemon, chunk: words[wordIndex] + " " }
+                  }));
+                  wordIndex++;
+                } else {
+                  clearInterval(streamInterval);
+                  // Send final response ended event
+                  ws.send(JSON.stringify({
+                    type: "chat:response",
+                    payload: {
+                      text: fullText,
+                      suggestedPokemon,
+                      navigatePokemon,
+                      isFallback: true,
+                      groundingChunks: []
+                    }
+                  }));
+                }
+              }, 40);
+            }, 500);
+            return;
+          }
+
+          // Online Gemini Mode
+          try {
+            const contents = messages.map((m: any) => ({
+              role: m.role === 'user' ? 'user' : 'model',
+              parts: [{ text: m.text }]
+            }));
+
+            const langNameMap: Record<string, string> = {
+              it: "Italian", es: "Spanish", fr: "French", de: "German", en: "English"
+            };
+            const targetLangName = langNameMap[lang] || "English";
+            const currentViewed = context?.selectedPokemon ? context.selectedPokemon.name : "None";
+            const activeContextName = suggestedPokemon || currentViewed;
+
+            const response = await generateWithRetry({
+              model: LITE_MODEL,
+              contents: contents,
+              config: {
+                systemInstruction: `You are Pokéthology, the eminent AI Pokétheology Academic System, Lore Archivist, and Theological Professor.
+                Your goal is to provide Trainers with deeply intellectual, engaging, and mind-blowing academic analyses of Pokémon cosmology, mythology, history, ecology, biology, and design origin over a REALTIME WebSocket interface.
+
+                FRIENDLY MENTOR PERSPECTIVE (HUMAN-SOUNDING EXPLANATIONS):
+                - When the user asks about game mechanics, combat strategies, badge requirements, or tutorial elements, ALWAYS adopt a warm, supportive, and friendly mentor-like persona.
+                - Break down mechanical concepts with simple, human-sounding analogies, high encouragement, and intuitive phrasing.
+
+                SMART, DIRECT & CONCISE MANDATE:
+                - Answer the user's inquiry immediately with ultra-snappy, direct, and short phrasing. High quota constraint is active.
+                - Limit replies to max 1-2 small paragraphs or a few beautiful bullet points total. Keep sentences concise.
+                - Leverage plenty of relevant, colorful emojis (🧬, 🌌, 📜, 🔮, ⚡, 🛡️, ⚔️, 🦕, 🌀, 🌾) at the start of lines.
+                - Strictly avoid any greeting fluff, filler talk, or boilerplate intros/outros.
+
+                VISUAL STYLE: Always format with simple, highly readable Markdown. Bold key terms and keep lists compact. Do NOT use markdown blockquotes (e.g. "> markdown quotes") or code fence blocks. Keep text flowing natively.
+
+                CRITICAL CONTEXT OVERRIDE:
+                The UI is currently focused on: ${activeContextName}.
+                If the user asks "is it strong?", "tell me its lore", "what about its biology", or uses any implicit pronoun (e.g., "tell me about it"), YOU MUST ASSUME they are talking about THIS Pokémon (${activeContextName}).
+
+                Full Interface Context: 
+                ${JSON.stringify({ ...context, newlySelected: suggestedPokemon })}
+
+                CRITICAL MULTILINGUAL MANDATE: Preferred language is ${targetLangName}. Respond exclusively in ${targetLangName}.`
+              }
+            });
+
+            const fullText = response.text || "";
+            const groundingMetadata = response.candidates?.[0]?.groundingMetadata;
+            const chunks = groundingMetadata?.groundingChunks || [];
+
+            // Stream the text to the client over WS to make it look extremely immediate and futuristic
+            const textLength = fullText.length;
+            let charIndex = 0;
+            const batchSize = 6; // send in batches of chars
+
+            const textStreamInterval = setInterval(() => {
+              if (charIndex < textLength) {
+                charIndex += batchSize;
+                const partialText = fullText.substring(0, charIndex);
                 ws.send(JSON.stringify({
                   type: "chat:stream_chunk",
-                  payload: { text: currentSentText, suggestedPokemon, chunk: words[wordIndex] + " " }
+                  payload: { text: partialText, suggestedPokemon, chunk: fullText.substring(charIndex - batchSize, charIndex) }
                 }));
-                wordIndex++;
               } else {
-                clearInterval(streamInterval);
+                clearInterval(textStreamInterval);
                 // Send final complete payload
                 ws.send(JSON.stringify({
                   type: "chat:response",
                   payload: {
-                    text: IN_DEVELOPMENT_MSG,
+                    text: fullText,
                     suggestedPokemon,
                     navigatePokemon,
-                    groundingChunks: [],
-                    isFallback: true
+                    groundingChunks: chunks,
+                    groundingMetadata,
+                    isFallback: false
                   }
                 }));
               }
-            }, 40);
-          }, 500);
-          return;
+            }, 25);
+
+          } catch (err: any) {
+            console.error("[WS Gemini Error]", err);
+            const isQuota = isQuotaError(err);
+            const fallbackText = generateOfflineChatResponse(messages, context, lang);
+
+            ws.send(JSON.stringify({
+              type: "chat:response",
+              payload: {
+                text: fallbackText,
+                suggestedPokemon,
+                navigatePokemon,
+                isFallback: true,
+                isQuota,
+                error: err.message || "Gemini limit hit"
+              }
+            }));
+          }
         }
 
         // 3. DIAGNOSTICS STREAMING (STREAM EVENT LOGS OVER WS FOR USER PROGRESS)
@@ -180,9 +326,10 @@ export function initializeWebSocketServer(server: http.Server) {
 
         // 4. REALTIME BATTLE STAT COUNTER PREDICTOR OVER WS
         if (type === "battle:sync") {
-          const { opponent, playerHP, opponentHP } = payload;
+          const { opponent, playerHP, opponentHP, playerPokemon } = payload;
           if (!opponent) return;
 
+          // Simple live combat hint generated on server and pushed down
           let hintText = "";
           if (playerHP < 35) {
             hintText = `🚨 **ALERT:** Player is at ${playerHP}%! Deploy shields or prioritization moves over socket commands immediately!`;
