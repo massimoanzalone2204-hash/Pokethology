@@ -1033,7 +1033,7 @@ async function setupVite() {
 // Listen only if not running as a Vercel function
 if (process.env.VERCEL !== "1") {
   setupVite().then(() => {
-    const PORT = 3000;
+    const PORT = process.env.PORT || 3000;
     const server = app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on http://0.0.0.0:${PORT}`);
     });
