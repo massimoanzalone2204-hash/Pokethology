@@ -32,13 +32,12 @@ import ReactPlayer from 'react-player';
 
 import { pokeApi, isApiError } from './lib/pokeApiService';
 
-import { PokethologyQuizWidget } from './components/PokethologyQuizWidget';
-import { BattleHistory } from './components/BattleHistory';
-
 // Lazy loaded heavy UI and modal chunks via dynamic import()
 const BattleResultScreen = React.lazy(() => import('./components/BattleResultScreen').then(m => ({ default: m.BattleResultScreen })));
 const Tutorial = React.lazy(() => import('./components/Tutorial').then(m => ({ default: m.Tutorial })));
+const PokethologyQuizWidget = React.lazy(() => import('./components/PokethologyQuizWidget').then(m => ({ default: m.PokethologyQuizWidget })));
 const MoveModal = React.lazy(() => import('./components/MoveModal').then(m => ({ default: m.MoveModal })));
+const BattleHistory = React.lazy(() => import('./components/BattleHistory').then(m => ({ default: m.BattleHistory })));
 const AboutModal = React.lazy(() => import('./components/AboutModal').then(m => ({ default: m.AboutModal })));
 const OfflineManagerModal = React.lazy(() => import('./components/OfflineManagerModal').then(m => ({ default: m.OfflineManagerModal })));
 
@@ -1330,7 +1329,7 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
   };
   
   const spriteClasses = cn(
-    "transition-all duration-500  select-none max-w-[150%] max-h-[150%]",
+    "transition-all duration-500 will-change-transform select-none max-w-[150%] max-h-[150%]",
     (isSelected || isOpponentSelected) 
       ? "!scale-[1.6]" 
       : "opacity-90 group-hover:opacity-100"
@@ -1366,7 +1365,7 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
         sounds.hover();
       }}
       className={cn(
-        "border rounded-xl p-3 flex flex-col items-center transition-all group cursor-pointer relative overflow-hidden h-32 sm:h-36 justify-center  shadow-lg",
+        "border rounded-xl p-3 flex flex-col items-center transition-all group cursor-pointer relative overflow-hidden h-32 sm:h-36 justify-center will-change-transform shadow-lg",
         isLightMode
           ? "bg-white border-slate-200 hover:bg-cyan-50/20 hover:border-cyan-400"
           : "bg-slate-950/40 border-slate-800/50 hover:bg-cyan-950/20 hover:border-cyan-500/40",
@@ -1403,6 +1402,30 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
             transition={{ duration: 0.5 }}
             className="absolute inset-0 overflow-hidden pointer-events-none rounded-xl"
           >
+            {[...Array(12)].map((_, i) => (
+              <motion.div
+                key={i}
+                className={`absolute w-1.5 h-1.5 rounded-full blur-[1px] ${typeBaseColors[cardType]}`}
+                initial={{
+                  x: Math.random() * 100 + "%",
+                  y: "110%",
+                  scale: Math.random() * 0.5 + 0.5,
+                  opacity: Math.random() * 0.5 + 0.2
+                }}
+                animate={{
+                  y: "-10%",
+                  x: `${Math.random() * 100}%`,
+                  opacity: [0, Math.random() * 0.5 + 0.2, 0],
+                  scale: [Math.random() * 0.5 + 0.5, Math.random() * 1.5 + 0.5, 0]
+                }}
+                transition={{
+                  duration: Math.random() * 2 + 2,
+                  repeat: Infinity,
+                  ease: "easeOut",
+                  delay: Math.random() * 2
+                }}
+              />
+            ))}
             <div className={`absolute inset-0 opacity-20 blur-xl ${typeBaseColors[cardType]}`} />
           </motion.div>
         )}
@@ -1577,13 +1600,11 @@ const BattleLog = memo(({ log, enableAnimations, turn, isBattling }: { log: (Log
       exit={{ opacity: 0, y: 10, scale: 0.98 }}
       transition={{ duration: 0.3 }}
       ref={logRef} 
-      className="bg-slate-900/80 rounded-xl p-3 sm:p-4 h-32 sm:h-40 md:h-48 overflow-y-auto custom-scrollbar font-mono text-[10px] sm:text-[11px] sm:leading-relaxed font-bold tracking-wider space-y-1 sm:space-y-1.5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_32px_rgba(0,0,0,0.5)] shrink-0 pointer-events-auto scroll-smooth" 
+      className="bg-slate-900/30 backdrop-blur-md rounded-xl p-3 sm:p-4 h-32 sm:h-40 md:h-48 overflow-y-auto custom-scrollbar font-mono text-[10px] sm:text-[11px] sm:leading-relaxed font-bold tracking-wider space-y-1 sm:space-y-1.5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_32px_rgba(0,0,0,0.5)] shrink-0 pointer-events-auto scroll-smooth" 
       style={{ overflowAnchor: 'none' }}
     >
       {log.slice(-50).map((entry, i) => {
-        
-        const isLatest = i === Math.min(log.length, 50) - 1;
-        const absoluteIndex = log.length > 50 ? log.length - 50 + i : i;
+        const isLatest = i === log.length - 1;
         let colorClass = "text-slate-400 border-slate-800 bg-slate-900/40";
         let Icon = Info;
 
@@ -1639,7 +1660,7 @@ const BattleLog = memo(({ log, enableAnimations, turn, isBattling }: { log: (Log
 
         return (
           <div 
-            key={`battle-log-${absoluteIndex}`} 
+            key={`battle-log-${entry.turn || turn}-${entry.type || ''}-${i}`} 
             className={cn(
               "border rounded-lg px-2 py-1.5 flex items-center gap-2 transition-all duration-300",
               enableAnimations && !isLatest && "animate-in fade-in slide-in-from-left-1",
@@ -3320,14 +3341,14 @@ export default function App() {
     if (isPlayer && pokemonFlinched) {
       setPokemonFlinched(false);
       log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
-      setBattleMessage({ text: "FLINCHED!", type: 'status' }); playHaptic(20);
+      setBattleMessage({ text: "FLINCHED!", type: 'status' });
       await battleDelay(800);
       setBattleMessage(null);
       return 0;
     } else if (!isPlayer && opponentFlinched) {
       setOpponentFlinched(false);
       log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
-      setBattleMessage({ text: "FLINCHED!", type: 'status' }); playHaptic(20);
+      setBattleMessage({ text: "FLINCHED!", type: 'status' });
       await battleDelay(800);
       setBattleMessage(null);
       return 0;
@@ -3336,7 +3357,7 @@ export default function App() {
     // Check for status effects that prevent moving
     if (attackerStatus === 'PAR' && Math.random() < 0.25) {
       log(`${attacker.name.toUpperCase()} is paralyzed! It can't move!`, 'status-effect');
-      setBattleMessage({ text: "PARALYZED", type: 'status' }); playHaptic([20, 20, 20]);
+      setBattleMessage({ text: "PARALYZED", type: 'status' });
       sounds.statusParalysis();
       await battleDelay(800);
       setBattleMessage(null);
@@ -3345,13 +3366,13 @@ export default function App() {
     if (attackerStatus === 'FRZ') {
       if (Math.random() < 0.2) {
         log(`${attacker.name.toUpperCase()} thawed out!`, 'status-effect');
-        setBattleMessage({ text: "THAWED!", type: 'status' }); playHaptic([10, 40]);
+        setBattleMessage({ text: "THAWED!", type: 'status' });
         if (isPlayer) setPokemonStatus(null); else setOpponentStatus(null);
         await battleDelay(600);
         setBattleMessage(null);
       } else {
         log(`${attacker.name.toUpperCase()} is frozen solid!`, 'status-effect');
-        setBattleMessage({ text: "FROZEN!", type: 'status' }); playHaptic(50);
+        setBattleMessage({ text: "FROZEN!", type: 'status' });
         sounds.statusFreeze();
         await battleDelay(800);
         setBattleMessage(null);
@@ -3360,7 +3381,7 @@ export default function App() {
     }
     if (attackerStatus === 'SLP') {
       log(`${attacker.name.toUpperCase()} is fast asleep...`, 'status-effect');
-      setBattleMessage({ text: "ASLEEP", type: 'status' }); playHaptic([10, 20, 10]);
+      setBattleMessage({ text: "ASLEEP", type: 'status' });
       sounds.statusSleep();
       await battleDelay(800);
       setBattleMessage(null);
@@ -3370,7 +3391,7 @@ export default function App() {
     if (attackerStatus === 'CON') {
       if (Math.random() < 0.25) {
         log(`${attacker.name.toUpperCase()} snapped out of its confusion!`, 'status-effect');
-        setBattleMessage({ text: "SNAPPED OUT!", type: 'status' }); playHaptic([40, 20]);
+        setBattleMessage({ text: "SNAPPED OUT!", type: 'status' });
         if (isPlayer) setPokemonStatus(null); else setOpponentStatus(null);
         await battleDelay(600);
         setBattleMessage(null);
@@ -3379,7 +3400,7 @@ export default function App() {
         if (Math.random() < 0.33) {
           log(`It hurt itself in its confusion!`, 'status-effect');
           setBattleMessage({ text: "HURT SELF!", type: 'status' });
-                    sounds.hit(); playHaptic([40, 20]);
+                    sounds.hit();
           
           const level = 50;
           const a = getEffectiveStat(attacker, 'attack', isPlayer);
@@ -3409,8 +3430,8 @@ export default function App() {
     if (move.accuracy && Math.random() * 100 > move.accuracy) {
       log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
       log(`But it missed!`, 'normal');
-      setBattleMessage({ text: "MISSED!", type: 'status' }); playHaptic([10, 30, 10]);
-            sounds.notVeryEffective(); playHaptic([10, 30, 10]);
+      setBattleMessage({ text: "MISSED!", type: 'status' });
+            sounds.notVeryEffective();
       await battleDelay(800);
       setBattleMessage(null);
       return 0;
@@ -3419,12 +3440,12 @@ export default function App() {
     // Special handling for Transform
     if (move.name.toLowerCase() === 'transform') {
       log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
-      setBattleMessage({ text: "TRANSFORM!", type: 'move' }); playHaptic([20, 20]);
+      setBattleMessage({ text: "TRANSFORM!", type: 'move' });
       sounds.playMoveSound('normal', true);
       await battleDelay(600);
       
       log(`${attacker.name.toUpperCase()} transformed into ${defender.name.toUpperCase()}!`, 'system');
-      setBattleMessage({ text: "TRANSFORMED!", type: 'move' }); playHaptic([50, 20, 50]);
+      setBattleMessage({ text: "TRANSFORMED!", type: 'move' });
             
       const transformedData: Pokemon = {
         ...attacker,
@@ -3472,7 +3493,7 @@ export default function App() {
     */
 
     log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
-    setBattleMessage({ text: move.name.toUpperCase(), type: 'move' }); playHaptic(10);
+    setBattleMessage({ text: move.name.toUpperCase(), type: 'move' });
     
     // Determine Damage Class precisely from the API
     const isSpecial = move.damage_class === 'special';
@@ -3489,7 +3510,7 @@ export default function App() {
       if (isPlayer) setPlayerProtected(true);
       else setOpponentProtected(true);
       log(`${attacker.name.toUpperCase()} protected itself!`, 'stat-boost');
-      setBattleMessage({ text: "PROTECTED!", type: 'status' }); playHaptic([20, 20, 40]);
+      setBattleMessage({ text: "PROTECTED!", type: 'status' });
             await battleDelay(800);
       setBattleMessage(null);
       return 0; // successfully protected this turn
@@ -3498,7 +3519,7 @@ export default function App() {
     if (isDefenderProtected && (move.power !== null && move.power > 0 || (move.stat_changes && move.stat_changes.some(s => s.change < 0)))) {
        await battleDelay(400);
        log(`${defender.name.toUpperCase()} protected itself!`, 'normal');
-       setBattleMessage({ text: "BLOCKED!", type: 'status' }); playHaptic([10, 30, 10]);
+       setBattleMessage({ text: "BLOCKED!", type: 'status' });
               await battleDelay(800);
        setBattleMessage(null);
        return 0;
@@ -3522,7 +3543,7 @@ export default function App() {
           setOpponentSubstitute(subCost);
         }
         log(`${attacker.name.toUpperCase()} sacrificed HP to make a substitute!`, 'system');
-        setBattleMessage({ text: "SUBSTITUTE!", type: 'status' }); playHaptic([20, 20, 40]);
+        setBattleMessage({ text: "SUBSTITUTE!", type: 'status' });
               }
       await battleDelay(800);
       setBattleMessage(null);
@@ -3532,7 +3553,7 @@ export default function App() {
     if (!doesHit) {
       await battleDelay(600);
       log(`${attacker.name.toUpperCase()}'s attack missed!`, 'normal');
-      setBattleMessage({ text: "MISSED!", type: 'status' }); playHaptic([10, 30, 10]);
+      setBattleMessage({ text: "MISSED!", type: 'status' });
             await battleDelay(800);
       setBattleMessage(null);
       return 0; // Turn ends on miss!
@@ -3551,10 +3572,9 @@ export default function App() {
 
     if (effectiveness === 0) {
       log(`It had no effect on ${defender.name.toUpperCase()}...`, 'not-effective');
-      addFloatingText("NO EFFECT", 'not-effective', isPlayer); playHaptic([10, 50, 10]);
+      addFloatingText("NO EFFECT", 'not-effective', isPlayer);
       turnOutcomeMessages.push("NO EFFECT!");
       highestMsgType = 'status';
-      playHaptic([10, 50, 10]);
       await battleDelay(350);
     } else if (isDamaging) {
       // Determine number of hits
@@ -3580,7 +3600,7 @@ export default function App() {
         const damage = Math.max(1, Math.floor((((baseDamage * (attackStat / defenseStat) * effectiveness * critMultiplier * stabMultiplier * weatherMultiplier) / 5) + 2) * randomMultiplier));
         totalDamage += damage;
         
-        sounds.hit(); playHaptic([40, 20]);
+        sounds.hit();
         let dmgType: any = 'damage'; if (critMultiplier > 1) dmgType = 'crit-damage'; else if (effectiveness > 1) dmgType = 'super-damage'; else if (effectiveness < 1) dmgType = 'weak-damage'; addFloatingText(damage.toString(), dmgType, isPlayer);
         
         // Trigger visual effect
@@ -3622,7 +3642,7 @@ export default function App() {
         if (isCrit) {
           damageDetails += " - Critical Hit!";
           sounds.criticalHit();
-          playHaptic([50, 50, 150]);
+          playHaptic(100);
           setArenaCriticalNotify(true);
           setTimeout(() => {
             setArenaCriticalNotify(false);
@@ -3649,15 +3669,11 @@ export default function App() {
 
       if (effectiveness > 1) {
         log("It's super effective!", 'effective');
-        playHaptic([40, 30, 40]);
         if (isPlayer) {
           setUsedSuperEffectiveCurrentBattle(true);
         }
       } else if (effectiveness < 1 && effectiveness > 0) {
         log("It's not very effective...", 'not-effective');
-        playHaptic([20, 20]);
-      } else if (totalDamage > 0 && !anyCrit) {
-        playHaptic(30);
       }
       
       // Unified aesthetic battle message for hits
@@ -3695,7 +3711,7 @@ export default function App() {
       if (defenderSubstitute > 0) {
         if (totalDamage >= defenderSubstitute) {
           log(`The substitute broke from the damage!`, 'status-effect');
-          sounds.hit(); playHaptic([40, 20]);
+          sounds.hit();
           setDefenderSubstitute(0);
           hpDamageRemaining = 0; // Does not overflow
         } else {
@@ -3711,7 +3727,6 @@ export default function App() {
           const next = Math.max(0, prev - hpDamageRemaining);
           if (next === 0 && prev > 0) {
             sounds.faint();
-            playHaptic([100, 50, 200]);
             setScreenShake(true);
             setTimeout(() => setScreenShake(false), 500);
             setDefenderAnimation('faint');
@@ -3723,7 +3738,7 @@ export default function App() {
           const next = Math.max(0, prev - hpDamageRemaining);
           if (next === 0 && prev > 0) {
             sounds.faint();
-            playHaptic([200, 100, 300]);
+            playHaptic(200);
             setScreenShake(true);
             setTimeout(() => setScreenShake(false), 500);
             setAttackerAnimation('faint');
@@ -4000,14 +4015,12 @@ export default function App() {
       log(`${isPlayer ? pokemon?.name?.toUpperCase() : battleOpponent?.name?.toUpperCase()} is hurt by its burn!`, 'status-effect');
       if (isPlayer) setPokemonHP(prev => Math.max(0, prev - damage));
       else setOpponentHP(prev => Math.max(0, prev - damage));
-      playHaptic(20);
       await new Promise(r => setTimeout(r, 200));
     } else if (status === 'PSN') {
       damage = Math.max(1, Math.floor(maxHP / 8));
       log(`${isPlayer ? pokemon?.name?.toUpperCase() : battleOpponent?.name?.toUpperCase()} is hurt by poison!`, 'status-effect');
       if (isPlayer) setPokemonHP(prev => Math.max(0, prev - damage));
       else setOpponentHP(prev => Math.max(0, prev - damage));
-      playHaptic(20);
       await new Promise(r => setTimeout(r, 200));
     }
     
@@ -4022,7 +4035,6 @@ export default function App() {
         setIsBattling(false);
         setBattleState('finished');
         setBattleResult('defeat');
-        playHaptic([400, 200, 100, 50]);
         setSessionLosses(prev => {
           const next = prev + 1;
           sessionStorage.setItem('pokethology_session_losses', String(next));
@@ -4045,7 +4057,6 @@ export default function App() {
         setIsBattling(false);
         setBattleState('finished');
         setBattleResult('victory');
-        playHaptic([50, 100, 200, 400]);
         setSessionWins(prev => {
           const next = prev + 1;
           sessionStorage.setItem('pokethology_session_wins', String(next));
@@ -5136,7 +5147,7 @@ export default function App() {
 
   useEffect(() => {
     setDisplayLimit(50);
-  }, [filteredList, debouncedQuery, sortBy, sortOrder]);
+  }, [filteredList, query, sortBy, sortOrder]);
 
   return (
     <ErrorBoundary>
@@ -5205,7 +5216,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 1.04, filter: "blur(10px)", transition: { duration: 0.4, ease: "easeInOut" } }}
-            className="fixed inset-0 z-[250] flex flex-col items-center justify-center overflow-hidden bg-slate-950/95  select-none p-2 xs:p-4 sm:p-8 cursor-default pointer-events-auto"
+            className="fixed inset-0 z-[250] flex flex-col items-center justify-center overflow-hidden bg-slate-950/95 backdrop-blur-md select-none p-2 xs:p-4 sm:p-8 cursor-default pointer-events-auto"
           >
             {/* Background Ambient Glows & Slashed Effect */}
             <div className="absolute inset-0 z-0 select-none pointer-events-none overflow-hidden">
@@ -5252,7 +5263,7 @@ export default function App() {
                   />
                 </div>
 
-                <div className="bg-slate-950/90 border-2 border-cyan-400/80 px-2.5 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl z-20 shadow-[0_0_20px_rgba(6,182,212,0.3)] flex flex-col items-center gap-1 w-full max-w-[130px] xs:max-w-[160px] sm:max-w-[280px] md:max-w-[340px] text-center ">
+                <div className="bg-slate-950/90 border-2 border-cyan-400/80 px-2.5 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl z-20 shadow-[0_0_20px_rgba(6,182,212,0.3)] flex flex-col items-center gap-1 w-full max-w-[130px] xs:max-w-[160px] sm:max-w-[280px] md:max-w-[340px] text-center backdrop-blur-md">
                   <span className="font-hud uppercase text-cyan-100 tracking-[0.08em] sm:tracking-[0.14em] text-xs xs:text-sm sm:text-xl md:text-2xl font-black drop-shadow-[0_0_10px_rgba(34,211,238,0.6)] w-full break-words leading-tight">
                     {pokemon?.name?.replace(/-/g, ' ')}
                   </span>
@@ -5314,7 +5325,7 @@ export default function App() {
                   />
                 </div>
 
-                <div className="bg-slate-950/90 border-2 border-red-500/80 px-2.5 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl z-20 shadow-[0_0_20px_rgba(239,68,68,0.3)] flex flex-col items-center gap-1 w-full max-w-[130px] xs:max-w-[160px] sm:max-w-[280px] md:max-w-[340px] text-center ">
+                <div className="bg-slate-950/90 border-2 border-red-500/80 px-2.5 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl z-20 shadow-[0_0_20px_rgba(239,68,68,0.3)] flex flex-col items-center gap-1 w-full max-w-[130px] xs:max-w-[160px] sm:max-w-[280px] md:max-w-[340px] text-center backdrop-blur-md">
                   <span className="font-hud uppercase text-red-100 tracking-[0.08em] sm:tracking-[0.14em] text-xs xs:text-sm sm:text-xl md:text-2xl font-black drop-shadow-[0_0_10px_rgba(239,68,68,0.6)] w-full break-words leading-tight">
                     {battleOpponent?.name?.replace(/-/g, ' ')}
                   </span>
@@ -5353,7 +5364,7 @@ export default function App() {
         {/* Single Panel Layout */}
         <div className="flex-1 flex flex-col relative overflow-hidden overflow-x-hidden bg-transparent w-full">
           {/* Compact Top Bar with Integrated Search */}
-          <div className="bg-slate-900/60 border-b border-slate-800/60 shadow-[0_4px_20px_rgba(0,0,0,0.4)]  z-40 relative overflow-x-hidden w-full flex justify-center">
+          <div className="bg-slate-900/60 border-b border-slate-800/60 shadow-[0_4px_20px_rgba(0,0,0,0.4)] backdrop-blur-md z-40 relative overflow-x-hidden w-full flex justify-center">
             <div className="w-full max-w-[1920px] px-2 lg:px-4 xl:px-6 flex items-center justify-between gap-3 sm:gap-4 py-2 sm:py-3">
             <div className="flex items-center gap-3 shrink-0">
               <div className="relative">
@@ -5596,7 +5607,7 @@ export default function App() {
                             className="flex-1 bg-transparent relative overflow-hidden flex flex-col p-1 sm:p-2 w-full max-w-[1920px] mx-auto lg:px-4 xl:px-6"
                           >
                         {loadingPokemon && (
-                           <div className="absolute inset-0 bg-slate-950/40 z-[100] flex flex-col items-center justify-center pointer-events-auto ">
+                           <div className="absolute inset-0 bg-slate-950/40 z-[100] flex flex-col items-center justify-center pointer-events-auto backdrop-blur-[2px]">
                                <Loader2 className="w-8 h-8 text-cyan-400 animate-spin mb-3 shadow-lg" />
                                <span className="font-hud text-xs text-cyan-400 animate-pulse tracking-widest uppercase drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]">Fetching Data...</span>
                            </div>
@@ -5794,7 +5805,7 @@ export default function App() {
                                     isShiny={isShiny}
                                     isFemale={isFemale}
                                     use2dSprite={false}
-                                    className="w-full h-full object-contain transition-all duration-500 select-none  filter drop-shadow-[0_0_15px_rgba(34,211,238,0.4)] group-hover:scale-105 group-hover:drop-shadow-[0_0_25px_rgba(34,211,238,0.65)]"
+                                    className="w-full h-full object-contain transition-all duration-500 select-none will-change-transform filter drop-shadow-[0_0_15px_rgba(34,211,238,0.4)] group-hover:scale-105 group-hover:drop-shadow-[0_0_25px_rgba(34,211,238,0.65)]"
                                     onClick={() => sounds.playCry(pokemon?.name, pokemon.cries?.latest, pokemon?.name?.includes('-gmax'))}
                                   />
                                 </div>
@@ -5916,7 +5927,7 @@ export default function App() {
                                 <div className="w-full mb-3 shrink-0">
                                   {(() => {
                                     let varietiesList = (pokemon.varieties || [{ pokemon: { name: pokemon?.name, url: `https://pokeapi.co/api/v2/pokemon/${pokemon.id || ''}` } }])
-                                      .filter(v => v.pokemon?.name !== 'tatsugiri-curly-mega' && v.pokemon?.name !== 'tatsugiri-droopy-mega' && v.pokemon?.name !== 'floette-eternal-mega' && !v.pokemon?.name.startsWith('koraidon-') && !v.pokemon?.name.startsWith('miraidon-'));
+                                      .filter(v => v.pokemon?.name !== 'tatsugiri-curly-mega' && v.pokemon?.name !== 'tatsugiri-droopy-mega' && v.pokemon?.name !== 'floette-eternal-mega');
                                     
                                     if (pokemon?.name?.includes('tatsugiri') && !varietiesList.some(v => v.pokemon?.name === 'tatsugiri-stretchy-mega')) {
                                       varietiesList.push({ pokemon: { name: 'tatsugiri-stretchy-mega', url: '' } });
@@ -6015,7 +6026,7 @@ export default function App() {
                                   >
                                     {/* Pokedex Entry Description */}
                                     <div className={cn(
-                                      " rounded-2xl p-6 sm:p-8 border shadow-2xl relative group/entry transition-all overflow-hidden",
+                                      "backdrop-blur-md rounded-2xl p-6 sm:p-8 border shadow-2xl relative group/entry transition-all overflow-hidden",
                                       isLightMode 
                                         ? "bg-white/95 border-slate-200 hover:border-cyan-500/40 hover:shadow-[0_12px_45px_rgba(6,182,212,0.1)]"
                                         : "bg-slate-900/40 border-white/5 hover:border-cyan-500/30 hover:shadow-[0_12px_40px_rgba(6,182,212,0.15)]"
@@ -6246,7 +6257,7 @@ export default function App() {
                                     </div>
 
                                     <div className={cn(
-                                      " rounded-2xl p-5 sm:p-7 border shadow-inner relative overflow-hidden group/statshud w-full max-w-full z-10 box-border",
+                                      "backdrop-blur-md rounded-2xl p-5 sm:p-7 border shadow-inner relative overflow-hidden group/statshud w-full max-w-full z-10 box-border",
                                       isLightMode 
                                         ? "bg-white/95 border-slate-200" 
                                         : "bg-slate-900/60 border-cyan-900/40"
@@ -6298,7 +6309,7 @@ export default function App() {
                                     {/* Moves Section */}
                                     {pokemon.moves && pokemon.moves.length > 0 && (
                                       <div className={cn(
-                                        " rounded-2xl p-6 sm:p-8 border shadow-2xl relative overflow-hidden mt-6 w-full",
+                                        "backdrop-blur-md rounded-2xl p-6 sm:p-8 border shadow-2xl relative overflow-hidden mt-6 w-full",
                                         isLightMode ? "bg-white/95 border-slate-200" : "bg-slate-900/40 border-white/5"
                                       )}>
                                         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
@@ -6660,10 +6671,10 @@ export default function App() {
                                       </div>
                                       <div className={cn(
                                         "px-2.5 py-1.5 flex gap-1.5 overflow-x-auto custom-scrollbar whitespace-nowrap border-t relative z-10 shrink-0",
-                                        isLightMode ? "bg-slate-50 border-slate-200" : "bg-slate-900/90 border-cyan-900/40 "
+                                        isLightMode ? "bg-slate-50 border-slate-200" : "bg-slate-900/90 border-cyan-900/40 backdrop-blur-md"
                                       )}>
                                         {quotaLimitReached && (
-                                          <div className="absolute bottom-[40px] left-0 right-0 z-10 bg-red-950/90 border-t border-red-500/30 p-2 flex flex-col gap-1  animate-in slide-in-from-bottom-5">
+                                          <div className="absolute bottom-[40px] left-0 right-0 z-10 bg-red-950/90 border-t border-red-500/30 p-2 flex flex-col gap-1 backdrop-blur-md animate-in slide-in-from-bottom-5">
                                             <div className="flex items-center justify-between">
                                               <div className="flex items-center gap-2">
                                                 <AlertTriangle className="w-2.5 h-2.5 text-red-500 animate-pulse" />
@@ -6678,7 +6689,7 @@ export default function App() {
                                         )}
                                         {(pokemon 
                                           ? [`Lore: ${pokemon?.name}`, `Counter for ${pokemon?.name}?`, `Battle usage?`, `Moveset?`]
-                                          : ["Strongest Pokemon?", "Mega Evolutions?", "Chaos Mode Tips?", "Who is Arceus?"]
+                                          : ["Strongest Pokemon?", "Mega Evolutions?", "Chaos Match Tips?", "Who is Arceus?"]
                                         ).map((s, idx) => (
                                           <button 
                                             key={`suggested-${s}-${idx}`} 
@@ -6698,7 +6709,7 @@ export default function App() {
                                         ))}
                                       </div>
                                       <form onSubmit={handleSendMessage} className={cn(
-                                        "sticky bottom-0 left-0 right-0 p-2.5 border-t flex gap-2 shrink-0 z-30 pb-[max(0.625rem,env(safe-area-inset-bottom))] shadow-2xl ",
+                                        "sticky bottom-0 left-0 right-0 p-2.5 border-t flex gap-2 shrink-0 z-30 pb-[max(0.625rem,env(safe-area-inset-bottom))] shadow-2xl backdrop-blur-md",
                                         isLightMode ? "bg-slate-100/95 border-slate-200" : "bg-slate-900/95 border-cyan-900/40"
                                       )}>
                                         <input
@@ -6737,7 +6748,7 @@ export default function App() {
                                         
                                         <div 
                                           ref={arenaRef}
-                                          className="bg-slate-900/80  rounded-2xl relative shadow-[0_8px_32px_rgba(0,0,0,0.6)] flex flex-col mb-1.5 sm:mb-2 overflow-hidden w-full max-w-full h-auto z-10 arena-container no-scrollbar"
+                                          className="bg-slate-900/80 backdrop-blur-md rounded-2xl relative shadow-[0_8px_32px_rgba(0,0,0,0.6)] flex flex-col mb-1.5 sm:mb-2 overflow-hidden w-full max-w-full h-auto z-10 arena-container no-scrollbar"
                                         >
                                       {/* Battle Background / Field */}
                                       <div className="absolute inset-0 z-0 rounded-xl sm:rounded-2xl overflow-hidden pointer-events-none">
@@ -6883,7 +6894,7 @@ export default function App() {
                                         ref={arenaCallbackRef}
                                         transition={{ duration: 0.25, ease: "easeOut" }}
                                         id="battle-arena-container"
-                                        className="relative flex-1 flex flex-col justify-center min-h-[220px] xs:min-h-[260px] sm:min-h-[300px] md:min-h-[320px] lg:min-h-[340px] h-[300px] sm:h-[340px] lg:h-[380px] max-h-[40vh] z-10 p-[clamp(0.5rem,2vw,1.5rem)] font-bold overflow-hidden w-full max-w-full transform-gpu "
+                                        className="relative flex-1 flex flex-col justify-center min-h-[220px] xs:min-h-[260px] sm:min-h-[300px] md:min-h-[320px] lg:min-h-[340px] h-[300px] sm:h-[340px] lg:h-[380px] max-h-[40vh] z-10 p-[clamp(0.5rem,2vw,1.5rem)] font-bold overflow-hidden w-full max-w-full transform-gpu will-change-transform"
                                         style={{ touchAction: 'pan-y', boxSizing: 'border-box' }}
                                       >
                                         {/* Battle Flash Overlay */}
@@ -6941,7 +6952,7 @@ export default function App() {
                                               animate={getBattleSpriteAnimation(defenderAnimation, opponentStatus)}
                                               transition={getBattleSpriteTransition(defenderAnimation)}
 
-                                              className="relative flex flex-col items-center justify-end  transform-gpu group"
+                                              className="relative flex flex-col items-center justify-end will-change-transform transform-gpu group"
                                             >
                                               <div className="relative h-28 w-28 xs:h-32 xs:w-32 sm:h-40 sm:w-40 md:h-48 md:w-48 lg:h-52 lg:w-52 xl:h-56 xl:w-56 flex items-center justify-center max-h-[40vh]">
                                               {opponentDialogue && (
@@ -7019,7 +7030,7 @@ export default function App() {
                                             animate={getBattleSpriteAnimation(attackerAnimation, pokemonStatus)}
                                             transition={getBattleSpriteTransition(attackerAnimation)}
 
-                                            className="relative flex flex-col items-center justify-end  transform-gpu group"
+                                            className="relative flex flex-col items-center justify-end will-change-transform transform-gpu group"
                                           >
                                             <div className="relative h-32 w-32 xs:h-36 xs:w-36 sm:h-48 sm:w-48 md:h-56 md:w-56 lg:h-64 lg:w-64 xl:h-72 xl:w-72 flex items-center justify-center max-h-[40vh]">
                                               {playerDialogue && (
@@ -7125,7 +7136,7 @@ export default function App() {
                                               initial={{ opacity: 0 }}
                                               animate={{ opacity: 1 }}
                                               exit={{ opacity: 0 }}
-                                              className="absolute inset-0 z-[100] flex flex-col items-center justify-center p-2 sm:p-4 bg-slate-950/50 "
+                                              className="absolute inset-0 z-[100] flex flex-col items-center justify-center p-2 sm:p-4 bg-slate-950/50 backdrop-blur-md"
                                             >
                                               <motion.div 
                                                 initial={{ opacity: 0, scale: 0.9 }}
@@ -7226,7 +7237,7 @@ export default function App() {
                                                         setOpponentHP(oMax);
                                                         setTurnNumber(1);
                                                         sounds.battleStart();
-                                                        setBattleLog([{ text: 'Starting Chaos Mode...', type: 'critical' }]);
+                                                        setBattleLog([{ text: 'Starting Chaos Match...', type: 'critical' }]);
                                                         setBattleState('battling');
                                                         setIsBattling(true);
                                                         setIsChaosMatchSetup(false);
@@ -7253,7 +7264,7 @@ export default function App() {
                                                onClick={runBattle}
                                                disabled={selectedMoves.length === 0 || !battleOpponent}
                                                className={cn(
-                                                 "px-3.5 xs:px-5 sm:px-7 py-1.5 xs:py-2 sm:py-2.5 bg-red-700/90 hover:bg-red-600 text-white font-hud rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5),0_0_10px_rgba(0,0,0,0.8)] transition-all text-[9.5px] xs:text-[10.5px] sm:text-xs uppercase tracking-wider xs:tracking-widest border-2 border-red-400/80 font-black flex items-center gap-1.5 sm:gap-2 active:scale-95 cursor-pointer btn-breathe-red whitespace-nowrap ",
+                                                 "px-3.5 xs:px-5 sm:px-7 py-1.5 xs:py-2 sm:py-2.5 bg-red-700/90 hover:bg-red-600 text-white font-hud rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5),0_0_10px_rgba(0,0,0,0.8)] transition-all text-[9.5px] xs:text-[10.5px] sm:text-xs uppercase tracking-wider xs:tracking-widest border-2 border-red-400/80 font-black flex items-center gap-1.5 sm:gap-2 active:scale-95 cursor-pointer btn-breathe-red whitespace-nowrap backdrop-blur-md",
                                                  (selectedMoves.length === 0 || !battleOpponent) && "opacity-60 cursor-not-allowed bg-slate-900 border-slate-700 text-slate-400 font-medium shadow-none hover:bg-slate-900"
                                                )}
                                              >
@@ -7274,7 +7285,7 @@ export default function App() {
                                            animate={{ opacity: 1, y: 0, scale: 1 }}
                                            exit={{ opacity: 0, y: 25, scale: 0.98 }}
                                            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                                           className="mt-1 sm:mt-2 shrink-0 w-full bg-slate-950/60  rounded-xl p-2 border border-cyan-500/20 shadow-xl relative z-20 flex flex-col gap-2"
+                                           className="mt-1 sm:mt-2 shrink-0 w-full bg-slate-950/60 backdrop-blur-sm rounded-xl p-2 border border-cyan-500/20 shadow-xl relative z-20 flex flex-col gap-2"
                                          >
                                           <HUDCorners />
                                           <div className="flex justify-between items-center px-1">
@@ -7556,7 +7567,7 @@ export default function App() {
                                               
                                               <div className="relative flex items-center justify-center gap-3">
                                                 <span className="text-white font-hud text-xs sm:text-sm font-black tracking-[0.3em] uppercase drop-shadow-[0_0_5px_rgba(34,211,238,1)]">
-                                                  Chaos Mode
+                                                  Full Chaos Match
                                                 </span>
                                               </div>
 
@@ -8819,7 +8830,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/85  overflow-y-auto custom-scrollbar"
+              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto custom-scrollbar"
             >
               <motion.div
                 initial={{ scale: 0.94, y: 12, opacity: 0 }}
@@ -8936,7 +8947,7 @@ export default function App() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[150] flex items-center justify-center p-2 sm:p-4 bg-black/90  overflow-y-auto custom-scrollbar"
+                className="fixed inset-0 z-[150] flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-xl overflow-y-auto custom-scrollbar"
               >
                 <motion.div
                   initial={{ scale: 0.92, y: 20 }}
@@ -9194,7 +9205,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/85  overflow-y-auto custom-scrollbar"
+              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto custom-scrollbar"
             >
               <motion.div
                 initial={{ scale: 0.9, y: 30 }}
@@ -9296,7 +9307,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className={cn("fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/80  overflow-y-auto custom-scrollbar")}
+              className={cn("fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto custom-scrollbar")}
             >
               <motion.div
                 initial={{ scale: 0.94, y: 12, opacity: 0 }}
@@ -9472,7 +9483,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[140] flex items-center justify-center p-2 sm:p-4 bg-black/85  overflow-y-auto custom-scrollbar"
+              className="fixed inset-0 z-[140] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto custom-scrollbar"
             >
               <motion.div
                 initial={{ scale: 0.92, y: 15 }}
@@ -9537,7 +9548,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[130] flex items-center justify-center p-2 sm:p-4 bg-black/80  overflow-y-auto custom-scrollbar"
+              className="fixed inset-0 z-[130] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto custom-scrollbar"
             >
               <motion.div
                 initial={{ scale: 0.94, y: 12, opacity: 0 }}
@@ -9588,14 +9599,14 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-slate-950/90  overflow-y-auto custom-scrollbar"
+              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-slate-950/90 backdrop-blur-md overflow-y-auto custom-scrollbar"
             >
               <motion.div
                 initial={{ scale: 0.95, y: 15 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.95, y: 15 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                className="bg-slate-900/60  rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_15px_60px_rgba(0,0,0,0.6),0_0_40px_rgba(6,182,212,0.15)] flex flex-col max-h-[90dvh] my-auto mx-auto"
+                className="bg-slate-900/60 backdrop-blur-xl rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_15px_60px_rgba(0,0,0,0.6),0_0_40px_rgba(6,182,212,0.15)] flex flex-col max-h-[90dvh] my-auto mx-auto"
               >
                 <div className="p-5 sm:p-7 border-b border-white/5 bg-slate-900/40 relative">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
@@ -9752,7 +9763,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/80  overflow-y-auto custom-scrollbar"
+              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto custom-scrollbar"
             >
               <motion.div
                 initial={{ scale: 0.94, y: 12, opacity: 0 }}
@@ -9873,7 +9884,7 @@ export default function App() {
                   exit={{ opacity: 0, x: 70, scale: 0.92 }}
                   transition={{ type: "spring", stiffness: 350, damping: 25 }}
                   className={cn(
-                    "pointer-events-auto w-full bg-slate-950/95  rounded-xl border p-4 flex gap-3 relative overflow-hidden",
+                    "pointer-events-auto w-full bg-slate-950/95 backdrop-blur-md rounded-xl border p-4 flex gap-3 relative overflow-hidden",
                     borderColor
                   )}
                   onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}
@@ -9925,7 +9936,7 @@ export default function App() {
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
               className="fixed top-24 sm:top-28 left-1/2 -translate-x-1/2 z-[600] pointer-events-none"
             >
-              <div className="bg-slate-950/95 border-2 border-cyan-500 rounded-2xl p-4 shadow-[0_0_30px_rgba(34,211,238,0.4)]  flex items-center gap-4">
+              <div className="bg-slate-950/95 border-2 border-cyan-500 rounded-2xl p-4 shadow-[0_0_30px_rgba(34,211,238,0.4)] backdrop-blur-md flex items-center gap-4">
                 <div className="bg-cyan-500/20 p-2 rounded-full border border-cyan-500/50">
                   <Trophy className="w-6 h-6 text-cyan-400 animate-pulse" />
                 </div>
@@ -9949,7 +9960,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[550] flex items-center justify-center p-4 bg-slate-950/95 "
+              className="fixed inset-0 z-[550] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md"
               id="combat-mission-celebration-overlay"
             >
               {/* Spinning cyber background layer */}

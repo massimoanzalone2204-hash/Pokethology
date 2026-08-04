@@ -5,13 +5,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 let lastHapticTime = 0;
-export const playHaptic = (pattern: number | number[] = 20) => {
+export const playHaptic = (duration: number = 20) => {
   const now = Date.now();
-  if (typeof pattern === 'number' && now - lastHapticTime < 35) return;
+  if (now - lastHapticTime < 35) return;
   lastHapticTime = now;
   if (typeof navigator !== 'undefined' && navigator.vibrate) {
     try {
-      navigator.vibrate(pattern);
+      navigator.vibrate(duration);
     } catch (_) {}
   }
 };
