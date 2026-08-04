@@ -3962,34 +3962,44 @@ export default function App() {
     setActiveTab('battle');
     setShowVSScreen(true);
     sounds.battleStart();
+    playHaptic('heavy');
 
-    // 2. Play Pokémon cries at specific sequential times during the VS screen intro
+    // 2. Clear previous active animations & timeouts
+    if (vsTimeoutRef.current) clearTimeout(vsTimeoutRef.current);
     if (vsPlayerCryTimeoutRef.current) clearTimeout(vsPlayerCryTimeoutRef.current);
     if (vsOpponentCryTimeoutRef.current) clearTimeout(vsOpponentCryTimeoutRef.current);
 
-    if (pokemon?.cries?.latest) {
-      vsPlayerCryTimeoutRef.current = setTimeout(() => {
-        sounds.playCry(pokemon?.name ?? '', pokemon.cries.latest, pokemon?.name?.includes('-gmax') ?? false);
-      }, 300);
-    }
-
-    if (battleOpponent?.cries?.latest) {
-      vsOpponentCryTimeoutRef.current = setTimeout(() => {
-        sounds.playCry(battleOpponent?.name ?? '', battleOpponent.cries.latest, battleOpponent?.name?.includes('-gmax') ?? false);
-      }, 1600);
-    }
-
-    // 2. Clear previous active animations
     setAttackerAnimation('none');
     setDefenderAnimation('none');
     setMoveAnimation('none');
 
-    // 3. Defer the actual state shift until the VS screen finishes (snappy transition)
-    if (vsTimeoutRef.current) clearTimeout(vsTimeoutRef.current);
-    
-    vsTimeoutRef.current = setTimeout(() => {
+    // 3. Play both Pokemon cries completely in sequence before transition auto-completes
+    (async () => {
+      // 300ms initial enter delay
+      await new Promise(r => setTimeout(r, 300));
+
+      if (pokemon?.cries?.latest) {
+        playHaptic('cry');
+        await sounds.playCry(pokemon?.name ?? '', pokemon.cries.latest, pokemon?.name?.includes('-gmax') ?? false, false);
+      } else {
+        await new Promise(r => setTimeout(r, 900));
+      }
+
+      // 350ms buffer between cries
+      await new Promise(r => setTimeout(r, 350));
+
+      if (battleOpponent?.cries?.latest) {
+        playHaptic('cry');
+        await sounds.playCry(battleOpponent?.name ?? '', battleOpponent.cries.latest, battleOpponent?.name?.includes('-gmax') ?? false, false);
+      } else {
+        await new Promise(r => setTimeout(r, 900));
+      }
+
+      // Buffer to allow echo to conclude smoothly
+      await new Promise(r => setTimeout(r, 550));
+
       skipVSScreen();
-    }, 5200);
+    })();
   };
 
   const applyEndOfTurnEffects = async (isPlayer: boolean) => {
@@ -5923,11 +5933,17 @@ export default function App() {
                               </div>
 
                               {/* Alternative Forms / Varieties (Hidden in Pokethology section for a cleaner left interface) */}
-                              {activeTab !== 'chat' && ( (pokemon.varieties && pokemon.varieties.length > 1) || ['pyroar', 'unfezant', 'frillish', 'jellicent', 'hippowdon', 'hippopotas', 'basculegion', 'oinkologne', 'tatsugiri'].some(d => pokemon?.name?.includes(d)) ) && (
+                              {activeTab !== 'chat' && !pokemon?.name?.includes('koraidon') && !pokemon?.name?.includes('miraidon') && ( (pokemon.varieties && pokemon.varieties.length > 1) || ['pyroar', 'unfezant', 'frillish', 'jellicent', 'hippowdon', 'hippopotas', 'basculegion', 'oinkologne', 'tatsugiri'].some(d => pokemon?.name?.includes(d)) ) && (
                                 <div className="w-full mb-3 shrink-0">
                                   {(() => {
                                     let varietiesList = (pokemon.varieties || [{ pokemon: { name: pokemon?.name, url: `https://pokeapi.co/api/v2/pokemon/${pokemon.id || ''}` } }])
-                                      .filter(v => v.pokemon?.name !== 'tatsugiri-curly-mega' && v.pokemon?.name !== 'tatsugiri-droopy-mega' && v.pokemon?.name !== 'floette-eternal-mega');
+                                      .filter(v => 
+                                        v.pokemon?.name !== 'tatsugiri-curly-mega' && 
+                                        v.pokemon?.name !== 'tatsugiri-droopy-mega' && 
+                                        v.pokemon?.name !== 'floette-eternal-mega' &&
+                                        !v.pokemon?.name?.startsWith('koraidon-') &&
+                                        !v.pokemon?.name?.startsWith('miraidon-')
+                                      );
                                     
                                     if (pokemon?.name?.includes('tatsugiri') && !varietiesList.some(v => v.pokemon?.name === 'tatsugiri-stretchy-mega')) {
                                       varietiesList.push({ pokemon: { name: 'tatsugiri-stretchy-mega', url: '' } });

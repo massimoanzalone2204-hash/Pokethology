@@ -760,6 +760,9 @@ function hashCode(str: string): number {
   return Math.abs(hash);
 }
 
+let examCacheKey = '';
+let cachedExams: any = null;
+
 export const PokethologyQuizWidget: React.FC = memo(() => {
   const [activeRegionIndex, setActiveRegionIndex] = useState<number>(0);
   const [userAnswersMap, setUserAnswersMap] = useState<Record<string, number>>({});
@@ -777,11 +780,15 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
     });
   }, []);
 
-  // Dynamically calculate today's selected 3 theory exam questions per region
+  // Dynamically calculate today's selected 3 theory exam questions per region with fast cache
   const allExams = useMemo(() => {
-    const baseHash = hashCode(`${todayStr}_v2_seed_${customSeed}`);
+    const key = `${todayStr}_v2_seed_${customSeed}`;
+    if (examCacheKey === key && cachedExams) {
+      return cachedExams;
+    }
+    const baseHash = hashCode(key);
     
-    return REGION_LORE_DATABASE.map((regionData, rIdx) => {
+    const result = REGION_LORE_DATABASE.map((regionData, rIdx) => {
       const pool = [...regionData.questions];
       const count = 3;
       const picked: RegionQuestion[] = [];
@@ -814,6 +821,10 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
         questions: picked
       };
     });
+
+    examCacheKey = key;
+    cachedExams = result;
+    return result;
   }, [todayStr, customSeed]);
 
   const handleRerollDailyExam = () => {

@@ -5,14 +5,128 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 let lastHapticTime = 0;
-export const playHaptic = (duration: number = 20) => {
+let audioCtx: AudioContext | null = null;
+
+export type HapticPreset = 'light' | 'medium' | 'heavy' | 'selection' | 'success' | 'error' | 'impact' | 'cry';
+
+function playSyntheticMicroTick(type: HapticPreset) {
+  try {
+    if (typeof window === 'undefined') return;
+    const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtxClass) return;
+    if (!audioCtx || audioCtx.state === 'closed') {
+      audioCtx = new AudioCtxClass();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
+    }
+    
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    if (type === 'light' || type === 'selection') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(420, now);
+      osc.frequency.exponentialRampToValueAtTime(180, now + 0.015);
+      gain.gain.setValueAtTime(0.015, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.015);
+      osc.start(now);
+      osc.stop(now + 0.015);
+    } else if (type === 'medium' || type === 'impact') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(260, now);
+      osc.frequency.exponentialRampToValueAtTime(80, now + 0.03);
+      gain.gain.setValueAtTime(0.03, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
+      osc.start(now);
+      osc.stop(now + 0.03);
+    } else if (type === 'heavy' || type === 'cry') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(180, now);
+      osc.frequency.exponentialRampToValueAtTime(40, now + 0.06);
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+      osc.start(now);
+      osc.stop(now + 0.06);
+    } else if (type === 'success') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(520, now);
+      osc.frequency.exponentialRampToValueAtTime(780, now + 0.04);
+      gain.gain.setValueAtTime(0.02, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+      osc.start(now);
+      osc.stop(now + 0.04);
+    } else if (type === 'error') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.setValueAtTime(100, now + 0.025);
+      gain.gain.setValueAtTime(0.025, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+      osc.start(now);
+      osc.stop(now + 0.05);
+    }
+  } catch (_) {}
+}
+
+export const playHaptic = (pattern: number | number[] | HapticPreset = 'selection') => {
   const now = Date.now();
-  if (now - lastHapticTime < 35) return;
+  if (now - lastHapticTime < 25) return;
   lastHapticTime = now;
+
+  let vibrationPattern: number | number[] = 15;
+  let presetName: HapticPreset = 'selection';
+
+  if (typeof pattern === 'string') {
+    presetName = pattern as HapticPreset;
+    switch (pattern) {
+      case 'light':
+      case 'selection':
+        vibrationPattern = 12;
+        break;
+      case 'medium':
+        vibrationPattern = 25;
+        break;
+      case 'heavy':
+        vibrationPattern = [40, 30, 40];
+        break;
+      case 'impact':
+        vibrationPattern = [30, 20, 50];
+        break;
+      case 'success':
+        vibrationPattern = [15, 40, 25];
+        break;
+      case 'error':
+        vibrationPattern = [40, 40, 40, 40];
+        break;
+      case 'cry':
+        vibrationPattern = [25, 40, 25, 40, 30];
+        break;
+      default:
+        vibrationPattern = 15;
+    }
+  } else {
+    vibrationPattern = pattern;
+    if (typeof pattern === 'number') {
+      presetName = pattern > 40 ? 'heavy' : pattern > 20 ? 'medium' : 'light';
+    } else {
+      presetName = 'impact';
+    }
+  }
+
+  let didVibrate = false;
   if (typeof navigator !== 'undefined' && navigator.vibrate) {
     try {
-      navigator.vibrate(duration);
+      didVibrate = navigator.vibrate(vibrationPattern);
     } catch (_) {}
+  }
+
+  // Play subtle synthetic audio micro-tick if navigator.vibrate was unsupported or returned false
+  if (!didVibrate) {
+    playSyntheticMicroTick(presetName);
   }
 };
 

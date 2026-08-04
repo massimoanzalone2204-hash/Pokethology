@@ -150,12 +150,14 @@ const TROPHY_DEFS: TrophyDef[] = [
   }
 ];
 
+let cachedBattleHistory: BattleRecord[] | null = null;
+
 export interface BattleHistoryProps {
   isLightMode?: boolean;
 }
 
-export const BattleHistory: React.FC<BattleHistoryProps> = ({ isLightMode = false }) => {
-    const [history, setHistory] = useState<BattleRecord[]>([]);
+export const BattleHistory: React.FC<BattleHistoryProps> = React.memo(({ isLightMode = false }) => {
+    const [history, setHistory] = useState<BattleRecord[]>(() => cachedBattleHistory || []);
     const [selectedTrophy, setSelectedTrophy] = useState<TrophyDef | null>(TROPHY_DEFS[0]);
     const [hoveredTrophyId, setHoveredTrophyId] = useState<string | null>(null);
     const [filterUnlocked, setFilterUnlocked] = useState<'all' | 'unlocked'>('all');
@@ -176,9 +178,137 @@ export const BattleHistory: React.FC<BattleHistoryProps> = ({ isLightMode = fals
     const fetchHistory = async () => {
         const saved = await idbGetAll(STORES.BATTLE_HISTORY);
         if (saved) {
-            setHistory(saved.sort((a, b) => b.timestamp - a.timestamp));
+            const sorted = saved.sort((a, b) => b.timestamp - a.timestamp);
+            cachedBattleHistory = sorted;
+            setHistory(sorted);
         }
     };
+
+    useEffect(() => {
+        fetchHistory();
+        window.addEventListener('storage', fetchHistory);
+
+        const updateCountdown = () => {
+            const now = new Date();
+            const nextMonday = new Date(now);
+            const day = now.getUTCDay();
+            const diff = day === 0 ? 1 : 8 - day; // days until next Monday in UTC
+            
+            nextMonday.setUTCDate(now.getUTCDate() + diff);
+            nextMonday.setUTCHours(0, 0, 0, 0);
+            nextMonday.setUTCMinutes(0, 0, 0);
+
+            const diffMs = nextMonday.getTime() - now.getTime();
+            const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+            setTimeLeftStr(`${days}d ${hours}h ${minutes}m ${seconds}s UTC`);
+        };
+
+        updateCountdown();
+        const interval = setInterval(updateCountdown, 1000);
+
+        return () => {
+            window.removeEventListener('storage', fetchHistory);
+            clearInterval(interval);
+        };
+    }, []);
+
+    // Memoize streak calculation helper
+    const streakMap = React.useMemo(() => {
+        const startOfWeek = getStartOfWeek(new Date()).getTime();
+        const thisWeeksHistory = history.filter(record => record.timestamp >= startOfWeek);
+        const sorted = [...thisWeeksHistory].sort((a, b) => a.timestamp - b.timestamp);
+
+        const map: Record<string, { current: number; max: number; unlocked: boolean; unlockTimestamp: number | null; unlockOpponent: string | null }> = {};
+
+        for (const trophy of TROPHY_DEFS) {
+            let filtered: BattleRecord[] = [];
+            if (trophy.types.includes('all')) {
+                filtered = sorted;
+            } else {
+                filtered = sorted.filter(record => {
+                    if (!record.opponentTypes) return false;
+                    return record.opponentTypes.some(t => trophy.types.includes(t.toLowerCase()));
+                });
+            }
+
+            let currentStreak = 0;
+            let maxStreak = 0;
+            let unlockTimestamp: number | null = null;
+            let unlockOpponent: string | null = null;
+
+            for (const record of filtered) {
+                const satisfiesRule = trophy.specialRule !== 'no-supereffective' || !record.usedSuperEffective;
+                
+                if (record.result === 'victory' && satisfiesRule) {
+                    currentStreak += 1;
+                    if (currentStreak > maxStreak) {
+                        maxStreak = currentStreak;
+                    }
+                    if (currentStreak >= trophy.targetCount && !unlockTimestamp) {
+                        unlockTimestamp = record.timestamp;
+                        unlockOpponent = record.opponentPokemon;
+                    }
+                } else {
+                    currentStreak = 0;
+                }
+            }
+
+            map[trophy.id] = {
+                current: currentStreak,
+                max: maxStreak,
+                unlocked: maxStreak >= trophy.targetCount,
+                unlockTimestamp,
+                unlockOpponent
+            };
+        }
+
+        return map;
+    }, [history]);
+
+    const getStreak = React.useCallback((trophy: TrophyDef) => {
+        return streakMap[trophy.id] || { current: 0, max: 0, unlocked: false, unlockTimestamp: null, unlockOpponent: null };
+    }, [streakMap]);
+
+    const hasHistory = history.length > 0;
+
+    // Memoize list of unlocked trophies & stats
+    const { unlockedTrophies, totalBattles, victories, defeats, winRate, currentStreakCount, maxStreakCount } = React.useMemo(() => {
+        const unlocked = TROPHY_DEFS.map(t => ({
+            compDef: t,
+            streakData: streakMap[t.id] || { current: 0, max: 0, unlocked: false, unlockTimestamp: null, unlockOpponent: null }
+        })).filter(item => item.streakData.unlocked);
+
+        const total = history.length;
+        const v = history.filter(x => x.result === 'victory').length;
+        const d = total - v;
+        const rate = total > 0 ? Math.round((v / total) * 100) : 0;
+
+        const sortedChronological = [...history].sort((a, b) => a.timestamp - b.timestamp);
+        let currentS = 0;
+        let maxS = 0;
+        for (const r of sortedChronological) {
+            if (r.result === 'victory') {
+                currentS++;
+                if (currentS > maxS) maxS = currentS;
+            } else {
+                currentS = 0;
+            }
+        }
+
+        return {
+            unlockedTrophies: unlocked,
+            totalBattles: total,
+            victories: v,
+            defeats: d,
+            winRate: rate,
+            currentStreakCount: currentS,
+            maxStreakCount: maxS
+        };
+    }, [history, streakMap]);
 
     const handleDownloadSummary = () => {
         const last5 = history.slice(0, 5);
@@ -218,115 +348,6 @@ export const BattleHistory: React.FC<BattleHistoryProps> = ({ isLightMode = fals
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
     };
-
-    useEffect(() => {
-        fetchHistory();
-        window.addEventListener('storage', fetchHistory);
-
-        const updateCountdown = () => {
-            const now = new Date();
-            const nextMonday = new Date(now);
-            const day = now.getUTCDay();
-            const diff = day === 0 ? 1 : 8 - day; // days until next Monday in UTC
-            
-            nextMonday.setUTCDate(now.getUTCDate() + diff);
-            nextMonday.setUTCHours(0, 0, 0, 0);
-            nextMonday.setUTCMinutes(0, 0, 0);
-
-            const diffMs = nextMonday.getTime() - now.getTime();
-            const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-
-            setTimeLeftStr(`${days}d ${hours}h ${minutes}m ${seconds}s UTC`);
-        };
-
-        updateCountdown();
-        const interval = setInterval(updateCountdown, 1000);
-
-        return () => {
-            window.removeEventListener('storage', fetchHistory);
-            clearInterval(interval);
-        };
-    }, []);
-
-    // Helper to calculate streak for a specific trophy and find the unlock details
-    const getStreak = (trophy: TrophyDef) => {
-        const startOfWeek = getStartOfWeek(new Date()).getTime();
-        const thisWeeksHistory = history.filter(record => record.timestamp >= startOfWeek);
-
-        // Sort chronologically (oldest to newest)
-        const sorted = [...thisWeeksHistory].sort((a, b) => a.timestamp - b.timestamp);
-        
-        let filtered: BattleRecord[] = [];
-        if (trophy.types.includes('all')) {
-            filtered = sorted;
-        } else {
-            filtered = sorted.filter(record => {
-                if (!record.opponentTypes) return false;
-                return record.opponentTypes.some(t => trophy.types.includes(t.toLowerCase()));
-            });
-        }
-
-        let currentStreak = 0;
-        let maxStreak = 0;
-        let unlockTimestamp: number | null = null;
-        let unlockOpponent: string | null = null;
-
-        for (const record of filtered) {
-            // Check platinum strict no-supereffective rules
-            const satisfiesRule = trophy.specialRule !== 'no-supereffective' || !record.usedSuperEffective;
-            
-            if (record.result === 'victory' && satisfiesRule) {
-                currentStreak += 1;
-                if (currentStreak > maxStreak) {
-                    maxStreak = currentStreak;
-                }
-                if (currentStreak >= trophy.targetCount && !unlockTimestamp) {
-                    unlockTimestamp = record.timestamp;
-                    unlockOpponent = record.opponentPokemon;
-                }
-            } else {
-                currentStreak = 0; // Streak broken
-            }
-        }
-
-        return {
-            current: currentStreak,
-            max: maxStreak,
-            unlocked: maxStreak >= trophy.targetCount,
-            unlockTimestamp,
-            unlockOpponent
-        };
-    };
-
-    const hasHistory = history.length > 0;
-
-    // Compile list of unlocked trophies
-    const unlockedTrophies = TROPHY_DEFS.map(t => ({
-        compDef: t,
-        streakData: getStreak(t)
-    })).filter(item => item.streakData.unlocked);
-
-    const totalBattles = history.length;
-    const victories = history.filter(x => x.result === 'victory').length;
-    const defeats = totalBattles - victories;
-    const winRate = totalBattles > 0 ? Math.round((victories / totalBattles) * 100) : 0;
-
-    const sortedChronological = [...history].sort((a, b) => a.timestamp - b.timestamp);
-    let currentStreakCount = 0;
-    let maxStreakCount = 0;
-    for (const r of sortedChronological) {
-        if (r.result === 'victory') {
-            currentStreakCount++;
-            if (currentStreakCount > maxStreakCount) {
-                maxStreakCount = currentStreakCount;
-            }
-        } else {
-            currentStreakCount = 0;
-        }
-    }
 
     // Render original Game Badge Case component helper
     const renderMedalCase = (isCabinetMode: boolean = false) => {
@@ -686,4 +707,4 @@ export const BattleHistory: React.FC<BattleHistoryProps> = ({ isLightMode = fals
             )}
         </div>
     );
-};
+});

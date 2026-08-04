@@ -354,16 +354,18 @@ export const sounds = {
     }
   },
   _currentCry: null as HTMLAudioElement | null,
-  playCry: async (pokemonName: string, pokeApiUrl?: string, isGmax: boolean = false) => {
+  playCry: async (pokemonName: string, pokeApiUrl?: string, isGmax: boolean = false, stopPrevious: boolean = true): Promise<void> => {
     try {
-      if (sounds._currentCry) {
+      if (stopPrevious && sounds._currentCry) {
         sounds._currentCry.pause();
         sounds._currentCry.src = ""; 
         sounds._currentCry = null;
       }
 
       const audio = new Audio();
-      sounds._currentCry = audio;
+      if (stopPrevious) {
+        sounds._currentCry = audio;
+      }
       audio.volume = 0.5 * sfxVolume;
 
       const cleanName = pokemonName.toLowerCase().replace(/[^a-z0-9-]/g, '');
@@ -396,7 +398,7 @@ export const sounds = {
       };
 
       for (const url of urls) {
-        if (sounds._currentCry !== audio) return;
+        if (stopPrevious && sounds._currentCry !== audio) return;
 
         try {
           audio.src = url;
@@ -420,7 +422,7 @@ export const sounds = {
             setTimeout(() => { cleanup(); reject(new Error("Timeout")); }, 2000);
           });
 
-          if (sounds._currentCry !== audio) return;
+          if (stopPrevious && sounds._currentCry !== audio) return;
 
           const lowerName = pokemonName.toLowerCase();
           if (isGmax || lowerName.includes('eternamax')) {
@@ -431,13 +433,33 @@ export const sounds = {
           }
 
           await audio.play();
+          
+          // Await playback completion so VS transition knows when cry is finished
+          await new Promise((resolve) => {
+            const onEnded = () => {
+              cleanup();
+              resolve(null);
+            };
+            const onError = () => {
+              cleanup();
+              resolve(null);
+            };
+            const cleanup = () => {
+              audio.removeEventListener('ended', onEnded);
+              audio.removeEventListener('error', onError);
+            };
+            audio.addEventListener('ended', onEnded);
+            audio.addEventListener('error', onError);
+            setTimeout(() => { cleanup(); resolve(null); }, 2200);
+          });
+
           return;
         } catch (e) {
-          if (sounds._currentCry !== audio) return;
+          if (stopPrevious && sounds._currentCry !== audio) return;
         }
       }
       
-      if (sounds._currentCry === audio) {
+      if (!stopPrevious || sounds._currentCry === audio) {
         console.warn(`All cry sources failed, generating procedural retro synth cry for: ${pokemonName}`);
         // Beautiful fallback procedural cry
         const hash = pokemonName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -445,6 +467,7 @@ export const sounds = {
         const duration = 0.3 + ((hash % 10) / 20);
         playTone(freqBase, 'sawtooth', duration, 0.08);
         setTimeout(() => playTone(freqBase * 1.3, 'triangle', duration * 0.7, 0.05), 50);
+        await new Promise(r => setTimeout(r, (duration + 0.1) * 1000));
       }
     } catch (e) {
       console.error("Audio playback failed", e);
