@@ -12,7 +12,6 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@babel/parser": "^8.0.4",
     "@google/genai": "^1.48.0",
     "@tailwindcss/vite": "^4.1.14",
     "@types/cors": "^2.8.19",
@@ -51,7 +50,6 @@
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
-    "vite": "^6.2.0",
-    "vite-plugin-compression2": "^2.5.3"
+    "vite": "^6.2.0"
   }
 }
