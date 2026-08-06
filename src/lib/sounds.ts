@@ -823,94 +823,9 @@ export const sounds = {
   playBGM: (theme: string) => {
     try {
       sounds.stopBGM();
-      const ctx = getAudioContext();
       currentTheme = theme;
-      
-      let step = 0;
-      
-      // 4 Sophisticated, complicated, non-fastidious melodic tracks with rich multi-octave sequences & polyphony
-      const trackSequences: Record<string, { bass: number[]; lead: number[]; speed: number }> = {
-        route1: {
-          bass: [130.81, 146.83, 164.81, 174.61, 196.00, 220.00, 246.94, 261.63, 220.00, 196.00, 174.61, 164.81, 146.83, 130.81, 110.00, 123.47],
-          lead: [261.63, 329.63, 392.00, 523.25, 493.88, 392.00, 329.63, 293.66, 349.23, 440.00, 523.25, 659.25, 587.33, 523.25, 440.00, 392.00],
-          speed: 300
-        },
-        battle: {
-          bass: [110.00, 110.00, 130.81, 123.47, 98.00, 98.00, 110.00, 130.81, 146.83, 130.81, 123.47, 110.00, 98.00, 92.50, 98.00, 110.00],
-          lead: [220.00, 261.63, 329.63, 349.23, 440.00, 523.25, 440.00, 349.23, 329.63, 293.66, 261.63, 220.00, 196.00, 220.00, 261.63, 329.63],
-          speed: 220
-        },
-        forest: {
-          bass: [174.61, 174.61, 220.00, 220.00, 196.00, 196.00, 164.81, 164.81, 146.83, 146.83, 174.61, 174.61, 130.81, 130.81, 164.81, 196.00],
-          lead: [349.23, 440.00, 523.25, 659.25, 587.33, 523.25, 440.00, 392.00, 329.63, 392.00, 440.00, 523.25, 493.88, 440.00, 392.00, 349.23],
-          speed: 380
-        },
-        champion: {
-          bass: [98.00, 110.00, 123.47, 130.81, 146.83, 164.81, 174.61, 196.00, 196.00, 174.61, 164.81, 146.83, 130.81, 123.47, 110.00, 98.00],
-          lead: [392.00, 493.88, 587.33, 783.99, 659.25, 587.33, 493.88, 392.00, 440.00, 523.25, 659.25, 880.00, 783.99, 659.25, 523.25, 440.00],
-          speed: 200
-        }
-      };
-
-      const currentTrack = trackSequences[theme] || trackSequences.route1;
-      let stepSpeed = currentTrack.speed / tempoMultiplier;
-
-      bgmInterval = window.setInterval(() => {
-        if (bgmVolume * bgmFadeMultiplier <= 0.01) return;
-        const now = ctx.currentTime;
-        const bassFreq = currentTrack.bass[step % currentTrack.bass.length];
-        const leadFreq = currentTrack.lead[step % currentTrack.lead.length];
-
-        // Layer 1: Sophisticated Bass / Rhythm Pulse
-        const bassOsc = ctx.createOscillator();
-        const bassFilter = ctx.createBiquadFilter();
-        const bassGain = ctx.createGain();
-
-        bassOsc.type = theme === 'battle' || theme === 'champion' ? 'sawtooth' : 'triangle';
-        bassOsc.frequency.setValueAtTime(bassFreq, now);
-
-        bassFilter.type = 'lowpass';
-        bassFilter.frequency.setValueAtTime(theme === 'battle' ? 1400 : 600, now);
-        bassFilter.frequency.exponentialRampToValueAtTime(200, now + 0.2);
-
-        bassGain.gain.setValueAtTime(0, now);
-        bassGain.gain.linearRampToValueAtTime(0.09 * bgmVolume * bgmFadeMultiplier, now + 0.02);
-        bassGain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
-
-        bassOsc.connect(bassFilter);
-        bassFilter.connect(bassGain);
-        bassGain.connect(ctx.destination);
-
-        bassOsc.start(now);
-        bassOsc.stop(now + 0.28);
-
-        // Layer 2: Evolving Lead Melody / Harmony Arpeggio
-        if (step % 2 === 0 || theme === 'champion') {
-          const leadOsc = ctx.createOscillator();
-          const leadFilter = ctx.createBiquadFilter();
-          const leadGain = ctx.createGain();
-
-          leadOsc.type = theme === 'forest' ? 'sine' : 'square';
-          leadOsc.frequency.setValueAtTime(leadFreq, now);
-
-          leadFilter.type = 'bandpass';
-          leadFilter.frequency.setValueAtTime(2200, now);
-          leadFilter.Q.setValueAtTime(8, now);
-
-          leadGain.gain.setValueAtTime(0, now);
-          leadGain.gain.linearRampToValueAtTime(0.05 * bgmVolume * bgmFadeMultiplier, now + 0.015);
-          leadGain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-
-          leadOsc.connect(leadFilter);
-          leadFilter.connect(leadGain);
-          leadGain.connect(ctx.destination);
-
-          leadOsc.start(now);
-          leadOsc.stop(now + 0.22);
-        }
-
-        step++;
-      }, stepSpeed);
+      // Procedural BGM playback disabled per configuration; BGM volume bar preserved on settings
+      return;
     } catch (e) {
       console.warn("BGM initialization failed:", e);
     }

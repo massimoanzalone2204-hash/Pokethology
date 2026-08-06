@@ -66,8 +66,7 @@ export const OfflineManagerModal: React.FC<OfflineManagerModalProps> = ({
   const [customThreshold, setCustomThreshold] = useState<number>(50);
   const [quotaInputMap, setQuotaInputMap] = useState<Record<ServiceName, number>>({
     pokeapi: 1000,
-    gemini_ai: 50,
-    youtube_api: 100
+    gemini_ai: 50
   });
 
   const [notification, setNotification] = useState<{ text: string; type: 'success' | 'warn' | 'info' } | null>(null);
@@ -102,8 +101,7 @@ export const OfflineManagerModal: React.FC<OfflineManagerModalProps> = ({
       setQuotas(currentQuotas);
       setQuotaInputMap({
         pokeapi: currentQuotas.pokeapi.limit,
-        gemini_ai: currentQuotas.gemini_ai.limit,
-        youtube_api: currentQuotas.youtube_api.limit
+        gemini_ai: currentQuotas.gemini_ai.limit
       });
     }
   }, [isOpen]);

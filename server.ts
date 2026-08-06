@@ -55,8 +55,8 @@ const ai = new GoogleGenAI({
   }
 });
 
-const DEFAULT_MODEL = "gemini-1.5-flash";
-const LITE_MODEL = "gemini-1.5-flash-lite";
+const DEFAULT_MODEL = "gemini-3.6-flash";
+const LITE_MODEL = "gemini-3.1-flash-lite";
 
 // --- OFFLINE GENERATIVE ENGINE (Fallback Mode) ---
 
@@ -1225,7 +1225,7 @@ app.post("/api/analyze", async (req, res) => {
       contents: `Perform a detailed tactical analysis of this Pokémon battle: ${JSON.stringify(battleData)}`,
       config: {
         maxOutputTokens: 250,
-        systemInstruction: `You are a Battle Frontier Strategist. System Key: ${process.env.POKETHOLOGY || "Pokédex"}. Provide concise, high-impact tactical advice under 80 words. Use plenty of expressive emojis (🔮, ⚔️, 🛡️, 💥, ⚡, 🎯, 📊, 🧬) for visual signaling. Focus on 1v1 singles battle formats, type advantages, HP management, and predicted opponent moves where switching is not possible.
+        systemInstruction: `You are a Battle Frontier Strategist. System Key: Pokédex. Provide concise, high-impact tactical advice under 80 words. Use plenty of expressive emojis (🔮, ⚔️, 🛡️, 💥, ⚡, 🎯, 📊, 🧬) for visual signaling. Focus on 1v1 singles battle formats, type advantages, HP management, and predicted opponent moves where switching is not possible.
         
         CRITICAL MULTILINGUAL MANDATE: The user's preferred language is ${targetLangName}. You MUST write the entire analysis in ${targetLangName}. Translate all tactical reports, status values, and directions cleanly to ${targetLangName}.`,
       }
@@ -1276,7 +1276,7 @@ app.post("/api/suggest", async (req, res) => {
       contents: `Provide a single, incredibly interesting fun fact or pro battle tip about ${pokemonName}. Keep it under 20 words with expressive emojis. Write this fact exclusively in ${targetLangName}.`,
       config: {
         maxOutputTokens: 100,
-        systemInstruction: `You are Pokéthology. System Key: ${process.env.POKETHOLOGY || "Pokédex"}. You provide ultra-short, punchy, and fascinating Pokémon insights with expressive emojis (🧬, ✨, 💥, 🌟, 🔮), written exclusively in ${targetLangName}.`,
+        systemInstruction: `You are Pokéthology. System Key: Pokédex. You provide ultra-short, punchy, and fascinating Pokémon insights with expressive emojis (🧬, ✨, 💥, 🌟, 🔮), written exclusively in ${targetLangName}.`,
       }
     });
 
@@ -1327,7 +1327,7 @@ app.post("/api/strategy", async (req, res) => {
       - Opponent: ${battleData.opponent?.name || "the opponent"} (Type: ${battleData.opponent?.types?.join('/') || "unknown"}, HP: ${battleData.opponent?.hpPercent || 100}%, Status: ${battleData.opponent?.status || "Healthy"}).`,
       config: {
         maxOutputTokens: 150,
-        systemInstruction: `You are the ultimate competitive Pokémon Grandmaster AI Coach. System Key: ${process.env.POKETHOLOGY || "Pokétheology Tactical Engine"}.
+        systemInstruction: `You are the ultimate competitive Pokémon Grandmaster AI Coach. System Key: Pokétheology Tactical Engine.
         Deliver an ultra-concise, direct, highly strategic 1v1 battle suggestion. Keep it under 40-50 words total!
         Format exactly as 2 tiny bullet lines with emojis for critical tactical signaling:
         • 🔮 **ANALYSIS**: Direct, fast speed/vulnerability threat assessment.
@@ -1358,7 +1358,7 @@ async function setupVite() {
   const isProd = process.env.NODE_ENV === "production" || process.argv[1]?.endsWith('server.cjs');
   if (!isProd) {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { middlewareMode: true, hmr: false },
       appType: "spa",
     });
     app.use(vite.middlewares);

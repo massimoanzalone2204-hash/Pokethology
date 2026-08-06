@@ -6,7 +6,7 @@ interface AudioSettingsProps {
   mode?: 'full' | 'simple';
 }
 
-export function AudioSettings({ mode = 'full' }: AudioSettingsProps) {
+export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
   const [bgmPlaying, setBgmPlaying] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<'route1' | 'battle' | 'forest' | 'champion'>('route1');
   const [bgmVolume, setBgmVolume] = useState(sounds.getBGMVolume());

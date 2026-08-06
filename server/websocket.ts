@@ -17,7 +17,7 @@ try {
 }
 
 const getApiKey = () => process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-const LITE_MODEL = "gemini-1.5-flash";
+const LITE_MODEL = "gemini-3.1-flash-lite";
 
 const ai = new GoogleGenAI({
   apiKey: getApiKey(),
@@ -392,33 +392,6 @@ export function initializeWebSocketServer(server: http.Server) {
               clearInterval(diagInterval);
             }
           }, 400);
-        }
-
-        // 4. REALTIME BATTLE STAT COUNTER PREDICTOR OVER WS
-        if (type === "battle:sync") {
-          const { opponent, playerHP, opponentHP, playerPokemon } = payload;
-          if (!opponent) return;
-
-          // Simple live combat hint generated on server and pushed down
-          let hintText = "";
-          if (playerHP < 35) {
-            hintText = `🚨 **ALERT:** Player is at ${playerHP}%! Deploy shields or prioritization moves over socket commands immediately!`;
-          } else if (opponentHP < 40) {
-            hintText = `🔥 **OPPORTUNITY:** Opponent ${opponent.toUpperCase()} is weak at ${opponentHP}% HP! Go for full offensive power!`;
-          } else {
-            hintText = `⚡ **SYNC DIALOGUE:** High speed socket combat active. Maintain STAB attacks and watch opponent swap alerts.`;
-          }
-
-          ws.send(JSON.stringify({
-            type: "battle:insight",
-            payload: {
-              hint: hintText,
-              opponent,
-              playerHP,
-              opponentHP,
-              timestamp: new Date().toLocaleTimeString()
-            }
-          }));
         }
 
         // 5. LIVE QUIZ CHALLENGE DISPATCHER

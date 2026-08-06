@@ -3,7 +3,7 @@ import { idbGet, idbSet, idbGetAll, idbDelete, STORES } from "./lib/indexedDB";
 import { checkQuotaAllowed, recordApiUsage } from "./lib/quotaManager";
 import { useState, useEffect, useRef, useTransition, useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Download, Search, Loader2, Database, Sparkles, Volume2, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork } from 'lucide-react';
+import { Download, Search, Loader2, Database, Sparkles, Volume2, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork, Github } from 'lucide-react';
 import { EvolutionNodeComponent } from './components/EvolutionNodeComponent';
 
 import { PokethologyLogo } from './components/PokethologyLogo';
@@ -32,14 +32,14 @@ import ReactPlayer from 'react-player';
 
 import { pokeApi, isApiError } from './lib/pokeApiService';
 
-// Lazy loaded heavy UI and modal chunks via dynamic import()
-const BattleResultScreen = React.lazy(() => import('./components/BattleResultScreen').then(m => ({ default: m.BattleResultScreen })));
-const Tutorial = React.lazy(() => import('./components/Tutorial').then(m => ({ default: m.Tutorial })));
-const PokethologyQuizWidget = React.lazy(() => import('./components/PokethologyQuizWidget').then(m => ({ default: m.PokethologyQuizWidget })));
-const MoveModal = React.lazy(() => import('./components/MoveModal').then(m => ({ default: m.MoveModal })));
-const BattleHistory = React.lazy(() => import('./components/BattleHistory').then(m => ({ default: m.BattleHistory })));
-const AboutModal = React.lazy(() => import('./components/AboutModal').then(m => ({ default: m.AboutModal })));
-const OfflineManagerModal = React.lazy(() => import('./components/OfflineManagerModal').then(m => ({ default: m.OfflineManagerModal })));
+// Directly imported UI and modal components for instant rendering
+import { BattleResultScreen } from './components/BattleResultScreen';
+import { Tutorial } from './components/Tutorial';
+import { PokethologyQuizWidget } from './components/PokethologyQuizWidget';
+import { MoveModal } from './components/MoveModal';
+import { BattleHistory } from './components/BattleHistory';
+import { AboutModal } from './components/AboutModal';
+import { OfflineManagerModal } from './components/OfflineManagerModal';
 
 const getShowdownName = (name: string, isFemale: boolean = false) => {
   if (!name) return '';
@@ -1435,29 +1435,10 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
       {/* ID Badge */}
       {!isCardView && (
         <div className="absolute top-2 left-2.5 px-1.5 py-0.5 rounded bg-slate-950/80 border border-slate-800 text-[7px] font-bold font-mono text-cyan-600 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all flex items-center gap-1 z-20">
-          <span className={cn("w-1 h-1 rounded-full bg-cyan-900 group-hover:bg-cyan-400", enableAnimations && "group-hover:animate-pulse")}></span>
           {isSpecial && !isMega && !isGmax
             ? "SPECIAL" 
             : `#${String(displayId || "0").padStart(4, '0')}`}
         </div>
-      )}
-
-      {/* Cry Player Button */}
-      {!isCardView && (
-        <motion.button
-          whileHover={{ scale: 1.15, rotate: [0, -10, 10, 0] }}
-          whileTap={{ scale: 0.9 }}
-          transition={{ duration: 0.4 }}
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            sounds.playCry(p.name, p.cries?.latest || `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${id || displayId}.ogg`, isGmax);
-          }}
-          className="absolute top-2 right-2.5 p-1 rounded bg-slate-950/80 border border-slate-800 hover:border-cyan-500/40 hover:text-cyan-400 text-slate-500 hover:bg-cyan-950/40 transition-colors z-20 group/cry"
-          title={`Play ${p.name.replace(/-/g, ' ')} Cry`}
-        >
-          <Volume2 className="w-3 h-3 group-hover/cry:animate-pulse" />
-        </motion.button>
       )}
 
       {/* Scanline Effect */}
@@ -3090,7 +3071,9 @@ export default function App() {
         }),
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
+      let data: any = {};
+      try { data = JSON.parse(responseText); } catch (_) { data = { error: responseText || "Rate limit or server error", isQuotaExhausted: true }; }
       if (response.status === 429 || data.isQuotaExhausted) {
         if (data.isQuotaExhausted || data.percentRemaining === 0) {
           setQuotaLimitReached(true);
@@ -4648,7 +4631,9 @@ export default function App() {
         }),
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
+      let data: any = {};
+      try { data = JSON.parse(responseText); } catch (_) { data = { error: responseText || "Rate limit or server error", isQuotaExhausted: true }; }
       if (response.status === 429 || data.isQuotaExhausted) {
         if (data.isQuotaExhausted || data.percentRemaining === 0) {
           setQuotaLimitReached(true);
@@ -4751,7 +4736,9 @@ export default function App() {
         }),
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
+      let data: any = {};
+      try { data = JSON.parse(responseText); } catch (_) { data = { error: responseText || "Rate limit or server error", isQuotaExhausted: true }; }
       if (response.status === 429 || data.isQuota === true || data.isQuotaExhausted) {
         if (data.isQuotaExhausted || data.percentRemaining === 0) {
           setQuotaLimitReached(true);
@@ -4945,7 +4932,9 @@ export default function App() {
             }),
           })
           .then(async res => {
-            const data = await res.json();
+            const resText = await res.text();
+            let data: any = {};
+            try { data = JSON.parse(resText); } catch (_) { data = { error: resText || "Rate limit or server error", isQuotaExhausted: true }; }
             if (res.status === 429 || data.isQuotaExhausted) {
                if (data.isQuotaExhausted || data.percentRemaining === 0) {
                  setQuotaLimitReached(true);
@@ -5513,21 +5502,7 @@ export default function App() {
               </span>
             </motion.button>
 
-             {/* Connection Status Indicator in Top-Right Header */}
-             <div className={cn(
-               "hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-lg border text-[10px] font-mono uppercase tracking-wider shrink-0 transition-all",
-               quotaLimitReached
-                 ? "bg-red-950/60 border-red-500/60 text-red-300 shadow-[0_0_12px_rgba(239,68,68,0.3)] animate-pulse"
-                 : "bg-emerald-950/40 border-emerald-500/40 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
-             )}>
-               <span className={cn(
-                 "w-2 h-2 rounded-full",
-                 quotaLimitReached ? "bg-red-500 animate-ping" : "bg-emerald-400 animate-pulse"
-               )} />
-               <span className="font-bold">
-                 {quotaLimitReached ? "AI OFFLINE (QUOTA LIMIT)" : "AI ONLINE (GEMINI)"}
-               </span>
-             </div>
+
 
              
 
@@ -6598,13 +6573,13 @@ export default function App() {
                                                     Bulbapedia
                                                   </a>
                                                   <a 
-                                                    href={`https://pokemon.fandom.com/wiki/${encodeURIComponent(pokemon.name)}`} 
+                                                    href={`https://www.serebii.net/search.shtml?q=${encodeURIComponent(pokemon.name)}`} 
                                                     target="_blank" 
                                                     rel="noopener noreferrer" 
                                                     className="inline-flex items-center gap-1 text-[7.5px] font-hud font-black uppercase tracking-wider text-cyan-400 hover:text-cyan-200 bg-slate-950/40 hover:bg-cyan-500/15 border border-cyan-500/20 px-2 py-0.5 rounded transition-colors"
                                                   >
                                                     <Globe className="w-2.5 h-2.5 text-cyan-500" />
-                                                    Fandom
+                                                    Serebii
                                                   </a>
 
                                                   <a 
@@ -7404,38 +7379,7 @@ export default function App() {
                                       <div className="lg:col-span-4 flex flex-col gap-4 w-full min-w-0 select-none pb-0 z-20">
                                         <AnimatePresence>
                                           {isBattling && <BattleLog log={battleLog} enableAnimations={enableAnimations} turn={turn || 'player'} isBattling={isBattling} />}
-                                        </AnimatePresence>
-
-                                     {/* WebSocket Live Telemetry Insight Box */}
-                                     {isBattling && wsBattleInsight && (
-                                       <motion.div
-                                         initial={{ opacity: 0, scale: 0.98, y: 5 }}
-                                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                                         className="bg-slate-950/90 rounded-xl border border-cyan-500/40 p-3 sm:p-4 text-[10px] sm:text-[11px] leading-relaxed relative overflow-hidden shadow-[0_0_15px_rgba(6,182,212,0.15)] select-text my-2"
-                                       >
-                                         <div className="absolute top-0 left-0 w-full h-[1.5px] bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent" />
-                                         <div className="flex justify-between items-center mb-1.5 border-b border-cyan-900/30 pb-1">
-                                           <div className="flex items-center gap-1.5">
-                                             <span className="relative flex h-1.5 w-1.5">
-                                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                                               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span>
-                                             </span>
-                                             <span className="text-[8px] font-black uppercase tracking-[0.2em] font-hud text-cyan-400 font-bold">
-                                               REAL-TIME SOCKET INTEL COUNTERS
-                                             </span>
-                                           </div>
-                                           <button 
-                                             onClick={() => setWsBattleInsight(null)}
-                                             className="text-[7.5px] font-hud text-cyan-400 hover:text-cyan-300 transition-colors uppercase font-bold"
-                                           >
-                                             Dismiss
-                                           </button>
-                                         </div>
-                                         <p className="text-cyan-200 font-mono text-[9px] leading-relaxed select-text">
-                                           {wsBattleInsight}
-                                         </p>
-                                       </motion.div>
-                                     )}
+                                         </AnimatePresence>
 
                                      
                                      {/* AI Coach Tactical Advice Panel - Displayed directly inside the Combat Arena */}
@@ -9358,7 +9302,6 @@ export default function App() {
                       <span className="text-cyan-300 font-hud uppercase text-[9px] font-bold tracking-widest">Theme</span>
                     </div>
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={handleThemeToggle}
                       className="relative w-12 h-6 rounded-full bg-slate-900/30 border border-slate-700/50 transition-colors focus:outline-none"
@@ -9377,27 +9320,7 @@ export default function App() {
                     </motion.button>
                   </div>
 
-                  {/* Animations Toggle Selector */}
-                  <div className="flex flex-col sm:flex-row items-center justify-between pt-2 border-t border-slate-900/80 gap-2">
-                    <div className="flex flex-col text-center sm:text-left items-center sm:items-start">
-                      <span className="text-cyan-300 font-hud uppercase text-[9px] font-bold tracking-widest">Animations</span>
-                      <span className="text-[7.5px] text-slate-500 font-mono leading-none mt-1 text-center sm:text-left">Slick motion transitions & effects</span>
-                    </div>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => {
-                        setEnableAnimations(!enableAnimations);
-                        sounds.scan();
-                      }}
-                      className={cn(
-                        "px-3 py-1.5 rounded font-hud uppercase text-[9px] font-extrabold tracking-widest transition-all",
-                        enableAnimations ? "bg-cyan-600/20 text-cyan-400 border border-cyan-500/40 shadow-[0_0_10px_rgba(34,211,238,0.15)]" : "bg-slate-800 text-slate-500 border border-transparent"
-                      )}
-                    >
-                      {enableAnimations ? 'ACTIVE' : 'MUTED'}
-                    </motion.button>
-                  </div>
+                  
                 </div>
 
                 <div className="flex flex-col gap-2 w-full text-center">
@@ -9405,7 +9328,6 @@ export default function App() {
                   
                   <div className="flex flex-col gap-2">
                     <motion.button
-                      whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => {
                         setIsSettingsOpen(false);
@@ -9415,7 +9337,7 @@ export default function App() {
                       className="flex items-center justify-between p-3.5 bg-slate-950/40 hover:bg-slate-950/80 border border-cyan-900/30 hover:border-cyan-500/40 rounded-xl transition-all group w-full"
                     >
                       <div className="flex items-center gap-2 text-cyan-400">
-                        <BookOpen className="w-4 h-4 shrink-0" />
+                        <BookOpen className="w-4 h-4 shrink-0 text-cyan-400 group-hover:scale-110 transition-transform" />
                         <div className="flex flex-col text-left">
                           <span className="font-hud text-[8px] font-bold tracking-wider uppercase tracking-widest whitespace-nowrap">Tutorial</span>
                           <span className="text-[7.5px] font-mono text-slate-400 leading-none mt-0.5">Interactive guide & controls walkthrough</span>
@@ -9445,31 +9367,27 @@ export default function App() {
                       </span>
                     </a>
 
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        setIsSettingsOpen(false);
-                        setIsAboutOpen(true);
-                        sounds.scan();
-                      }}
-                      className="flex items-center justify-between p-3.5 bg-slate-950/40 hover:bg-slate-950/80 border border-cyan-900/30 hover:border-cyan-500/40 rounded-xl transition-all group w-full"
+                    <a
+                      href="https://github.com/massimoanzalone2204-hash/Pokethology"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => sounds.scan()}
+                      className="flex items-center justify-between p-3.5 bg-slate-950/40 hover:bg-slate-950/80 border border-cyan-900/30 hover:border-cyan-500/40 rounded-xl transition-all group w-full text-cyan-400"
                     >
-                      <div className="flex items-center gap-2 text-cyan-400">
-                        <Info className="w-4 h-4 shrink-0" />
+                      <div className="flex items-center gap-2">
+                        <Github className="w-4 h-4 shrink-0 text-cyan-400 group-hover:scale-110 transition-transform" />
                         <div className="flex flex-col text-left">
-                          <span className="font-hud text-[8px] font-bold tracking-wider uppercase tracking-widest whitespace-nowrap">Pokéthology Core Info</span>
-                          <span className="text-[7.5px] font-mono text-slate-400 leading-none mt-0.5">App version, build specs & system info</span>
+                          <span className="font-hud text-[8px] font-bold tracking-wider uppercase tracking-widest whitespace-nowrap">GitHub Repository</span>
+                          <span className="text-[7.5px] font-mono text-slate-400 leading-none mt-0.5">Visit official GitHub repository</span>
                         </div>
                       </div>
                       <span className="text-[7px] font-mono text-cyan-600 group-hover:text-cyan-300 uppercase tracking-widest">
-                        Open
+                        Visit
                       </span>
-                    </motion.button>
+                    </a>
                   </div>
 
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleSystemRestart}
                     disabled={isRebooting}
@@ -9826,7 +9744,7 @@ export default function App() {
                         {enableAnimations ? 'Enabled' : 'Disabled'}
                       </button>
                     </div>
-                    <AudioSettings mode="full" />
+                    <AudioSettings mode="simple" />
 
 
                     

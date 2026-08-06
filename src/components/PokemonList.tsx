@@ -270,7 +270,6 @@ export const PokemonList = memo(({
                     
                     {/* Tiny YouTube-style item badge / Unit Indicator */}
                     <div className="absolute top-2.5 left-3 text-[9px] font-mono text-slate-500 group-hover:text-slate-400 transition-colors flex items-center gap-1.5 shrink-0">
-                      <span className={cn("w-1.5 h-1.5 rounded-full", isSelected ? "bg-cyan-500" : isOpponentSelected ? "bg-red-500" : isComparisonSelected ? "bg-amber-500" : "bg-slate-700 group-hover:bg-slate-400")}></span>
                       <span>#{String(displayId || "0").padStart(4, '0')}</span>
                     </div>
 

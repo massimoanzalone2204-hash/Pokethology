@@ -3,8 +3,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const DEFAULT_MODEL = "gemini-1.5-flash";
-const LITE_MODEL = "gemini-1.5-flash-lite";
+const DEFAULT_MODEL = "gemini-3.6-flash";
+const LITE_MODEL = "gemini-3.1-flash-lite";
 
 const getApiKey = () => process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 

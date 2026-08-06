@@ -216,6 +216,19 @@ export const BattleHistory: React.FC<BattleHistoryProps> = React.memo(({ isLight
         };
     }, []);
 
+    const handleDownloadSummary = () => {
+      const summaryText = history.slice(0, 5).map((r, i) => 
+        `Battle #${i + 1}: ${r.playerPokemon} vs ${r.opponentPokemon} - Result: ${r.result.toUpperCase()} (${new Date(r.timestamp).toLocaleString()})`
+      ).join("\n");
+      const blob = new Blob([summaryText || "No battle logs recorded yet."], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "battle-history-summary.txt";
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+
     // Memoize streak calculation helper
     const streakMap = React.useMemo(() => {
         const startOfWeek = getStartOfWeek(new Date()).getTime();

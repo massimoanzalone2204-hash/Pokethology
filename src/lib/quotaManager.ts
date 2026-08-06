@@ -1,8 +1,8 @@
 // API Quota State Management System
-// Tracks local API request counters for PokeAPI, Gemini AI Strategy, and YouTube services.
+// Tracks local API request counters for PokeAPI and Gemini AI Strategy services.
 // Provides local quota limits, warning thresholds, daily auto-resets, and offline cloud simulation.
 
-export type ServiceName = 'pokeapi' | 'gemini_ai' | 'youtube_api';
+export type ServiceName = 'pokeapi' | 'gemini_ai';
 
 export interface ServiceQuotaConfig {
   name: string;
@@ -26,13 +26,6 @@ export const SERVICES_CONFIG: Record<ServiceName, ServiceQuotaConfig> = {
     defaultLimit: 50,
     description: 'AI battle suggestions, theological lore generation, and team synergy diagnostics',
     unitName: 'Prompts'
-  },
-  youtube_api: {
-    name: 'YouTube & Audio API',
-    service: 'youtube_api',
-    defaultLimit: 100,
-    description: 'Playlist queries, trainer music syncing, and audio track streaming',
-    unitName: 'Streams'
   }
 };
 
@@ -84,15 +77,13 @@ function getStoredLimits(): Record<ServiceName, number> {
       const parsed = JSON.parse(custom);
       return {
         pokeapi: parsed.pokeapi || SERVICES_CONFIG.pokeapi.defaultLimit,
-        gemini_ai: parsed.gemini_ai || SERVICES_CONFIG.gemini_ai.defaultLimit,
-        youtube_api: parsed.youtube_api || SERVICES_CONFIG.youtube_api.defaultLimit
+        gemini_ai: parsed.gemini_ai || SERVICES_CONFIG.gemini_ai.defaultLimit
       };
     } catch (_) {}
   }
   return {
     pokeapi: SERVICES_CONFIG.pokeapi.defaultLimit,
-    gemini_ai: SERVICES_CONFIG.gemini_ai.defaultLimit,
-    youtube_api: SERVICES_CONFIG.youtube_api.defaultLimit
+    gemini_ai: SERVICES_CONFIG.gemini_ai.defaultLimit
   };
 }
 
@@ -115,8 +106,7 @@ function getStoredQuotaData(): StoredQuotaData {
           dateStr: today,
           counts: {
             pokeapi: parsed.counts?.pokeapi || 0,
-            gemini_ai: parsed.counts?.gemini_ai || 0,
-            youtube_api: parsed.counts?.youtube_api || 0
+            gemini_ai: parsed.counts?.gemini_ai || 0
           }
         };
       }
@@ -126,7 +116,7 @@ function getStoredQuotaData(): StoredQuotaData {
   // Daily Reset cycle
   const resetData: StoredQuotaData = {
     dateStr: today,
-    counts: { pokeapi: 0, gemini_ai: 0, youtube_api: 0 }
+    counts: { pokeapi: 0, gemini_ai: 0 }
   };
   localStorage.setItem(QUOTA_STORAGE_KEY, JSON.stringify(resetData));
   return resetData;
@@ -168,8 +158,7 @@ export function getQuotaStatus(service: ServiceName): QuotaStatus {
 export function getAllQuotaStatuses(): Record<ServiceName, QuotaStatus> {
   return {
     pokeapi: getQuotaStatus('pokeapi'),
-    gemini_ai: getQuotaStatus('gemini_ai'),
-    youtube_api: getQuotaStatus('youtube_api')
+    gemini_ai: getQuotaStatus('gemini_ai')
   };
 }
 
@@ -195,7 +184,7 @@ export function resetQuotaUsage(service?: ServiceName): void {
   if (service) {
     stored.counts[service] = 0;
   } else {
-    stored.counts = { pokeapi: 0, gemini_ai: 0, youtube_api: 0 };
+    stored.counts = { pokeapi: 0, gemini_ai: 0 };
   }
   localStorage.setItem(QUOTA_STORAGE_KEY, JSON.stringify(stored));
   notifyListeners();
