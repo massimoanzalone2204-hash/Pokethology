@@ -382,6 +382,7 @@
 
 /* Custom Scrollbar for HUD (Sleek minimalist sliding bar with framed borders) */
 ::-webkit-scrollbar {
+  -webkit-appearance: none;
   width: 6px;
   height: 6px;
 }
@@ -409,6 +410,7 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar {
+  -webkit-appearance: none;
   width: 6px;
   height: 6px;
 }
@@ -616,6 +618,7 @@ p, li {
 .arena-container::-webkit-scrollbar,
 #battle-arena-container *::-webkit-scrollbar,
 .arena-container *::-webkit-scrollbar {
+  -webkit-appearance: none;
   display: none !important;
   width: 0 !important;
   height: 0 !important;
@@ -952,6 +955,7 @@ p, li {
 
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
+  -webkit-appearance: none;
     display: none;
   }
   .no-scrollbar {

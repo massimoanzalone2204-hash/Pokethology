@@ -3073,12 +3073,23 @@ export default function App() {
         }),
       });
 
-      const data = await response.json();
+      let data: any = {};
+      const text = await response.text();
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (e) {
+        if (response.status === 429) {
+          setQuotaLimitReached(true);
+          throw new Error("QUOTA_LIMIT");
+        }
+        throw new Error(`Invalid JSON: ${text}`);
+      }
+      
       if (response.status === 429 || data.isQuotaExhausted) {
         if (data.isQuotaExhausted || data.percentRemaining === 0) {
           setQuotaLimitReached(true);
         }
-        setLastQuotaError(data.error);
+        setLastQuotaError(data.error || "Rate limit reached");
         if (data.strategy) {
           aiCache.current[battleKey] = data.strategy;
           setBattleSuggestion(data.strategy);
@@ -3086,7 +3097,7 @@ export default function App() {
         }
         throw new Error("QUOTA_LIMIT");
       }
-      if (!response.ok) throw new Error(data.error || "Strategy module error");
+      if (!response.ok) throw new Error(data.error || text || "Strategy module error");
       
       aiCache.current[battleKey] = data.strategy;
       setBattleSuggestion(data.strategy);
@@ -4631,12 +4642,23 @@ export default function App() {
         }),
       });
 
-      const data = await response.json();
+      let data: any = {};
+      const text = await response.text();
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (e) {
+        if (response.status === 429) {
+          setQuotaLimitReached(true);
+          throw new Error("QUOTA_LIMIT");
+        }
+        throw new Error(`Invalid JSON: ${text}`);
+      }
+
       if (response.status === 429 || data.isQuotaExhausted) {
         if (data.isQuotaExhausted || data.percentRemaining === 0) {
           setQuotaLimitReached(true);
         }
-        setLastQuotaError(data.error);
+        setLastQuotaError(data.error || "Rate limit reached");
         if (data.analysis) {
           setIsAiTyping(true);
           setChatMessages(prev => [...prev, { role: 'model', text: data.analysis }]);
@@ -4649,8 +4671,9 @@ export default function App() {
           }, Math.min(data.analysis.length * 15, 3000));
           return;
         }
+        throw new Error("QUOTA_LIMIT");
       }
-      if (!response.ok) throw new Error(data.error || "Connection lost to battle server.");
+      if (!response.ok) throw new Error(data.error || text || "Connection lost to battle server.");
 
       setIsAiTyping(true);
       setChatMessages(prev => [...prev, { role: 'model', text: data.analysis }]);
@@ -4734,7 +4757,18 @@ export default function App() {
         }),
       });
 
-      const data = await response.json();
+      let data: any = {};
+      const text = await response.text();
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (e) {
+        if (response.status === 429) {
+          setQuotaLimitReached(true);
+          throw new Error("QUOTA_LIMIT");
+        }
+        throw new Error(`Invalid JSON: ${text}`);
+      }
+
       if (response.status === 429 || data.isQuota === true || data.isQuotaExhausted) {
         if (data.isQuotaExhausted || data.percentRemaining === 0) {
           setQuotaLimitReached(true);
@@ -4759,8 +4793,9 @@ export default function App() {
           sounds.success();
           return;
         }
+        throw new Error("QUOTA_LIMIT");
       }
-      if (!response.ok) throw new Error(data.error || "Offline");
+      if (!response.ok) throw new Error(data.error || text || "Offline");
 
       setIsAiTyping(true);
       const finalMsg = { role: 'model' as const, text: data.text, groundingChunks: data.groundingChunks, groundingMetadata: data.groundingMetadata };
@@ -4928,12 +4963,23 @@ export default function App() {
             }),
           })
           .then(async res => {
-            const data = await res.json();
+            let data: any = {};
+            const text = await res.text();
+            try {
+              data = text ? JSON.parse(text) : {};
+            } catch (e) {
+              if (res.status === 429) {
+                setQuotaLimitReached(true);
+                throw new Error("QUOTA");
+              }
+              throw new Error(`Invalid JSON: ${text}`);
+            }
+
             if (res.status === 429 || data.isQuotaExhausted) {
                if (data.isQuotaExhausted || data.percentRemaining === 0) {
                  setQuotaLimitReached(true);
                }
-               setLastQuotaError(data.error);
+               setLastQuotaError(data.error || "Rate limit reached");
                if (data.suggestion) {
                  aiCache.current[pokeData.name] = data.suggestion;
                  setAiSuggestion(data.suggestion);
