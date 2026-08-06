@@ -1374,9 +1374,8 @@ async function setupVite() {
 // Listen only if not running as a Vercel function
 if (process.env.VERCEL !== "1") {
   setupVite().then(() => {
-    // In AI Studio, we must use 3000. On Render, we use process.env.PORT.
-    const PORT = process.env.RENDER ? (process.env.PORT || 3000) : 3000;
-    const server = app.listen(PORT as number, "0.0.0.0", () => {
+    const PORT = 3000;
+    const server = app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on http://0.0.0.0:${PORT}`);
     });
     initializeWebSocketServer(server);

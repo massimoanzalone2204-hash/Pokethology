@@ -310,45 +310,6 @@ export const BattleHistory: React.FC<BattleHistoryProps> = React.memo(({ isLight
         };
     }, [history, streakMap]);
 
-    const handleDownloadSummary = () => {
-        const last5 = history.slice(0, 5);
-        if (last5.length === 0) return;
-
-        let content = `==================================================\n`;
-        content += `       POKÉTHOLOGY ARENA - BATTLE SUMMARY\n`;
-        content += `==================================================\n`;
-        content += `Generated on : ${new Date().toLocaleString()}\n`;
-        content += `Total Games  : ${totalBattles}\n`;
-        content += `Win Rate     : ${winRate}%\n`;
-        content += `Best Streak  : ${maxStreakCount}\n`;
-        content += `--------------------------------------------------\n\n`;
-        content += `LAST ${last5.length} BATTLES REPORT:\n`;
-        
-        last5.forEach((record, index) => {
-            const num = index + 1;
-            const resSymbol = record.result === 'victory' ? '🏆 VICTORY' : '❌ DEFEAT';
-            const dateStr = new Date(record.timestamp).toLocaleString();
-            const typesStr = record.opponentTypes ? record.opponentTypes.join('/') : 'unknown';
-            
-            content += `${num}. ${resSymbol} | ${record.playerPokemon.toUpperCase()} vs ${record.opponentPokemon.toUpperCase()}\n`;
-            content += `   Timestamp: ${dateStr}\n`;
-            content += `   Opponent Types: ${typesStr.toUpperCase()}\n`;
-            content += `--------------------------------------------------\n`;
-        });
-
-        content += `\nKeep battling and studying Pokémon theology!\n`;
-
-        const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `pokethology_battle_summary_${Date.now()}.txt`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    };
-
     // Render original Game Badge Case component helper
     const renderMedalCase = (isCabinetMode: boolean = false) => {
         return (

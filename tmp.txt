@@ -1,0 +1,17 @@
+2111:  const [pokemonHP, setPokemonHP] = useState(100);
+2122:          playerHP: pokemonHP,
+2128:  }, [isBattling, pokemonHP, opponentHP, battleOpponent, pokemon, wsStatus]);
+2582:      const battleKey = `${pokemon?.name}-${battleOpponent?.name}-${pokemonHP}-${opponentHP}-${pokemonStatus}-${opponentStatus}`;
+2592:          hpPercent: Math.round((pokemonHP / pokemonMaxHP) * 100),
+2649:  }, [pokemon, battleOpponent, pokemonHP, pokemonMaxHP, selectedMoves, opponentHP, opponentMaxHP, opponentStatus]);
+3047:      const currentAttackerHP = isPlayer ? pokemonHP : opponentHP;
+3423:    const prompt = `Give me a highly concise tactical tip for my active battle match: my **${pokemon.name}** vs opponent's **${battleOpponent.name}**. My current moves: ${selectedMoves.map(m => m.name).join(', ')}. HP status: Player ${pokemonHP}/${pokemonMaxHP}, Opponent ${opponentHP}/${opponentMaxHP}.`;
+3514:      if (pokemonHP <= 0) {
+3692:  }, [pokemonHP, opponentHP, battleState, pokemon, battleOpponent]);
+3727:    if (battleState === 'battling' && turn === 'opponent' && opponentHP > 0 && pokemonHP > 0) {
+3752:          const playerHealthPercent = (pokemonHP / pokemonMaxHP) * 100;
+3788:              if (expectedDamage >= pokemonHP) {
+3889:            // The issue is `pokemonHP` and `opponentHP` in this closure are stale.
+3978:          hp: pokemonHP,
+4068:        playerHP: pokemonHP,
+6073:                                          pokemonHP={pokemonHP}

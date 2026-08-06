@@ -1,0 +1,8 @@
+
+  return (
+    <div 
+      ref={logRef} 
+      className="bg-slate-950/80 rounded-xl border border-cyan-900/30 p-3 sm:p-4 h-32 sm:h-40 md:h-48  font-mono text-[10px] sm:text-[11px] sm:leading-relaxed font-bold tracking-wider space-y-1 sm:space-y-1.5 shadow-inner shrink-0 pointer-events-auto scroll-smooth" 
+      style={{ overflowAnchor: 'none' }}
+    >
+      {log.slice(-50).map((entry, i) => {

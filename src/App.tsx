@@ -3,7 +3,7 @@ import { idbGet, idbSet, idbGetAll, idbDelete, STORES } from "./lib/indexedDB";
 import { checkQuotaAllowed, recordApiUsage } from "./lib/quotaManager";
 import { useState, useEffect, useRef, useTransition, useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Download, Search, Loader2, Database, Sparkles, Volume2, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork, Maximize2, Minimize2 } from 'lucide-react';
+import { Download, Search, Loader2, Database, Sparkles, Volume2, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork } from 'lucide-react';
 import { EvolutionNodeComponent } from './components/EvolutionNodeComponent';
 
 import { PokethologyLogo } from './components/PokethologyLogo';
@@ -2222,6 +2222,7 @@ export default function App() {
   const [wsStatus, setWsStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
   const [wsTelemetry, setWsTelemetry] = useState<any | null>(null);
   const [wsClientId, setWsClientId] = useState<string | null>(null);
+  const [wsBattleInsight, setWsBattleInsight] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const streamQueueRef = useRef<string[]>([]);
   const streamTimerRef = useRef<any>(null);
@@ -2349,6 +2350,8 @@ export default function App() {
             } else {
               sounds?.typing?.();
             }
+          } else if (type === "battle:insight") {
+            setWsBattleInsight(payload.hint);
           }
         } catch (e) {
           console.error("[WS Client] failed to parse message", e);
@@ -2459,6 +2462,21 @@ export default function App() {
   const [turn, setTurn] = useState<'player' | 'opponent' | null>(null);
   const [tempoTier, setTempoTier] = useState(1.0);
 
+  // Sync active battle metrics via websocket stream
+  useEffect(() => {
+    if (isBattling && pokemon && battleOpponent && wsRef.current && wsStatus === 'connected') {
+      wsRef.current.send(JSON.stringify({
+        type: "battle:sync",
+        payload: {
+          opponent: battleOpponent.name,
+          playerHP: pokemonHP,
+          opponentHP: opponentHP,
+          playerPokemon: pokemon.name
+        }
+      }));
+    }
+  }, [isBattling, pokemonHP, opponentHP, battleOpponent, pokemon, wsStatus]);
+
   const [isAnimating, setIsAnimating] = useState(false);
   const [moveBeingLearned, setMoveBeingLearned] = useState<Move | null>(null);
   const [isMoveLearningOpen, setIsMoveLearningOpen] = useState(false);
@@ -2550,7 +2568,6 @@ export default function App() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
   const [battleState, setBattleState] = useState<'setup' | 'battling' | 'finished'>('setup');
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedMoves, setSelectedMoves] = useState<Move[]>([]);
   const selectedMovesRef = useRef(selectedMoves);
   useEffect(() => {
@@ -3073,23 +3090,12 @@ export default function App() {
         }),
       });
 
-      let data: any = {};
-      const text = await response.text();
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch (e) {
-        if (response.status === 429) {
-          setQuotaLimitReached(true);
-          throw new Error("QUOTA_LIMIT");
-        }
-        throw new Error(`Invalid JSON: ${text}`);
-      }
-      
+      const data = await response.json();
       if (response.status === 429 || data.isQuotaExhausted) {
         if (data.isQuotaExhausted || data.percentRemaining === 0) {
           setQuotaLimitReached(true);
         }
-        setLastQuotaError(data.error || "Rate limit reached");
+        setLastQuotaError(data.error);
         if (data.strategy) {
           aiCache.current[battleKey] = data.strategy;
           setBattleSuggestion(data.strategy);
@@ -3097,7 +3103,7 @@ export default function App() {
         }
         throw new Error("QUOTA_LIMIT");
       }
-      if (!response.ok) throw new Error(data.error || text || "Strategy module error");
+      if (!response.ok) throw new Error(data.error || "Strategy module error");
       
       aiCache.current[battleKey] = data.strategy;
       setBattleSuggestion(data.strategy);
@@ -4642,23 +4648,12 @@ export default function App() {
         }),
       });
 
-      let data: any = {};
-      const text = await response.text();
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch (e) {
-        if (response.status === 429) {
-          setQuotaLimitReached(true);
-          throw new Error("QUOTA_LIMIT");
-        }
-        throw new Error(`Invalid JSON: ${text}`);
-      }
-
+      const data = await response.json();
       if (response.status === 429 || data.isQuotaExhausted) {
         if (data.isQuotaExhausted || data.percentRemaining === 0) {
           setQuotaLimitReached(true);
         }
-        setLastQuotaError(data.error || "Rate limit reached");
+        setLastQuotaError(data.error);
         if (data.analysis) {
           setIsAiTyping(true);
           setChatMessages(prev => [...prev, { role: 'model', text: data.analysis }]);
@@ -4671,9 +4666,8 @@ export default function App() {
           }, Math.min(data.analysis.length * 15, 3000));
           return;
         }
-        throw new Error("QUOTA_LIMIT");
       }
-      if (!response.ok) throw new Error(data.error || text || "Connection lost to battle server.");
+      if (!response.ok) throw new Error(data.error || "Connection lost to battle server.");
 
       setIsAiTyping(true);
       setChatMessages(prev => [...prev, { role: 'model', text: data.analysis }]);
@@ -4757,18 +4751,7 @@ export default function App() {
         }),
       });
 
-      let data: any = {};
-      const text = await response.text();
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch (e) {
-        if (response.status === 429) {
-          setQuotaLimitReached(true);
-          throw new Error("QUOTA_LIMIT");
-        }
-        throw new Error(`Invalid JSON: ${text}`);
-      }
-
+      const data = await response.json();
       if (response.status === 429 || data.isQuota === true || data.isQuotaExhausted) {
         if (data.isQuotaExhausted || data.percentRemaining === 0) {
           setQuotaLimitReached(true);
@@ -4793,9 +4776,8 @@ export default function App() {
           sounds.success();
           return;
         }
-        throw new Error("QUOTA_LIMIT");
       }
-      if (!response.ok) throw new Error(data.error || text || "Offline");
+      if (!response.ok) throw new Error(data.error || "Offline");
 
       setIsAiTyping(true);
       const finalMsg = { role: 'model' as const, text: data.text, groundingChunks: data.groundingChunks, groundingMetadata: data.groundingMetadata };
@@ -4963,23 +4945,12 @@ export default function App() {
             }),
           })
           .then(async res => {
-            let data: any = {};
-            const text = await res.text();
-            try {
-              data = text ? JSON.parse(text) : {};
-            } catch (e) {
-              if (res.status === 429) {
-                setQuotaLimitReached(true);
-                throw new Error("QUOTA");
-              }
-              throw new Error(`Invalid JSON: ${text}`);
-            }
-
+            const data = await res.json();
             if (res.status === 429 || data.isQuotaExhausted) {
                if (data.isQuotaExhausted || data.percentRemaining === 0) {
                  setQuotaLimitReached(true);
                }
-               setLastQuotaError(data.error || "Rate limit reached");
+               setLastQuotaError(data.error);
                if (data.suggestion) {
                  aiCache.current[pokeData.name] = data.suggestion;
                  setAiSuggestion(data.suggestion);
@@ -5542,7 +5513,21 @@ export default function App() {
               </span>
             </motion.button>
 
-             {/* Settings button */}
+             {/* Connection Status Indicator in Top-Right Header */}
+             <div className={cn(
+               "hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-lg border text-[10px] font-mono uppercase tracking-wider shrink-0 transition-all",
+               quotaLimitReached
+                 ? "bg-red-950/60 border-red-500/60 text-red-300 shadow-[0_0_12px_rgba(239,68,68,0.3)] animate-pulse"
+                 : "bg-emerald-950/40 border-emerald-500/40 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
+             )}>
+               <span className={cn(
+                 "w-2 h-2 rounded-full",
+                 quotaLimitReached ? "bg-red-500 animate-ping" : "bg-emerald-400 animate-pulse"
+               )} />
+               <span className="font-bold">
+                 {quotaLimitReached ? "AI OFFLINE (QUOTA LIMIT)" : "AI ONLINE (GEMINI)"}
+               </span>
+             </div>
 
              
 
@@ -6925,20 +6910,9 @@ export default function App() {
                                         ref={arenaCallbackRef}
                                         transition={{ duration: 0.25, ease: "easeOut" }}
                                         id="battle-arena-container"
-                                        className={cn(
-                                          "relative flex-1 flex flex-col justify-center min-h-[220px] xs:min-h-[260px] sm:min-h-[300px] md:min-h-[320px] lg:min-h-[340px] h-[300px] sm:h-[340px] lg:h-[380px] max-h-[40vh] z-10 p-6 sm:p-8 md:p-10 font-bold overflow-hidden w-full max-w-full transform-gpu will-change-transform transition-all duration-300",
-                                          (pokemonHP / pokemonMaxHP <= 0.2 && pokemonHP > 0) ? "ring-2 ring-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-pulse" : "",
-                                          playerStatAnimation === 'boost' ? "ring-2 ring-green-400 shadow-[0_0_15px_rgba(74,222,128,0.5)]" : ""
-                                        )}
+                                        className="relative flex-1 flex flex-col justify-center min-h-[220px] xs:min-h-[260px] sm:min-h-[300px] md:min-h-[320px] lg:min-h-[340px] h-[300px] sm:h-[340px] lg:h-[380px] max-h-[40vh] z-10 p-[clamp(0.5rem,2vw,1.5rem)] font-bold overflow-hidden w-full max-w-full transform-gpu will-change-transform"
                                         style={{ touchAction: 'pan-y', boxSizing: 'border-box' }}
                                       >
-                                        {/* Dynamic Entrance Arena Background Elements */}
-                                        <div key={`arena-bg-${pokemon?.name}-${battleOpponent?.name}`} className="arena-bg-element absolute inset-0 pointer-events-none z-0 overflow-hidden">
-                                          <div className="arena-bg-left absolute top-0 left-0 w-1/2 h-full bg-gradient-to-br from-cyan-500/10 via-cyan-900/5 to-transparent border-r border-cyan-500/20" />
-                                          <div className="arena-bg-right absolute top-0 right-0 w-1/2 h-full bg-gradient-to-bl from-red-500/10 via-red-900/5 to-transparent border-l border-red-500/20" />
-                                          <div className="arena-bg-center absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(15,23,42,0.4)_0%,transparent_70%)]" />
-                                        </div>
-
                                         {/* Battle Flash Overlay */}
                                         <AnimatePresence>
                                           {(attackerAnimation === 'hit' || defenderAnimation === 'hit') && (
@@ -7312,7 +7286,7 @@ export default function App() {
                                              >
                                                <Zap className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-yellow-300 animate-bounce shrink-0" />
                                                <span className="truncate">
-                                                 {!battleOpponent ? "SELECT OPPONENT FIRST" : selectedMoves.length === 0 ? "EQUIP AT LEAST 1 MOVE" : "Start battle"}
+                                                 {!battleOpponent ? "SELECT OPPONENT FIRST" : selectedMoves.length === 0 ? "EQUIP AT LEAST 1 MOVE" : "INITIATE BATTLE"}
                                                </span>
                                              </button>
                                            </div>
@@ -7432,6 +7406,38 @@ export default function App() {
                                           {isBattling && <BattleLog log={battleLog} enableAnimations={enableAnimations} turn={turn || 'player'} isBattling={isBattling} />}
                                         </AnimatePresence>
 
+                                     {/* WebSocket Live Telemetry Insight Box */}
+                                     {isBattling && wsBattleInsight && (
+                                       <motion.div
+                                         initial={{ opacity: 0, scale: 0.98, y: 5 }}
+                                         animate={{ opacity: 1, scale: 1, y: 0 }}
+                                         className="bg-slate-950/90 rounded-xl border border-cyan-500/40 p-3 sm:p-4 text-[10px] sm:text-[11px] leading-relaxed relative overflow-hidden shadow-[0_0_15px_rgba(6,182,212,0.15)] select-text my-2"
+                                       >
+                                         <div className="absolute top-0 left-0 w-full h-[1.5px] bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent" />
+                                         <div className="flex justify-between items-center mb-1.5 border-b border-cyan-900/30 pb-1">
+                                           <div className="flex items-center gap-1.5">
+                                             <span className="relative flex h-1.5 w-1.5">
+                                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                                               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span>
+                                             </span>
+                                             <span className="text-[8px] font-black uppercase tracking-[0.2em] font-hud text-cyan-400 font-bold">
+                                               REAL-TIME SOCKET INTEL COUNTERS
+                                             </span>
+                                           </div>
+                                           <button 
+                                             onClick={() => setWsBattleInsight(null)}
+                                             className="text-[7.5px] font-hud text-cyan-400 hover:text-cyan-300 transition-colors uppercase font-bold"
+                                           >
+                                             Dismiss
+                                           </button>
+                                         </div>
+                                         <p className="text-cyan-200 font-mono text-[9px] leading-relaxed select-text">
+                                           {wsBattleInsight}
+                                         </p>
+                                       </motion.div>
+                                     )}
+
+                                     
                                      {/* AI Coach Tactical Advice Panel - Displayed directly inside the Combat Arena */}
                                      {isBattling && (isAiSuggesting || battleSuggestion) && (
                                        <motion.div 
@@ -9679,6 +9685,12 @@ export default function App() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 text-[10px] font-mono">
+                      <div className="p-3 bg-slate-950/60 border border-white/5 rounded-xl flex flex-col justify-between shadow-inner hover:border-cyan-500/30 transition-colors">
+                        <span className="text-slate-500 text-[8px] uppercase tracking-wider">SOCKET PIPELINE</span>
+                        <span className={cn("font-bold uppercase text-[9px]", wsStatus === "connected" ? "text-emerald-400 animate-pulse" : wsStatus === "connecting" ? "text-amber-400" : "text-rose-400")}>
+                          {wsStatus === "connected" ? `CONNECTED ${wsClientId ? `(${wsClientId})` : ""}` : wsStatus === "connecting" ? "CONNECTING..." : "DISCONNECTED"}
+                        </span>
+                      </div>
                       <div className="p-2 bg-slate-900 border border-cyan-900/30 rounded flex flex-col justify-between">
                         <span className="text-slate-500 text-[8px] uppercase tracking-wider">COGNITION ENGINE</span>
                         <span className="text-cyan-400 font-bold uppercase text-[9px]">
@@ -9689,6 +9701,12 @@ export default function App() {
                         <span className="text-slate-500 text-[8px] uppercase tracking-wider">SERVER MEMORY</span>
                         <span className="text-cyan-400 font-bold text-[9px]">
                           {wsTelemetry?.memoryHeapUsed ? `${wsTelemetry.memoryHeapUsed}MB / ${wsTelemetry.memoryHeapTotal}MB` : "ONLINE SECURE"}
+                        </span>
+                      </div>
+                      <div className="p-2 bg-slate-900 border border-cyan-900/30 rounded flex flex-col justify-between">
+                        <span className="text-slate-500 text-[8px] uppercase tracking-wider">SOCKET CONNECTIONS</span>
+                        <span className="text-emerald-400 font-bold text-[9px]">
+                          {wsTelemetry?.connections ? `${wsTelemetry.connections} ACTIVE SOCKETS` : "ESTABLISHED NODE"}
                         </span>
                       </div>
                     </div>

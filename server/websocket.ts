@@ -145,7 +145,7 @@ export function initializeWebSocketServer(server: http.Server) {
   // Track connection list
   const activeSockets = new Set<WebSocket>();
 
-  // Periodically broadcast telemetry stats (uptime, memory, node heap state)
+  // Periodically broadcast telemetry stats (uptime, connections, memory, node heap state)
   const statsInterval = setInterval(() => {
     if (wss.clients.size === 0) return;
 
@@ -154,6 +154,7 @@ export function initializeWebSocketServer(server: http.Server) {
       type: "telemetry:update",
       payload: {
         timestamp: new Date().toISOString(),
+        connections: wss.clients.size,
         uptime: Math.round(process.uptime()),
         memoryHeapUsed: Math.round(memoryInfo.heapUsed / 1024 / 1024),
         memoryHeapTotal: Math.round(memoryInfo.heapTotal / 1024 / 1024),
@@ -355,7 +356,7 @@ export function initializeWebSocketServer(server: http.Server) {
         if (type === "diag:start") {
           const logsSequence = [
             "[OK] Initiating WebSocket diagnostic loop...",
-            "[OK] High fidelity network pipeline registered.",
+            "[OK] Connected sockets count registered: " + activeSockets.size,
             "[OK] Allocating virtual high fidelity node buffer...",
             "[SUCCESS] Low latency sandbox memory alignment configured.",
             "[OK] Pinging high performance PokeAPI micro-servers...",
@@ -393,7 +394,34 @@ export function initializeWebSocketServer(server: http.Server) {
           }, 400);
         }
 
-        // 4. LIVE QUIZ CHALLENGE DISPATCHER
+        // 4. REALTIME BATTLE STAT COUNTER PREDICTOR OVER WS
+        if (type === "battle:sync") {
+          const { opponent, playerHP, opponentHP, playerPokemon } = payload;
+          if (!opponent) return;
+
+          // Simple live combat hint generated on server and pushed down
+          let hintText = "";
+          if (playerHP < 35) {
+            hintText = `🚨 **ALERT:** Player is at ${playerHP}%! Deploy shields or prioritization moves over socket commands immediately!`;
+          } else if (opponentHP < 40) {
+            hintText = `🔥 **OPPORTUNITY:** Opponent ${opponent.toUpperCase()} is weak at ${opponentHP}% HP! Go for full offensive power!`;
+          } else {
+            hintText = `⚡ **SYNC DIALOGUE:** High speed socket combat active. Maintain STAB attacks and watch opponent swap alerts.`;
+          }
+
+          ws.send(JSON.stringify({
+            type: "battle:insight",
+            payload: {
+              hint: hintText,
+              opponent,
+              playerHP,
+              opponentHP,
+              timestamp: new Date().toLocaleTimeString()
+            }
+          }));
+        }
+
+        // 5. LIVE QUIZ CHALLENGE DISPATCHER
         if (type === "quiz:request") {
           const triviaQuestions = [
             { question: "Quale Pokémon ha la stessa somma di statistiche della forma Base di Mew?", options: ["Celebi", "Jirachi", "Manaphy", "Tutti questi"], answer: 3 },
