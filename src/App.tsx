@@ -3904,7 +3904,7 @@ export default function App() {
 
   const handleRun = () => {
     sounds.flee();
-    setBattleLog(prev => [{ text: "PLAYER FLED THE BATTLE!", type: 'system' }, ...prev]);
+    setBattleLog(prev => [{ text: "PLAYER QUIT THE BATTLE!", type: 'system' }, ...prev]);
     setTimeout(() => {
       resetSimulation();
       setBattleState('setup');
@@ -5323,7 +5323,7 @@ export default function App() {
             >
               <div className="px-4 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-[10px] sm:text-xs font-mono text-cyan-300 uppercase tracking-widest shadow-xl flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-red-500 animate-ping shrink-0" />
-                BATTLE SIMULATION INITIALIZING
+                START SIMULATION
               </div>
             </motion.div>
           </motion.div>
@@ -7265,7 +7265,7 @@ export default function App() {
                                                onMouseEnter={() => sounds.hover()}
                                                className="py-1 px-3 rounded text-[9px] border border-red-900/40 bg-red-950/40 text-red-400 hover:text-red-300 hover:bg-red-900/30 hover:border-red-500/30 active:scale-95 font-hud font-black uppercase tracking-widest flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                                              >
-                                               FLEE
+                                               QUIT
                                              </button>
                                             </div>
                                           </div>
@@ -7883,7 +7883,7 @@ export default function App() {
                                               )}
                                             >
                                               <MoveRight className="w-3 h-3" />
-                                              Run
+                                              Quit
                                             </motion.button>
                                           </div>
 )}
@@ -8002,7 +8002,7 @@ export default function App() {
                           </div>
 
                           {/* Home Screen Copyright & Legal Disclaimer */}
-                          <p className="text-[9px] sm:text-[10px] text-slate-400 font-mono tracking-wider max-w-2xl mx-auto text-center mt-8 sm:mt-12 md:mt-16 leading-relaxed opacity-80 select-none px-2">
+                          <p className="text-[9px] sm:text-[10px] text-slate-400 font-mono tracking-wider max-w-2xl mx-auto text-center mt-3 sm:mt-4 md:mt-5 mb-2 leading-relaxed opacity-80 select-none px-2">
                             Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc. TM, ® and Pokémon character names are trademarks of Nintendo.<br className="hidden sm:inline"/>
                             No copyright or trademark infringement is intended in using Pokémon content on Pokéthology.
                           </p>
