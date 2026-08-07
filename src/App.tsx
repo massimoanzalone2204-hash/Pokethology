@@ -3029,7 +3029,6 @@ export default function App() {
       const battleKey = `${pokemon?.name}-${battleOpponent?.name}-${pokemonHP}-${opponentHP}-${pokemonStatus}-${opponentStatus}`;
       if (aiCache.current[battleKey]) {
         setBattleSuggestion(aiCache.current[battleKey]);
-        setIsAiSuggesting(false);
         return;
       }
 
@@ -3048,16 +3047,6 @@ export default function App() {
         }
       };
 
-      if (quotaLimitReached) {
-        console.warn("Quota reached, skipping AI strategy call.");
-        setAiSuggestion("AI Offline (Quota reached). Please use local controls.");
-        return;
-      }
-      
-      const { allowed: strategyAllowed } = checkQuotaAllowed("gemini_ai");
-      if (!strategyAllowed) {
-        throw new Error("Local AI Quota Exceeded! Please reset quota or wait until tomorrow.");
-      }
       recordApiUsage("gemini_ai", 1);
       const response = await fetch("/api/strategy", {
         method: "POST",
@@ -3073,36 +3062,24 @@ export default function App() {
 
       const responseText = await response.text();
       let data: any = {};
-      try { data = JSON.parse(responseText); } catch (_) { data = { error: responseText || "Rate limit or server error", isQuotaExhausted: true }; }
-      if (response.status === 429 || data.isQuotaExhausted) {
-        if (data.isQuotaExhausted || data.percentRemaining === 0) {
-          setQuotaLimitReached(true);
-        }
-        setLastQuotaError(data.error);
-        if (data.strategy) {
-          aiCache.current[battleKey] = data.strategy;
-          setBattleSuggestion(data.strategy);
-          return;
-        }
-        throw new Error("QUOTA_LIMIT");
-      }
-      if (!response.ok) throw new Error(data.error || "Strategy module error");
-      
-      aiCache.current[battleKey] = data.strategy;
-      setBattleSuggestion(data.strategy);
+      try { data = JSON.parse(responseText); } catch (_) { data = { strategy: null }; }
+
+      const resultStrategy = data?.strategy || (bestMove 
+        ? `• 🔮 **ANALYSIS**: Opponent ${battleOpponent?.name} is vulnerable to optimal type matchups.\n• ⚔️ **COMMAND**: Execute ${bestMove.toUpperCase()} immediately for maximum damage.`
+        : `• 🔮 **ANALYSIS**: Maintain tactical momentum against ${battleOpponent?.name}.\n• ⚔️ **COMMAND**: Focus on high-power moves and HP preservation.`);
+
+      aiCache.current[battleKey] = resultStrategy;
+      setBattleSuggestion(resultStrategy);
     } catch (err: any) {
-      if (err.message !== "QUOTA_LIMIT") {
-        console.error(err);
-      }
-      if (err.message === "QUOTA_LIMIT") {
-        setBattleSuggestion("System high volume. Fallback: Protect your HP and exploit type weaknesses.");
-      } else {
-        setBattleSuggestion("Focus on type advantages and HP management.");
-      }
+      console.error("Strategy error:", err);
+      const fallbackStr = bestMove 
+        ? `• 🔮 **ANALYSIS**: Type advantage identified against ${battleOpponent?.name}.\n• ⚔️ **COMMAND**: Strike with ${bestMove.toUpperCase()}!`
+        : `• 🔮 **ANALYSIS**: Target opponent weaknesses.\n• ⚔️ **COMMAND**: Protect HP and use highest power move.`;
+      setBattleSuggestion(fallbackStr);
     } finally {
       setIsAiSuggesting(false);
     }
-  }, [pokemon, battleOpponent, pokemonHP, pokemonMaxHP, selectedMoves, opponentHP, opponentMaxHP, opponentStatus]);
+  }, [pokemon, battleOpponent, pokemonHP, pokemonMaxHP, selectedMoves, opponentHP, opponentMaxHP, opponentStatus, pokemonStatus, getBestMove, selectedLang]);
 
   const getEffectiveStat = useCallback((p: Pokemon | null, statName: string, isPlayer: boolean) => {
     if (!p) return 0;
@@ -7261,7 +7238,7 @@ export default function App() {
                                              >
                                                <Zap className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-yellow-300 animate-bounce shrink-0" />
                                                <span className="truncate">
-                                                 {!battleOpponent ? "SELECT OPPONENT FIRST" : selectedMoves.length === 0 ? "EQUIP AT LEAST 1 MOVE" : "INITIATE BATTLE"}
+                                                 {!battleOpponent ? "SELECT OPPONENT FIRST" : selectedMoves.length === 0 ? "EQUIP AT LEAST 1 MOVE" : "START BATTLE"}
                                                </span>
                                              </button>
                                            </div>
@@ -7280,7 +7257,7 @@ export default function App() {
                                          >
                                           <HUDCorners />
                                           <div className="flex justify-between items-center px-1">
-                                            <span className="text-[10px] font-mono text-cyan-500/60 uppercase tracking-[0.2em] font-bold">Combat Actions</span>
+                                            <span className="text-[10px] font-mono text-cyan-500/60 uppercase tracking-[0.2em] font-bold">Moveset</span>
                                             <div className="flex items-center gap-2">
                                             
                                             <button
@@ -7394,7 +7371,7 @@ export default function App() {
                                            <div className="flex items-center gap-1.5">
                                              <div className={cn("w-1.5 h-1.5 rounded-full", isAiSuggesting ? "bg-purple-400 animate-pulse shadow-[0_0_8px_rgba(192,132,252,0.6)]" : "bg-purple-500")} />
                                              <span className="text-[10px] font-black uppercase tracking-[0.15em] font-hud text-purple-300">
-                                               Grandmaster Tactical Advisor
+                                               AI Strategist
                                               </span>
                                             </div>
                                             <button 
@@ -7527,7 +7504,7 @@ export default function App() {
                                               
                                               <div className="relative flex items-center justify-center gap-3">
                                                 <span className="text-white font-hud text-xs sm:text-sm font-black tracking-[0.3em] uppercase drop-shadow-[0_0_5px_rgba(34,211,238,1)]">
-                                                  Full Chaos Match
+                                                  Chaos Mode
                                                 </span>
                                               </div>
 
@@ -7892,7 +7869,7 @@ export default function App() {
                                               )}
                                             >
                                               {isAiSuggesting ? <Loader2 className="w-3 h-3 animate-spin" /> : <BrainCircuit className="w-3 h-3" /> }
-                                              AI Strategy
+                                              AI Strategist
                                             </motion.button>
                                             
                                             <motion.button
@@ -9506,7 +9483,7 @@ export default function App() {
                     <ul className="text-slate-400 text-xs space-y-2 list-none">
                       <li>● <strong>Fighting:</strong> Pick a move to attack. Faster Pokemon usually go first!</li>
                       <li>● <strong>Pokemon Cries:</strong> Tap on a Pokemon model to hear its cry.</li>
-                      <li>● <strong>AI Helper:</strong> Click 'AI Strategy' if you want advice on which move is best to use.</li>
+                      <li>● <strong>AI Helper:</strong> Click 'AI Strategist' if you want advice on which move is best to use.</li>
                     </ul>
                   </div>
 

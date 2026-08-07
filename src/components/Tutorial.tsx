@@ -272,7 +272,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                   <motion.div whileHover={{ scale: 1.01 }} className="bg-slate-900/50 p-4 rounded-xl border border-red-500/20 flex gap-3 relative overflow-hidden group">
                     <Activity className="w-6 h-6 text-red-400 shrink-0 group-hover:animate-pulse transition-colors" />
                     <div>
-                      <span className="font-bold text-red-400 text-[11px] sm:text-xs uppercase font-hud tracking-wider">Full Chaos Mode</span>
+                      <span className="font-bold text-red-400 text-[11px] sm:text-xs uppercase font-hud tracking-wider">Chaos Mode</span>
                       <p className="text-[10px] sm:text-[10.5px] text-slate-400 leading-normal font-sans mt-1">
                         Turn on auto-battling to instantly roll randomized moves based on STAB logic, tracking HP and stat degradation dynamically.
                       </p>
