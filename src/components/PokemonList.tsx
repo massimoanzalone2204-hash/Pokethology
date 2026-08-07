@@ -85,11 +85,11 @@ export const PokemonList = memo(({
         <div className="flex flex-col gap-3.5 mb-5 border-b border-zinc-900 pb-4 shrink-0">
           <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-3">
             <div className="flex items-center gap-3">
-              <div className="relative w-11 h-11 flex items-center justify-center bg-zinc-900 border border-zinc-800 rounded-full shadow-inner">
+              <div className="relative w-11 h-11 flex items-center justify-center bg-zinc-900 border border-zinc-800 rounded-full shadow-inner overflow-hidden p-1">
                 <img 
-                  src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" 
-                  alt="PokeBall" 
-                  className="w-7 h-7 object-contain drop-shadow-[0_2px_8px_rgba(6,182,212,0.4)] animate-[spin_10s_linear_infinite]"
+                  src="https://i.postimg.cc/1zgPj6SW/20260201-111647-0000.png" 
+                  alt="Pokéthology Logo" 
+                  className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(6,182,212,0.4)]"
                   referrerPolicy="no-referrer"
                 />
               </div>

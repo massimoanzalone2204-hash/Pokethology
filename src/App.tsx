@@ -8002,7 +8002,7 @@ export default function App() {
                           </div>
 
                           {/* Home Screen Copyright & Legal Disclaimer */}
-                          <p className="text-[9px] sm:text-[10px] text-slate-400 font-mono tracking-wider max-w-2xl mx-auto text-center mt-3 sm:mt-4 leading-relaxed opacity-80 select-none px-2">
+                          <p className="text-[9px] sm:text-[10px] text-slate-400 font-mono tracking-wider max-w-2xl mx-auto text-center mt-8 sm:mt-12 md:mt-16 leading-relaxed opacity-80 select-none px-2">
                             Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc. TM, ® and Pokémon character names are trademarks of Nintendo.<br className="hidden sm:inline"/>
                             No copyright or trademark infringement is intended in using Pokémon content on Pokéthology.
                           </p>
