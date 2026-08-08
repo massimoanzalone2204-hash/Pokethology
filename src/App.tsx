@@ -40,6 +40,12 @@ import { MoveModal } from './components/MoveModal';
 import { BattleHistory } from './components/BattleHistory';
 import { AboutModal } from './components/AboutModal';
 import { OfflineManagerModal } from './components/OfflineManagerModal';
+import { PokedexEntrySection } from './components/PokedexEntrySection';
+import { AbilitiesSection } from './components/AbilitiesSection';
+import { TypeWeaknessesSection } from './components/TypeWeaknessesSection';
+import { CombatStatsSection } from './components/CombatStatsSection';
+import { MovesetAnalysisSection } from './components/MovesetAnalysisSection';
+import { ChatMessageItem } from './components/ChatMessageItem';
 
 const getShowdownName = (name: string, isFemale: boolean = false) => {
   if (!name) return '';
@@ -5218,7 +5224,7 @@ export default function App() {
               >
                 <div className="px-2.5 xs:px-3.5 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-[9px] sm:text-[10px] font-mono text-cyan-300 font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-lg whitespace-nowrap">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                  CHALLENGER
+                  USER
                 </div>
 
                 <div className="w-28 h-28 xs:w-36 xs:h-36 sm:w-60 sm:h-60 relative flex items-center justify-center shrink-0">
@@ -5614,6 +5620,7 @@ export default function App() {
                                   handleTabChange('data');
                                 }
                               }}
+                              onMouseEnter={() => sounds?.hover?.()}
                               whileHover={{ scale: 1.03, boxShadow: activeTab === 'data' ? "0 0 22px rgba(6,182,212,0.35)" : "0 0 16px rgba(6,182,212,0.2)" }}
                               whileTap={{ scale: 0.97 }}
                               className={cn(
@@ -5648,6 +5655,7 @@ export default function App() {
                                   handleTabChange('chat');
                                 }
                               }}
+                              onMouseEnter={() => sounds?.hover?.()}
                               whileHover={{ scale: 1.03, boxShadow: activeTab === 'chat' ? "0 0 22px rgba(168,85,247,0.35)" : "0 0 16px rgba(168,85,247,0.2)" }}
                               whileTap={{ scale: 0.97 }}
                               className={cn(
@@ -5682,6 +5690,7 @@ export default function App() {
                                   handleTabChange('battle');
                                 }
                               }}
+                              onMouseEnter={() => sounds?.hover?.()}
                               whileHover={{ scale: 1.03, boxShadow: activeTab === 'battle' ? "0 0 22px rgba(239,68,68,0.35)" : "0 0 16px rgba(239,68,68,0.2)" }}
                               whileTap={{ scale: 0.97 }}
                               className={cn(
@@ -5992,179 +6001,24 @@ export default function App() {
                                     transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                                     className="w-full space-y-4"
                                   >
-                                    {/* Pokedex Entry Description */}
-                                    <div className={cn(
-                                      "backdrop-blur-md rounded-2xl p-6 sm:p-8 border shadow-2xl relative group/entry transition-all overflow-hidden",
-                                      isLightMode 
-                                        ? "bg-white/95 border-slate-200 hover:border-cyan-500/40 hover:shadow-[0_12px_45px_rgba(6,182,212,0.1)]"
-                                        : "bg-slate-900/40 border-white/5 hover:border-cyan-500/30 hover:shadow-[0_12px_40px_rgba(6,182,212,0.15)]"
-                                    )}>
-                                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent opacity-50"></div>
-                                      <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none group-hover/entry:bg-cyan-500/10 transition-colors duration-700"></div>
-                                      
-                                      <div className={cn("absolute top-3 sm:top-5 right-4 sm:right-6 text-[40px] sm:text-[60px] font-black italic select-none pointer-events-none font-hud tracking-tighter leading-none z-0", isLightMode ? "text-slate-100/60" : "text-cyan-950/30")}>{(pokemon.baseId || pokemon.id).toString().padStart(4, '0')}</div>
-                                      
-                                      <h3 className={cn(
-                                        "font-hud text-[12px] sm:text-[14px] uppercase tracking-[0.3em] mb-5 sm:mb-6 flex items-center justify-between pb-4 border-b relative z-10",
-                                        isLightMode ? "text-cyan-700 border-slate-200" : "text-cyan-400 border-white/5"
-                                      )}>
-                                        <div className="flex items-center gap-3">
-                                          <Database className="w-4 h-4 text-cyan-400 shrink-0 filter drop-shadow-[0_0_6px_rgba(34,211,238,0.6)]" />
-                                          <span className={cn("font-black", isLightMode ? "" : "text-shadow-[0_0_15px_rgba(34,211,238,0.5)]")}>Pokédex Entry</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                          
-                                          
+                                    {/* Enhanced Pokedex Entry Section */}
+                                     <PokedexEntrySection
+                                       pokemon={pokemon}
+                                       selectedGameDescIndex={selectedGameDescIndex}
+                                       setSelectedGameDescIndex={setSelectedGameDescIndex}
+                                       isLightMode={isLightMode}
+                                       sounds={sounds}
+                                       TypewriterText={TypewriterText}
+                                     />
 
-                                        </div>
-                                      </h3>
+                                     {/* Abilities Section */}
+                                     <AbilitiesSection
+                                       abilities={pokemon.abilities}
+                                       isLightMode={isLightMode}
+                                       sounds={sounds}
+                                     />
 
-                                      {/* Game Version Selector tabs */}
-                                      {pokemon.gameDescriptions && pokemon.gameDescriptions.length > 0 ? (
-                                        <div className="mb-4 relative z-10">
-                                          <p className={cn("text-[10px] uppercase tracking-wider mb-2 font-bold", isLightMode ? "text-slate-500" : "text-slate-400")}>Pokédex Entries:</p>
-                                          <div className="flex flex-wrap gap-2 max-h-[140px] overflow-y-auto custom-scrollbar pb-1">
-                                            {pokemon.gameDescriptions.map((desc, idx) => {
-                                              const isActive = selectedGameDescIndex === idx;
-                                              return (
-                                                <button
-                                                  key={idx}
-                                                  type="button"
-                                                  onClick={() => {
-                                                    setSelectedGameDescIndex(idx);
-                                                    try { sounds.scan?.(); } catch(_) {}
-                                                  }}
-                                                  className={cn(
-                                                    "px-3 py-1.5 text-[9.5px] sm:text-[10.5px] font-sans rounded-lg border transition-all cursor-pointer uppercase font-bold tracking-wide",
-                                                    isActive 
-                                                      ? "bg-cyan-500 text-white border-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.4)] scale-[1.02]"
-                                                      : isLightMode 
-                                                        ? "bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:text-slate-800 hover:border-slate-300" 
-                                                        : "bg-slate-900/60 text-slate-400 border-slate-700 hover:bg-slate-800 hover:text-slate-200 hover:border-slate-500"
-                                                  )}
-                                                >
-                                                  {desc.version === 'legends-z-a' ? 'Legends Z-A' : desc.version.replace(/-/g, ' ')}
-                                                </button>
-                                              );
-                                            })}
-                                          </div>
-                                        </div>
-                                      ) : null}
-
-                                      <div className="relative z-10 mt-4">
-                                          <div className={cn(
-                                            "p-4 rounded-xl border relative shadow-inner overflow-hidden",
-                                            isLightMode 
-                                              ? "bg-slate-50 border-slate-200" 
-                                              : "bg-slate-900/50 border-slate-700/50"
-                                          )}>
-                                            <div className="absolute top-2 left-2 text-4xl opacity-20 font-serif leading-none">"</div>
-                                            <AnimatePresence mode="wait">
-                                            <motion.p
-                                              key={`flavor-${selectedGameDescIndex}-${pokemon?.name}`}
-                                              initial={{ opacity: 0, y: 6 }}
-                                              animate={{ opacity: 1, y: 0 }}
-                                              exit={{ opacity: 0, y: -6 }}
-                                              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                                              className={cn(
-                                                "text-[13px] sm:text-[14px] font-sans italic leading-relaxed min-h-[60px] relative z-10 pl-4",
-                                                isLightMode ? "text-slate-700" : "text-slate-300"
-                                              )}
-                                            >
-                                              <TypewriterText 
-                                                text={pokemon.gameDescriptions && pokemon.gameDescriptions[selectedGameDescIndex] 
-                                                  ? pokemon.gameDescriptions[selectedGameDescIndex].flavor_text 
-                                                  : (pokemon.description || "No data available for this unit.")}
-                                                delay={12}
-                                              />
-                                            </motion.p>
-                                          </AnimatePresence>
-                                          </div>
-                                      </div>
-
-                                      {/* active game version badge */}
-                                    </div>
-
-                                    <div className="flex justify-center gap-4 text-xs font-sans shrink-0 w-full max-w-sm mx-auto">
-                                      <div className={cn(
-                                        "flex-1 p-2 sm:p-3 rounded-xl text-center border shadow-sm transition-colors flex flex-col items-center justify-center gap-1",
-                                        isLightMode 
-                                          ? "bg-white border-slate-200" 
-                                          : "bg-slate-900/40 border-slate-800"
-                                      )}>
-                                        <p className={cn("mb-0.5 uppercase tracking-wider text-[10px] font-bold", isLightMode ? "text-slate-500" : "text-slate-400")}>Weight</p>
-                                        <p className={cn("text-[13px] sm:text-[14px] font-bold leading-none", isLightMode ? "text-slate-800" : "text-slate-200")}>{(pokemon.weight / 10).toFixed(1)} KG</p>
-                                        <p className={cn("text-[10px] text-slate-500 leading-none")}>{((pokemon.weight / 10) * 2.20462).toFixed(1)} lbs</p>
-                                      </div>
-                                      <div className={cn(
-                                        "flex-1 p-2 sm:p-3 rounded-xl text-center border shadow-sm transition-colors flex flex-col items-center justify-center gap-1",
-                                        isLightMode 
-                                          ? "bg-white border-slate-200" 
-                                          : "bg-slate-900/40 border-slate-800"
-                                      )}>
-                                        <p className={cn("mb-0.5 uppercase tracking-wider text-[10px] font-bold", isLightMode ? "text-slate-500" : "text-slate-400")}>Height</p>
-                                        <p className={cn("text-[13px] sm:text-[14px] font-bold leading-none", isLightMode ? "text-slate-800" : "text-slate-200")}>{(pokemon.height / 10).toFixed(1)} M</p>
-                                        <p className={cn("text-[10px] text-slate-500 leading-none")}>{Math.floor((pokemon.height / 10) * 3.28084)}'{Math.round(((pokemon.height / 10) * 3.28084 - Math.floor((pokemon.height / 10) * 3.28084)) * 12)}"</p>
-                                      </div>
-                                    </div>
-
-                                    {/* Abilities */}
-                                    <div className={cn(
-                                      "rounded-xl p-4 border-2 shadow-[0_4px_22px_rgba(0,0,0,0.03)]",
-                                      isLightMode ? "bg-white border-slate-200" : "bg-slate-950/60 border-cyan-900/40 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
-                                    )}>
-                                      <h3 className={cn(
-                                        "font-hud text-[11px] uppercase tracking-[0.3em] mb-4 border-b pb-2 flex items-center justify-between",
-                                        isLightMode ? "text-cyan-800 border-slate-200" : "text-cyan-500 border-cyan-900/40"
-                                      )}>
-                                        <div className="flex items-center gap-2">
-                                          <Zap className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                                          <span>Abilities</span>
-                                        </div>
-                                        <span className={cn("text-[9px] font-bold tracking-wider font-mono", isLightMode ? "text-slate-500" : "text-cyan-500 font-bold")}>PASSIVE TRAITS</span>
-                                      </h3>
-                                      <div className="space-y-4">
-                                        {pokemon.abilities && pokemon.abilities.length > 0 ? (
-                                          <div className="flex flex-col gap-3">
-                                            {pokemon.abilities.map((a, i) => (
-                                              <div key={`${a.name}-${i}`} className={cn(
-                                                "p-3 rounded-lg border transition-colors relative overflow-hidden",
-                                                a.is_hidden
-                                                  ? isLightMode
-                                                    ? "bg-purple-50/40 border-purple-200 hover:bg-purple-50/70"
-                                                    : "bg-purple-950/10 border-purple-900/30 hover:bg-purple-900/15"
-                                                  : isLightMode 
-                                                    ? "bg-slate-50 border-slate-200/80 hover:bg-slate-100/50" 
-                                                    : "bg-cyan-950/20 border-cyan-900/30 hover:bg-cyan-900/20"
-                                              )}>
-                                                <div className="flex items-center justify-between gap-2 mb-1.5">
-                                                  <div className="flex items-center gap-2">
-                                                    <span className={cn("text-[11px] font-hud uppercase tracking-[0.2em] font-black", isLightMode ? "text-cyan-800" : "text-cyan-400")}>{a.name.replace('-', ' ')}</span>
-                                                  </div>
-                                                  <span className={cn(
-                                                    "text-[8px] font-bold tracking-widest px-2 py-0.5 rounded-full border uppercase font-mono tracking-wider font-extrabold",
-                                                    a.is_hidden
-                                                      ? isLightMode 
-                                                        ? "bg-purple-50 text-purple-700 border-purple-300" 
-                                                        : "bg-purple-900/80 text-purple-300 border-purple-500/40 animate-pulse"
-                                                      : isLightMode
-                                                        ? "bg-cyan-50 text-cyan-700 border-cyan-200"
-                                                        : "bg-cyan-950 text-cyan-400 border-cyan-800/60"
-                                                  )}>
-                                                    {a.is_hidden ? "Hidden Ability" : "Standard Ability"}
-                                                  </span>
-                                                </div>
-                                                <p className={cn("text-[10px] leading-relaxed tracking-tight", isLightMode ? "text-slate-600 font-medium" : "text-cyan-100")}>{a.description}</p>
-                                              </div>
-                                            ))}
-                                          </div>
-                                        ) : (
-                                          <p className={cn("text-[9px] font-bold tracking-wider uppercase tracking-widest text-center py-2", isLightMode ? "text-slate-400" : "text-cyan-500")}>No abilities detected</p>
-                                        )}
-                                      </div>
-                                    </div>
-
-                                    {/* Evolution Line & Methods Section (Only for standard 1025 Pokémon) */}
+                                     {/* Evolution Line & Methods Section (Only for standard 1025 Pokémon) */}
                                      {isStandard1025Pokemon(pokemon) && pokemon.evolutionChain && pokemon.evolutionChain.evolves_to && pokemon.evolutionChain.evolves_to.length > 0 && (
                                        <div className={cn(
                                          "rounded-xl p-4 sm:p-5 border-2 shadow-[0_4px_22px_rgba(0,0,0,0.03)] overflow-x-auto custom-scrollbar relative mb-4 touch-pan-x touch-pan-y [touch-action:pan-x_pan-y]",
@@ -6178,7 +6032,6 @@ export default function App() {
                                              <GitFork className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                                              <span>Evolution Line & Methods</span>
                                            </div>
-                                           
                                          </h3>
 
                                          <div className="flex items-center justify-start min-w-max pb-1 pt-2 touch-pan-x touch-pan-y [touch-action:pan-x_pan-y]">
@@ -6193,187 +6046,33 @@ export default function App() {
                                        </div>
                                      )}
 
-                                     {/* Weaknesses */}
-                                     <div className={cn(
-                                       "rounded-xl p-4 border-2 shadow-[0_4px_22px_rgba(0,0,0,0.03)]",
-                                       isLightMode ? "bg-white border-slate-200" : "bg-slate-950/60 border-cyan-900/40 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
-                                     )}>
-                                       <h3 className={cn(
-                                         "font-hud text-[11px] uppercase tracking-[0.3em] mb-4 border-b pb-2 flex items-center gap-2",
-                                         isLightMode ? "text-cyan-800 border-slate-200" : "text-cyan-500 border-cyan-900/40"
-                                       )}>
-                                         <Shield className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                                         <span>Type Weaknesses</span>
-                                       </h3>
-                                      <div className="flex flex-wrap gap-2.5">
-                                        {pokemon.weaknesses && pokemon.weaknesses.length > 0 ? (
-                                          pokemon.weaknesses.map((w, idx) => (
-                                            <span
-                                              key={`weakness-${w}-${idx}`}
-                                              className={cn(
-                                                "px-3 py-1.5 rounded-md text-[9px] font-bold tracking-wider font-hud font-black uppercase tracking-[0.2em] shadow-md hover:scale-110 transition-transform",
-                                                typeColors[w] || "bg-slate-600"
-                                              )}
-                                            >
-                                              {w}
-                                            </span>
-                                          ))
-                                        ) : (
-                                          <span className={cn("font-medium text-[9px] font-bold tracking-wider uppercase tracking-widest", isLightMode ? "text-slate-500" : "text-slate-300")}>No major weaknesses detected</span>
-                                        )}
-                                      </div>
-                                    </div>
+                                     {/* Type Weaknesses Matrix Section */}
+                                     <TypeWeaknessesSection
+                                       weaknesses={pokemon.weaknesses}
+                                       types={pokemon.types}
+                                       isLightMode={isLightMode}
+                                       typeColors={typeColors}
+                                     />
 
-                                    <div className={cn(
-                                      "backdrop-blur-md rounded-2xl p-5 sm:p-7 border shadow-inner relative overflow-hidden group/statshud w-full max-w-full z-10 box-border",
-                                      isLightMode 
-                                        ? "bg-white/95 border-slate-200" 
-                                        : "bg-slate-900/60 border-cyan-900/40"
-                                    )}>
-                                      <div className="absolute top-0 right-0 w-48 h-48 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
-                                      
-                                      <h3 className={cn(
-                                        "font-hud text-[11px] sm:text-[13px] uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-5 border-b pb-3 font-black flex items-center justify-between",
-                                        isLightMode ? "text-cyan-800 border-slate-200" : "text-cyan-400 border-cyan-900/30"
-                                      )}>
-                                        <div className="flex items-center gap-2">
-                                          <Activity className="w-3.5 h-3.5 text-cyan-400 shrink-0 filter drop-shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
-                                          Combat HUD
-                                        </div>
-                                        <div className={cn("text-[9px] font-mono tracking-widest hidden sm:inline-block", isLightMode ? "text-slate-400" : "text-cyan-800")}>LIVE ANALYSIS</div>
-                                      </h3>
+                                     {/* Combat Base Stats HUD Section */}
+                                     <CombatStatsSection
+                                       stats={pokemon.stats}
+                                       isLightMode={isLightMode}
+                                       sounds={sounds}
+                                     />
 
-                                      <div className="w-full flex flex-col gap-3 sm:gap-4 relative z-10">
-                                        {pokemon.stats.map((s, idx) => (
-                                          <div key={`stat-${s.stat.name}-${idx}`} className="flex items-center gap-2 sm:gap-3 group/stat relative w-full">
-                                            <div className={cn("w-24 sm:w-28 uppercase text-[8px] sm:text-[9px] font-black shrink-0 cursor-help flex items-center gap-1.5", isLightMode ? "text-slate-500" : "text-cyan-600")}>
-                                              <div className={cn("w-1 h-3 rounded-[1px] transition-colors", isLightMode ? "bg-slate-300 group-hover/stat:bg-cyan-600" : "bg-cyan-900/80 group-hover/stat:bg-cyan-400")}></div>
-                                              <span className="truncate">{statNameMap[s.stat.name] || s.stat.name}</span>
-                                              <div className="opacity-0 group-hover/stat:opacity-100 absolute left-0 -top-12 z-[100] bg-slate-900 border border-cyan-500/30 p-2 sm:p-3 rounded-lg text-[9px] sm:text-[10px] font-medium tracking-wide text-cyan-100 w-48 sm:w-56 pointer-events-none transition-all duration-200 shadow-2xl">
-                                                {statExplanations[s.stat.name] || "No data available."}
-                                              </div>
-                                            </div>
-                                            <div className={cn(
-                                              "flex-1 h-2 rounded-full overflow-hidden border shadow-inner relative flex items-center",
-                                              isLightMode ? "bg-slate-100 border-slate-200" : "bg-slate-950/80 border border-cyan-950/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)] p-[1px]"
-                                            )}>
-                                              <motion.div 
-                                                initial={{ width: 0 }}
-                                                animate={{ width: `${Math.min(100, (s.base_stat / 255) * 100)}%` }}
-                                                transition={{ type: "spring", stiffness: 140, damping: 22 }}
-                                                className="h-full bg-gradient-to-r from-cyan-900 via-cyan-500 to-cyan-300 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.6)]"
-                                              />
-                                            </div>
-                                            <span className={cn("w-8 sm:w-10 text-right text-[10px] sm:text-[12px] font-mono shrink-0", isLightMode ? "text-slate-800 font-bold" : "text-cyan-300 font-black")}>{s.base_stat}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                      
-                                      
-                                    </div>
-
-
-
-                                    {/* Moves Section */}
-                                    {pokemon.moves && pokemon.moves.length > 0 && (
-                                      <div className={cn(
-                                        "backdrop-blur-md rounded-2xl p-6 sm:p-8 border shadow-2xl relative overflow-hidden mt-6 w-full",
-                                        isLightMode ? "bg-white/95 border-slate-200" : "bg-slate-900/40 border-white/5"
-                                      )}>
-                                        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
-                                        <h3 className={cn(
-                                          "font-hud text-[12px] sm:text-[14px] uppercase tracking-[0.3em] mb-6 border-b pb-4 font-black flex items-center justify-between relative z-10",
-                                          isLightMode ? "text-cyan-700 border-slate-200" : "text-cyan-400 border-white/5"
-                                        )}>
-                                          <div className="flex items-center gap-2.5">
-                                            <Swords className="w-4 h-4 text-emerald-400 shrink-0 filter drop-shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
-                                            Moveset Analysis
-                                          </div>
-                                          <span className="text-[10px] text-slate-500 font-mono tracking-widest hidden sm:inline-block">POKÉMON DATABASE</span>
-                                        </h3>
-                                        <div className="space-y-8 relative z-10">
-                                          {['level-up', 'machine', 'egg', 'tutor'].map((method) => {
-                                            const methodMoves = pokemon.moves.filter(m => m.learn_method === method);
-                                            if (methodMoves.length === 0) return null;
-                                            
-                                            const isCollapsed = collapsedMoveMethods[method] !== false;
-                                            
-                                            return (
-                                              <div key={`move-method-${method}`} className={cn("border rounded-xl p-3 mb-3", isLightMode ? "bg-slate-50/55 border-slate-200" : "bg-slate-900/10 border-cyan-900/20")}>
-                                                <button
-                                                  type="button"
-                                                  onClick={() => {
-                                                    setCollapsedMoveMethods(prev => ({
-                                                      ...prev,
-                                                      [method]: !isCollapsed
-                                                    }));
-                                                    try { sounds.scan(); } catch(_) {}
-                                                  }}
-                                                  className="w-full flex items-center justify-between py-1.5 px-2 hover:bg-cyan-500/5 rounded-lg transition-colors text-left"
-                                                >
-                                                  <h4 className={cn("text-[9px] font-hud font-black tracking-[0.15em] uppercase flex items-center gap-2", isLightMode ? "text-slate-600" : "text-cyan-400")}>
-                                                    {method === 'level-up' ? <ArrowUp className="w-3.5 h-3.5 text-cyan-400 shrink-0" /> : method === 'machine' ? <Cpu className="w-3.5 h-3.5 text-cyan-400 shrink-0" /> : method === 'egg' ? <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0" /> : <BookOpen className="w-3.5 h-3.5 text-cyan-400 shrink-0" />}
-                                                    {method.replace('-', ' ')} ({methodMoves.length})
-                                                  </h4>
-                                                  <div className="flex items-center gap-1.5">
-                                                    <span className="text-[7.5px] font-mono text-slate-500 uppercase font-semibold">{isCollapsed ? "Expand" : "Collapse"}</span>
-                                                    <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-300 text-cyan-500", !isCollapsed ? "rotate-180" : "rotate-0")} />
-                                                  </div>
-                                                </button>
-                                                
-                                                <AnimatePresence initial={false}>
-                                                  {!isCollapsed && (
-                                                    <motion.div
-                                                      initial={{ opacity: 0, height: 0 }}
-                                                      animate={{ opacity: 1, height: 'auto' }}
-                                                      exit={{ opacity: 0, height: 0 }}
-                                                      transition={{ duration: 0.2 }}
-                                                      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 mt-2 pt-2 border-t border-cyan-900/10 overflow-hidden"
-                                                    >
-                                                      {methodMoves.map((move, moveIdx) => (
-                                                        <button 
-                                                          key={`${move.name}-${moveIdx}`}
-                                                          onClick={() => {
-                                                            setSelectedMoveDetail(move);
-                                                            setIsMoveDetailOpen(true);
-                                                            sounds.scan();
-                                                          }}
-                                                          className={cn(
-                                                            "w-full p-2 rounded border flex justify-between items-center group transition-colors text-left",
-                                                            isLightMode 
-                                                              ? "bg-slate-50 border-slate-200/80 hover:border-cyan-500/50 hover:bg-slate-100/50" 
-                                                              : "bg-slate-900/50 border-cyan-900/20 hover:border-cyan-500/50"
-                                                          )}
-                                                        >
-                                                          <div className="flex flex-col">
-                                                            <span className={cn("text-[10px] font-bold tracking-wider font-hud uppercase tracking-wider", isLightMode ? "text-slate-800" : "text-cyan-300")}>{move.name.replace('-', ' ')}</span>
-                                                            <div className="flex items-center gap-2 mt-1">
-                                                              <span className={cn(
-                                                                "text-[7px] font-bold tracking-wider px-1 rounded-md uppercase font-bold",
-                                                                typeColors[move.type] || "bg-slate-600"
-                                                              )}>
-                                                                {move.type}
-                                                              </span>
-                                                              {move.power && <span className={cn("text-[7px] font-bold tracking-wider", isLightMode ? "text-slate-500 font-medium" : "text-slate-300 font-medium")}>PWR: {move.power}</span>}
-                                                              {move.accuracy && <span className={cn("text-[7px] font-bold tracking-wider", isLightMode ? "text-slate-500 font-medium" : "text-slate-300 font-medium")}>ACC: {move.accuracy}%</span>}
-                                                            </div>
-                                                          </div>
-                                                          <div className="text-right flex flex-col items-end gap-1">
-                                                            <span className={cn("font-mono text-[8px] font-bold tracking-wider uppercase", isLightMode ? "text-slate-500" : "text-cyan-600")}>PP: {move.pp}</span>
-                                                            <Info className={cn("w-2.5 h-2.5 transition-colors", isLightMode ? "text-slate-400 group-hover:text-cyan-600" : "text-cyan-600 group-hover:text-cyan-400")} />
-                                                          </div>
-                                                        </button>
-                                                      ))}
-                                                    </motion.div>
-                                                  )}
-                                                </AnimatePresence>
-                                              </div>
-                                            );
-                                          })}
-                                        </div>
-                                      </div>
-                                    )}
-                                  </motion.div>
+                                     {/* Moveset Analysis Section */}
+                                     {pokemon.moves && pokemon.moves.length > 0 && (
+                                       <MovesetAnalysisSection
+                                         moves={pokemon.moves}
+                                         isLightMode={isLightMode}
+                                         typeColors={typeColors}
+                                         sounds={sounds}
+                                         setSelectedMoveDetail={setSelectedMoveDetail}
+                                         setIsMoveDetailOpen={setIsMoveDetailOpen}
+                                       />
+                                     )}
+                                   </motion.div>
                                 ) : activeTab === 'chat' ? (
                                   <motion.div
                                     key="chat"
@@ -6496,125 +6195,7 @@ export default function App() {
                                           </button>
                                         )}
                                         {chatMessages.map((msg, i) => (
-                                          <motion.div 
-                                            key={`chat-msg-${i}-${msg.role}`} 
-                                            initial={{ opacity: 0, x: msg.role === 'user' ? 20 : -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ duration: 0.3, ease: "easeOut" }}
-                                            className={cn(
-                                              "flex w-full gap-2.5 py-3 relative z-10 border-b border-cyan-900/20 last:border-0",
-                                              msg.role === 'user' ? "flex-row-reverse" : "flex-row"
-                                            )}
-                                          >
-                                            <div className={cn("shrink-0 mt-1 flex items-center justify-center", msg.role === 'user' ? (isLightMode ? 'text-slate-500' : 'text-slate-400') : (isLightMode ? 'text-cyan-600' : 'text-cyan-400'))}>
-                                              {msg.role === 'user' ? <User className="w-4 h-4" /> : <BrainCircuit className="w-4 h-4" />}
-                                            </div>
-                                            <div className={cn("flex flex-col w-full min-w-0 max-w-[85%]", msg.role === 'user' ? "items-end" : "items-start")}>
-                                              <span className={cn("text-[7px] font-hud font-bold uppercase tracking-widest mb-1", msg.role === 'user' ? "text-slate-500" : "text-cyan-500/70")}>{msg.role === 'user' ? 'Operator' : 'Pokéthology AI'}</span>
-                                              <div className={cn(
-                                                "markdown-body select-text text-[11px] sm:text-[12px] font-sans leading-relaxed break-words rounded-xl px-3 py-2 text-left", 
-                                                msg.role === 'user' 
-                                                  ? (isLightMode ? "bg-slate-200 text-slate-800" : "bg-slate-800 text-slate-200") 
-                                                  : (isLightMode ? "text-cyan-900" : "text-cyan-100")
-                                              )}>
-                                                <Markdown
-                                                  components={{
-                                                    a: ({ href, children }) => (
-                                                      <span className="inline-block">
-                                                        <a 
-                                                          href={href} 
-                                                          target="_blank" 
-                                                          rel="noopener noreferrer" 
-                                                          className="text-cyan-400 hover:text-cyan-300 underline font-semibold inline-flex items-center gap-1"
-                                                        >
-                                                          {children}
-                                                          <Globe className="w-2.5 h-2.5 inline text-cyan-400/80" />
-                                                        </a>
-                                                      </span>
-                                                    )
-                                                  }}
-                                                >
-                                                  {msg.text}
-                                                </Markdown>
-                                              </div>
-                                              {msg.role === 'model' && pokemon?.name && (
-                                                <div className="mt-2.5 pt-2 border-t border-cyan-500/10 flex flex-wrap gap-1.5 align-middle items-center">
-                                                  <span className="text-[7.5px] text-slate-500 font-hud tracking-widest uppercase block w-full mb-0.5">Verified Knowledge Sources:</span>
-                                                  <a 
-                                                    href={`https://bulbapedia.bulbagarden.net/wiki/${encodeURIComponent(pokemon.name)}_(Pokémon)`} 
-                                                    target="_blank" 
-                                                    rel="noopener noreferrer" 
-                                                    className="inline-flex items-center gap-1 text-[7.5px] font-hud font-black uppercase tracking-wider text-cyan-400 hover:text-cyan-200 bg-slate-950/40 hover:bg-cyan-500/15 border border-cyan-500/20 px-2 py-0.5 rounded transition-colors"
-                                                  >
-                                                    <BookOpen className="w-2.5 h-2.5 text-cyan-500" />
-                                                    Bulbapedia
-                                                  </a>
-                                                  <a 
-                                                    href={`https://www.serebii.net/search.shtml?q=${encodeURIComponent(pokemon.name)}`} 
-                                                    target="_blank" 
-                                                    rel="noopener noreferrer" 
-                                                    className="inline-flex items-center gap-1 text-[7.5px] font-hud font-black uppercase tracking-wider text-cyan-400 hover:text-cyan-200 bg-slate-950/40 hover:bg-cyan-500/15 border border-cyan-500/20 px-2 py-0.5 rounded transition-colors"
-                                                  >
-                                                    <Globe className="w-2.5 h-2.5 text-cyan-500" />
-                                                    Serebii
-                                                  </a>
-
-                                                  <a 
-                                                    href={`https://www.youtube.com/results?search_query=${encodeURIComponent(pokemon.name + ' lore pokémon')}`} 
-                                                    target="_blank" 
-                                                    rel="noopener noreferrer" 
-                                                    className="inline-flex items-center gap-1 text-[7.5px] font-hud font-black uppercase tracking-wider text-red-400 hover:text-red-200 bg-slate-950/40 hover:bg-red-500/15 border border-red-500/20 px-2 py-0.5 rounded transition-colors"
-                                                  >
-                                                    <Search className="w-2.5 h-2.5 text-red-500" />
-                                                    YouTube
-                                                  </a>
-                                                </div>
-                                              )}
-                                              {msg.groundingMetadata?.webSearchQueries?.length > 0 && (
-                                                <div className="flex flex-wrap items-center gap-1 mt-2 border-t border-slate-700/30 pt-1.5 text-[8px] font-mono text-cyan-400/90 select-none">
-                                                  <Search className="w-2 h-2 text-cyan-400 animate-pulse" />
-                                                  <span className="font-bold uppercase tracking-wider text-[7px] text-cyan-400/70">Scanned Web:</span>
-                                                  {msg.groundingMetadata.webSearchQueries.map((query: string, qi: number) => (
-                                                    <span key={`query-${qi}`} className="bg-cyan-950/50 border border-cyan-500/15 px-1 py-0.5 rounded text-[7px] font-bold">
-                                                      "{query}"
-                                                    </span>
-                                                  ))}
-                                                </div>
-                                              )}
-
-                                              {msg.groundingChunks?.length > 0 && (
-                                                <div className="mt-2 text-[8px] select-all">
-                                                  <div className="text-[7px] tracking-widest font-black text-slate-400/70 uppercase mb-1 flex items-center gap-1 font-hud">
-                                                    <Globe className="w-1.5 h-1.5 text-cyan-500" />
-                                                    <span>Academic Citations & Origins</span>
-                                                  </div>
-                                                  <div className="flex flex-wrap gap-1">
-                                                    {msg.groundingChunks.filter(c => c.web?.uri).map((chunk, ci) => {
-                                                      let domain = 'Source';
-                                                      try {
-                                                        domain = new URL(chunk.web.uri).hostname.replace('www.', '');
-                                                      } catch (err) {}
-                                                      return (
-                                                        <a 
-                                                          key={`chunk-${ci}`} 
-                                                          href={chunk.web.uri} 
-                                                          target="_blank" 
-                                                          rel="noopener noreferrer" 
-                                                          className="text-[7.5px] font-mono text-cyan-300 hover:text-cyan-100 flex items-center gap-1 border border-cyan-500/15 px-1.5 py-0.5 bg-cyan-950/30 hover:bg-cyan-950/85 rounded transition-all duration-150 decoration-transparent"
-                                                        >
-                                                          <Globe className="w-1.5 h-1.5 text-cyan-500" />
-                                                          <span className="underline truncate max-w-[120px] font-bold">
-                                                            {chunk.web.title || domain}
-                                                          </span>
-                                                          <span className="opacity-40 text-[6.5px]">({domain})</span>
-                                                        </a>
-                                                      );
-                                                    })}
-                                                  </div>
-                                                </div>
-                                              )}
-                                            </div>
-                                          </motion.div>
+                                          <ChatMessageItem key={`chat-msg-${i}-${msg.role}`} msg={msg} isLightMode={isLightMode} sounds={sounds} />
                                         ))}
                                         {isChatLoading && (
                                           <motion.div 
@@ -7406,6 +6987,7 @@ export default function App() {
                                               setIsBattleHistoryExpanded(!isBattleHistoryExpanded);
                                               sounds.scan();
                                             }}
+                                            onMouseEnter={() => sounds?.hover?.()}
                                             className="w-full flex items-center justify-between px-3.5 py-2 sm:py-2.5 bg-slate-900/45 hover:bg-slate-900/75 transition-all font-hud text-[9.5px] tracking-widest text-slate-400 hover:text-cyan-400 font-bold uppercase cursor-pointer"
                                           >
                                             <div className="flex items-center gap-1.5">
@@ -7843,7 +7425,7 @@ export default function App() {
                                             </div>
                                           )}
                                         </motion.div>
-                                      ) : (
+                                      ) : isBattling ? (
                                         <motion.div
                                           key="arena-active"
                                           initial={{ opacity: 0, scale: 0.98, y: 15 }}
@@ -7852,16 +7434,12 @@ export default function App() {
                                           transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                                           className="space-y-4"
                                         >
-
-
-                                          {/* AI Strategy & Run Buttons */}
-                                          {/* AI Strategy & Run Buttons */}
-                                          {isBattling && (
-<div className="flex gap-2 mb-4 items-center">
+                                          <div className="flex gap-2 mb-4 items-center">
                                             <motion.button
                                               whileHover={{ scale: 1.03 }}
                                               whileTap={{ scale: 0.95 }}
                                               onClick={getBattleStrategy}
+                                              onMouseEnter={() => sounds?.hover?.()}
                                               disabled={isAiSuggesting || !isBattling}
                                               className={cn(
                                                 "flex-[3] py-1.5 bg-purple-900/40 hover:bg-purple-800/60 text-purple-300 font-hud rounded-lg border border-purple-500/40 transition-all text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2",
@@ -7876,6 +7454,7 @@ export default function App() {
                                               whileHover={{ scale: 1.05 }}
                                               whileTap={{ scale: 0.95 }}
                                               onClick={() => { setPendingAction('run'); setShowExitConfirmation(true); }}
+                                              onMouseEnter={() => sounds?.hover?.()}
                                               disabled={!isBattling}
                                               className={cn(
                                                 "flex-1 py-1.5 bg-slate-900 border border-slate-700 text-slate-500 font-hud rounded-lg transition-all text-[9px] font-black uppercase tracking-widest hover:border-red-500/50 hover:text-red-400 active:scale-95 flex items-center justify-center gap-2",
@@ -7886,12 +7465,8 @@ export default function App() {
                                               Quit
                                             </motion.button>
                                           </div>
-)}
-
-
-
                                         </motion.div>
-                                      )}
+                                      ) : null}
                                     </AnimatePresence>
                                     </div> {/* End of flex container */}
                                       </div> {/* End of Right Column */}
@@ -7928,12 +7503,12 @@ export default function App() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98, y: -12 }}
                         transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-                        className="flex-1 flex flex-col items-center justify-center gap-4 sm:gap-5 md:gap-6 py-4 px-4 text-center relative overflow-y-auto md:overflow-hidden select-none w-full h-full my-auto"
+                        className="flex-1 flex flex-col items-center justify-between py-6 px-4 pb-16 sm:pb-20 text-center relative overflow-y-auto select-none w-full h-full my-auto custom-scrollbar"
                       >
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/5 to-transparent pointer-events-none"></div>
                         
                         <motion.div 
-                          className="relative w-40 h-40 xxs:w-48 xxs:h-48 xs:w-56 xs:h-56 sm:w-64 sm:h-64 md:w-64 md:h-64 lg:w-64 lg:h-64 xl:w-72 xl:h-72 flex items-center justify-center shrink-0 max-h-[32vh]"
+                          className="relative w-36 h-36 xxs:w-40 xxs:h-40 xs:w-48 xs:h-48 sm:w-56 sm:h-56 md:w-60 md:h-60 lg:w-60 lg:h-60 xl:w-72 xl:h-72 flex items-center justify-center shrink-0 max-h-[30vh]"
                           initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: "easeOut" }}
                         >
                           <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 75%)' }}></div>
@@ -8002,13 +7577,13 @@ export default function App() {
                           </div>
 
                           {/* Home Screen Copyright & Legal Disclaimer */}
-                          <p className="text-[9px] sm:text-[10px] text-slate-400 font-mono tracking-wider max-w-2xl mx-auto text-center mt-3 sm:mt-4 md:mt-5 mb-2 leading-relaxed opacity-80 select-none px-2">
-                            Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc. TM, ® and Pokémon character names are trademarks of Nintendo.<br className="hidden sm:inline"/>
+                          <p className="text-[9px] sm:text-[10px] text-slate-400 font-mono tracking-wider max-w-2xl mx-auto text-center mt-8 sm:mt-12 md:mt-16 mb-4 sm:mb-6 leading-relaxed opacity-90 select-text px-3 relative z-10 break-words">
+                            Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc. TM, ® and Pokémon character names are trademarks of Nintendo.<br className="hidden sm:inline"/>{" "}
                             No copyright or trademark infringement is intended in using Pokémon content on Pokéthology.
                           </p>
                         </div>
 
-                        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end opacity-40 pointer-events-none">
+                        <div className="absolute bottom-2 left-4 right-4 flex justify-between items-end opacity-30 pointer-events-none z-0">
                           <div className="flex flex-col gap-1">
                             <div className="w-24 h-1 bg-cyan-900/60"></div>
                             <div className="w-16 h-1 bg-cyan-900/60"></div>
@@ -8073,7 +7648,7 @@ export default function App() {
                           <div className="flex flex-col gap-2.5 mb-2.5 border-b border-cyan-900/50 pb-2.5 shrink-0">
                             <div className="flex justify-between items-center px-2 py-2">
                               <div className="flex items-center gap-4 sm:gap-6 shrink-0">
-                                <div className="relative w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center shrink-0">
+                                <div className="relative w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 flex items-center justify-center shrink-0">
                                   <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.18) 0%, transparent 70%)' }}></div>
                                   <PokethologyLogo className="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(6,182,212,0.35)]" />
                                 </div>
