@@ -39,6 +39,7 @@ import { PokethologyQuizWidget } from './components/PokethologyQuizWidget';
 import { MoveModal } from './components/MoveModal';
 import { BattleHistory } from './components/BattleHistory';
 import { AboutModal } from './components/AboutModal';
+import { PwaInstallModal } from './components/PwaInstallModal';
 import { OfflineManagerModal } from './components/OfflineManagerModal';
 import { PokedexEntrySection } from './components/PokedexEntrySection';
 import { PokemonComparisonSidebar } from './components/PokemonComparisonSidebar';
@@ -2609,13 +2610,17 @@ export default function App() {
     };
   }, []);
 
+  const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
+
   const handleInstallPWA = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      setDeferredPrompt(null);
-      setIsInstallable(false);
+    setIsPwaModalOpen(true);
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+        setIsInstallable(false);
+      }
     }
   };
   const [isRebooting, setIsRebooting] = useState(false);
@@ -4965,8 +4970,8 @@ export default function App() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
       if (!fromChat) {
-        // Just append a context switch message, do not wipe the entire chat!
-        setChatMessages(prev => [...prev, { 
+        // Reset chat messages to only show the focus shifted system message
+        setChatMessages([{ 
           role: 'model' as const, 
           text: selectedLang === 'it' 
             ? `*Sistema: Focus spostato su **${pokeData.name.toUpperCase()}**.*`
@@ -7508,7 +7513,7 @@ export default function App() {
                                                           <div key={`${move.name}-${i}`} className="border border-slate-900 bg-slate-950/30 rounded px-2.5 py-2 flex flex-col gap-1.5">
                                                             <div className="flex justify-between items-center">
                                                               <div className="flex items-center gap-1.5">
-                                                                <span className="font-hud uppercase text-[9px] sm:text-[10px] font-black tracking-wide text-cyan-400">{move.name.replace('-', ' ')}</span>
+                                                                <span className={cn("font-hud uppercase text-[9px] sm:text-[10px] font-black tracking-wide", isLightMode ? "text-slate-900" : "text-cyan-400")}>{move.name.replace('-', ' ')}</span>
                                                                 <span className={cn("text-[6px] sm:text-[7px] px-1 py-0.5 rounded font-bold uppercase", typeColors[move.type] || "bg-slate-600")}>
                                                                   {move.type}
                                                                 </span>
@@ -7623,7 +7628,7 @@ export default function App() {
                                                           )}
                                                         >
                                                           <div className="flex justify-between w-full items-center gap-1">
-                                                            <span className="font-hud uppercase tracking-wider text-cyan-300 group-hover:text-white truncate">{move.name.replace('-', ' ')}</span>
+                                                            <span className={cn("font-hud uppercase tracking-wider truncate", isLightMode ? "text-slate-900 group-hover:text-slate-950" : "text-cyan-300 group-hover:text-white")}>{move.name.replace('-', ' ')}</span>
                                                             <TypeBadge type={move.type} size="xs" />
                                                           </div>
                                                           <div className="flex gap-2.5 text-[8px] font-mono text-slate-400 font-bold">
@@ -9873,6 +9878,10 @@ export default function App() {
           isOpen={isAboutOpen}
           onClose={() => setIsAboutOpen(false)}
           isLightMode={isLightMode}
+        />
+        <PwaInstallModal
+          isOpen={isPwaModalOpen}
+          onClose={() => setIsPwaModalOpen(false)}
         />
       </div>
       </Suspense>

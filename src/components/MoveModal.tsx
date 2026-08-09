@@ -30,13 +30,19 @@ export const MoveModal: React.FC<MoveModalProps> = ({ isOpen, onClose, moves, on
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 bg-slate-900 border border-cyan-500/30 rounded-3xl p-6 shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col"
+            className={cn(
+              "fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 border rounded-3xl p-6 shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col",
+              isLightMode ? "bg-white border-slate-200" : "bg-slate-900 border-cyan-500/30"
+            )}
           >
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-hud text-cyan-400 uppercase tracking-widest">Available Moves</h2>
+              <h2 className={cn("text-xl font-hud uppercase tracking-widest", isLightMode ? "text-slate-900" : "text-cyan-400")}>Available Moves</h2>
               <button 
                 onClick={onClose} 
-                className="p-2 rounded-full bg-slate-800/80 border border-slate-700/80 hover:bg-slate-700 text-slate-200 hover:text-white transition-all hover:scale-105 active:scale-95 shadow-md flex items-center justify-center shrink-0"
+                className={cn(
+                  "p-2 rounded-full border transition-all hover:scale-105 active:scale-95 shadow-md flex items-center justify-center shrink-0",
+                  isLightMode ? "bg-slate-100 border-slate-200 hover:bg-slate-200 text-slate-700" : "bg-slate-800/80 border-slate-700/80 hover:bg-slate-700 text-slate-200 hover:text-white"
+                )}
                 title="Close"
               >
                 <X className="w-5 h-5 stroke-[2.5]" />
@@ -47,18 +53,24 @@ export const MoveModal: React.FC<MoveModalProps> = ({ isOpen, onClose, moves, on
                 <button
                   key={`${move.name}-${i}`}
                   onClick={() => onMoveClick(move)}
-                  className="w-full p-4 rounded-xl border border-cyan-900/30 bg-slate-800/50 hover:bg-slate-800 hover:border-cyan-500/50 transition-all text-left group"
+                  className={cn(
+                    "w-full p-4 rounded-xl border transition-all text-left group",
+                    isLightMode ? "bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-cyan-500" : "bg-slate-800/50 border-cyan-900/30 hover:bg-slate-800 hover:border-cyan-500/50"
+                  )}
                 >
                   <div className="flex justify-between items-start mb-1">
-                    <span className="text-sm font-hud font-bold text-cyan-300 uppercase tracking-wider group-hover:text-white">
+                    <span className={cn(
+                      "text-sm font-hud font-bold uppercase tracking-wider group-hover:opacity-80",
+                      isLightMode ? "text-slate-900" : "text-cyan-300"
+                    )}>
                       {move.name.replace('-', ' ')}
                     </span>
-                    <span className="font-mono text-xs font-bold text-cyan-600">PP: {move.pp}</span>
+                    <span className={cn("font-mono text-xs font-bold", isLightMode ? "text-slate-600" : "text-cyan-600")}>PP: {move.pp}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <TypeBadge type={move.type} size="sm" />
-                    {move.power && <span className="text-xs text-slate-400">PWR: {move.power}</span>}
-                    {move.accuracy && <span className="text-xs text-slate-400">ACC: {move.accuracy}%</span>}
+                    {move.power && <span className={cn("text-xs", isLightMode ? "text-slate-600" : "text-slate-400")}>PWR: {move.power}</span>}
+                    {move.accuracy && <span className={cn("text-xs", isLightMode ? "text-slate-600" : "text-slate-400")}>ACC: {move.accuracy}%</span>}
                   </div>
                 </button>
               ))}

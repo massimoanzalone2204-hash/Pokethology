@@ -1084,6 +1084,14 @@ html, body {
   width: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 /* Scrollbars invisible by default, visible only while scrolling/sliding on mobile and touch devices */
 @media (max-width: 1024px), (pointer: coarse) {
   * {
