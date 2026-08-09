@@ -41,6 +41,7 @@ import { BattleHistory } from './components/BattleHistory';
 import { AboutModal } from './components/AboutModal';
 import { OfflineManagerModal } from './components/OfflineManagerModal';
 import { PokedexEntrySection } from './components/PokedexEntrySection';
+import { PokemonComparisonSidebar } from './components/PokemonComparisonSidebar';
 import { AbilitiesSection } from './components/AbilitiesSection';
 import { TypeWeaknessesSection } from './components/TypeWeaknessesSection';
 import { CombatStatsSection } from './components/CombatStatsSection';
@@ -2678,6 +2679,17 @@ export default function App() {
   const [battleTheme, setBattleTheme] = useState<string>('auto');
   const [isCompactBattle, setIsCompactBattle] = useState<boolean>(() => window.innerWidth < 768);
   const [isDailyHubOpen, setIsDailyHubOpen] = useState<boolean>(false);
+  const [isComparisonOpen, setIsComparisonOpen] = useState<boolean>(false);
+  const [pinnedComparisonPokemon, setPinnedComparisonPokemon] = useState<Pokemon | null>(null);
+
+  const handleOpenComparison = (p?: Pokemon) => {
+    const targetPokemon = p || pokemon;
+    if (targetPokemon) {
+      setPinnedComparisonPokemon(targetPokemon);
+      setIsComparisonOpen(true);
+      if (sounds?.hover) sounds.hover();
+    }
+  };
     const [isChaosModeActive, setIsChaosModeActive] = useState(false);
   const [dailyStreak, setDailyStreak] = useState<number>(0);
   const [isMissionCompleted, setIsMissionCompleted] = useState<boolean>(false);
@@ -2960,7 +2972,7 @@ export default function App() {
   const [isMusicOpen, setIsMusicOpen] = useState(false);
   // Lock body scrolling when any modal is active so main app background stays fixed
   useEffect(() => {
-    const isAnyModalOpen = isDailyHubOpen || isDailyScanOpen || isDailyQuizOpen || isSettingsOpen || isTutorialOpen || isMusicOpen;
+    const isAnyModalOpen = isDailyHubOpen || isDailyScanOpen || isDailyQuizOpen || isSettingsOpen || isTutorialOpen || isMusicOpen || isComparisonOpen;
     if (isAnyModalOpen) {
       document.body.style.overflow = 'hidden';
       document.body.style.touchAction = 'none';
@@ -6035,14 +6047,15 @@ export default function App() {
                                     className="w-full space-y-4"
                                   >
                                     {/* Enhanced Pokedex Entry Section */}
-                                     <PokedexEntrySection
-                                       pokemon={pokemon}
-                                       selectedGameDescIndex={selectedGameDescIndex}
-                                       setSelectedGameDescIndex={setSelectedGameDescIndex}
-                                       isLightMode={isLightMode}
-                                       sounds={sounds}
-                                       TypewriterText={TypewriterText}
-                                     />
+                                    <PokedexEntrySection
+                                      pokemon={pokemon}
+                                      selectedGameDescIndex={selectedGameDescIndex}
+                                      setSelectedGameDescIndex={setSelectedGameDescIndex}
+                                      isLightMode={isLightMode}
+                                      sounds={sounds}
+                                      TypewriterText={TypewriterText}
+                                      onCompare={() => handleOpenComparison(pokemon)}
+                                    />
 
                                      {/* Abilities Section */}
                                      <AbilitiesSection
@@ -8548,6 +8561,18 @@ export default function App() {
         </AnimatePresence>
 
         <Tutorial isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
+
+        <PokemonComparisonSidebar
+          isOpen={isComparisonOpen}
+          onClose={() => setIsComparisonOpen(false)}
+          pinnedPokemon={pinnedComparisonPokemon || pokemon}
+          onSelectMainPokemon={(p) => {
+            setPokemon(p);
+            setIsComparisonOpen(false);
+            if (sounds?.scan) sounds.scan();
+          }}
+          isLightMode={isLightMode}
+        />
 
         {/* Daily Hub Modal */}
         <AnimatePresence>

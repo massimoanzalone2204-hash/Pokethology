@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Pokemon } from '../types';
 import { cn } from '../lib/utils';
-import { BookOpen, Volume2, VolumeX, Copy, Check, AudioWaveform, Ruler, Scale, Zap } from 'lucide-react';
+import { BookOpen, Volume2, VolumeX, Copy, Check, AudioWaveform, Ruler, Scale, Zap, ArrowLeftRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TypeBadge } from './TypeBadge';
 
@@ -12,6 +12,7 @@ interface PokedexEntrySectionProps {
   isLightMode: boolean;
   sounds?: any;
   TypewriterText: React.ComponentType<{ text: string; delay?: number; onComplete?: () => void }>;
+  onCompare?: () => void;
 }
 
 const getVersionStyle = (version: string, isActive: boolean, isLightMode: boolean) => {
@@ -55,7 +56,8 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
   setSelectedGameDescIndex,
   isLightMode,
   sounds,
-  TypewriterText
+  TypewriterText,
+  onCompare
 }) => {
   const [copied, setCopied] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -172,7 +174,23 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
             <span className="font-bold">Pokédex Entry</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {onCompare && (
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onCompare}
+                title="Pin & Compare Stats"
+                className={cn(
+                  "flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-hud uppercase tracking-wider border transition-all cursor-pointer font-bold bg-gradient-to-r from-purple-950/80 to-cyan-950/80 hover:from-purple-900 hover:to-cyan-900 text-cyan-300 border-cyan-500/50 shadow-[0_0_10px_rgba(6,182,212,0.25)]"
+                )}
+              >
+                <ArrowLeftRight className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>Compare</span>
+              </motion.button>
+            )}
+
             {cryUrl && (
               <button
                 type="button"
