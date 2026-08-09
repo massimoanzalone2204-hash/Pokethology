@@ -2594,6 +2594,30 @@ export default function App() {
   const [isFemale, setIsFemale] = useState(false);
   const [isOpponentShiny, setIsOpponentShiny] = useState(false);
   const [isOpponentFemale, setIsOpponentFemale] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallPWA = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+      setIsInstallable(false);
+    }
+  };
   const [isRebooting, setIsRebooting] = useState(false);
   const [autoResetTime, setAutoResetTime] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<'id' | 'name'>('id');
@@ -7438,8 +7462,8 @@ export default function App() {
                                                       <span>MOVE EFFECTIVENESS SUMMARY</span>
                                                       <span className="font-mono text-[7px] text-slate-500">{pokemon.name.toUpperCase()} vs {battleOpponent.name.toUpperCase()}</span>
                                                     </div>
-                                                    <div className="flex flex-col gap-2">
-                                                      {selectedMoves.map((move, i) => {
+                                                     <div className="flex flex-col gap-2">
+                                                       {selectedMoves.map((move, i) => {
                                                         const isStab = pokemon.types.some((t: any) => t.type.name.toLowerCase() === move.type.toLowerCase());
                                                         const oppTypes = battleOpponent.types.map((t: any) => t.type.name);
                                                         
@@ -9137,6 +9161,27 @@ export default function App() {
                   <span className="text-[9px] font-hud font-black text-cyan-500/80 uppercase tracking-widest block mb-1 text-center">REGISTRY UTILITIES</span>
                   
                   <div className="flex flex-col gap-2">
+                    {isInstallable && (
+                      <motion.button
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                          handleInstallPWA();
+                          sounds.scan();
+                        }}
+                        className="flex items-center justify-between p-3.5 bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/50 hover:border-cyan-400 rounded-xl transition-all group w-full text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.25)]"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Download className="w-4 h-4 shrink-0 text-cyan-400 group-hover:scale-110 transition-transform animate-bounce" />
+                          <div className="flex flex-col text-left">
+                            <span className="font-hud text-[8px] font-bold tracking-wider uppercase tracking-widest whitespace-nowrap">Install App (PWA)</span>
+                            <span className="text-[7.5px] font-mono text-cyan-400/80 leading-none mt-0.5">Install Pokéthology on your device</span>
+                          </div>
+                        </div>
+                        <span className="text-[7px] font-mono text-cyan-300 group-hover:text-white uppercase tracking-widest bg-cyan-900/60 px-2 py-1 rounded border border-cyan-500/40">
+                          Install
+                        </span>
+                      </motion.button>
+                    )}
                     <motion.button
                       whileTap={{ scale: 0.98 }}
                       onClick={() => {
