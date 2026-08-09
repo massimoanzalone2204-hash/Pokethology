@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { cn } from '../lib/utils';
-import { Gauge, BarChart2, PieChart } from 'lucide-react';
+import { Gauge, BarChart2, PieChart, ArrowLeftRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { SingleStatRadar } from './SingleStatRadar';
 
@@ -8,6 +8,7 @@ interface CombatStatsSectionProps {
   stats: { base_stat: number; stat: { name: string } }[];
   isLightMode: boolean;
   sounds?: any;
+  onCompare?: () => void;
 }
 
 const statNameMap: Record<string, string> = {
@@ -29,7 +30,8 @@ const getStatColor = (val: number) => {
 
 export const CombatStatsSection: React.FC<CombatStatsSectionProps> = ({
   stats,
-  isLightMode
+  isLightMode,
+  onCompare
 }) => {
   const [viewMode, setViewMode] = useState<'bars' | 'radar'>('bars');
 
@@ -59,8 +61,23 @@ export const CombatStatsSection: React.FC<CombatStatsSectionProps> = ({
           <span className="font-bold">Base Stats</span>
         </div>
 
-        {/* View Mode Toggle */}
-        <div className="flex items-center gap-1 bg-slate-950/40 p-1 rounded-lg border border-slate-800">
+        <div className="flex items-center gap-2">
+          {onCompare && (
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onCompare}
+              title="Pin & Compare Stats"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-hud uppercase tracking-wider border transition-all cursor-pointer font-bold bg-gradient-to-r from-purple-950/80 to-cyan-950/80 hover:from-purple-900 hover:to-cyan-900 text-cyan-300 border-cyan-500/50 shadow-[0_0_10px_rgba(6,182,212,0.25)]"
+            >
+              <ArrowLeftRight className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <span>Compare</span>
+            </motion.button>
+          )}
+
+          {/* View Mode Toggle */}
+          <div className="flex items-center gap-1 bg-slate-950/40 p-1 rounded-lg border border-slate-800">
           <button
             type="button"
             onClick={() => setViewMode('bars')}
@@ -89,6 +106,7 @@ export const CombatStatsSection: React.FC<CombatStatsSectionProps> = ({
           </button>
         </div>
       </div>
+    </div>
 
       {/* Summary Row */}
       <div className="grid grid-cols-3 gap-2 mb-4">

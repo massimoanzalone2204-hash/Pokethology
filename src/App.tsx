@@ -3,7 +3,7 @@ import { idbGet, idbSet, idbGetAll, idbDelete, STORES } from "./lib/indexedDB";
 import { checkQuotaAllowed, recordApiUsage } from "./lib/quotaManager";
 import { useState, useEffect, useRef, useTransition, useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Download, Search, Loader2, Database, Sparkles, Volume2, VolumeX, Copy, Check, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork, Github } from 'lucide-react';
+import { Download, Search, Loader2, Database, Sparkles, Volume2, VolumeX, Copy, Check, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork, Github, ArrowLeftRight } from 'lucide-react';
 import { EvolutionNodeComponent } from './components/EvolutionNodeComponent';
 
 import { PokethologyLogo } from './components/PokethologyLogo';
@@ -5845,6 +5845,24 @@ export default function App() {
                                     <HUDCorners />
                                     <Sparkles className={cn("w-4 h-4", isShiny ? "text-yellow-400 animate-pulse" : (isLightMode ? "text-slate-400" : "text-cyan-400"))} />
                                   </button>
+
+                                  {/* Compare Stats Toggle Button (below Shiny button) */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      handleOpenComparison(pokemon);
+                                      try { sounds.scan(); } catch (_) {}
+                                    }}
+                                    onMouseEnter={() => sounds.hover()}
+                                    className={cn(
+                                      hudButtonClass(false, 'purple'),
+                                      "!p-1.5 !rounded-full shadow-lg flex items-center justify-center cursor-pointer"
+                                    )}
+                                    title="Pin & Compare Stats"
+                                  >
+                                    <HUDCorners />
+                                    <ArrowLeftRight className="w-4 h-4 text-cyan-300" />
+                                  </button>
                                   
                                   {/* Female Form Toggle Button */}
                                   {['pyroar', 'unfezant', 'frillish', 'jellicent', 'hippowdon', 'hippopotas', 'meowstic', 'indeedee', 'oinkologne', 'basculegion'].includes(pokemon?.name?.split('-')[0].toLowerCase()) && (
@@ -6105,6 +6123,7 @@ export default function App() {
                                        stats={pokemon.stats}
                                        isLightMode={isLightMode}
                                        sounds={sounds}
+                                       onCompare={() => handleOpenComparison(pokemon)}
                                      />
 
                                      {/* Moveset Analysis Section */}

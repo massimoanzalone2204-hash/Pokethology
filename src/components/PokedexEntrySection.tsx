@@ -175,22 +175,6 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {onCompare && (
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={onCompare}
-                title="Pin & Compare Stats"
-                className={cn(
-                  "flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-hud uppercase tracking-wider border transition-all cursor-pointer font-bold bg-gradient-to-r from-purple-950/80 to-cyan-950/80 hover:from-purple-900 hover:to-cyan-900 text-cyan-300 border-cyan-500/50 shadow-[0_0_10px_rgba(6,182,212,0.25)]"
-                )}
-              >
-                <ArrowLeftRight className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                <span>Compare</span>
-              </motion.button>
-            )}
-
             {cryUrl && (
               <button
                 type="button"
@@ -225,22 +209,6 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
             >
               {isSpeaking ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3 text-cyan-400" />}
               <span>{isSpeaking ? "Stop" : "Voice"}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleCopy}
-              title="Copy Entry"
-              className={cn(
-                "p-1.5 rounded-lg border transition-all cursor-pointer",
-                copied
-                  ? "bg-emerald-500 text-white border-emerald-400"
-                  : isLightMode
-                    ? "bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200"
-                    : "bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-700"
-              )}
-            >
-              {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
             </button>
           </div>
         </div>
@@ -283,6 +251,22 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
         )}>
           <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-cyan-900/20 text-[10px] font-hud uppercase tracking-wider text-cyan-500/90 font-bold">
             <span>Version: {formattedVersionName}</span>
+            <button
+              type="button"
+              onClick={handleCopy}
+              title="Copy Entry Text"
+              className={cn(
+                "flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-[9.5px] font-hud uppercase tracking-wider transition-all cursor-pointer font-bold",
+                copied
+                  ? "bg-emerald-500 text-white border-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)]"
+                  : isLightMode
+                    ? "bg-slate-200/80 text-slate-700 border-slate-300 hover:bg-slate-300"
+                    : "bg-slate-900/90 text-cyan-300 border-cyan-800/80 hover:bg-cyan-950 hover:border-cyan-500/50"
+              )}
+            >
+              {copied ? <Check className="w-3 h-3 text-white" /> : <Copy className="w-3 h-3 text-cyan-400" />}
+              <span>{copied ? "Copied" : "Copy"}</span>
+            </button>
           </div>
 
           <div className="min-h-[50px] flex items-center">
