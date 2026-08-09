@@ -1083,3 +1083,37 @@ html, body {
   padding: 0 !important;
   width: 100%;
 }
+
+/* Scrollbars invisible by default, visible only while scrolling/sliding on mobile and touch devices */
+@media (max-width: 1024px), (pointer: coarse) {
+  * {
+    scrollbar-width: none;
+  }
+  *::-webkit-scrollbar {
+    display: none;
+  }
+  *.is-scrolling {
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(6, 182, 212, 0.6) transparent !important;
+  }
+  *.is-scrolling::-webkit-scrollbar {
+    display: block !important;
+    width: 4px !important;
+    height: 4px !important;
+  }
+  *.is-scrolling::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+  *.is-scrolling::-webkit-scrollbar-thumb {
+    background: rgba(6, 182, 212, 0.6) !important;
+    border-radius: 4px !important;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -167,6 +167,36 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                   </p>
                 </div>
                 
+                {/* Complete New Stats Section */}
+                <div className="bg-slate-900/60 p-4 rounded-xl border border-emerald-500/30 text-left space-y-3 shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+                  <div className="flex items-center justify-between border-b border-emerald-500/20 pb-2">
+                    <span className="font-hud font-black text-emerald-400 text-xs uppercase tracking-widest flex items-center gap-2">
+                      <Radar className="w-4 h-4 text-emerald-400 animate-spin-slow" /> Complete New Stats Section
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[7px] font-mono uppercase tracking-widest font-extrabold">
+                      REDESIGNED
+                    </span>
+                  </div>
+                  <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans">
+                    The Pokédex diagnostic view has been entirely overhauled with the <span className="text-emerald-300 font-bold">Complete New Stats Section</span>. Explore rigorous mathematical breakdowns of Base Stat Totals (BST), individual attribute weightings (HP, Attack, Defense, Sp. Atk, Sp. Def, Speed), dynamic speed tier assessments, and live effectiveness counters. Experience immersive radar diagrams mapping exact battle capabilities instantly.
+                  </p>
+                </div>
+
+                {/* Compare Section */}
+                <div className="bg-slate-900/60 p-4 rounded-xl border border-cyan-500/30 text-left space-y-3 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+                  <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2">
+                    <span className="font-hud font-black text-cyan-400 text-xs uppercase tracking-widest flex items-center gap-2">
+                      <Swords className="w-4 h-4 text-cyan-400 animate-pulse" /> Advanced Compare Section
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[7px] font-mono uppercase tracking-widest font-extrabold">
+                      SIDE-BY-SIDE
+                    </span>
+                  </div>
+                  <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans">
+                    Pin any species to activate the <span className="text-cyan-300 font-bold">Compare Section & Side-by-Side Comparison Sidebar</span>. Evaluate head-to-head stat differentials with color-coded advantage highlights (green for superiority, red for deficit), type coverage overlaps, and direct competitive matchup advantages to build unstoppable teams.
+                  </p>
+                </div>
+
                 <h4 className="font-hud text-[9px] text-emerald-500 uppercase tracking-[0.2em] border-b border-emerald-500/20 pb-1.5 mt-6 text-left flex items-center gap-1.5">
                   <Database className="w-3.5 h-3.5" /> THE STATS SCHEDULE
                 </h4>

@@ -4603,6 +4603,25 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const handleGlobalScroll = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (target && target.classList) {
+        target.classList.add('is-scrolling');
+        if ((target as any)._scrollTimeout) {
+          clearTimeout((target as any)._scrollTimeout);
+        }
+        (target as any)._scrollTimeout = setTimeout(() => {
+          target.classList.remove('is-scrolling');
+        }, 500);
+      }
+    };
+    window.addEventListener('scroll', handleGlobalScroll, true);
+    return () => {
+      window.removeEventListener('scroll', handleGlobalScroll, true);
+    };
+  }, []);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(query);
     }, 300);
@@ -5514,14 +5533,14 @@ export default function App() {
                          animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
                          transition={{ duration: 0.5 }}
                       >
-                         <Layers className={cn("w-4 h-4 text-yellow-400", viewAllGenerations && "animate-pulse")} />
+                         <BookOpen className={cn("w-4 h-4 text-yellow-400", viewAllGenerations && "animate-pulse")} />
                       </motion.div>
                     ) : (
                       <motion.div
                          whileHover={{ scale: 1.1, rotate: [0, 10, -10, 0] }}
                          transition={{ duration: 0.4 }}
                       >
-                        <Globe className="w-4 h-4 text-purple-400" />
+                        <Book className="w-4 h-4 text-purple-400" />
                       </motion.div>
                     )}
                   </motion.button>
@@ -8033,9 +8052,9 @@ export default function App() {
                                   >
                                     <HUDCorners />
                                     {viewAllGenerations ? (
-                                      <BookOpen className={cn("w-2 h-2 inline-block mr-1 transition-transform group-hover/viewall-bottom:scale-110", viewAllGenerations && "animate-pulse text-yellow-400")} />
+                                      <BookOpen className={cn("w-2.5 h-2.5 inline-block mr-1 transition-transform group-hover/viewall-bottom:scale-110", viewAllGenerations && "animate-pulse text-yellow-400")} />
                                     ) : (
-                                      <Book className="w-2 h-2 inline-block mr-1 transition-transform group-hover/viewall-bottom:scale-110 text-purple-400" />
+                                      <Book className="w-2.5 h-2.5 inline-block mr-1 transition-transform group-hover/viewall-bottom:scale-110 text-purple-400" />
                                     )}
                                     {viewAllGenerations ? "VIEWING ALL" : "ALL"}
                                   </button>
