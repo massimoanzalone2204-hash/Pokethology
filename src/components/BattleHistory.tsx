@@ -13,6 +13,8 @@ import {
   Sprout, 
   Sparkles, 
   Award,
+  Crown,
+  Moon,
   Lock,
   CheckCircle2,
   Filter,
@@ -120,7 +122,7 @@ const TROPHY_DEFS: TrophyDef[] = [
     colorClass: 'text-yellow-600/30 bg-yellow-950/10 border-yellow-950',
     unlockedColorClass: 'text-purple-400 bg-purple-950/30 border-purple-500/70',
     glowClass: 'shadow-[0_0_18px_rgba(168,85,247,0.35)]',
-    icon: Sparkles
+    icon: Moon
   },
   {
     id: 'rising-badge',
@@ -133,7 +135,7 @@ const TROPHY_DEFS: TrophyDef[] = [
     colorClass: 'text-indigo-500/30 bg-indigo-950/10 border-indigo-950',
     unlockedColorClass: 'text-cyan-400 bg-cyan-950/40 border-cyan-500/90 font-extrabold',
     glowClass: 'shadow-[0_0_24px_rgba(6,182,212,0.55)]',
-    icon: Award
+    icon: Crown
   },
   {
     id: 'champion-medal',
@@ -146,7 +148,7 @@ const TROPHY_DEFS: TrophyDef[] = [
     colorClass: 'text-indigo-500/30 bg-indigo-950/10 border-indigo-950',
     unlockedColorClass: 'text-cyan-400 bg-cyan-950/40 border-cyan-500/90 font-extrabold',
     glowClass: 'shadow-[0_0_24px_rgba(6,182,212,0.55)] animate-pulse',
-    icon: Swords
+    icon: Trophy
   }
 ];
 

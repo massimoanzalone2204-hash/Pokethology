@@ -4,7 +4,6 @@ import { Loader2, Database, Sparkles, Search, ArrowUpDown, ChevronDown, Check } 
 import { cn } from '../lib/utils';
 import { GENERATIONS } from '../lib/api';
 import { Pokemon } from '../types';
-import { PokethologyLogo } from './PokethologyLogo';
 
 interface PokemonListProps {
   listMode: 'home' | 'pokemon' | 'types';
@@ -86,8 +85,13 @@ export const PokemonList = memo(({
         <div className="flex flex-col gap-3.5 mb-5 border-b border-zinc-900 pb-4 shrink-0">
           <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-3">
             <div className="flex items-center gap-3">
-              <div className="relative w-11 h-11 sm:w-14 sm:h-14 flex items-center justify-center bg-zinc-900 border border-zinc-800 rounded-full shadow-inner overflow-hidden p-1 shrink-0">
-                <PokethologyLogo className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(6,182,212,0.4)]" />
+              <div className="relative w-11 h-11 flex items-center justify-center bg-zinc-900 border border-zinc-800 rounded-full shadow-inner overflow-hidden p-1">
+                <img 
+                  src="https://i.postimg.cc/1zgPj6SW/20260201-111647-0000.png" 
+                  alt="Pokéthology Logo" 
+                  className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(6,182,212,0.4)]"
+                  referrerPolicy="no-referrer"
+                />
               </div>
               <div className="flex flex-col">
                 <h1 className="text-md sm:text-xl font-sans font-black tracking-widest text-zinc-100 flex items-center gap-2">

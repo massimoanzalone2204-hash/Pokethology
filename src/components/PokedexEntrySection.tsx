@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Pokemon } from '../types';
 import { cn } from '../lib/utils';
-import { Database, Volume2, VolumeX, Copy, Check, Radio, Ruler, Scale, Zap } from 'lucide-react';
+import { BookOpen, Volume2, VolumeX, Copy, Check, AudioWaveform, Ruler, Scale, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TypeBadge } from './TypeBadge';
 
@@ -80,19 +80,20 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
     }
 
     window.speechSynthesis.cancel();
-    const cleanEntryText = (currentEntry.flavor_text || "")
-      .replace(/[\f\n\r]+/g, ' ')
+    const cleanText = currentEntry.flavor_text
+      .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{2300}-\u{23FF}]/gu, '')
+      .replace(/[*_#`~>|-]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
 
-    if (!cleanEntryText) return;
+    if (!cleanText) return;
 
-    const utterance = new SpeechSynthesisUtterance(cleanEntryText);
-    utterance.rate = 0.95;
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.rate = 1.0;
     utterance.pitch = 1.0;
 
     const voices = window.speechSynthesis.getVoices();
-    const englishVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('Daniel') || v.name.includes('Karen')));
+    const englishVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha')));
     if (englishVoice) utterance.voice = englishVoice;
 
     utterance.onstart = () => setIsSpeaking(true);
@@ -100,27 +101,34 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
     utterance.onerror = () => setIsSpeaking(false);
 
     window.speechSynthesis.speak(utterance);
-    try { sounds?.button?.(); } catch (_) {}
+    try { sounds?.scan?.() || sounds?.button?.(); } catch (_) {}
   };
 
   const handlePlayCry = () => {
     const cryUrl = pokemon.cries?.latest || pokemon.cries?.legacy;
-    if (!cryUrl) return;
+    if (!cryUrl && !pokemon.name) return;
 
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-
-    const audio = new Audio(cryUrl);
-    audioRef.current = audio;
     setIsPlayingCry(true);
-
-    audio.play().then(() => {
-      audio.onended = () => setIsPlayingCry(false);
-    }).catch(() => {
+    if (sounds?.playCry) {
+      sounds.playCry(pokemon.name, cryUrl, pokemon.name.includes('-gmax')).finally(() => {
+        setIsPlayingCry(false);
+      });
+    } else if (cryUrl) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      const audio = new Audio(cryUrl);
+      audio.volume = 1.0;
+      audioRef.current = audio;
+      audio.play().then(() => {
+        audio.onended = () => setIsPlayingCry(false);
+      }).catch(() => {
+        setIsPlayingCry(false);
+      });
+    } else {
       setIsPlayingCry(false);
-    });
+    }
   };
 
   const handleCopy = () => {
@@ -160,7 +168,7 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
           isLightMode ? "text-cyan-900 border-slate-200" : "text-cyan-400 border-cyan-900/40"
         )}>
           <div className="flex items-center gap-2">
-            <Database className="w-4 h-4 text-cyan-400" />
+            <BookOpen className="w-4 h-4 text-cyan-400" />
             <span className="font-bold">Pokédex Entry</span>
           </div>
 
@@ -169,7 +177,6 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
               <button
                 type="button"
                 onClick={handlePlayCry}
-                onMouseEnter={() => sounds?.hover?.()}
                 title="Play Pokémon Cry"
                 className={cn(
                   "flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-hud uppercase tracking-wider border transition-all cursor-pointer font-bold",
@@ -180,7 +187,7 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
                       : "bg-slate-800/80 text-cyan-300 border-slate-700 hover:bg-slate-700"
                 )}
               >
-                <Radio className="w-3 h-3 text-amber-400" />
+                <AudioWaveform className="w-3 h-3 text-amber-400" />
                 <span>Cry</span>
               </button>
             )}
@@ -188,7 +195,6 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
             <button
               type="button"
               onClick={handleTTS}
-              onMouseEnter={() => sounds?.hover?.()}
               title={isSpeaking ? "Stop Voice" : "Read Entry"}
               className={cn(
                 "flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-hud uppercase tracking-wider border transition-all cursor-pointer font-bold",
@@ -206,7 +212,6 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
             <button
               type="button"
               onClick={handleCopy}
-              onMouseEnter={() => sounds?.hover?.()}
               title="Copy Entry"
               className={cn(
                 "p-1.5 rounded-lg border transition-all cursor-pointer",
@@ -238,7 +243,6 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
                       setSelectedGameDescIndex(idx);
                       try { sounds?.scan?.(); } catch (_) {}
                     }}
-                    onMouseEnter={() => sounds?.hover?.()}
                     className={cn(
                       "px-2.5 py-1 text-[9.5px] font-sans rounded-md border transition-all cursor-pointer uppercase font-bold tracking-wide shrink-0",
                       styleClass

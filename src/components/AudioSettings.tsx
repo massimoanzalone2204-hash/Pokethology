@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, Volume2, VolumeX, Radio } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Music, Compass, Zap, Trees, Crown } from 'lucide-react';
 import { sounds } from '../lib/sounds';
 
 interface AudioSettingsProps {
@@ -50,7 +50,7 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
       {mode === 'full' && (
         <>
           <div className="flex items-center gap-2 justify-center">
-            <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
+            <Music className="w-4 h-4 text-emerald-400 animate-pulse" />
             <span className="text-emerald-300 font-hud uppercase text-[11px] font-bold tracking-widest text-center">Sophisticated Pokéthology BGM</span>
           </div>
 
@@ -60,23 +60,27 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
 
           <div className="grid grid-cols-2 gap-2">
             {[
-              { id: 'route1', name: 'Pokéthology BGM 1' },
-              { id: 'battle', name: 'Pokéthology BGM 2' },
-              { id: 'forest', name: 'Pokéthology BGM 3' },
-              { id: 'champion', name: 'Pokéthology BGM 4' },
-            ].map((track) => (
-              <button
-                key={track.id}
-                onClick={() => handleTrackChange(track.id as any)}
-                className={`p-2 rounded-xl border flex flex-col items-center gap-0.5 transition-all text-center ${
-                  selectedTrack === track.id
-                    ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-300 shadow-lg shadow-emerald-950/30'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700'
-                }`}
-              >
-                <span className="font-hud uppercase text-[9px] font-bold tracking-wider">{track.name}</span>
-              </button>
-            ))}
+              { id: 'route1', name: 'Pokéthology BGM 1', icon: Compass },
+              { id: 'battle', name: 'Pokéthology BGM 2', icon: Zap },
+              { id: 'forest', name: 'Pokéthology BGM 3', icon: Trees },
+              { id: 'champion', name: 'Pokéthology BGM 4', icon: Crown },
+            ].map((track) => {
+              const TrackIcon = track.icon;
+              return (
+                <button
+                  key={track.id}
+                  onClick={() => handleTrackChange(track.id as any)}
+                  className={`p-2 rounded-xl border flex items-center justify-center gap-1.5 transition-all text-center ${
+                    selectedTrack === track.id
+                      ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-300 shadow-lg shadow-emerald-950/30'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  <TrackIcon className="w-3 h-3 text-emerald-400 shrink-0" />
+                  <span className="font-hud uppercase text-[9px] font-bold tracking-wider">{track.name}</span>
+                </button>
+              );
+            })}
           </div>
 
           <div className="flex items-center justify-between p-3 bg-slate-950/80 border border-slate-800/80 rounded-xl">

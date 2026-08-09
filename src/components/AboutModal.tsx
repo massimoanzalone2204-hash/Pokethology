@@ -110,7 +110,7 @@ export function AboutModal({ isOpen, onClose, isLightMode = false }: AboutModalP
               </div>
 
               {/* Copyright Footnote */}
-              <div className="text-[9px] font-mono text-slate-400 text-center mt-4 pt-4 pb-1 border-t border-slate-800/80 leading-relaxed break-words px-2 select-text">
+              <div className="text-[9px] font-mono text-slate-500 text-center pt-2 border-t border-slate-800">
                 Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc. TM, ® and Pokémon character names are trademarks of Nintendo.
                 <br />
                 No copyright or trademark infringement is intended in using Pokémon content on Pokéthology.

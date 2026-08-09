@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { cn } from '../lib/utils';
-import { Activity, BarChart2, PieChart } from 'lucide-react';
+import { Gauge, BarChart2, PieChart } from 'lucide-react';
 import { motion } from 'motion/react';
 import { SingleStatRadar } from './SingleStatRadar';
 
@@ -55,7 +55,7 @@ export const CombatStatsSection: React.FC<CombatStatsSectionProps> = ({
         isLightMode ? "text-cyan-900 border-slate-200" : "text-cyan-400 border-cyan-900/40"
       )}>
         <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4 text-cyan-400" />
+          <Gauge className="w-4 h-4 text-cyan-400" />
           <span className="font-bold">Base Stats</span>
         </div>
 
@@ -64,7 +64,6 @@ export const CombatStatsSection: React.FC<CombatStatsSectionProps> = ({
           <button
             type="button"
             onClick={() => setViewMode('bars')}
-            onMouseEnter={() => sounds?.hover?.()}
             className={cn(
               "p-1 rounded text-[10px] transition-all cursor-pointer",
               viewMode === 'bars'
@@ -78,7 +77,6 @@ export const CombatStatsSection: React.FC<CombatStatsSectionProps> = ({
           <button
             type="button"
             onClick={() => setViewMode('radar')}
-            onMouseEnter={() => sounds?.hover?.()}
             className={cn(
               "p-1 rounded text-[10px] transition-all cursor-pointer",
               viewMode === 'radar'

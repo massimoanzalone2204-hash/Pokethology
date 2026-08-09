@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Move } from '../types';
 import { cn } from '../lib/utils';
-import { Swords, ArrowUp, Cpu, Sparkles, BookOpen, ChevronDown, Info, Search } from 'lucide-react';
+import { Swords, TrendingUp, Disc, Sparkles, GraduationCap, ChevronDown, Info, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface MovesetAnalysisSectionProps {
@@ -113,12 +113,12 @@ export const MovesetAnalysisSection: React.FC<MovesetAnalysisSectionProps> = ({
           const isCollapsed = searchQuery ? false : (collapsedMethods[method] ?? false);
 
           const icon = method === 'level-up'
-            ? <ArrowUp className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            ? <TrendingUp className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
             : method === 'machine'
-              ? <Cpu className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+              ? <Disc className="w-3.5 h-3.5 text-purple-400 shrink-0" />
               : method === 'egg'
                 ? <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                : <BookOpen className="w-3.5 h-3.5 text-emerald-400 shrink-0" />;
+                : <GraduationCap className="w-3.5 h-3.5 text-emerald-400 shrink-0" />;
 
           return (
             <div
@@ -132,7 +132,6 @@ export const MovesetAnalysisSection: React.FC<MovesetAnalysisSectionProps> = ({
               <button
                 type="button"
                 onClick={() => toggleMethod(method)}
-                onMouseEnter={() => sounds?.hover?.()}
                 className="w-full flex items-center justify-between py-1 px-1 hover:bg-cyan-500/5 rounded-lg transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-2">
@@ -165,7 +164,6 @@ export const MovesetAnalysisSection: React.FC<MovesetAnalysisSectionProps> = ({
                             setIsMoveDetailOpen(true);
                             try { sounds?.scan?.(); } catch (_) {}
                           }}
-                          onMouseEnter={() => sounds?.hover?.()}
                           className={cn(
                             "w-full p-2 rounded-lg border flex justify-between items-center group transition-all text-left cursor-pointer",
                             isLightMode

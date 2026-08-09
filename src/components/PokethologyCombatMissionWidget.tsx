@@ -27,7 +27,14 @@ import {
   UserCheck,
   Shield,
   Search,
-  Sparkle
+  Sparkle,
+  BookOpen,
+  GraduationCap,
+  Target,
+  ShieldCheck,
+  Crown,
+  Scroll,
+  Puzzle
 } from 'lucide-react';
 
 export interface CombatMission {
@@ -1010,26 +1017,25 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-950/70 p-4.5 rounded-2xl border border-cyan-500/10 text-left shadow-lg">
         <div className="space-y-1.5 border-b sm:border-b-0 sm:border-r border-slate-900 pb-3 sm:pb-0 sm:pr-4">
           <div className="flex items-center gap-1.5 md:gap-2">
-            <Award className="w-5 h-5 text-cyan-400 animate-pulse" />
-            <span className="text-[10px] sm:text-xs font-hud font-black text-cyan-400 uppercase tracking-widest">Operator Synapse Level</span>
+            <Award className="w-5 h-5 text-cyan-400" />
+            <span className="text-[10px] sm:text-xs font-hud font-black text-cyan-400 uppercase tracking-widest">Operator Rank</span>
           </div>
-          <p className="text-[9px] font-mono text-slate-400 uppercase">
-            Current Status: &nbsp;
-            <span className={cn("font-bold text-[10px] tracking-wider", operatorRank.color)}>
+          <p className="text-[10px] font-mono text-slate-300 uppercase font-bold">
+            <span className={cn("tracking-wider", operatorRank.color)}>
               {operatorRank.title}
             </span>
           </p>
           <div className="flex items-center gap-2 mt-1">
             <div className="text-xl sm:text-2xl font-hud font-black text-white leading-none">
-              {totalCompletedCount} <span className="text-xs text-cyan-400/60 font-bold">COMPLETED</span>
+              {totalCompletedCount} <span className="text-xs text-cyan-400/80 font-bold">COMPLETED</span>
             </div>
           </div>
         </div>
 
         <div className="space-y-1 sm:pl-4 flex flex-col justify-center">
           <div className="flex justify-between items-center">
-            <span className="text-[10px] font-hud font-extrabold text-slate-400 uppercase tracking-wider">Daily Accomplices</span>
-            <span className="text-xs font-hud font-black text-white">{totalCompletedCount} / 12 Completed</span>
+            <span className="text-[10px] font-hud font-extrabold text-slate-400 uppercase tracking-wider">Daily Progress</span>
+            <span className="text-xs font-hud font-black text-white">{totalCompletedCount} / 12</span>
           </div>
           <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-[1px] mt-1.5">
             <motion.div 
@@ -1039,26 +1045,18 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
               transition={{ duration: 0.8 }}
             />
           </div>
-          <p className="text-[8px] font-mono text-slate-500 uppercase mt-1 tracking-wider text-right">
-            Active Operations: {12 - totalCompletedCount} remaining today
+          <p className="text-[9px] font-mono text-slate-400 uppercase mt-1 tracking-wider text-right">
+            {12 - totalCompletedCount} remaining today
           </p>
         </div>
       </div>
         {/* HUD OPERATIONS DIRECTORY (BRONZE, SILVER, GOLD DIVISION) */}
-      <div className="mt-4 select-none">
-        <div className="flex justify-center items-center mb-2 px-1">
-          <h4 className="text-[10px] font-hud font-black text-cyan-500/80 uppercase tracking-widest flex items-center gap-1.5 justify-center">
-            <Sparkles className="w-3.5 h-3.5" />
-            OPERATIONAL TIERS
-          </h4>
-        </div>
-        
+      <div className="mt-2 select-none">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
           {[
             { 
               id: 'bronze', 
-              label: 'Bronze operations', 
-              desc: 'Basic calibration', 
+              label: 'Bronze Tier', 
               color: 'from-orange-600/20 to-orange-950/20 border-orange-500 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.2)]', 
               activeStyle: 'border-orange-400 bg-gradient-to-br from-orange-950/60 via-slate-900/90 to-orange-900/30 text-orange-300 shadow-[0_0_20px_rgba(249,115,22,0.3)]',
               hoverBorder: 'hover:border-orange-700/40',
@@ -1068,8 +1066,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
             },
             { 
               id: 'silver', 
-              label: 'Silver operations', 
-              desc: 'Standard alignment', 
+              label: 'Silver Tier', 
               color: 'from-slate-600/20 to-slate-800/10 border-slate-400 text-slate-200 shadow-[0_0_15px_rgba(148,163,184,0.2)]', 
               activeStyle: 'border-slate-300 bg-gradient-to-br from-slate-950/60 via-slate-900/90 to-slate-800/30 text-slate-200 shadow-[0_0_20px_rgba(148,163,184,0.3)]',
               hoverBorder: 'hover:border-slate-600/40',
@@ -1079,8 +1076,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
             },
             { 
               id: 'gold', 
-              label: 'Gold operations', 
-              desc: 'Overload validation', 
+              label: 'Gold Tier', 
               color: 'from-yellow-600/20 to-yellow-950/20 border-yellow-500 text-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.2)]', 
               activeStyle: 'border-yellow-400 bg-gradient-to-br from-yellow-950/60 via-slate-900/90 to-yellow-900/30 text-yellow-300 shadow-[0_0_20px_rgba(234,179,8,0.3)]',
               hoverBorder: 'hover:border-yellow-600/40',
@@ -1097,14 +1093,14 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 key={tier.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 * parseInt(tier.id === 'bronze' ? '0' : tier.id === 'silver' ? '1' : '2') }}
+                transition={{ duration: 0.3 }}
               >
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => { setSelectedDifficulty(tier.id as any); try { sounds.scan(); } catch (_) {} }}
                   className={cn(
-                    "relative group flex flex-row items-center justify-between border rounded-xl transition-all duration-200 cursor-pointer overflow-hidden text-left focus:outline-none w-full px-4 h-14",
+                    "relative group flex flex-row items-center justify-between border rounded-xl transition-all duration-200 cursor-pointer overflow-hidden text-left focus:outline-none w-full px-4 h-12",
                     isActive 
                       ? tier.activeStyle
                       : "bg-slate-900/40 border-slate-800/80 text-slate-400 hover:border-slate-700 hover:text-slate-300"
@@ -1112,40 +1108,18 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 >
                   <div className="flex items-center gap-1.5 shrink-0">
                     <TierIcon className={cn("w-3.5 h-3.5 shrink-0", isActive ? "text-current" : "text-slate-500")} />
-                    <span className="font-hud text-[9.5px] font-black uppercase tracking-wider">{tier.label}</span>
+                    <span className="font-hud text-xs font-bold uppercase tracking-wider">{tier.label}</span>
                   </div>
                   
-                  <div className="flex items-center gap-1 shrink-0 font-mono text-[9px] font-semibold">
-                    <span className={cn("px-1.5 py-0.5 rounded text-[8px] tracking-tight leading-none", isActive ? "bg-slate-950/80 text-current" : "bg-slate-950/30 text-slate-500")}>
+                  <div className="flex items-center gap-1 shrink-0 font-mono text-xs font-semibold">
+                    <span className={cn("px-2 py-0.5 rounded text-[10px] tracking-tight leading-none font-bold", isActive ? "bg-slate-950/80 text-current" : "bg-slate-950/30 text-slate-500")}>
                       {tier.completed}/4
                     </span>
-                    {isActive && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping shrink-0" />
-                    )}
                   </div>
                 </motion.button>
               </motion.div>
             )
           })}
-        </div>
-        
-        {/* Elegant status line matching selected difficulty tier */}
-        <div className="mt-2.5 mb-1 px-3 py-1.5 bg-slate-950/40 border border-slate-900/80 rounded-lg flex justify-between items-center text-[7.5px] font-mono tracking-wider text-slate-400 uppercase select-none">
-          <div className="flex items-center gap-1.5">
-            <span className="text-cyan-500/80 font-bold font-mono">Status:</span>
-            <span className={cn("font-black font-hud text-[8px]", 
-              selectedDifficulty === 'bronze' ? 'text-orange-400' : selectedDifficulty === 'silver' ? 'text-slate-300' : 'text-yellow-400'
-            )}>
-              {selectedDifficulty} Tier Selected
-            </span>
-            <span className="text-slate-700">|</span>
-            <span className="text-slate-500 lowercase font-medium">
-              {selectedDifficulty === 'bronze' ? 'basic training calibration' : selectedDifficulty === 'silver' ? 'standard alignment protocols' : 'expert overload validation logs'}
-            </span>
-          </div>
-          <div className="text-slate-500 font-medium">
-            {selectedDifficulty === 'bronze' ? easyCompletedCount : selectedDifficulty === 'silver' ? medCompletedCount : hardCompletedCount} of 4 completed
-          </div>
         </div>
       </div>
 
@@ -1163,18 +1137,15 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
               {/* ACTIVITY 01 • Theory Challenge */}
               <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg text-left max-w-full">
                 <HUDCorners />
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col">
-                    <h4 className="text-[11px] font-hud text-amber-500 uppercase font-black tracking-wider flex items-center gap-1.5 font-bold">
-                      <BrainCircuit className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
-                      Activity 01 • Theory Challenge
-                    </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Nectar of the Novices </span>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <h4 className="text-xs sm:text-sm font-hud text-amber-400 uppercase font-bold tracking-wider flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-amber-400" />
+                    Activity 01 • Theory Question
+                  </h4>
                   {easyTriviaStatus === 'correct' ? (
-                    <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
+                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
                   ) : (
-                    <span className="text-[8px] font-bold text-amber-500 bg-amber-950/30 border border-amber-500/25 px-1.5 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
+                    <span className="text-[9px] font-bold text-amber-400 bg-amber-950/30 border border-amber-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                   )}
                 </div>
 
@@ -1218,7 +1189,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 {easyTriviaStatus !== 'unanswered' && (
                   <div className="flex flex-col gap-1.5 mt-1 max-w-full">
                     <p className="text-[8px] sm:text-[9px] text-teal-400 font-mono tracking-wide leading-relaxed bg-teal-950/20 p-2.5 rounded border border-teal-500/10 uppercase break-words max-w-full" style={{ overflowWrap: 'break-word' }}>
-                      {easyTriviaStatus === 'correct' ? "✔️ Right! " : "❌ Locked! "}
+                      {easyTriviaStatus === 'correct' ? "✔️ Correct! " : "❌ Incorrect! "}
                       {easyTriviaQuestion.explanation}
                     </p>
                     {easyTriviaStatus === 'incorrect' && (
@@ -1236,18 +1207,15 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
               {/* ACTIVITY 02 • Theory Challenge II */}
               <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg text-left">
                 <HUDCorners />
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col">
-                    <h4 className="text-[11px] font-hud text-amber-500 uppercase font-black tracking-wider flex items-center gap-1.5 font-bold">
-                      <BrainCircuit className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
-                      Activity 02 • Theory II
-                    </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Type Effectiveness Check </span>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <h4 className="text-xs sm:text-sm font-hud text-amber-400 uppercase font-bold tracking-wider flex items-center gap-2">
+                    <Swords className="w-4 h-4 text-amber-400" />
+                    Activity 02 • Type Knowledge
+                  </h4>
                   {easyTriviaStatusB === 'correct' ? (
-                    <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
+                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
                   ) : (
-                    <span className="text-[8px] font-bold text-amber-500 bg-amber-950/30 border border-amber-500/25 px-1.5 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
+                    <span className="text-[9px] font-bold text-amber-400 bg-amber-950/30 border border-amber-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                   )}
                 </div>
 
@@ -1291,7 +1259,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 {easyTriviaStatusB !== 'unanswered' && (
                   <div className="flex flex-col gap-1.5 mt-1">
                     <p className="text-[8px] sm:text-[9px] text-teal-400 font-mono tracking-wide leading-relaxed bg-teal-950/20 p-2.5 rounded border border-teal-500/10 uppercase break-words">
-                      {easyTriviaStatusB === 'correct' ? "✔️ Right! " : "❌ Locked! "}
+                      {easyTriviaStatusB === 'correct' ? "✔️ Correct! " : "❌ Incorrect! "}
                       {easyTriviaQuestionB.explanation}
                     </p>
                     {easyTriviaStatusB === 'incorrect' && (
@@ -1309,18 +1277,15 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
               {/* ACTIVITY 03 • Pokédex Challenge */}
               <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden shadow-lg text-left">
                 <HUDCorners />
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col">
-                    <h4 className="text-[11px] font-hud text-amber-500 uppercase font-black tracking-wider flex items-center gap-1.5 font-bold">
-                      <BrainCircuit className="w-3.5 h-3.5 text-amber-500 animate-spin" style={{ animationDuration: '6s' }} />
-                      Activity 03 • Pokédex
-                    </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Daily Pokédex Scan </span>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <h4 className="text-xs sm:text-sm font-hud text-amber-400 uppercase font-bold tracking-wider flex items-center gap-2">
+                    <Compass className="w-4 h-4 text-amber-400" />
+                    Activity 03 • Pokédex Scan
+                  </h4>
                   {scanStatus === 'completed' ? (
-                    <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
+                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
                   ) : (
-                    <span className="text-[8px] font-bold text-amber-500 bg-amber-950/30 border border-amber-500/25 px-1.5 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
+                    <span className="text-[9px] font-bold text-amber-400 bg-amber-950/30 border border-amber-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                   )}
                 </div>
 
@@ -1371,18 +1336,15 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 meditationFlash ? "ring-2 ring-emerald-400 border-emerald-400 shadow-[0_0_25px_rgba(52,211,153,0.8)] bg-emerald-950/10 scale-[1.01]" : ""
               )}>
                 <HUDCorners />
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col">
-                    <h4 className="text-[11px] font-hud text-amber-500 uppercase font-black tracking-wider flex items-center gap-1.5 font-bold">
-                      <Gauge className="w-3.5 h-3.5 text-amber-500" />
-                      Activity 04 • Smart & Reactivity
-                    </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Focus Meditation </span>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <h4 className="text-xs sm:text-sm font-hud text-amber-400 uppercase font-bold tracking-wider flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-amber-400" />
+                    Activity 04 • Focus Breathing
+                  </h4>
                   {medCheckinStatus === 'completed' ? (
-                    <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
+                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
                   ) : (
-                    <span className="text-[8px] font-bold text-amber-500 bg-amber-950/30 border border-amber-500/25 px-1.5 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
+                    <span className="text-[9px] font-bold text-amber-400 bg-amber-950/30 border border-amber-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                   )}
                 </div>
 
@@ -1438,18 +1400,15 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
               {/* ACTIVITY 05 • Theory Challenge */}
               <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg text-left">
                 <HUDCorners />
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col">
-                    <h4 className="text-[11px] font-hud text-slate-300 uppercase font-black tracking-wider flex items-center gap-1.5 font-bold">
-                      <BrainCircuit className="w-3.5 h-3.5 text-slate-400 animate-pulse" />
-                      Activity 05 • Theory Challenge
-                    </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Advanced Hermeneutics Exam </span>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <h4 className="text-xs sm:text-sm font-hud text-slate-300 uppercase font-bold tracking-wider flex items-center gap-2">
+                    <GraduationCap className="w-4 h-4 text-slate-400" />
+                    Activity 05 • Theory Question
+                  </h4>
                   {medTriviaStatus === 'correct' ? (
-                    <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
+                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
                   ) : (
-                    <span className="text-[8px] font-bold text-slate-400 bg-slate-950/30 border border-slate-500/20 px-1.5 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
+                    <span className="text-[9px] font-bold text-slate-400 bg-slate-950/30 border border-slate-500/20 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                   )}
                 </div>
 
@@ -1493,7 +1452,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 {medTriviaStatus !== 'unanswered' && (
                   <div className="flex flex-col gap-1.5 mt-1">
                     <p className="text-[8px] sm:text-[9px] text-purple-400 font-mono tracking-wide leading-relaxed bg-purple-950/20 p-2.5 rounded border border-purple-500/10 uppercase break-words">
-                      {medTriviaStatus === 'correct' ? "✔️ Right! " : "❌ Locked! "}
+                      {medTriviaStatus === 'correct' ? "✔️ Correct! " : "❌ Incorrect! "}
                       {medTriviaQuestion.explanation}
                     </p>
                     {medTriviaStatus === 'incorrect' && (
@@ -1511,18 +1470,15 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
               {/* ACTIVITY 06 • Theory Challenge II */}
               <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg text-left">
                 <HUDCorners />
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col">
-                    <h4 className="text-[11px] font-hud text-slate-300 uppercase font-black tracking-wider flex items-center gap-1.5 font-bold">
-                      <BrainCircuit className="w-3.5 h-3.5 text-slate-400 animate-pulse" />
-                      Activity 06 • Theory II
-                    </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Complex Move Strategy Check </span>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <h4 className="text-xs sm:text-sm font-hud text-slate-300 uppercase font-bold tracking-wider flex items-center gap-2">
+                    <Target className="w-4 h-4 text-slate-400" />
+                    Activity 06 • Move Strategy
+                  </h4>
                   {medTriviaStatusB === 'correct' ? (
-                    <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
+                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
                   ) : (
-                    <span className="text-[8px] font-bold text-slate-400 bg-slate-950/30 border border-slate-500/20 px-1.5 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
+                    <span className="text-[9px] font-bold text-slate-400 bg-slate-950/30 border border-slate-500/20 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                   )}
                 </div>
 
@@ -1566,7 +1522,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 {medTriviaStatusB !== 'unanswered' && (
                   <div className="flex flex-col gap-1.5 mt-1">
                     <p className="text-[8px] sm:text-[9px] text-purple-400 font-mono tracking-wide leading-relaxed bg-purple-950/20 p-2.5 rounded border border-purple-500/10 uppercase break-words">
-                      {medTriviaStatusB === 'correct' ? "✔️ Right! " : "❌ Locked! "}
+                      {medTriviaStatusB === 'correct' ? "✔️ Correct! " : "❌ Incorrect! "}
                       {medTriviaQuestionB.explanation}
                     </p>
                     {medTriviaStatusB === 'incorrect' && (
@@ -1587,18 +1543,15 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 chronoFlash ? "ring-2 ring-emerald-400 border-emerald-400 shadow-[0_0_25px_rgba(52,211,153,0.8)] bg-emerald-950/10 scale-[1.01]" : ""
               )}>
                 <HUDCorners />
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col">
-                    <h4 className="text-[11px] font-hud text-slate-300 uppercase font-black tracking-wider flex items-center gap-1.5 font-bold">
-                      <BrainCircuit className="w-3.5 h-3.5 text-slate-400 animate-spin" style={{ animationDuration: '6s' }} />
-                      Activity 07 • Pokédex
-                    </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">High-Stat Defense Scanner </span>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <h4 className="text-xs sm:text-sm font-hud text-slate-300 uppercase font-bold tracking-wider flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-slate-400" />
+                    Activity 07 • High Defense Scan
+                  </h4>
                   {chronoClaimed ? (
-                    <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
+                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
                   ) : (
-                    <span className="text-[8px] font-bold text-slate-400 bg-slate-950/30 border border-slate-500/25 px-1.5 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
+                    <span className="text-[9px] font-bold text-slate-400 bg-slate-950/30 border border-slate-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                   )}
                 </div>
 
@@ -1611,7 +1564,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                     chronoClaimed ? (
                       <div className="w-full py-2 bg-emerald-950/20 border border-emerald-500/20 text-emerald-400 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5">
                         <Check className="w-3.5 h-3.5" />
-                        Defense metrics locked perfectly!
+                        Defense metrics verified!
                       </div>
                     ) : (
                       <button
@@ -1625,7 +1578,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                   ) : (
                     <div className="w-full py-2.5 bg-slate-900 border border-slate-800 text-slate-500 text-[10px] font-hud font-semibold uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5 select-none">
                       <ShieldAlert className="w-3.5 h-3.5" />
-                      Pending heavy defense index detection...
+                      Pending heavy defense species detection...
                     </div>
                   )}
                 </div>
@@ -1634,18 +1587,15 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
               {/* ACTIVITY 08 • Smart & Reactivity Challenge */}
               <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden shadow-lg text-left">
                 <HUDCorners />
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col">
-                    <h4 className="text-[11px] font-hud text-slate-300 uppercase font-black tracking-wider flex items-center gap-1.5 font-bold">
-                      <Gauge className="w-3.5 h-3.5 text-slate-400" />
-                      Activity 08 • Smart & Reactivity
-                    </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Reflex Calibration Exercise </span>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <h4 className="text-xs sm:text-sm font-hud text-slate-300 uppercase font-bold tracking-wider flex items-center gap-2">
+                    <Timer className="w-4 h-4 text-slate-400" />
+                    Activity 08 • Reflex Calibration
+                  </h4>
                   {coreRechargeStatus === 'completed' ? (
-                    <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
+                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
                   ) : (
-                    <span className="text-[8px] font-bold text-slate-400 bg-slate-950/30 border border-slate-500/25 px-1.5 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
+                    <span className="text-[9px] font-bold text-slate-400 bg-slate-950/30 border border-slate-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                   )}
                 </div>
 
@@ -1726,18 +1676,15 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
               {/* ACTIVITY 09: Master Strategist Exam (Hard Trivia) */}
               <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg text-left">
                 <HUDCorners />
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col">
-                    <h4 className="text-[11px] font-hud text-yellow-400 uppercase font-black tracking-wider flex items-center gap-1.5 font-bold">
-                      <BrainCircuit className="w-3.5 h-3.5 text-yellow-400 animate-pulse" />
-                      Activity 09 • Theory Challenge
-                    </h4>
-                    <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Master Strategist Theory Exam </span>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <h4 className="text-xs sm:text-sm font-hud text-yellow-400 uppercase font-bold tracking-wider flex items-center gap-2">
+                    <Crown className="w-4 h-4 text-yellow-400" />
+                    Activity 09 • Strategy Exam
+                  </h4>
                   {masterExamStatus === 'correct' ? (
-                    <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
+                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
                   ) : (
-                    <span className="text-[8px] font-bold text-yellow-500 bg-yellow-950/30 border border-yellow-500/25 px-1.5 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
+                    <span className="text-[9px] font-bold text-yellow-400 bg-yellow-950/30 border border-yellow-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                   )}
                 </div>
 
@@ -1781,7 +1728,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 {masterExamStatus !== 'unanswered' && (
                   <div className="flex flex-col gap-1.5 mt-1">
                     <p className="text-[8px] sm:text-[9px] text-red-400 font-mono tracking-wide leading-relaxed bg-red-950/20 p-2.5 rounded border border-red-500/10 uppercase break-words text-left">
-                      {masterExamStatus === 'correct' ? "✔️ Right! " : "❌ Locked! "}
+                      {masterExamStatus === 'correct' ? "✔️ Correct! " : "❌ Incorrect! "}
                       {hardTriviaQuestion.explanation}
                     </p>
                     {masterExamStatus === 'incorrect' && (
@@ -1801,18 +1748,15 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 {/* Activity 10: Theory Challenge II */}
                 <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg text-left">
                   <HUDCorners />
-                  <div className="flex justify-between items-start">
-                    <div className="flex flex-col">
-                      <h4 className="text-[11px] font-hud text-yellow-400 uppercase font-black tracking-wider flex items-center gap-1.5 font-bold">
-                        <BrainCircuit className="w-3.5 h-3.5 text-yellow-400 animate-pulse" />
-                        Activity 10 • Theory II
-                      </h4>
-                      <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Legendary Lore </span>
-                    </div>
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-xs sm:text-sm font-hud text-yellow-400 uppercase font-bold tracking-wider flex items-center gap-2">
+                      <Scroll className="w-4 h-4 text-yellow-400" />
+                      Activity 10 • Legendary Lore
+                    </h4>
                     {masterExamStatusB === 'correct' ? (
-                      <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
+                      <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
                     ) : (
-                      <span className="text-[8px] font-bold text-yellow-500 bg-yellow-950/30 border border-yellow-500/25 px-1.5 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
+                      <span className="text-[9px] font-bold text-yellow-400 bg-yellow-950/30 border border-yellow-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                     )}
                   </div>
 
@@ -1856,7 +1800,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                   {masterExamStatusB !== 'unanswered' && (
                     <div className="flex flex-col gap-1.5 mt-1 w-full text-left">
                       <p className="text-[8px] text-red-400 font-mono tracking-wide leading-relaxed bg-red-950/20 p-2 rounded border border-red-500/10 uppercase">
-                        {masterExamStatusB === 'correct' ? "✔️ Right! " : "❌ Locked! "}
+                        {masterExamStatusB === 'correct' ? "✔️ Correct! " : "❌ Incorrect! "}
                         {hardTriviaQuestionB.explanation}
                       </p>
                       {masterExamStatusB === 'incorrect' && (
@@ -1874,18 +1818,15 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 {/* Activity 11: Pokédex Challenge */}
                 <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg text-left">
                   <HUDCorners />
-                  <div className="flex justify-between items-start">
-                    <div className="flex flex-col">
-                      <h4 className="text-[11px] font-hud text-yellow-400 uppercase font-black tracking-wider flex items-center gap-1.5 font-bold">
-                        <BrainCircuit className="w-3.5 h-3.5 text-yellow-400 animate-spin" style={{ animationDuration: '6s' }} />
-                        Activity 11 • Pokédex Puzzle
-                      </h4>
-                      <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Grid Puzzle </span>
-                    </div>
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-xs sm:text-sm font-hud text-yellow-400 uppercase font-bold tracking-wider flex items-center gap-2">
+                      <Puzzle className="w-4 h-4 text-yellow-400" />
+                      Activity 11 • Grid Puzzle
+                    </h4>
                     {matrixLockdownStatus === 'completed' ? (
-                      <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
+                      <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
                     ) : (
-                      <span className="text-[8px] font-bold text-yellow-500 bg-yellow-950/30 border border-yellow-500/25 px-1.5 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
+                      <span className="text-[9px] font-bold text-yellow-400 bg-yellow-950/30 border border-yellow-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                     )}
                   </div>
 
@@ -1934,18 +1875,15 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 {/* Activity 12: Smart & Reactivity Challenge */}
                 <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg text-left">
                   <HUDCorners />
-                  <div className="flex justify-between items-start">
-                    <div className="flex flex-col">
-                      <h4 className="text-[11px] font-hud text-yellow-400 uppercase font-black tracking-wider flex items-center gap-1.5 font-bold">
-                        <Gauge className="w-3.5 h-3.5 text-yellow-400" />
-                        Activity 12 • Smart & Reactivity
-                      </h4>
-                      <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-0.5 font-bold">Speed Trial </span>
-                    </div>
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-xs sm:text-sm font-hud text-yellow-400 uppercase font-bold tracking-wider flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-yellow-400" />
+                      Activity 12 • Speed Trial
+                    </h4>
                     {speedTrialStatus === 'completed' ? (
-                      <span className="text-[8px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">PASSED</span>
+                      <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
                     ) : (
-                      <span className="text-[8px] font-bold text-yellow-500 bg-yellow-950/30 border border-yellow-500/25 px-1.5 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
+                      <span className="text-[9px] font-bold text-yellow-400 bg-yellow-950/30 border border-yellow-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                     )}
                   </div>
 

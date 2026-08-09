@@ -55,7 +55,7 @@ const ai = new GoogleGenAI({
   }
 });
 
-const DEFAULT_MODEL = "gemini-3.6-flash";
+const DEFAULT_MODEL = "gemini-3.1-flash-lite";
 const LITE_MODEL = "gemini-3.1-flash-lite";
 
 // --- OFFLINE GENERATIVE ENGINE (Fallback Mode) ---

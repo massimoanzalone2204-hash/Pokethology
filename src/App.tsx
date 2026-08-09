@@ -3,7 +3,7 @@ import { idbGet, idbSet, idbGetAll, idbDelete, STORES } from "./lib/indexedDB";
 import { checkQuotaAllowed, recordApiUsage } from "./lib/quotaManager";
 import { useState, useEffect, useRef, useTransition, useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Download, Search, Loader2, Database, Sparkles, Volume2, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork, Github } from 'lucide-react';
+import { Download, Search, Loader2, Database, Sparkles, Volume2, VolumeX, Copy, Check, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork, Github } from 'lucide-react';
 import { EvolutionNodeComponent } from './components/EvolutionNodeComponent';
 
 import { PokethologyLogo } from './components/PokethologyLogo';
@@ -45,7 +45,6 @@ import { AbilitiesSection } from './components/AbilitiesSection';
 import { TypeWeaknessesSection } from './components/TypeWeaknessesSection';
 import { CombatStatsSection } from './components/CombatStatsSection';
 import { MovesetAnalysisSection } from './components/MovesetAnalysisSection';
-import { ChatMessageItem } from './components/ChatMessageItem';
 
 const getShowdownName = (name: string, isFemale: boolean = false) => {
   if (!name) return '';
@@ -2201,6 +2200,51 @@ export default function App() {
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState<{role: 'user' | 'model', text: string, groundingChunks?: any[], groundingMetadata?: any}[]>([]);
   const [isChatLoading, setIsChatLoading] = useState(false);
+  const [chatSpeakingIndex, setChatSpeakingIndex] = useState<number | null>(null);
+  const [chatCopiedIndex, setChatCopiedIndex] = useState<number | null>(null);
+
+  const handleChatTTS = useCallback((text: string, index: number) => {
+    if (!('speechSynthesis' in window)) return;
+
+    if (chatSpeakingIndex === index) {
+      window.speechSynthesis.cancel();
+      setChatSpeakingIndex(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    // Clean text: strip emojis, markdown symbols, and collapse spaces
+    const cleanText = text
+      .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{2300}-\u{23FF}]/gu, '')
+      .replace(/[*_#`~>|-]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (!cleanText) return;
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+
+    const voices = window.speechSynthesis.getVoices();
+    const englishVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha')));
+    if (englishVoice) utterance.voice = englishVoice;
+
+    utterance.onstart = () => setChatSpeakingIndex(index);
+    utterance.onend = () => setChatSpeakingIndex(null);
+    utterance.onerror = () => setChatSpeakingIndex(null);
+
+    window.speechSynthesis.speak(utterance);
+    try { sounds.scan(); } catch (_) {}
+  }, [chatSpeakingIndex]);
+
+  const handleChatCopy = useCallback((text: string, index: number) => {
+    navigator.clipboard.writeText(text);
+    setChatCopiedIndex(index);
+    try { sounds.scan(); } catch (_) {}
+    setTimeout(() => setChatCopiedIndex(null), 2000);
+  }, []);
   const [battleLog, setBattleLog] = useState<(LogEntry & { turn?: number })[]>([]);
   const [isBattling, setIsBattling] = useState(false);
   const [usedSuperEffectiveCurrentBattle, setUsedSuperEffectiveCurrentBattle] = useState(false);
@@ -2886,9 +2930,7 @@ export default function App() {
   const [isBattleHistoryExpanded, setIsBattleHistoryExpanded] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [pendingAction, setPendingAction] = useState<'flee' | 'run' | null>(null);
-  const [isLightMode, setIsLightMode] = useState<boolean>(() => {
-    return localStorage.getItem('isLightMode') === 'true';
-  });
+  const [isLightMode, setIsLightMode] = useState<boolean>(false);
 
   const [arenaArtworkMode, setArenaArtworkMode] = useState<'home' | '2d'>('home');
 
@@ -5436,14 +5478,14 @@ export default function App() {
                          animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
                          transition={{ duration: 0.5 }}
                       >
-                         <BookOpen className={cn("w-4 h-4 text-yellow-400", viewAllGenerations && "animate-pulse")} />
+                         <Layers className={cn("w-4 h-4 text-yellow-400", viewAllGenerations && "animate-pulse")} />
                       </motion.div>
                     ) : (
                       <motion.div
                          whileHover={{ scale: 1.1, rotate: [0, 10, -10, 0] }}
                          transition={{ duration: 0.4 }}
                       >
-                        <Book className="w-4 h-4 text-purple-400" />
+                        <Globe className="w-4 h-4 text-purple-400" />
                       </motion.div>
                     )}
                   </motion.button>
@@ -5476,13 +5518,7 @@ export default function App() {
               >
                 <Trophy className={cn("w-4 h-4 filter drop-shadow-[0_0_6px_rgba(34,211,238,0.8)]", isDailyHubOpen ? "text-cyan-300 animate-pulse" : "text-cyan-400")} />
               </motion.div>
-              <span className="hidden sm:inline font-hud tracking-[0.1em] relative z-10 font-black">{t('DAILY HUB') || 'DAILY HUB'}</span>
-              
-              {/* Scan Ready status pill */}
-              <span className="relative z-10 items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-[7px] text-cyan-300 font-extrabold tracking-wider uppercase shrink-0 shadow-[0_0_8px_rgba(34,211,238,0.4)] animate-pulse hidden md:inline-flex">
-                <span className="w-1 h-1 rounded-full bg-cyan-400 animate-ping shrink-0" />
-                READY
-              </span>
+              <span className="hidden sm:inline font-hud tracking-[0.1em] relative z-10 font-black">{t('DAILY HUB') || 'Daily Hub'}</span>
             </motion.button>
 
 
@@ -5620,7 +5656,6 @@ export default function App() {
                                   handleTabChange('data');
                                 }
                               }}
-                              onMouseEnter={() => sounds?.hover?.()}
                               whileHover={{ scale: 1.03, boxShadow: activeTab === 'data' ? "0 0 22px rgba(6,182,212,0.35)" : "0 0 16px rgba(6,182,212,0.2)" }}
                               whileTap={{ scale: 0.97 }}
                               className={cn(
@@ -5655,7 +5690,6 @@ export default function App() {
                                   handleTabChange('chat');
                                 }
                               }}
-                              onMouseEnter={() => sounds?.hover?.()}
                               whileHover={{ scale: 1.03, boxShadow: activeTab === 'chat' ? "0 0 22px rgba(168,85,247,0.35)" : "0 0 16px rgba(168,85,247,0.2)" }}
                               whileTap={{ scale: 0.97 }}
                               className={cn(
@@ -5690,7 +5724,6 @@ export default function App() {
                                   handleTabChange('battle');
                                 }
                               }}
-                              onMouseEnter={() => sounds?.hover?.()}
                               whileHover={{ scale: 1.03, boxShadow: activeTab === 'battle' ? "0 0 22px rgba(239,68,68,0.35)" : "0 0 16px rgba(239,68,68,0.2)" }}
                               whileTap={{ scale: 0.97 }}
                               className={cn(
@@ -6162,9 +6195,18 @@ export default function App() {
                                         onScroll={(e) => {
                                           savedChatScrollTopRef.current = e.currentTarget.scrollTop;
                                         }}
-                                        className="chat-messages-area flex-1 overflow-y-auto p-3 space-y-4 custom-scrollbar relative bg-slate-950/20 min-h-0"
+                                        className={cn(
+                                          "chat-messages-area flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 custom-scrollbar relative min-h-0 transition-colors",
+                                          isLightMode ? "bg-[#efeae2]" : "bg-[#0b141a]"
+                                        )}
                                       >
-                                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
+                                        {/* WhatsApp Wallpaper Pattern Overlay */}
+                                        <div 
+                                          className="absolute inset-0 pointer-events-none opacity-[0.06] dark:opacity-[0.07] bg-repeat z-0"
+                                          style={{
+                                            backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M11 18h2v2h-2v-2zm10 0h2v2h-2v-2zm-10 10h2v2h-2v-2zm10 0h2v2h-2v-2zM3 39h2v2H3v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zM3 49h2v2H3v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zM51 18h2v2h-2v-2zm10 0h2v2h-2v-2zm-10 10h2v2h-2v-2zm10 0h2v2h-2v-2zM43 39h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zM43 49h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2z'/%3E%3C/g%3E%3C/svg%3E")`,
+                                          }}
+                                        />
 
                                         {quotaLimitReached && (
                                           <div className="bg-red-950/40 border border-red-500/30 p-2 rounded flex flex-col gap-1 mb-2 animate-in fade-in slide-in-from-top-1">
@@ -6195,7 +6237,170 @@ export default function App() {
                                           </button>
                                         )}
                                         {chatMessages.map((msg, i) => (
-                                          <ChatMessageItem key={`chat-msg-${i}-${msg.role}`} msg={msg} isLightMode={isLightMode} sounds={sounds} />
+                                          <motion.div 
+                                            key={`chat-msg-${i}-${msg.role}`} 
+                                            initial={{ opacity: 0, x: msg.role === 'user' ? 20 : -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.3, ease: "easeOut" }}
+                                            className={cn(
+                                              "flex w-full gap-2.5 py-3 relative z-10 border-b border-cyan-900/20 last:border-0",
+                                              msg.role === 'user' ? "flex-row-reverse" : "flex-row"
+                                            )}
+                                          >
+                                            <div className={cn("shrink-0 mt-1 flex items-center justify-center", msg.role === 'user' ? (isLightMode ? 'text-slate-500' : 'text-slate-400') : (isLightMode ? 'text-cyan-600' : 'text-cyan-400'))}>
+                                              {msg.role === 'user' ? <User className="w-4 h-4" /> : <BrainCircuit className="w-4 h-4" />}
+                                            </div>
+                                            <div className={cn("flex flex-col w-full min-w-0 max-w-[85%]", msg.role === 'user' ? "items-end" : "items-start")}>
+                                              {msg.role === 'model' ? (
+                                                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                                  <span className={cn("text-[8px] font-hud font-bold uppercase tracking-widest", isLightMode ? "text-cyan-800" : "text-cyan-400/90")}>
+                                                    Pokéthology AI
+                                                  </span>
+                                                  <div className="flex items-center gap-1.5 ml-0.5">
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => handleChatTTS(msg.text, i)}
+                                                      title={chatSpeakingIndex === i ? "Stop Voice" : "Listen to Message"}
+                                                      className={cn(
+                                                        "flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-hud uppercase tracking-wider border transition-all cursor-pointer font-bold select-none",
+                                                        chatSpeakingIndex === i
+                                                          ? "bg-cyan-500 text-slate-950 border-cyan-300 shadow-sm"
+                                                          : isLightMode
+                                                            ? "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
+                                                            : "bg-slate-800/90 text-cyan-300 border-slate-700 hover:bg-slate-700"
+                                                      )}
+                                                    >
+                                                      {chatSpeakingIndex === i ? <VolumeX className="w-2.5 h-2.5" /> : <Volume2 className="w-2.5 h-2.5 text-cyan-400" />}
+                                                      <span>{chatSpeakingIndex === i ? "Stop" : "Voice"}</span>
+                                                    </button>
+
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => handleChatCopy(msg.text, i)}
+                                                      title="Copy Message"
+                                                      className={cn(
+                                                        "flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-hud uppercase tracking-wider border transition-all cursor-pointer font-bold select-none",
+                                                        chatCopiedIndex === i
+                                                          ? "bg-emerald-500 text-white border-emerald-400 shadow-sm"
+                                                          : isLightMode
+                                                            ? "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
+                                                            : "bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700"
+                                                      )}
+                                                    >
+                                                      {chatCopiedIndex === i ? <Check className="w-2.5 h-2.5" /> : <Copy className="w-2.5 h-2.5" />}
+                                                      <span>{chatCopiedIndex === i ? "Copied" : "Copy"}</span>
+                                                    </button>
+                                                  </div>
+                                                </div>
+                                              ) : (
+                                                <span className={cn("text-[8px] font-hud font-bold uppercase tracking-widest mb-1", isLightMode ? "text-slate-600" : "text-slate-400")}>
+                                                  Operator
+                                                </span>
+                                              )}
+                                              <div className={cn(
+                                                "markdown-body select-text text-[11px] sm:text-[12.5px] font-sans leading-relaxed break-words rounded-2xl px-3.5 py-2.5 text-left shadow-sm transition-all", 
+                                                msg.role === 'user' 
+                                                  ? (isLightMode ? "bg-[#d9fdd3] text-[#111b21] border border-[#c1eab8] rounded-tr-none" : "bg-[#005c4b] text-[#e9edef] border border-[#02735e] rounded-tr-none") 
+                                                  : (isLightMode ? "bg-white text-[#111b21] border border-slate-200/90 rounded-tl-none" : "bg-[#202c33] text-[#e9edef] border border-[#2a3942] rounded-tl-none")
+                                              )}>
+                                                <Markdown
+                                                  components={{
+                                                    a: ({ href, children }) => (
+                                                      <span className="inline-block">
+                                                        <a 
+                                                          href={href} 
+                                                          target="_blank" 
+                                                          rel="noopener noreferrer" 
+                                                          className="text-cyan-400 hover:text-cyan-300 underline font-semibold inline-flex items-center gap-1"
+                                                        >
+                                                          {children}
+                                                          <Globe className="w-2.5 h-2.5 inline text-cyan-400/80" />
+                                                        </a>
+                                                      </span>
+                                                    )
+                                                  }}
+                                                >
+                                                  {msg.text}
+                                                </Markdown>
+                                              </div>
+                                              {msg.role === 'model' && pokemon?.name && (
+                                                <div className="mt-2.5 pt-2 border-t border-cyan-500/10 flex flex-wrap gap-1.5 align-middle items-center">
+                                                  <span className="text-[7.5px] text-slate-500 font-hud tracking-widest uppercase block w-full mb-0.5">Verified Knowledge Sources:</span>
+                                                  <a 
+                                                    href={`https://bulbapedia.bulbagarden.net/wiki/${encodeURIComponent(pokemon.name)}_(Pokémon)`} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer" 
+                                                    className="inline-flex items-center gap-1 text-[7.5px] font-hud font-black uppercase tracking-wider text-cyan-400 hover:text-cyan-200 bg-slate-950/40 hover:bg-cyan-500/15 border border-cyan-500/20 px-2 py-0.5 rounded transition-colors"
+                                                  >
+                                                    <BookOpen className="w-2.5 h-2.5 text-cyan-500" />
+                                                    Bulbapedia
+                                                  </a>
+                                                  <a 
+                                                    href={`https://www.serebii.net/search.shtml?q=${encodeURIComponent(pokemon.name)}`} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer" 
+                                                    className="inline-flex items-center gap-1 text-[7.5px] font-hud font-black uppercase tracking-wider text-cyan-400 hover:text-cyan-200 bg-slate-950/40 hover:bg-cyan-500/15 border border-cyan-500/20 px-2 py-0.5 rounded transition-colors"
+                                                  >
+                                                    <Globe className="w-2.5 h-2.5 text-cyan-500" />
+                                                    Serebii
+                                                  </a>
+
+                                                  <a 
+                                                    href={`https://www.youtube.com/results?search_query=${encodeURIComponent(pokemon.name + ' lore pokémon')}`} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer" 
+                                                    className="inline-flex items-center gap-1 text-[7.5px] font-hud font-black uppercase tracking-wider text-red-400 hover:text-red-200 bg-slate-950/40 hover:bg-red-500/15 border border-red-500/20 px-2 py-0.5 rounded transition-colors"
+                                                  >
+                                                    <Search className="w-2.5 h-2.5 text-red-500" />
+                                                    YouTube
+                                                  </a>
+                                                </div>
+                                              )}
+                                              {msg.groundingMetadata?.webSearchQueries?.length > 0 && (
+                                                <div className="flex flex-wrap items-center gap-1 mt-2 border-t border-slate-700/30 pt-1.5 text-[8px] font-mono text-cyan-400/90 select-none">
+                                                  <Search className="w-2 h-2 text-cyan-400 animate-pulse" />
+                                                  <span className="font-bold uppercase tracking-wider text-[7px] text-cyan-400/70">Scanned Web:</span>
+                                                  {msg.groundingMetadata.webSearchQueries.map((query: string, qi: number) => (
+                                                    <span key={`query-${qi}`} className="bg-cyan-950/50 border border-cyan-500/15 px-1 py-0.5 rounded text-[7px] font-bold">
+                                                      "{query}"
+                                                    </span>
+                                                  ))}
+                                                </div>
+                                              )}
+
+                                              {msg.groundingChunks?.length > 0 && (
+                                                <div className="mt-2 text-[8px] select-all">
+                                                  <div className="text-[7px] tracking-widest font-black text-slate-400/70 uppercase mb-1 flex items-center gap-1 font-hud">
+                                                    <Globe className="w-1.5 h-1.5 text-cyan-500" />
+                                                    <span>Academic Citations & Origins</span>
+                                                  </div>
+                                                  <div className="flex flex-wrap gap-1">
+                                                    {msg.groundingChunks.filter(c => c.web?.uri).map((chunk, ci) => {
+                                                      let domain = 'Source';
+                                                      try {
+                                                        domain = new URL(chunk.web.uri).hostname.replace('www.', '');
+                                                      } catch (err) {}
+                                                      return (
+                                                        <a 
+                                                          key={`chunk-${ci}`} 
+                                                          href={chunk.web.uri} 
+                                                          target="_blank" 
+                                                          rel="noopener noreferrer" 
+                                                          className="text-[7.5px] font-mono text-cyan-300 hover:text-cyan-100 flex items-center gap-1 border border-cyan-500/15 px-1.5 py-0.5 bg-cyan-950/30 hover:bg-cyan-950/85 rounded transition-all duration-150 decoration-transparent"
+                                                        >
+                                                          <Globe className="w-1.5 h-1.5 text-cyan-500" />
+                                                          <span className="underline truncate max-w-[120px] font-bold">
+                                                            {chunk.web.title || domain}
+                                                          </span>
+                                                          <span className="opacity-40 text-[6.5px]">({domain})</span>
+                                                        </a>
+                                                      );
+                                                    })}
+                                                  </div>
+                                                </div>
+                                              )}
+                                            </div>
+                                          </motion.div>
                                         ))}
                                         {isChatLoading && (
                                           <motion.div 
@@ -6633,7 +6838,10 @@ export default function App() {
 
                                         {/* Center: VS & Messages */}
                                         <div className="absolute inset-0 pointer-events-none z-30">
-                                          <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-cyan-500/5 font-hud text-4xl sm:text-8xl lg:text-[15rem] xl:text-[20rem] italic font-black select-none z-0">VS</div>
+                                          <div className={cn(
+                                            "absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 font-hud text-2xl sm:text-5xl lg:text-7xl italic font-black select-none z-0 transition-colors",
+                                            isLightMode ? "text-slate-900/10" : "text-cyan-500/10"
+                                          )}>VS</div>
                                           
                                           <AnimatePresence>
                                             {battleMessage && (
@@ -6987,7 +7195,6 @@ export default function App() {
                                               setIsBattleHistoryExpanded(!isBattleHistoryExpanded);
                                               sounds.scan();
                                             }}
-                                            onMouseEnter={() => sounds?.hover?.()}
                                             className="w-full flex items-center justify-between px-3.5 py-2 sm:py-2.5 bg-slate-900/45 hover:bg-slate-900/75 transition-all font-hud text-[9.5px] tracking-widest text-slate-400 hover:text-cyan-400 font-bold uppercase cursor-pointer"
                                           >
                                             <div className="flex items-center gap-1.5">
@@ -7425,7 +7632,7 @@ export default function App() {
                                             </div>
                                           )}
                                         </motion.div>
-                                      ) : isBattling ? (
+                                      ) : (
                                         <motion.div
                                           key="arena-active"
                                           initial={{ opacity: 0, scale: 0.98, y: 15 }}
@@ -7434,12 +7641,16 @@ export default function App() {
                                           transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                                           className="space-y-4"
                                         >
-                                          <div className="flex gap-2 mb-4 items-center">
+
+
+                                          {/* AI Strategy & Run Buttons */}
+                                          {/* AI Strategy & Run Buttons */}
+                                          {isBattling && (
+<div className="flex gap-2 mb-4 items-center">
                                             <motion.button
                                               whileHover={{ scale: 1.03 }}
                                               whileTap={{ scale: 0.95 }}
                                               onClick={getBattleStrategy}
-                                              onMouseEnter={() => sounds?.hover?.()}
                                               disabled={isAiSuggesting || !isBattling}
                                               className={cn(
                                                 "flex-[3] py-1.5 bg-purple-900/40 hover:bg-purple-800/60 text-purple-300 font-hud rounded-lg border border-purple-500/40 transition-all text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2",
@@ -7454,7 +7665,6 @@ export default function App() {
                                               whileHover={{ scale: 1.05 }}
                                               whileTap={{ scale: 0.95 }}
                                               onClick={() => { setPendingAction('run'); setShowExitConfirmation(true); }}
-                                              onMouseEnter={() => sounds?.hover?.()}
                                               disabled={!isBattling}
                                               className={cn(
                                                 "flex-1 py-1.5 bg-slate-900 border border-slate-700 text-slate-500 font-hud rounded-lg transition-all text-[9px] font-black uppercase tracking-widest hover:border-red-500/50 hover:text-red-400 active:scale-95 flex items-center justify-center gap-2",
@@ -7465,8 +7675,12 @@ export default function App() {
                                               Quit
                                             </motion.button>
                                           </div>
+)}
+
+
+
                                         </motion.div>
-                                      ) : null}
+                                      )}
                                     </AnimatePresence>
                                     </div> {/* End of flex container */}
                                       </div> {/* End of Right Column */}
@@ -7503,12 +7717,12 @@ export default function App() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98, y: -12 }}
                         transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-                        className="flex-1 flex flex-col items-center justify-between py-6 px-4 pb-16 sm:pb-20 text-center relative overflow-y-auto select-none w-full h-full my-auto custom-scrollbar"
+                        className="flex-1 flex flex-col items-center justify-center gap-4 sm:gap-5 md:gap-6 py-4 px-4 text-center relative overflow-y-auto md:overflow-hidden select-none w-full h-full my-auto"
                       >
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/5 to-transparent pointer-events-none"></div>
                         
                         <motion.div 
-                          className="relative w-36 h-36 xxs:w-40 xxs:h-40 xs:w-48 xs:h-48 sm:w-56 sm:h-56 md:w-60 md:h-60 lg:w-60 lg:h-60 xl:w-72 xl:h-72 flex items-center justify-center shrink-0 max-h-[30vh]"
+                          className="relative w-40 h-40 xxs:w-48 xxs:h-48 xs:w-56 xs:h-56 sm:w-64 sm:h-64 md:w-64 md:h-64 lg:w-64 lg:h-64 xl:w-72 xl:h-72 flex items-center justify-center shrink-0 max-h-[32vh]"
                           initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: "easeOut" }}
                         >
                           <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 75%)' }}></div>
@@ -7577,13 +7791,13 @@ export default function App() {
                           </div>
 
                           {/* Home Screen Copyright & Legal Disclaimer */}
-                          <p className="text-[9px] sm:text-[10px] text-slate-400 font-mono tracking-wider max-w-2xl mx-auto text-center mt-8 sm:mt-12 md:mt-16 mb-4 sm:mb-6 leading-relaxed opacity-90 select-text px-3 relative z-10 break-words">
-                            Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc. TM, ® and Pokémon character names are trademarks of Nintendo.<br className="hidden sm:inline"/>{" "}
+                          <p className="text-[9px] sm:text-[10px] text-slate-400 font-mono tracking-wider max-w-2xl mx-auto text-center mt-3 sm:mt-4 md:mt-5 mb-2 leading-relaxed opacity-80 select-none px-2">
+                            Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc. TM, ® and Pokémon character names are trademarks of Nintendo.<br className="hidden sm:inline"/>
                             No copyright or trademark infringement is intended in using Pokémon content on Pokéthology.
                           </p>
                         </div>
 
-                        <div className="absolute bottom-2 left-4 right-4 flex justify-between items-end opacity-30 pointer-events-none z-0">
+                        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end opacity-40 pointer-events-none">
                           <div className="flex flex-col gap-1">
                             <div className="w-24 h-1 bg-cyan-900/60"></div>
                             <div className="w-16 h-1 bg-cyan-900/60"></div>
@@ -7648,7 +7862,7 @@ export default function App() {
                           <div className="flex flex-col gap-2.5 mb-2.5 border-b border-cyan-900/50 pb-2.5 shrink-0">
                             <div className="flex justify-between items-center px-2 py-2">
                               <div className="flex items-center gap-4 sm:gap-6 shrink-0">
-                                <div className="relative w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 flex items-center justify-center shrink-0">
+                                <div className="relative w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center shrink-0">
                                   <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.18) 0%, transparent 70%)' }}></div>
                                   <PokethologyLogo className="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(6,182,212,0.35)]" />
                                 </div>
@@ -8358,7 +8572,7 @@ export default function App() {
                       <Star className="w-4 h-4 text-cyan-400 animate-spin" style={{ animationDuration: '6s' }} />
                     </motion.div>
                     <h2 className="text-xs sm:text-sm font-hud text-cyan-400 uppercase tracking-[0.15em] sm:tracking-[0.2em] font-black group-hover:text-cyan-300 transition-colors">
-                      DAILY HUB
+                      {t('DAILY HUB') || 'Daily Hub'}
                     </h2>
                   </div>
                   <motion.button 

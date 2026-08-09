@@ -17,8 +17,29 @@ import {
   ChevronRight,
   Shield,
   Layers,
-  GraduationCap
+  GraduationCap,
+  Dna,
+  Flame,
+  Globe,
+  Scale,
+  Heart,
+  Sun,
+  Zap,
+  Gem,
+  Compass
 } from 'lucide-react';
+
+const REGION_ICONS: Record<string, React.ElementType> = {
+  Kanto: Dna,
+  Johto: Flame,
+  Hoenn: Globe,
+  Sinnoh: Compass,
+  Unova: Scale,
+  Kalos: Heart,
+  Alola: Sun,
+  Galar: Zap,
+  Paldea: Gem,
+};
 
 export interface RegionQuestion {
   id: string;
@@ -884,6 +905,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
       <div className="w-full flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1.5 shrink-0">
         {allExams.map((rData, idx) => {
           const isActive = idx === activeRegionIndex;
+          const RegionIcon = REGION_ICONS[rData.region] || Globe;
 
           return (
             <button
@@ -899,6 +921,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
                   : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-cyan-500/40 hover:text-cyan-300 hover:bg-slate-900'
               )}
             >
+              <RegionIcon className={cn("w-3.5 h-3.5 shrink-0", isActive ? "text-slate-950" : "text-cyan-400")} />
               <span>{rData.region}</span>
             </button>
           );
@@ -908,13 +931,13 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
       {/* ACTIVE REGION HEADER BANNER */}
       <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1.5 text-left relative overflow-hidden">
         <HUDCorners />
-        <div className="flex items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
-          <h3 className="text-sm sm:text-base font-hud font-black text-amber-300 uppercase tracking-wider flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-amber-400" />
-            {currentRegionData.region} Lore: {currentRegionData.themeTitle}
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+          <h3 className="text-xs xs:text-sm sm:text-base font-hud font-black text-amber-300 uppercase tracking-wider flex items-center gap-2 min-w-0 break-words">
+            {React.createElement(REGION_ICONS[currentRegionData.region] || BookOpen, { className: "w-4 h-4 text-amber-400 shrink-0" })}
+            <span className="truncate">{currentRegionData.region}: {currentRegionData.themeTitle}</span>
           </h3>
-          <span className={cn('px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider border', currentRegionData.badgeColor)}>
-            THEMATIC EVALUATION
+          <span className={cn('px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider border shrink-0', currentRegionData.badgeColor)}>
+            THEORY QUIZ
           </span>
         </div>
         <div className="text-xs text-slate-300 font-sans leading-relaxed">
@@ -946,7 +969,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
               {/* Question header */}
               <div className="flex justify-between items-start gap-2">
                 <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider">
-                  QUESTION {qIndex + 1} OF {currentRegionData.questions.length}
+                  QUESTION {qIndex + 1} / {currentRegionData.questions.length}
                 </span>
                 {isLocked && (
                   <span
@@ -959,11 +982,11 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
                   >
                     {isCorrect ? (
                       <>
-                        <Check className="w-3 h-3 text-emerald-400" /> CORRECT ACCREDITED
+                        <Check className="w-3 h-3 text-emerald-400" /> CORRECT
                       </>
                     ) : (
                       <>
-                        <XCircle className="w-3 h-3 text-rose-400" /> INCORRECT ENTRY
+                        <XCircle className="w-3 h-3 text-rose-400" /> INCORRECT
                       </>
                     )}
                   </span>
@@ -1025,13 +1048,13 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
                     )}
                   >
                     <Shield className="w-3.5 h-3.5 text-cyan-400" />
-                    LOCK IN ANSWER
+                    SUBMIT ANSWER
                   </button>
                 </div>
               ) : (
                 <div className="mt-2 p-3 rounded-lg bg-slate-950/80 border border-slate-800 text-xs text-slate-300 leading-relaxed font-sans">
                   <strong className="text-cyan-400 font-hud block mb-1 uppercase tracking-wider text-[9px]">
-                    ACADEMIC EXPLANATION & ARCHIVAL LORE
+                    EXPLANATION
                   </strong>
                   {q.explanation}
                 </div>

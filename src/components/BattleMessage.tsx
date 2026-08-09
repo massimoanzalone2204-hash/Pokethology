@@ -11,9 +11,39 @@ interface BattleMessageProps {
   isLightMode?: boolean;
 }
 
-export const BattleMessage: React.FC<BattleMessageProps> = memo(({ message, type, enableAnimations = true }) => {
+export const BattleMessage: React.FC<BattleMessageProps> = memo(({ message, type, enableAnimations = true, isLightMode = false }) => {
 
   const getStyle = () => {
+    if (isLightMode) {
+      switch (type) {
+        case 'critical':
+          return {
+            container: 'bg-red-100/98 border-red-600 text-red-950 shadow-lg',
+            chip: 'bg-red-200/90 border-red-500 text-red-950 font-extrabold',
+            icon: <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 shrink-0 animate-pulse" />
+          };
+        case 'effective':
+          return {
+            container: 'bg-amber-100/98 border-amber-600 text-amber-950 shadow-lg',
+            chip: 'bg-amber-200/90 border-amber-500 text-amber-950 font-extrabold',
+            icon: <Target className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 shrink-0" />
+          };
+        case 'status':
+          return {
+            container: 'bg-indigo-100/98 border-indigo-600 text-indigo-950 shadow-lg',
+            chip: 'bg-indigo-200/90 border-indigo-500 text-indigo-950 font-extrabold',
+            icon: <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 shrink-0" />
+          };
+        default:
+        case 'move':
+          return {
+            container: 'bg-white/98 border-cyan-600 text-slate-950 shadow-lg',
+            chip: 'bg-cyan-100 border-cyan-500 text-cyan-950 font-extrabold',
+            icon: <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600 shrink-0" />
+          };
+      }
+    }
+
     switch (type) {
       case 'critical':
         return {

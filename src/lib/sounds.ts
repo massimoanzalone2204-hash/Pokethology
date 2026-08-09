@@ -140,7 +140,7 @@ export const sounds = {
       oscSub.frequency.exponentialRampToValueAtTime(220, now + 0.07);
 
       gainSub.gain.setValueAtTime(0, now);
-      gainSub.gain.linearRampToValueAtTime(0.045 * sfxVolume, now + 0.003);
+      gainSub.gain.linearRampToValueAtTime(0.08 * sfxVolume, now + 0.003);
       gainSub.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
 
       // Crisp digital transients sweep-click (delivers immediate visual/tactile response)
@@ -152,7 +152,7 @@ export const sounds = {
       filter.frequency.setValueAtTime(1600, now);
       
       gainClick.gain.setValueAtTime(0, now);
-      gainClick.gain.linearRampToValueAtTime(0.02 * sfxVolume, now + 0.004);
+      gainClick.gain.linearRampToValueAtTime(0.04 * sfxVolume, now + 0.004);
       gainClick.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
 
       oscSub.connect(gainSub);
@@ -337,7 +337,7 @@ export const sounds = {
       filter.Q.setValueAtTime(2, now);
 
       gain.gain.setValueAtTime(0, now);
-      gain.gain.linearRampToValueAtTime(0.015 * sfxVolume, now + 0.003);
+      gain.gain.linearRampToValueAtTime(0.028 * sfxVolume, now + 0.003);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
       
       osc1.connect(filter);
@@ -350,7 +350,7 @@ export const sounds = {
       osc1.stop(now + 0.025);
       osc2.stop(now + 0.025);
     } catch {
-      playTone(600, 'sine', 0.012, 0.01);
+      playTone(600, 'sine', 0.02, 0.02);
     }
   },
   _currentCry: null as HTMLAudioElement | null,
@@ -366,7 +366,7 @@ export const sounds = {
       if (stopPrevious) {
         sounds._currentCry = audio;
       }
-      audio.volume = 0.5 * sfxVolume;
+      audio.volume = 1.0 * sfxVolume;
 
       const cleanName = pokemonName.toLowerCase().replace(/[^a-z0-9-]/g, '');
       const noHyphens = cleanName.replace(/-/g, '');

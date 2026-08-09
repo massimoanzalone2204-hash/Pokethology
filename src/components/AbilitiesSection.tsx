@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Ability } from '../types';
 import { cn } from '../lib/utils';
-import { Zap, Sparkles, Shield, Copy, Check } from 'lucide-react';
+import { Dna, Sparkles, Shield, Copy, Check } from 'lucide-react';
 
 interface AbilitiesSectionProps {
   abilities: Ability[];
@@ -36,7 +36,7 @@ export const AbilitiesSection: React.FC<AbilitiesSectionProps> = ({
         isLightMode ? "text-cyan-900 border-slate-200" : "text-cyan-400 border-cyan-900/40"
       )}>
         <div className="flex items-center gap-2">
-          <Zap className="w-4 h-4 text-cyan-400" />
+          <Dna className="w-4 h-4 text-cyan-400" />
           <span className="font-bold">Abilities</span>
         </div>
       </div>
@@ -78,7 +78,6 @@ export const AbilitiesSection: React.FC<AbilitiesSectionProps> = ({
                         <button
                           type="button"
                           onClick={() => handleCopy(a)}
-                          onMouseEnter={() => sounds?.hover?.()}
                           title="Copy Ability"
                           className={cn(
                             "p-1 rounded-md border text-[10px] transition-all cursor-pointer",
