@@ -27,9 +27,10 @@ export const MoveModal: React.FC<MoveModalProps> = ({ isOpen, onClose, moves, on
             onClick={onClose}
           />
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.98, y: 6 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            exit={{ opacity: 0, scale: 0.98, y: 6 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
             className={cn(
               "fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 border rounded-3xl p-6 shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col",
               isLightMode ? "bg-white border-slate-200" : "bg-slate-900 border-cyan-500/30"

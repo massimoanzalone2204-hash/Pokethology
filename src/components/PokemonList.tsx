@@ -132,8 +132,15 @@ export const PokemonList = memo(({
                   Cancel Matchup
                 </button>
               )}
-              <span className="text-cyan-400 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider px-3 py-1 bg-cyan-950/40 border border-cyan-500/30 rounded-lg shadow-sm">
-                {sortedAndFilteredList.length} Units Available
+              <span className="text-cyan-400 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider px-3 py-1 bg-cyan-950/40 border border-cyan-500/30 rounded-lg shadow-sm flex items-center gap-1.5">
+                {(typeof navigator !== 'undefined' && !navigator.onLine) || sortedAndFilteredList.some((p: any) => p.isOfflineCached) ? (
+                  <>
+                    <Database className="w-3 h-3 text-amber-400 animate-pulse" />
+                    <span className="text-amber-300">Offline Cache ({sortedAndFilteredList.length})</span>
+                  </>
+                ) : (
+                  <>{sortedAndFilteredList.length} Units Available</>
+                )}
               </span>
             </div>
           </div>

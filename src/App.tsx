@@ -3,7 +3,7 @@ import { idbGet, idbSet, idbGetAll, idbDelete, STORES } from "./lib/indexedDB";
 import { checkQuotaAllowed, recordApiUsage } from "./lib/quotaManager";
 import { useState, useEffect, useRef, useTransition, useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Download, Search, Loader2, Database, Sparkles, Volume2, VolumeX, Copy, Check, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork, Github, ArrowLeftRight } from 'lucide-react';
+import { Download, Search, Loader2, Database, Sparkles, Volume2, VolumeX, Copy, Check, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork, Github, ArrowLeftRight, Wifi, WifiOff } from 'lucide-react';
 import { EvolutionNodeComponent } from './components/EvolutionNodeComponent';
 
 import { PokethologyLogo } from './components/PokethologyLogo';
@@ -2966,6 +2966,18 @@ export default function App() {
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isOfflineManagerOpen, setIsOfflineManagerOpen] = useState(false);
+  const [isOnline, setIsOnline] = useState<boolean>(typeof navigator !== 'undefined' ? navigator.onLine : true);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
   const [isDailyScanOpen, setIsDailyScanOpen] = useState(false);
   const [isDailyQuizOpen, setIsDailyQuizOpen] = useState(false);
   const [isBattleHistoryExpanded, setIsBattleHistoryExpanded] = useState(false);
@@ -4767,7 +4779,21 @@ export default function App() {
 
     const userMessage = msg.trim();
 
-    // We do not block when quota is reached/missing, since the server has a beautiful offline multilingual local synthesis engine!
+    // Check if device is offline
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setChatMessages(prev => [...prev, 
+        { role: 'user' as const, text: userMessage },
+        { 
+          role: 'model' as const, 
+          text: selectedLang === 'it' 
+            ? `🌐 **MODEITÀ OFFLINE ATTIVA**: Il Chatbot AI richiede una connessione internet attiva per interrogare i modelli AI online.\n\n⚡ **TUTTE LE ALTRE FUNZIONALITÀ SONO 100% GIOCABILI OFFLINE**:\n- Consultazione e ricerca Pokédex (dati salvati in IndexedDB)\n- Simulatore di Lotta in tempo reale\n- Incontri giornalieri & Quiz\n- Analisi Tipi e Mosse`
+            : `🌐 **OFFLINE MODE ACTIVE**: The live AI Chatbot requires an active internet connection to query online AI models.\n\n⚡ **ALL OTHER FEATURES ARE 100% PLAYABLE OFFLINE**:\n- Pokédex Browsing & Search (IndexedDB storage)\n- Real-Time Battle Combat Simulator\n- Daily Encounters & Quizzes\n- Type Weaknesses & Move Stats`
+        }
+      ]);
+      sounds.error();
+      return;
+    }
+
     setChatMessages(prev => [...prev, { role: 'user' as const, text: userMessage }]);
     setIsChatLoading(true);
     sounds.scan();
@@ -5588,6 +5614,22 @@ export default function App() {
             
              
 
+            {!isOnline && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  setIsOfflineManagerOpen(true);
+                  sounds.hover();
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-950/80 border border-amber-500/60 text-amber-300 text-[9px] font-hud uppercase tracking-wider cursor-pointer hover:bg-amber-900 transition-all shadow-[0_0_10px_rgba(245,158,11,0.3)] shrink-0"
+                title="Offline Mode Active - Pokédex, Battles & Games 100% playable offline"
+              >
+                <WifiOff className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span className="hidden sm:inline font-bold">Offline Ready</span>
+              </motion.button>
+            )}
+
             <motion.button
                whileHover={{ scale: 1.1, rotate: 90 }}
                whileTap={{ scale: 0.95 }}
@@ -5664,10 +5706,10 @@ export default function App() {
                         return (
                           <motion.div
                             key={pokemon.name + '-' + (inspectingOpponent ? 'opp' : 'player')}
-                            initial={{ opacity: 0, scale: 0.98, y: 15 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.98, y: -15 }}
-                            transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+                            initial={{ opacity: 0, y: 4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            transition={{ duration: 0.15, ease: 'easeOut' }}
                             className="flex-1 bg-transparent relative overflow-hidden flex flex-col p-1 sm:p-2 w-full max-w-[1920px] mx-auto lg:px-4 xl:px-6"
                           >
                         {loadingPokemon && (
@@ -6101,15 +6143,15 @@ export default function App() {
                               
                             </div>
 
-                            <motion.div className="flex-1 flex flex-col min-w-0 w-full h-full" transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}>
+                            <motion.div className="flex-1 flex flex-col min-w-0 w-full h-full">
                               <AnimatePresence mode="wait">
                                 {activeTab === 'data' ? (
                                   <motion.div
                                     key="data"
-                                    initial={{ opacity: 0, y: 12, scale: 0.99 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: -12, scale: 0.99 }}
-                                    transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+                                    initial={{ opacity: 0, y: 4 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -4 }}
+                                    transition={{ duration: 0.15, ease: 'easeOut' }}
                                     className="w-full space-y-4"
                                   >
                                     {/* Enhanced Pokedex Entry Section */}
@@ -6189,10 +6231,10 @@ export default function App() {
                                 ) : activeTab === 'chat' ? (
                                   <motion.div
                                     key="chat"
-                                    initial={{ opacity: 0, y: 12, scale: 0.99 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: -12, scale: 0.99 }}
-                                    transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+                                    initial={{ opacity: 0, y: 4 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -4 }}
+                                    transition={{ duration: 0.15, ease: 'easeOut' }}
                                     className="w-full flex-1 flex flex-col gap-2 min-h-0 h-full overflow-hidden"
                                   >
                                     <div className={cn(
@@ -7865,7 +7907,7 @@ export default function App() {
                                 <span className="text-cyan-100 drop-shadow-[0_0_10px_rgba(34,211,238,0.6)]">{isInitializingDb ? "STARTING SYSTEM..." : "START APP"}</span>
                               </div>
                               <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-cyan-300/80 z-10 font-normal uppercase">
-                                {isInitializingDb ? "Loading Dex Registry & Generation I" : "Click to boot app & load dataset"}
+                                {isInitializingDb ? "Loading Dex Registry & Generation I" : "Enter into Pokéthology World"}
                               </span>
                             </motion.button>
                           </div>
@@ -8261,10 +8303,10 @@ export default function App() {
               className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90"
             >
               <motion.div
-                initial={{ scale: 0.94, y: 12, opacity: 0 }}
+                initial={{ scale: 0.98, y: 6, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.94, y: 12, opacity: 0 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                exit={{ scale: 0.98, y: 6, opacity: 0 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
                 className="bg-slate-900 border-2 border-red-500/50 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(239,68,68,0.3)]"
               >
                 <div className="p-4 border-b border-red-900/30 flex justify-between items-center bg-slate-950 shrink-0">
@@ -8365,10 +8407,10 @@ export default function App() {
               className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/90"
             >
               <motion.div
-                initial={{ scale: 0.94, y: 12, opacity: 0 }}
+                initial={{ scale: 0.98, y: 6, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.94, y: 12, opacity: 0 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                exit={{ scale: 0.98, y: 6, opacity: 0 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
                 className="bg-slate-950 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.3)]"
               >
                 <div className="p-4 sm:p-6 border-b border-cyan-900/30 bg-cyan-950/20">
@@ -8498,10 +8540,10 @@ export default function App() {
               className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80"
             >
               <motion.div
-                initial={{ scale: 0.94, y: 12, opacity: 0 }}
+                initial={{ scale: 0.98, y: 6, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.94, y: 12, opacity: 0 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                exit={{ scale: 0.98, y: 6, opacity: 0 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
                 className="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.2)]"
               >
                 <div className={cn(
@@ -8651,10 +8693,10 @@ export default function App() {
               className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto custom-scrollbar"
             >
               <motion.div
-                initial={{ scale: 0.94, y: 12, opacity: 0 }}
+                initial={{ scale: 0.98, y: 6, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.94, y: 12, opacity: 0 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                exit={{ scale: 0.98, y: 6, opacity: 0 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
                 className="bg-slate-950 border-2 border-cyan-500/50 rounded-2xl w-full max-w-4xl max-h-[92dvh] sm:max-h-[88vh] shadow-[0_0_50px_rgba(34,211,238,0.2)] p-4 sm:p-6 flex flex-col gap-3 relative my-auto mx-auto overflow-hidden"
               >
                 {/* Clean inline top header with touch-safe close action */}
@@ -9128,10 +9170,10 @@ export default function App() {
               className={cn("fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto custom-scrollbar")}
             >
               <motion.div
-                initial={{ scale: 0.94, y: 12, opacity: 0 }}
+                initial={{ scale: 0.98, y: 6, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.94, y: 12, opacity: 0 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                exit={{ scale: 0.98, y: 6, opacity: 0 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
                 className="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md max-h-[92dvh] sm:max-h-[85vh] overflow-hidden overflow-x-hidden shadow-[0_0_50px_rgba(34,211,238,0.3)] p-4 sm:p-6 flex flex-col gap-4 text-center items-center my-auto mx-auto"
               >
                 <div className="flex justify-between items-center border-b border-cyan-900/20 pb-3 w-full shrink-0">
@@ -9364,10 +9406,10 @@ export default function App() {
               className="fixed inset-0 z-[130] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto custom-scrollbar"
             >
               <motion.div
-                initial={{ scale: 0.94, y: 12, opacity: 0 }}
+                initial={{ scale: 0.98, y: 6, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.94, y: 12, opacity: 0 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                exit={{ scale: 0.98, y: 6, opacity: 0 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
                 className="bg-slate-900 border-2 border-red-500/50 rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_0_50px_rgba(239,68,68,0.2)] my-auto mx-auto"
               >
                 <div className="p-4 border-b border-red-900/30 flex justify-between items-center bg-slate-950">
@@ -9579,10 +9621,10 @@ export default function App() {
               className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto custom-scrollbar"
             >
               <motion.div
-                initial={{ scale: 0.94, y: 12, opacity: 0 }}
+                initial={{ scale: 0.98, y: 6, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.94, y: 12, opacity: 0 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                exit={{ scale: 0.98, y: 6, opacity: 0 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
                 className="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.2)] p-4 sm:p-6 my-auto mx-auto"
               >
                 <div className="flex justify-between items-center mb-6">

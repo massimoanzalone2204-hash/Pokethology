@@ -207,3 +207,23 @@ export async function getStoreByteSize(storeName: StoreName): Promise<number> {
     return 0;
   }
 }
+
+export async function getAllCachedPokemonData(): Promise<any[]> {
+  try {
+    const db = await getDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(STORES.POKEMON_CACHE, 'readonly');
+      const store = tx.objectStore(STORES.POKEMON_CACHE);
+      const req = store.getAll();
+      req.onsuccess = () => {
+        const items = req.result || [];
+        resolve(items.map(item => item.data).filter(Boolean));
+      };
+      req.onerror = () => resolve([]);
+    });
+  } catch (err) {
+    console.warn("Failed to retrieve cached pokemon data", err);
+    return [];
+  }
+}
+

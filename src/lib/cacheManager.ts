@@ -8,7 +8,8 @@ import {
   idbGet, 
   idbSet, 
   idbDelete, 
-  getStoreByteSize 
+  getStoreByteSize,
+  getAllCachedPokemonData
 } from './indexedDB';
 import { pokeApi } from './pokeApiService';
 
@@ -393,3 +394,107 @@ export async function clearAllLocalCaches(): Promise<void> {
     console.warn("Failed to clear localStorage caches", e);
   }
 }
+
+/**
+ * Searches IndexedDB for a cached Pokémon matching exact or partial query
+ */
+export async function searchOfflinePokemon(query: string): Promise<any | null> {
+  try {
+    const formatted = query.toLowerCase().trim();
+    if (!formatted) return null;
+
+    const all = await getAllCachedPokemonData();
+    if (!all || all.length === 0) return null;
+
+    // 1. Exact match on name
+    let match = all.find((p: any) => p.name?.toLowerCase() === formatted);
+    if (match) return match;
+
+    // 2. Exact match on ID
+    const numId = parseInt(formatted, 10);
+    if (!isNaN(numId)) {
+      match = all.find((p: any) => p.id === numId || p.baseId === numId);
+      if (match) return match;
+    }
+
+    // 3. Partial name match
+    match = all.find((p: any) => p.name?.toLowerCase().includes(formatted));
+    if (match) return match;
+
+    return null;
+  } catch (err) {
+    console.warn("Offline pokemon search failed:", err);
+    return null;
+  }
+}
+
+/**
+ * Retrieves list of all cached Pokémon in IndexedDB formatted for list views
+ */
+export async function getOfflinePokemonList(): Promise<{ name: string; url: string; displayId?: number; isForm?: boolean; isOfflineCached?: boolean; types?: string[] }[]> {
+  try {
+    const all = await getAllCachedPokemonData();
+    const seen = new Set<string>();
+    const list: any[] = [];
+
+    for (const p of all) {
+      if (!p || !p.name || seen.has(p.name)) continue;
+      seen.add(p.name);
+      list.push({
+        name: p.name,
+        url: `https://pokeapi.co/api/v2/pokemon/${p.id || p.name}`,
+        displayId: p.displayId || p.id || 1,
+        isForm: p.isForm || false,
+        isOfflineCached: true,
+        types: p.types?.map((t: any) => typeof t === 'string' ? t : t?.type?.name) || []
+      });
+    }
+
+    list.sort((a, b) => (a.displayId || 0) - (b.displayId || 0));
+    return list;
+  } catch (err) {
+    console.warn("Failed to generate offline pokemon list:", err);
+    return [];
+  }
+}
+
+/**
+ * Pre-caches a range of Pokémon and their official artwork images into IndexedDB for offline browsing
+ */
+export async function preCachePokemonRange(
+  start: number, 
+  end: number, 
+  onProgress?: (current: number, total: number) => void
+): Promise<number> {
+  let count = 0;
+  const total = end - start + 1;
+  const { searchPokemon } = await import('./api');
+
+  for (let id = start; id <= end; id++) {
+    try {
+      const data = await searchPokemon(id.toString(), 'en');
+      if (data) {
+        count++;
+        // Pre-cache artwork sprite image blob into IndexedDB if available
+        const artworkUrl = data.sprites?.other?.['official-artwork']?.front_default || data.sprites?.front_default;
+        if (artworkUrl) {
+          try {
+            const res = await fetch(artworkUrl);
+            if (res.ok) {
+              const blob = await res.blob();
+              await saveImageBlobToCache(artworkUrl, blob);
+            }
+          } catch (_) {}
+        }
+      }
+    } catch (err) {
+      console.warn(`Failed to pre-cache pokemon #${id}:`, err);
+    }
+    if (onProgress) {
+      onProgress(id - start + 1, total);
+    }
+  }
+  return count;
+}
+
+

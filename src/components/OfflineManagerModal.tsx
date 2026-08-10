@@ -70,6 +70,27 @@ export const OfflineManagerModal: React.FC<OfflineManagerModalProps> = ({
   });
 
   const [notification, setNotification] = useState<{ text: string; type: 'success' | 'warn' | 'info' } | null>(null);
+  const [isPreCaching, setIsPreCaching] = useState(false);
+  const [preCacheProgress, setPreCacheProgress] = useState<{ current: number; total: number; genName: string } | null>(null);
+
+  const handlePreCacheGen = async (start: number, end: number, genName: string) => {
+    setIsPreCaching(true);
+    setPreCacheProgress({ current: 0, total: end - start + 1, genName });
+    showNotify(`Pre-caching ${genName} (#${start}-#${end}) into IndexedDB...`, 'info');
+    try {
+      const { preCachePokemonRange } = await import('../lib/cacheManager');
+      const count = await preCachePokemonRange(start, end, (current, total) => {
+        setPreCacheProgress({ current, total, genName });
+      });
+      await refreshStorageAndDB();
+      showNotify(`Successfully pre-cached ${count} Pokémon from ${genName} into IndexedDB!`, 'success');
+    } catch (err) {
+      showNotify("Failed to pre-cache Pokémon range.", 'warn');
+    } finally {
+      setIsPreCaching(false);
+      setPreCacheProgress(null);
+    }
+  };
 
   const refreshStorageAndDB = async () => {
     try {
@@ -658,6 +679,68 @@ export const OfflineManagerModal: React.FC<OfflineManagerModalProps> = ({
                   <p className="text-[11px] text-slate-400 font-sans">
                     Pokethology daily theological lore exam scores, streaks, and answered logs.
                   </p>
+                </div>
+              </div>
+
+              {/* Bulk Offline Pre-caching Section */}
+              <div className="bg-slate-950/80 border border-cyan-500/40 rounded-xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-hud font-bold uppercase text-cyan-300 flex items-center gap-2">
+                    <Download className="w-4 h-4 text-cyan-400" />
+                    Bulk Pre-cache Generations for Offline Browsing
+                  </h4>
+                  <span className="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+                    IndexedDB Local Storage
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 font-sans leading-relaxed">
+                  Download Pokémon data, stats, movesets, and official artwork into your local IndexedDB database so you can browse the entire Pokédex even when offline without an internet connection.
+                </p>
+
+                {isPreCaching && preCacheProgress && (
+                  <div className="space-y-1.5 p-3 bg-cyan-950/50 border border-cyan-500/40 rounded-lg">
+                    <div className="flex justify-between text-[11px] font-mono text-cyan-300">
+                      <span>Pre-caching {preCacheProgress.genName}...</span>
+                      <span>{preCacheProgress.current} / {preCacheProgress.total} ({Math.round((preCacheProgress.current / preCacheProgress.total) * 100)}%)</span>
+                    </div>
+                    <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-cyan-500/30">
+                      <div 
+                        className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full transition-all duration-300"
+                        style={{ width: `${(preCacheProgress.current / preCacheProgress.total) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <button
+                    disabled={isPreCaching}
+                    onClick={() => handlePreCacheGen(1, 151, 'Gen 1 Kanto')}
+                    className="px-3 py-1.5 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-200 text-xs font-mono font-bold rounded-lg transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    + Pre-cache Gen 1 (#1-151)
+                  </button>
+                  <button
+                    disabled={isPreCaching}
+                    onClick={() => handlePreCacheGen(152, 251, 'Gen 2 Johto')}
+                    className="px-3 py-1.5 bg-purple-950/80 hover:bg-purple-900 border border-purple-500/50 text-purple-200 text-xs font-mono font-bold rounded-lg transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    + Pre-cache Gen 2 (#152-251)
+                  </button>
+                  <button
+                    disabled={isPreCaching}
+                    onClick={() => handlePreCacheGen(252, 386, 'Gen 3 Hoenn')}
+                    className="px-3 py-1.5 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-200 text-xs font-mono font-bold rounded-lg transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    + Pre-cache Gen 3 (#252-386)
+                  </button>
+                  <button
+                    disabled={isPreCaching}
+                    onClick={() => handlePreCacheGen(1, 50, 'Top 50 Starters')}
+                    className="px-3 py-1.5 bg-amber-950/80 hover:bg-amber-900 border border-amber-500/50 text-amber-200 text-xs font-mono font-bold rounded-lg transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    + Pre-cache Top 50
+                  </button>
                 </div>
               </div>
 

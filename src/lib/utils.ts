@@ -72,9 +72,22 @@ function playSyntheticMicroTick(type: HapticPreset) {
   } catch (_) {}
 }
 
+export const isNonPcDevice = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return (
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0 ||
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent)
+  );
+};
+
 export const playHaptic = (pattern: number | number[] | HapticPreset = 'selection') => {
+  if (typeof window === 'undefined') return;
+  // Enhanced haptic feedback for devices that aren't PC
+  if (!isNonPcDevice()) return;
+
   const now = Date.now();
-  if (now - lastHapticTime < 25) return;
+  if (now - lastHapticTime < 20) return;
   lastHapticTime = now;
 
   let vibrationPattern: number | number[] = 15;
@@ -85,28 +98,28 @@ export const playHaptic = (pattern: number | number[] | HapticPreset = 'selectio
     switch (pattern) {
       case 'light':
       case 'selection':
-        vibrationPattern = 12;
+        vibrationPattern = 18;
         break;
       case 'medium':
-        vibrationPattern = 25;
+        vibrationPattern = 32;
         break;
       case 'heavy':
-        vibrationPattern = [40, 30, 40];
+        vibrationPattern = [45, 30, 45];
         break;
       case 'impact':
-        vibrationPattern = [30, 20, 50];
+        vibrationPattern = [35, 25, 60];
         break;
       case 'success':
-        vibrationPattern = [15, 40, 25];
+        vibrationPattern = [20, 40, 30];
         break;
       case 'error':
-        vibrationPattern = [40, 40, 40, 40];
+        vibrationPattern = [50, 40, 50, 40];
         break;
       case 'cry':
-        vibrationPattern = [25, 40, 25, 40, 30];
+        vibrationPattern = [30, 45, 30, 45, 35];
         break;
       default:
-        vibrationPattern = 15;
+        vibrationPattern = 20;
     }
   } else {
     vibrationPattern = pattern;
@@ -124,7 +137,7 @@ export const playHaptic = (pattern: number | number[] | HapticPreset = 'selectio
     } catch (_) {}
   }
 
-  // Play subtle synthetic audio micro-tick if navigator.vibrate was unsupported or returned false
+  // Play subtle synthetic audio micro-tick if navigator.vibrate was unsupported or returned false (e.g. iOS Safari)
   if (!didVibrate) {
     playSyntheticMicroTick(presetName);
   }

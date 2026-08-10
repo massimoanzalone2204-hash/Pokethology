@@ -1,4 +1,4 @@
-import { savePokemonToCache, getPokemonFromCache } from "./cacheManager";
+import { savePokemonToCache, getPokemonFromCache, searchOfflinePokemon, getOfflinePokemonList } from "./cacheManager";
 import { Pokemon, Ability, EvolutionNode, Move } from '../types';
 import { pokeApi, isApiError } from './pokeApiService';
 
@@ -192,6 +192,15 @@ export async function searchPokemon(query: string, lang: string = 'en'): Promise
     return cachedPokemon;
   }
 
+  // Fallback check in IndexedDB offline cache
+  const offlineMatch = await searchOfflinePokemon(formattedQuery);
+
+  // If client device is strictly offline
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    if (offlineMatch) return offlineMatch;
+    throw new Error(`Pokemon "${query}" is not available in local IndexedDB cache while offline.`);
+  }
+
   // Fetch from PokeAPI
   let pokeRes = await fetch(`https://pokeapi.co/api/v2/pokemon/${formattedQuery}`);
   let data;
@@ -218,18 +227,23 @@ export async function searchPokemon(query: string, lang: string = 'en'): Promise
       const parts = formattedQuery.split('-');
       for (let i = parts.length - 1; i > 0; i--) {
         const baseQuery = parts.slice(0, i).join('-');
-        const baseRes = await fetch(`https://pokeapi.co/api/v2/pokemon/${baseQuery}`);
-        if (baseRes.ok) {
-          pokeRes = baseRes;
-          data = await baseRes.json();
-          data.name = formattedQuery; // Preserve the requested form name
-          break;
-        }
+        try {
+          const baseRes = await fetch(`https://pokeapi.co/api/v2/pokemon/${baseQuery}`);
+          if (baseRes.ok) {
+            pokeRes = baseRes;
+            data = await baseRes.json();
+            data.name = formattedQuery; // Preserve the requested form name
+            break;
+          }
+        } catch (_) {}
       }
     }
   }
   if (!data) {
-    if (!pokeRes.ok) {
+    if (offlineMatch) {
+      return offlineMatch;
+    }
+    if (!pokeRes || !pokeRes.ok) {
       throw new Error(`Pokemon "${query}" not found!`);
     }
     data = await pokeRes.json();
@@ -703,101 +717,26 @@ export const GENERATIONS = [
   { id: 9, name: 'GEN 09', start: 906, end: 1025 },
 ];
 
-export async function getPokemonList(start: number, end: number): Promise<{name: string, url: string, displayId?: number, isForm?: boolean}[]> {
-  const limit = end - start + 1;
-  const offset = start - 1;
-  
-  // Fetch the base list for the requested generation
-  const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`);
-  if (!res.ok) throw new Error("Failed to fetch Pokemon list");
-  const data = await res.json();
-  
-  // Fetch all forms list as database fallback helper
-  const allForms = await getAllFormsList();
-  
-  const results: any[] = [];
-  
-  data.results.forEach((p: any) => {
-    const displayId = parseInt(p.url.split('/').filter(Boolean).pop() || '0', 10);
-    const cleanName = REV_MALE_BASE_FORMS[p.name] || p.name;
-    const baseName = p.name;
-    
-    results.push({
-      ...p,
-      name: cleanName,
-      displayId
-    });
-    
-    // Find matching forms in cache
-    let addedForms = new Set<string>();
-    let relatedForms = allForms.filter((f: any) => 
-      f.name !== baseName && 
-      f.name.startsWith(baseName + '-')
-    );
-
-    // Special logic for Tatsugiri: replace curly-mega with stretchy-mega
-    if (baseName.includes('tatsugiri')) {
-      relatedForms = relatedForms.filter((f: any) => f.name !== 'tatsugiri-curly-mega' && f.name !== 'tatsugiri-droopy-mega');
-      const stretchyMega = allForms.find((f: any) => f.name === 'tatsugiri-stretchy-mega');
-      if (stretchyMega && !relatedForms.some((f: any) => f.name === 'tatsugiri-stretchy-mega')) {
-        relatedForms.push(stretchyMega);
-      }
+export async function getPokemonList(start: number, end: number): Promise<{name: string, url: string, displayId?: number, isForm?: boolean, isOfflineCached?: boolean}[]> {
+  try {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      throw new Error("OFFLINE_NETWORK_UNAVAILABLE");
     }
 
-    // Inject custom Legends Z-A Megas from LEGENDS_ZA_MEGA_ENTRIES
-    Object.keys(LEGENDS_ZA_MEGA_ENTRIES).forEach(zaKey => {
-      if (zaKey === 'tatsugiri-curly-mega' || zaKey === 'tatsugiri-droopy-mega' || zaKey === 'meowstic-female-mega' || zaKey === 'meowstic-male-mega' || zaKey === 'pyroar-female-mega' || zaKey === 'pyroar-male-mega' || zaKey === 'zygarde-50-mega' || zaKey === 'floette-eternal-mega') return;
-      if (zaKey.startsWith(baseName + '-') || (baseName === 'meowstic' && zaKey.startsWith('meowstic-')) || (baseName === 'pyroar' && zaKey.startsWith('pyroar-')) || (baseName === 'floette' && zaKey.startsWith('floette-')) || (baseName === 'zygarde' && zaKey.startsWith('zygarde-'))) {
-        if (!relatedForms.some((f: any) => f.name === zaKey)) {
-          relatedForms.push({ name: zaKey, url: `https://pokeapi.co/api/v2/pokemon/${zaKey}` });
-        }
-      }
-    });
-
-    // Order related forms based on suffix relevance (e.g. regional, primal, megas, gmax last)
-    const sortedRelated = relatedForms.sort((a, b) => {
-      const aSuff = a.name.replace(baseName, '');
-      const bSuff = b.name.replace(baseName, '');
-      const aIdx = ALLOWED_SUFFIXES.indexOf(aSuff);
-      const bIdx = ALLOWED_SUFFIXES.indexOf(bSuff);
-      return (aIdx === -1 ? 999 : aIdx) - (bIdx === -1 ? 999 : bIdx);
-    });
-
-    sortedRelated.forEach((form: any) => {
-      if (form.name.includes('-totem') || form.name.includes('-starter') || form.name.includes('-cosplay') || form.name.includes('-cap')) return;
-      if (addedForms.has(form.name)) return;
-
-      let suffix = form.name.replace(baseName, '');
-      if (form.name === 'tatsugiri-stretchy-mega') suffix = '-stretchy-mega';
-      if (!ALLOWED_SUFFIXES.includes(suffix)) return;
-
-      results.push({
-        ...form,
-        displayId, // Inherit base ID for sorting and displaying alongside base form
-        isForm: true
-      });
-      addedForms.add(form.name);
-    });
-  });
-  
-  return results;
-}
-
-export async function getPokemonByType(type: string, start: number, end: number): Promise<{name: string, url: string, displayId?: number, isForm?: boolean}[]> {
-  const res = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
-  if (!res.ok) throw new Error("Failed to fetch Pokemon by type");
-  const data = await res.json();
-  
-  const allForms = await getAllFormsList();
-  const results: any[] = [];
-  
-  data.pokemon
-    .map((p: any) => p.pokemon)
-    .filter((p: any) => {
-      const id = parseInt(p.url.split('/').filter(Boolean).pop() || '0', 10);
-      return id >= start && id <= end;
-    })
-    .forEach((p: any) => {
+    const limit = end - start + 1;
+    const offset = start - 1;
+    
+    // Fetch the base list for the requested generation
+    const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`);
+    if (!res.ok) throw new Error("Failed to fetch Pokemon list");
+    const data = await res.json();
+    
+    // Fetch all forms list as database fallback helper
+    const allForms = await getAllFormsList();
+    
+    const results: any[] = [];
+    
+    data.results.forEach((p: any) => {
       const displayId = parseInt(p.url.split('/').filter(Boolean).pop() || '0', 10);
       const cleanName = REV_MALE_BASE_FORMS[p.name] || p.name;
       const baseName = p.name;
@@ -808,31 +747,33 @@ export async function getPokemonByType(type: string, start: number, end: number)
         displayId
       });
       
+      // Find matching forms in cache
       let addedForms = new Set<string>();
       let relatedForms = allForms.filter((f: any) => 
-      f.name !== baseName && 
-      f.name.startsWith(baseName + '-')
-    );
+        f.name !== baseName && 
+        f.name.startsWith(baseName + '-')
+      );
 
-    // Special logic for Tatsugiri: replace curly-mega with stretchy-mega
-    if (baseName.includes('tatsugiri')) {
-      relatedForms = relatedForms.filter((f: any) => f.name !== 'tatsugiri-curly-mega' && f.name !== 'tatsugiri-droopy-mega');
-      const stretchyMega = allForms.find((f: any) => f.name === 'tatsugiri-stretchy-mega');
-      if (stretchyMega && !relatedForms.some((f: any) => f.name === 'tatsugiri-stretchy-mega')) {
-        relatedForms.push(stretchyMega);
-      }
-    }
-
-    // Inject custom Legends Z-A Megas from LEGENDS_ZA_MEGA_ENTRIES
-    Object.keys(LEGENDS_ZA_MEGA_ENTRIES).forEach(zaKey => {
-      if (zaKey === 'tatsugiri-curly-mega' || zaKey === 'tatsugiri-droopy-mega' || zaKey === 'meowstic-female-mega' || zaKey === 'meowstic-male-mega' || zaKey === 'pyroar-female-mega' || zaKey === 'pyroar-male-mega' || zaKey === 'zygarde-50-mega' || zaKey === 'floette-eternal-mega') return;
-      if (zaKey.startsWith(baseName + '-') || (baseName === 'meowstic' && zaKey.startsWith('meowstic-')) || (baseName === 'pyroar' && zaKey.startsWith('pyroar-')) || (baseName === 'floette' && zaKey.startsWith('floette-')) || (baseName === 'zygarde' && zaKey.startsWith('zygarde-'))) {
-        if (!relatedForms.some((f: any) => f.name === zaKey)) {
-          relatedForms.push({ name: zaKey, url: `https://pokeapi.co/api/v2/pokemon/${zaKey}` });
+      // Special logic for Tatsugiri: replace curly-mega with stretchy-mega
+      if (baseName.includes('tatsugiri')) {
+        relatedForms = relatedForms.filter((f: any) => f.name !== 'tatsugiri-curly-mega' && f.name !== 'tatsugiri-droopy-mega');
+        const stretchyMega = allForms.find((f: any) => f.name === 'tatsugiri-stretchy-mega');
+        if (stretchyMega && !relatedForms.some((f: any) => f.name === 'tatsugiri-stretchy-mega')) {
+          relatedForms.push(stretchyMega);
         }
       }
-    });
 
+      // Inject custom Legends Z-A Megas from LEGENDS_ZA_MEGA_ENTRIES
+      Object.keys(LEGENDS_ZA_MEGA_ENTRIES).forEach(zaKey => {
+        if (zaKey === 'tatsugiri-curly-mega' || zaKey === 'tatsugiri-droopy-mega' || zaKey === 'meowstic-female-mega' || zaKey === 'meowstic-male-mega' || zaKey === 'pyroar-female-mega' || zaKey === 'pyroar-male-mega' || zaKey === 'zygarde-50-mega' || zaKey === 'floette-eternal-mega') return;
+        if (zaKey.startsWith(baseName + '-') || (baseName === 'meowstic' && zaKey.startsWith('meowstic-')) || (baseName === 'pyroar' && zaKey.startsWith('pyroar-')) || (baseName === 'floette' && zaKey.startsWith('floette-')) || (baseName === 'zygarde' && zaKey.startsWith('zygarde-'))) {
+          if (!relatedForms.some((f: any) => f.name === zaKey)) {
+            relatedForms.push({ name: zaKey, url: `https://pokeapi.co/api/v2/pokemon/${zaKey}` });
+          }
+        }
+      });
+
+      // Order related forms based on suffix relevance (e.g. regional, primal, megas, gmax last)
       const sortedRelated = relatedForms.sort((a, b) => {
         const aSuff = a.name.replace(baseName, '');
         const bSuff = b.name.replace(baseName, '');
@@ -851,12 +792,114 @@ export async function getPokemonByType(type: string, start: number, end: number)
 
         results.push({
           ...form,
-          displayId,
+          displayId, // Inherit base ID for sorting and displaying alongside base form
           isForm: true
         });
         addedForms.add(form.name);
       });
     });
     
-  return results;
+    return results;
+  } catch (err) {
+    const offlineList = await getOfflinePokemonList();
+    if (offlineList && offlineList.length > 0) {
+      const filtered = offlineList.filter(p => {
+        const id = p.displayId || 0;
+        return id >= start && id <= end;
+      });
+      return filtered.length > 0 ? filtered : offlineList;
+    }
+    throw err;
+  }
+}
+
+export async function getPokemonByType(type: string, start: number, end: number): Promise<{name: string, url: string, displayId?: number, isForm?: boolean, isOfflineCached?: boolean}[]> {
+  try {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      throw new Error("OFFLINE_NETWORK_UNAVAILABLE");
+    }
+
+    const res = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
+    if (!res.ok) throw new Error("Failed to fetch Pokemon by type");
+    const data = await res.json();
+    
+    const allForms = await getAllFormsList();
+    const results: any[] = [];
+    
+    data.pokemon
+      .map((p: any) => p.pokemon)
+      .filter((p: any) => {
+        const id = parseInt(p.url.split('/').filter(Boolean).pop() || '0', 10);
+        return id >= start && id <= end;
+      })
+      .forEach((p: any) => {
+        const displayId = parseInt(p.url.split('/').filter(Boolean).pop() || '0', 10);
+        const cleanName = REV_MALE_BASE_FORMS[p.name] || p.name;
+        const baseName = p.name;
+        
+        results.push({
+          ...p,
+          name: cleanName,
+          displayId
+        });
+        
+        let addedForms = new Set<string>();
+        let relatedForms = allForms.filter((f: any) => 
+        f.name !== baseName && 
+        f.name.startsWith(baseName + '-')
+      );
+
+      // Special logic for Tatsugiri: replace curly-mega with stretchy-mega
+      if (baseName.includes('tatsugiri')) {
+        relatedForms = relatedForms.filter((f: any) => f.name !== 'tatsugiri-curly-mega' && f.name !== 'tatsugiri-droopy-mega');
+        const stretchyMega = allForms.find((f: any) => f.name === 'tatsugiri-stretchy-mega');
+        if (stretchyMega && !relatedForms.some((f: any) => f.name === 'tatsugiri-stretchy-mega')) {
+          relatedForms.push(stretchyMega);
+        }
+      }
+
+      // Inject custom Legends Z-A Megas from LEGENDS_ZA_MEGA_ENTRIES
+      Object.keys(LEGENDS_ZA_MEGA_ENTRIES).forEach(zaKey => {
+        if (zaKey === 'tatsugiri-curly-mega' || zaKey === 'tatsugiri-droopy-mega' || zaKey === 'meowstic-female-mega' || zaKey === 'meowstic-male-mega' || zaKey === 'pyroar-female-mega' || zaKey === 'pyroar-male-mega' || zaKey === 'zygarde-50-mega' || zaKey === 'floette-eternal-mega') return;
+        if (zaKey.startsWith(baseName + '-') || (baseName === 'meowstic' && zaKey.startsWith('meowstic-')) || (baseName === 'pyroar' && zaKey.startsWith('pyroar-')) || (baseName === 'floette' && zaKey.startsWith('floette-')) || (baseName === 'zygarde' && zaKey.startsWith('zygarde-'))) {
+          if (!relatedForms.some((f: any) => f.name === zaKey)) {
+            relatedForms.push({ name: zaKey, url: `https://pokeapi.co/api/v2/pokemon/${zaKey}` });
+          }
+        }
+      });
+
+        const sortedRelated = relatedForms.sort((a, b) => {
+          const aSuff = a.name.replace(baseName, '');
+          const bSuff = b.name.replace(baseName, '');
+          const aIdx = ALLOWED_SUFFIXES.indexOf(aSuff);
+          const bIdx = ALLOWED_SUFFIXES.indexOf(bSuff);
+          return (aIdx === -1 ? 999 : aIdx) - (bIdx === -1 ? 999 : bIdx);
+        });
+
+        sortedRelated.forEach((form: any) => {
+          if (form.name.includes('-totem') || form.name.includes('-starter') || form.name.includes('-cosplay') || form.name.includes('-cap')) return;
+          if (addedForms.has(form.name)) return;
+
+          let suffix = form.name.replace(baseName, '');
+          if (form.name === 'tatsugiri-stretchy-mega') suffix = '-stretchy-mega';
+          if (!ALLOWED_SUFFIXES.includes(suffix)) return;
+
+          results.push({
+            ...form,
+            displayId,
+            isForm: true
+          });
+          addedForms.add(form.name);
+        });
+      });
+      
+    return results;
+  } catch (err) {
+    const offlineList = await getOfflinePokemonList();
+    if (offlineList && offlineList.length > 0) {
+      const filtered = offlineList.filter(p => p.types?.includes(type));
+      return filtered.length > 0 ? filtered : offlineList;
+    }
+    throw err;
+  }
 }

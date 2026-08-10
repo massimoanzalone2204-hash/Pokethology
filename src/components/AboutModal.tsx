@@ -15,9 +15,10 @@ export function AboutModal({ isOpen, onClose, isLightMode = false }: AboutModalP
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            initial={{ opacity: 0, scale: 0.98, y: 6 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            exit={{ opacity: 0, scale: 0.98, y: 6 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
             className={`relative w-full max-w-lg rounded-2xl border p-5 sm:p-6 shadow-2xl overflow-hidden ${
               isLightMode
                 ? 'bg-white/95 border-slate-200 text-slate-800'
