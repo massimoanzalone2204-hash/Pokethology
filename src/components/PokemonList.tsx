@@ -87,7 +87,7 @@ export const PokemonList = memo(({
             <div className="flex items-center gap-3">
               <div className="relative w-11 h-11 flex items-center justify-center bg-zinc-900 border border-zinc-800 rounded-full shadow-inner overflow-hidden p-1">
                 <img 
-                  src="/logo.png" 
+                  src="https://i.postimg.cc/1zgPj6SW/20260201-111647-0000.png" 
                   alt="Pokéthology Logo" 
                   className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(6,182,212,0.4)]"
                   referrerPolicy="no-referrer"

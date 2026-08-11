@@ -7,6 +7,7 @@ import { Download, Search, Loader2, Database, Sparkles, Volume2, VolumeX, Copy, 
 import { EvolutionNodeComponent } from './components/EvolutionNodeComponent';
 
 import { PokethologyLogo } from './components/PokethologyLogo';
+import { PokeballIcon } from './components/PokeballIcon';
 import { BattleMessage } from './components/BattleMessage';
 import { StatChangeEffect } from './components/StatChangeEffect';
 import { FloatingText } from './components/FloatingText';
@@ -5237,7 +5238,7 @@ export default function App() {
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               />
               <div className="absolute inset-0 flex items-center justify-center">
-                <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain animate-pulse filter drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+                <PokeballIcon className="w-8 h-8 text-red-500 animate-pulse" />
               </div>
             </div>
             <div className="flex flex-col items-center gap-2">
@@ -6592,8 +6593,8 @@ export default function App() {
                                           "p-1.5 sm:p-2.5 mb-2.5"
                                         )}>
                                         <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink">
-                                          <img src="/logo.png" alt="Logo" className={cn(
-                                            "animate-pulse shrink-0 transition-all duration-300 object-contain filter drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]",
+                                          <PokeballIcon className={cn(
+                                            "animate-pulse shrink-0 transition-all duration-300",
                                             "w-6 h-6 sm:w-9 sm:h-9"
                                           )} />
                                           <div className="flex flex-col min-w-0">
