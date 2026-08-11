@@ -82,7 +82,7 @@ export const PwaInstallModal: React.FC<PwaInstallModalProps> = ({ isOpen, onClos
             <div className="flex items-center gap-3">
               <div className="relative w-12 h-12 rounded-xl bg-slate-950 border border-cyan-400/50 flex items-center justify-center p-1.5 shadow-lg overflow-hidden shrink-0">
                 <img
-                  src="/icon.svg"
+                  src="/logo.png"
                   alt="Pokéthology Logo"
                   className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]"
                 />

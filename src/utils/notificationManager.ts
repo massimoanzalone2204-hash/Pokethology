@@ -40,7 +40,7 @@ export const requestNotificationPermission = async (): Promise<NotificationPermi
 export const sendPokethologyNotification = async ({
   title,
   body,
-  icon = '/icon.svg',
+  icon = '/logo.png',
   tag = 'pokethology-discovery',
 }: PokethologyNotificationOptions): Promise<boolean> => {
   if (typeof window === 'undefined') return false;
