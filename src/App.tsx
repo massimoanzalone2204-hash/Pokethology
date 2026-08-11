@@ -907,139 +907,69 @@ interface PokethologyRadarScannerProps {
 }
 
 const PokethologyRadarScanner = memo(({ onAbort, targetName }: PokethologyRadarScannerProps) => {
-    const [statusIndex, setStatusIndex] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(5); // 5s auto-bypass safety limit
 
-  const statuses = useMemo(() => [
-    "ESTABLISHING SECURE POKÉBALL LINK...",
-    "SYNCING REGIONAL POKÉDEX ENTRIES...",
-    "MATCHING TYPE CHART COMBINATIONS...",
-    "RETRIEVING OFF-SITE BATTLE STATISTICS...",
-    "MAPPING SPECIES EVOLUTION PATTERNS...",
-    "GENERATING REAL-TIME COGNITIVE ALIGNMENT..."
-  ], []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setStatusIndex(prev => (prev + 1) % statuses.length);
-    }, 350);
-    return () => clearInterval(timer);
-  }, [statuses]);
-
-  // Handle progress climbs and automated bypass watchdog timer
   useEffect(() => {
     const progressTimer = setInterval(() => {
       setProgress(prev => {
-        if (prev < 95) {
-          return prev + Math.floor(Math.random() * 12) + 16; // Snappy increments between 16% and 27%
+        if (prev < 96) {
+          return prev + Math.floor(Math.random() * 3) + 2; // Smooth 4s steady progression
         }
         return prev;
       });
-    }, 100);
+    }, 80);
 
-    const countdownTimer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(progressTimer);
-          clearInterval(countdownTimer);
-          setTimeout(onAbort, 0); // Safe automatic bypass to avoid freezing
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    const watchdog = setTimeout(onAbort, 4000); // 4s buffer auto-bypass for smooth data pre-caching
 
     return () => {
       clearInterval(progressTimer);
-      clearInterval(countdownTimer);
+      clearTimeout(watchdog);
     };
   }, [onAbort]);
 
+  const formattedName = targetName ? targetName.replace(/-/g, ' ').toUpperCase() : "POKÉMON";
+
   return (
-    <div className="flex-1 flex flex-col items-center justify-center min-h-[420px] w-full max-w-lg mx-auto p-4 sm:p-6 text-center select-none relative overflow-hidden bg-slate-950/80 border-2 border-red-500/30 rounded-2xl shadow-[0_0_50px_rgba(239,68,68,0.15)]">
-      {/* Decorative Pokedex Corner Accents */}
-      <div className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-red-500" />
-      <div className="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-red-500" />
-      <div className="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-red-500" />
-      <div className="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-red-500" />
-
-      {/* Decorative Pokedex Round Lens LED lights */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-slate-900 px-3 py-1 rounded-full border border-slate-800">
-        <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse" />
-        <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-        <div className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
-        <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-      </div>
-
-      {/* Center Themed Pokeball Rotating Loader */}
-      <div className="relative w-48 h-48 mb-6 mt-4 flex items-center justify-center">
-        {/* Outer orbital rings */}
-        <div className="absolute inset-0 border-2 border-red-500/10 rounded-full animate-pulse" />
-        <div className="absolute inset-4 border border-dashed border-red-500/20 rounded-full animate-[spin_20s_linear_infinite]" />
+    <div className="flex-1 flex flex-col items-center justify-center min-h-[300px] w-full max-w-sm mx-auto p-6 text-center select-none relative overflow-hidden my-auto">
+      {/* Sleek Glowing Pokéball Spinner */}
+      <div className="relative w-24 h-24 mb-5 flex items-center justify-center shrink-0">
+        <div className="absolute inset-0 rounded-full bg-cyan-500/15 blur-xl animate-pulse" />
         
-        {/* Actual Pokéball Spinner component */}
-        <div className="relative w-24 h-24 flex items-center justify-center">
-          {/* Outer glow aura */}
-          <div className="absolute w-28 h-28 rounded-full bg-gradient-to-r from-red-500/10 to-transparent blur-xl animate-pulse" />
-          
-          {/* Custom designed Pokeball vector */}
-          <div className="relative w-20 h-20 rounded-full border-4 border-slate-950 bg-white overflow-hidden shadow-2xl animate-spin" style={{ animationDuration: '2s' }}>
-            {/* Top Red section */}
-            <div className="absolute top-0 inset-x-0 h-10 bg-gradient-to-b from-red-500 to-rose-600 border-b-4 border-slate-950" />
-            
-            {/* Center black band & button */}
-            <div className="absolute top-1/2 left-1/2 -ml-4 -mt-4 w-8 h-8 bg-white border-4 border-slate-950 rounded-full flex items-center justify-center z-10 shadow-md">
-              <div className="w-2.5 h-2.5 bg-red-400 rounded-full animate-ping" />
-              <div className="absolute w-2.5 h-2.5 bg-red-500 rounded-full" />
-            </div>
+        {/* Modern Pokeball vector spinner */}
+        <div className="relative w-16 h-16 rounded-full border-3 border-slate-950 bg-white overflow-hidden shadow-[0_0_20px_rgba(34,211,238,0.3)] animate-spin" style={{ animationDuration: '1.6s' }}>
+          <div className="absolute top-0 inset-x-0 h-8 bg-gradient-to-b from-red-500 to-rose-600 border-b-3 border-slate-950" />
+          <div className="absolute top-1/2 left-1/2 -ml-3 -mt-3 w-6 h-6 bg-white border-3 border-slate-950 rounded-full flex items-center justify-center z-10 shadow-sm">
+            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
           </div>
         </div>
       </div>
 
-      {/* Simplified, Pokedex styled readouts */}
-      <div className="flex flex-col items-center gap-1.5 shrink-0 z-10 w-full mb-6">
-        <h2 className="font-hud text-lg sm:text-xl tracking-widest text-slate-100 uppercase">
-          POKÉDEX RECONNAISSANCE
+      {/* Clean Status Text */}
+      <div className="space-y-1 mb-5 z-10">
+        <h2 className="font-hud text-base sm:text-lg font-black tracking-wider text-slate-100 uppercase">
+          SCANNING {formattedName}...
         </h2>
-        <div className="flex items-center gap-1.5 px-3 py-1 bg-red-950/20 border border-red-500/20 rounded-md">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
-          <span className="font-hud text-[10px] tracking-wider text-rose-400 uppercase font-black">
-            SCANNING FOR {targetName ? targetName.toUpperCase() : "SPECIES DATA"}
-          </span>
-        </div>
-        
-        {/* Dynamic scan description */}
-        <p className="min-h-[20px] text-[10px] font-mono tracking-wider text-slate-400 animate-pulse uppercase">
-          {statuses[statusIndex]}
+        <p className="text-[11px] font-mono text-cyan-400/90 tracking-widest uppercase animate-pulse">
+          Syncing Pokédex Registry
         </p>
       </div>
 
-      {/* Progress Bar styled in classic Red/Green Pokédex HP style */}
-      <div className="w-full max-w-xs flex flex-col gap-1.5 select-none z-10 bg-slate-900/60 p-3 rounded-xl border border-slate-800/80">
-        <div className="flex justify-between text-[9px] font-mono tracking-wider text-slate-300 leading-none">
-          <span className="text-red-400 font-bold">STABILITY_LINK</span>
-          <span>{Math.min(100, Math.round(progress))}%</span>
-        </div>
-        <div className="h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800 shadow-inner relative my-0.5">
+      {/* Minimalist Progress Line */}
+      <div className="w-full max-w-xs flex flex-col items-center gap-3 z-10">
+        <div className="w-full h-1.5 bg-slate-900/90 rounded-full overflow-hidden border border-slate-800/80 relative">
           <div 
             style={{ width: `${Math.min(100, progress)}%` }}
-            className="absolute top-0 left-0 h-full bg-gradient-to-r from-red-600 via-rose-500 to-emerald-400 shadow-[0_0_6px_rgba(239,68,68,0.5)] transition-all duration-300"
+            className="absolute top-0 left-0 h-full bg-gradient-to-r from-cyan-500 to-blue-500 shadow-[0_0_10px_rgba(34,211,238,0.7)] transition-all duration-200"
           />
         </div>
-        <div className="text-[8px] font-mono text-slate-500 tracking-wider flex justify-between mt-0.5">
-          <span>SAFE MODE: ON</span>
-          <span className="text-amber-500/90 font-bold">READY IN {timeLeft}S</span>
-        </div>
+        
+        <button
+          onClick={onAbort}
+          className="text-[11px] font-mono text-slate-400 hover:text-cyan-300 transition-colors uppercase tracking-wider underline cursor-pointer py-1 px-3"
+        >
+          Cancel
+        </button>
       </div>
-
-      {/* Skip Scanner button */}
-      <button
-        onClick={onAbort}
-        className="mt-6 px-4 py-2 bg-red-900/40 hover:bg-red-800/60 border border-red-500/50 rounded-lg text-red-100 font-hud text-xs tracking-widest uppercase transition-all z-20"
-      >
-        Cancel Scan
-      </button>
     </div>
   );
 });
@@ -2199,6 +2129,32 @@ export default function App() {
     if (opponentStatus && statusStartTurnRef.current.opponent === null) statusStartTurnRef.current.opponent = turnNumber;
     if (!opponentStatus) statusStartTurnRef.current.opponent = null;
   }, [pokemonStatus, opponentStatus, turnNumber]);
+  // Helper function to build standard welcome message for Chatbot
+  const getChatWelcomeMessage = useCallback((pokemonName?: string) => {
+    const nameUpper = pokemonName ? pokemonName.toUpperCase() : null;
+    if (selectedLang === 'it') {
+      return nameUpper 
+        ? `👋 **Ciao! Sono il Chatbot AI di Pokéthology.**\n\nOra sto analizzando **${nameUpper}**! Puoi chiedermi qualsiasi cosa sul mondo Pokémon, sulle sue statistiche, sulla lore, o su qualunque altro argomento generale!`
+        : `👋 **Ciao! Sono il Chatbot AI di Pokéthology.**\n\nChiedimi qualsiasi cosa sul mondo Pokémon, sulle sue statistiche, sulla lore, o su qualunque altro argomento generale!`;
+    } else if (selectedLang === 'es') {
+      return nameUpper 
+        ? `👋 **¡Hola! Soy el Chatbot AI de Pokéthology.**\n\n¡Ahora estoy analizando a **${nameUpper}**! Puedes preguntarme cualquier cosa sobre el mundo Pokémon, sus estadísticas, el lore, ¡o cualquier otro tema general!`
+        : `👋 **¡Hola! Soy el Chatbot AI de Pokéthology.**\n\n¡Pregúntame cualquier cosa sobre el mundo Pokémon, sus estadísticas, el lore, o cualquier otro tema general!`;
+    } else if (selectedLang === 'fr') {
+      return nameUpper 
+        ? `👋 **Bonjour ! Je suis le Chatbot AI de Pokéthology.**\n\nJ'analyse actuellement **${nameUpper}** ! Vous pouvez me poser toutes vos questions sur l'univers Pokémon, ses statistiques, le lore ou n'importe quel autre sujet général !`
+        : `👋 **Bonjour ! Je suis le Chatbot AI de Pokéthology.**\n\nPosez-moi toutes vos questions sur l'univers Pokémon, ses statistiques, le lore ou n'importe quel autre sujet général !`;
+    } else if (selectedLang === 'de') {
+      return nameUpper 
+        ? `👋 **Hallo! Ich bin der Pokéthology AI Chatbot.**\n\nIch analysiere derzeit **${nameUpper}**! Du kannst mich alles über die Pokémon-Welt, Statuswerte, Lore oder jedes andere allgemeine Thema fragen!`
+        : `👋 **Hallo! Ich bin der Pokéthology AI Chatbot.**\n\nFrage mich alles über die Pokémon-Welt, Statuswerte, Lore oder jedes andere allgemeine Thema!`;
+    } else {
+      return nameUpper 
+        ? `👋 **Hello! I am the Pokéthology AI Chatbot.**\n\nI am currently analyzing **${nameUpper}**! Ask me anything about the Pokémon world, stats, lore, or any general topic you'd like!`
+        : `👋 **Hello! I am the Pokéthology AI Chatbot.**\n\nAsk me anything about the Pokémon world, stats, lore, or any general topic you'd like!`;
+    }
+  }, [selectedLang]);
+
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState<{role: 'user' | 'model', text: string, groundingChunks?: any[], groundingMetadata?: any}[]>([]);
   const [isChatLoading, setIsChatLoading] = useState(false);
@@ -2674,8 +2630,8 @@ export default function App() {
         { text: "[CONNECTIONS] Connecting to Pokémon endpoints... Successful.", delay: 850, progress: 45 },
         { 
           text: quotaLimitReached 
-            ? "[WARN] [AI COACH] API limit reached. Standard mode active."
-            : "[OK] [AI COACH] AI Coach initialized and ready.",
+            ? "[WARN] [AI CHATBOT] Quota limit reached. Offline mode active."
+            : "[OK] [AI CHATBOT] Universal AI Chatbot initialized and ready.",
           delay: 1400, 
           progress: 70 
         },
@@ -4670,13 +4626,13 @@ export default function App() {
     }
   }, [chatMessages, isChatLoading]);
 
-  // Restore scroll position when switching back to Pokéthology chat tab
+  // Instantly show the last message when opening or switching to the Pokéthology chat tab
   useEffect(() => {
     if (activeTab === 'chat' && chatScrollRef.current) {
-      chatScrollRef.current.scrollTop = savedChatScrollTopRef.current;
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
       const timer = setTimeout(() => {
         if (chatScrollRef.current) {
-          chatScrollRef.current.scrollTop = savedChatScrollTopRef.current;
+          chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
         }
       }, 50);
       return () => clearTimeout(timer);
@@ -4996,18 +4952,10 @@ export default function App() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
       if (!fromChat) {
-        // Reset chat messages to only show the focus shifted system message
+        // Reset chat messages to remove precedent messages and show directly the typical chatbot welcome message
         setChatMessages([{ 
           role: 'model' as const, 
-          text: selectedLang === 'it' 
-            ? `*Sistema: Focus spostato su **${pokeData.name.toUpperCase()}**.*`
-            : selectedLang === 'es'
-            ? `*Sistema: Enfoque cambiado a **${pokeData.name.toUpperCase()}**.*`
-            : selectedLang === 'fr'
-            ? `*Système : Focus déplacé sur **${pokeData.name.toUpperCase()}**.*`
-            : selectedLang === 'de'
-            ? `*System: Fokus auf **${pokeData.name.toUpperCase()}** gewechselt.*`
-            : `*System: Focus shifted to **${pokeData.name.toUpperCase()}**.*`
+          text: getChatWelcomeMessage(pokeData.name)
         }]);
       }
       setActiveTab('data');
@@ -6277,7 +6225,7 @@ export default function App() {
                                               <span className="text-[6.5px] font-mono font-bold text-rose-400 uppercase">Clear?</span>
                                               <button
                                                 onClick={() => {
-                                                  setChatMessages([]);
+                                                  setChatMessages([{ role: "model", text: getChatWelcomeMessage(pokemon?.name) }]);
                                                   setShowClearChatConfirm(false);
                                                   try { sounds.scan(); } catch(_) {}
                                                 }}
@@ -6349,15 +6297,7 @@ export default function App() {
                                             </button>
                                           </div>
                                         )}
-                                        {isBattling && (
-                                          <button 
-                                            onClick={handleBattleAnalysis}
-                                            className="mb-2 w-full bg-amber-900/40 border border-amber-500/30 text-amber-400 text-[8px] font-bold tracking-wider py-1 rounded uppercase font-hud tracking-widest flex items-center justify-center gap-2 hover:bg-amber-800/50 transition-colors"
-                                          >
-                                            <Zap className="w-3 h-3" />
-                                            Request Tactical Analysis
-                                          </button>
-                                        )}
+
                                         {chatMessages.map((msg, i) => (
                                           <motion.div 
                                             key={`chat-msg-${i}-${msg.role}`} 
@@ -7839,22 +7779,22 @@ export default function App() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98, y: -12 }}
                         transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-                        className="flex-1 flex flex-col items-center justify-center gap-4 sm:gap-5 md:gap-6 py-4 px-4 text-center relative overflow-y-auto md:overflow-hidden select-none w-full h-full my-auto"
+                        className="flex-1 flex flex-col items-center justify-center gap-3 sm:gap-4 md:gap-5 py-3 sm:py-5 px-3 sm:px-4 text-center relative overflow-y-auto custom-scrollbar select-none w-full h-full my-auto max-w-5xl mx-auto min-h-0"
                       >
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/5 to-transparent pointer-events-none"></div>
                         
                         <motion.div 
-                          className="relative w-40 h-40 xxs:w-48 xxs:h-48 xs:w-56 xs:h-56 sm:w-64 sm:h-64 md:w-64 md:h-64 lg:w-64 lg:h-64 xl:w-72 xl:h-72 flex items-center justify-center shrink-0 max-h-[32vh]"
+                          className="relative w-32 h-32 xxs:w-40 xxs:h-40 xs:w-48 xs:h-48 sm:w-56 sm:h-56 md:w-60 md:h-60 lg:w-64 lg:h-64 flex items-center justify-center shrink max-h-[24vh] sm:max-h-[30vh] my-1"
                           initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: "easeOut" }}
                         >
                           <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 75%)' }}></div>
                           <PokethologyLogo className="w-full h-full object-contain filter drop-shadow-[0_0_30px_rgba(6,182,212,0.5)]" />
                         </motion.div>
 
-                        <div className="flex flex-col gap-2.5 sm:gap-3.5 relative z-10 shrink-0 w-full max-w-4xl px-2 sm:px-4">
-                          <h1 className={cn("flex flex-row flex-wrap items-center justify-center gap-2 sm:gap-3 lg:gap-4 text-4xl xxs:text-5xl xs:text-6xl sm:text-6xl md:text-6xl lg:text-6xl xl:text-7xl font-hud font-black tracking-[0.03em] sm:tracking-[0.05em] md:tracking-[0.08em] leading-tight text-center w-full break-words py-1 px-2 overflow-visible", isLightMode ? 'text-slate-900' : 'bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]')}>
-                            <span className="inline-block py-0.5">POKÉTHOLOGY</span>
-                            <span className="text-cyan-400 text-3xl xxs:text-4xl xs:text-5xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-6xl font-black text-glow inline-block py-0.5" style={{ textShadow: isLightMode ? 'none' : '0 0 16px rgba(34,211,238,0.7)' }}>OS</span>
+                        <div className="flex flex-col gap-2 sm:gap-3 relative z-10 shrink-0 w-full max-w-4xl px-2 sm:px-4">
+                          <h1 className={cn("flex flex-row flex-wrap items-center justify-center gap-1.5 sm:gap-3 lg:gap-4 text-3xl xxs:text-4xl xs:text-5xl sm:text-6xl md:text-6xl lg:text-7xl font-hud font-black tracking-normal sm:tracking-[0.05em] leading-tight text-center w-full break-words py-1 px-1 overflow-visible font-extrabold", isLightMode ? 'text-slate-900' : 'bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]')}>
+                            <span className="inline-block py-0.5 whitespace-nowrap">POKÉTHOLOGY</span>
+                            <span className="text-cyan-400 text-2xl xxs:text-3xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-black text-glow inline-block py-0.5 ml-1" style={{ textShadow: isLightMode ? 'none' : '0 0 16px rgba(34,211,238,0.7)' }}>OS</span>
                           </h1>
                           <p className="font-serif italic text-xs xxs:text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl text-cyan-400 select-none px-4 mt-0.5 tracking-wider whitespace-normal break-words text-center drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">
                             "Where dreams and adventures begin!"
@@ -9493,7 +9433,7 @@ export default function App() {
                       <li className="flex items-start gap-2"><div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5 shrink-0"></div><span><strong className="text-purple-300">Gen Registry grids</strong> with disappearing Daily hub & Exam drawers.</span></li>
                       <li className="flex items-start gap-2"><div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5 shrink-0"></div><span><strong className="text-purple-300">Symmetric Matchup Previews</strong> positioned above the simulated Arena.</span></li>
                       <li className="flex items-start gap-2"><div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5 shrink-0"></div><span><strong className="text-purple-300">Lossless Cry Audio Board</strong> with dynamic volume controls.</span></li>
-                      <li className="flex items-start gap-2"><div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5 shrink-0"></div><span><strong className="text-purple-300">Server-side Gemini AI Coach</strong> proxy for real-time battle predictions.</span></li>
+                      <li className="flex items-start gap-2"><div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5 shrink-0"></div><span><strong className="text-purple-300">Server-side Gemini AI Chatbot</strong> proxy for real-time answers on lore, combat strategies, and general topics.</span></li>
                       <li className="flex items-start gap-2"><div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5 shrink-0"></div><span><strong className="text-purple-300">Offline Diagnostics Center</strong> and Kanto Badge verification cards.</span></li>
                     </ul>
                   </div>

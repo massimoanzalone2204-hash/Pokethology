@@ -24,6 +24,11 @@
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     -webkit-touch-callout: none;
+    
+    /* 4K Ultra HD Crisp Typography & Vector Anti-Aliasing */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   
   #root {
@@ -34,6 +39,8 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    transform: translateZ(0); /* Hardware accelerated root surface */
+    backface-visibility: hidden;
   }
 
   html, body, #root {
@@ -56,10 +63,18 @@
     scroll-behavior: smooth;
   }
 
+  /* High DPI Image Crispness Optimization for 4K / HD Displays */
+  img, svg, canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    transform: translateZ(0);
+  }
+
   /* Robust physical micro-click pressed state feedback for ALL buttons on touch/click */
   button {
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease, filter 0.15s ease, background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform;
+    backface-visibility: hidden;
   }
   button:active:not(:disabled) {
     transform: scale(0.96) translateY(0.5px) !important;
@@ -67,14 +82,30 @@
   }
 }
 
-/* Smooth transition helper classes */
+/* 4K Ultra HD Display Media Optimizations */
+@media (min-width: 2560px) {
+  html {
+    font-size: 18px; /* High DPI scaled typography base */
+  }
+}
+
+@media (min-width: 3840px) {
+  html {
+    font-size: 22px; /* 4K Ultra Native Scale */
+  }
+}
+
+/* Smooth transition helper classes with GPU Compositing */
 .smooth-transition {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 .smooth-transform {
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
+  transform: translateZ(0);
 }
 
 .smooth-fade {

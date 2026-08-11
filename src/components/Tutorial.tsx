@@ -151,15 +151,16 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 initial={{ opacity: 0, x: -20 }} 
                 animate={{ opacity: 1, x: 0 }} 
                 exit={{ opacity: 0, x: 20 }}
-                className="space-y-6 max-w-2xl mx-auto"
+                className="space-y-5 max-w-2xl mx-auto"
               >
+                {/* Banner */}
                 <div className="p-4 bg-emerald-950/20 border-l-4 border-emerald-500 rounded-r-xl space-y-2 text-left relative overflow-hidden group">
                   <motion.div 
                     animate={{ x: [-100, 400], opacity: [0, 0.5, 0] }} 
                     transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                     className="absolute inset-y-0 w-32 bg-emerald-500/10 skew-x-12"
                   />
-                  <h3 className="font-hud font-black text-emerald-400 uppercase text-sm flex items-center gap-2">
+                  <h3 className="font-hud font-black text-emerald-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
                     <Map className="w-4 h-4 animate-pulse" /> Multigenerational Pokédex Exploration
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
@@ -168,52 +169,62 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 </div>
                 
                 {/* Complete New Stats Section */}
-                <div className="bg-slate-900/60 p-4 rounded-xl border border-emerald-500/30 text-left space-y-3 shadow-[0_0_20px_rgba(16,185,129,0.15)]">
-                  <div className="flex items-center justify-between border-b border-emerald-500/20 pb-2">
-                    <span className="font-hud font-black text-emerald-400 text-xs uppercase tracking-widest flex items-center gap-2">
-                      <Radar className="w-4 h-4 text-emerald-400 animate-spin-slow" /> Complete New Stats Section
-                    </span>
-                    <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[7px] font-mono uppercase tracking-widest font-extrabold">
-                      REDESIGNED
-                    </span>
+                <div className="p-4 rounded-xl border border-emerald-500/30 bg-slate-900/60 flex items-start gap-4 group text-left shadow-[0_0_20px_rgba(16,185,129,0.12)]">
+                  <div className="p-3 bg-emerald-950 rounded-full border border-emerald-500/50 shrink-0 group-hover:rotate-12 transition-transform">
+                    <Radar className="w-5 h-5 text-emerald-400 animate-spin-slow" />
                   </div>
-                  <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans">
-                    The Pokédex diagnostic view has been entirely overhauled with the <span className="text-emerald-300 font-bold">Complete New Stats Section</span>. Explore rigorous mathematical breakdowns of Base Stat Totals (BST), individual attribute weightings (HP, Attack, Defense, Sp. Atk, Sp. Def, Speed), dynamic speed tier assessments, and live effectiveness counters. Experience immersive radar diagrams mapping exact battle capabilities instantly.
-                  </p>
+                  <div className="space-y-1 w-full min-w-0">
+                    <div className="flex items-center justify-between border-b border-emerald-500/20 pb-1.5">
+                      <span className="font-hud font-black text-emerald-400 text-xs sm:text-sm uppercase tracking-wider">
+                        Complete New Stats Section
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[7px] font-mono uppercase tracking-widest font-extrabold shrink-0">
+                        REDESIGNED
+                      </span>
+                    </div>
+                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
+                      The Pokédex diagnostic view has been entirely overhauled with the <span className="text-emerald-300 font-bold">Complete New Stats Section</span>. Explore rigorous mathematical breakdowns of Base Stat Totals (BST), individual attribute weightings (HP, Attack, Defense, Sp. Atk, Sp. Def, Speed), dynamic speed tier assessments, and live effectiveness counters.
+                    </p>
+                  </div>
                 </div>
 
                 {/* Compare Section */}
-                <div className="bg-slate-900/60 p-4 rounded-xl border border-cyan-500/30 text-left space-y-3 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
-                  <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2">
-                    <span className="font-hud font-black text-cyan-400 text-xs uppercase tracking-widest flex items-center gap-2">
-                      <Swords className="w-4 h-4 text-cyan-400 animate-pulse" /> Advanced Compare Section
-                    </span>
-                    <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[7px] font-mono uppercase tracking-widest font-extrabold">
-                      SIDE-BY-SIDE
-                    </span>
+                <div className="p-4 rounded-xl border border-cyan-500/30 bg-slate-900/60 flex items-start gap-4 group text-left shadow-[0_0_20px_rgba(6,182,212,0.12)]">
+                  <div className="p-3 bg-cyan-950 rounded-full border border-cyan-500/50 shrink-0 group-hover:rotate-12 transition-transform">
+                    <Swords className="w-5 h-5 text-cyan-400 animate-pulse" />
                   </div>
-                  <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans">
-                    Pin any species to activate the <span className="text-cyan-300 font-bold">Compare Section & Side-by-Side Comparison Sidebar</span>. Evaluate head-to-head stat differentials with color-coded advantage highlights (green for superiority, red for deficit), type coverage overlaps, and direct competitive matchup advantages to build unstoppable teams.
-                  </p>
+                  <div className="space-y-1 w-full min-w-0">
+                    <div className="flex items-center justify-between border-b border-cyan-500/20 pb-1.5">
+                      <span className="font-hud font-black text-cyan-400 text-xs sm:text-sm uppercase tracking-wider">
+                        Advanced Compare Section
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[7px] font-mono uppercase tracking-widest font-extrabold shrink-0">
+                        SIDE-BY-SIDE
+                      </span>
+                    </div>
+                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
+                      Pin any species to activate the <span className="text-cyan-300 font-bold">Compare Section & Side-by-Side Comparison Sidebar</span>. Evaluate head-to-head stat differentials with color-coded advantage highlights (green for superiority, red for deficit), type coverage overlaps, and direct competitive matchup advantages.
+                    </p>
+                  </div>
                 </div>
 
-                <h4 className="font-hud text-[9px] text-emerald-500 uppercase tracking-[0.2em] border-b border-emerald-500/20 pb-1.5 mt-6 text-left flex items-center gap-1.5">
+                <h4 className="font-hud font-black text-[10px] text-emerald-400 uppercase tracking-[0.2em] border-b border-emerald-500/20 pb-1.5 mt-6 text-left flex items-center gap-1.5">
                   <Database className="w-3.5 h-3.5" /> THE STATS SCHEDULE
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-                  <motion.div whileHover={{ scale: 1.02 }} className="bg-slate-900/50 p-4 rounded-xl border border-slate-800 hover:border-emerald-500/30 transition-all flex flex-col gap-1.5">
-                    <span className="font-bold text-emerald-400 text-[11px] sm:text-xs flex items-center gap-1.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-left">
+                  <motion.div whileHover={{ scale: 1.01 }} className="bg-slate-900/60 p-4 rounded-xl border border-emerald-500/30 hover:border-emerald-400/50 transition-all flex flex-col gap-1.5">
+                    <span className="font-hud font-black text-emerald-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
                       <Radar className="w-3.5 h-3.5 animate-spin-slow" /> Comprehensive Diagnostics
                     </span>
-                    <p className="text-[10.5px] text-slate-400 leading-normal font-sans">
+                    <p className="text-[10.5px] text-slate-300 leading-relaxed font-sans">
                       Upon selecting a Pokémon, dive deep into its core metrics. View base stats, type advantages, weaknesses, and height/weight attributes dynamically generated on the fly.
                     </p>
                   </motion.div>
-                  <motion.div whileHover={{ scale: 1.02 }} className="bg-slate-900/50 p-4 rounded-xl border border-slate-800 hover:border-emerald-500/30 transition-all flex flex-col gap-1.5">
-                    <span className="font-bold text-emerald-400 text-[11px] sm:text-xs flex items-center gap-1.5">
+                  <motion.div whileHover={{ scale: 1.01 }} className="bg-slate-900/60 p-4 rounded-xl border border-emerald-500/30 hover:border-emerald-400/50 transition-all flex flex-col gap-1.5">
+                    <span className="font-hud font-black text-emerald-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 animate-pulse" /> Advanced Visuals
                     </span>
-                    <p className="text-[10.5px] text-slate-400 leading-normal font-sans">
+                    <p className="text-[10.5px] text-slate-300 leading-relaxed font-sans">
                       Experience immersive retro radar charts mapping exact stat distributions and dynamic 3D-style sprites bridging the gap between generations.
                     </p>
                   </motion.div>
@@ -226,43 +237,59 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }} 
                 animate={{ opacity: 1, scale: 1 }}
-                className="space-y-6 max-w-2xl mx-auto"
+                className="space-y-5 max-w-2xl mx-auto"
               >
-                <div className="p-4 bg-purple-950/20 border-r-4 border-purple-500 rounded-l-xl space-y-2 text-left relative overflow-hidden">
+                {/* Banner */}
+                <div className="p-4 bg-purple-950/20 border-l-4 border-purple-500 rounded-r-xl space-y-2 text-left relative overflow-hidden">
                   <motion.div 
                     animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.3, 0.1] }} 
                     transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                     className="absolute -right-10 -top-10 w-48 h-48 bg-purple-500 rounded-full blur-3xl pointer-events-none" 
                   />
-                  <h3 className="font-hud font-black text-purple-400 uppercase text-sm flex items-center gap-2">
+                  <h3 className="font-hud font-black text-purple-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
                     <Brain className="w-4 h-4 animate-pulse" /> The Pokéthology AI Mind
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Your personal, highly-advanced, server-side AI Coach. Powered by Gemini, the Pokéthology Chatbot isn't just an encyclopedia—it's a tactical advisor, lore master, and biological researcher all in one interface.
+                    Your personal, highly-advanced, server-side AI Assistant. Powered by Gemini, the Pokéthology Chatbot isn't limited to combat or encyclopedia data—it's an all-knowing companion ready to discuss everything about the Pokémon world, anime, games, lore, or any general topic and idea!
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left mt-6">
-                  <div className="bg-slate-900/50 p-4 rounded-xl border border-purple-500/20 flex flex-col items-center text-center gap-2 hover:bg-purple-900/10 transition-colors">
-                    <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 2, repeat: Infinity }}>
-                      <Crosshair className="w-6 h-6 text-purple-400" />
-                    </motion.div>
-                    <span className="font-bold text-white text-[11px] sm:text-xs">Tactical Coaching</span>
-                    <p className="text-[10px] text-slate-400 font-sans">Ask for real-time movesets, competitive strategies, and counter-picks against tough gym leaders.</p>
+                {/* HUD Feature Cards matching Daily Hub style */}
+                <div className="grid grid-cols-1 gap-3 text-left">
+                  <div className="p-4 rounded-xl border border-purple-500/30 bg-slate-900/60 flex items-center gap-4 group">
+                    <div className="p-3 bg-purple-950 rounded-full border border-purple-500/50 group-hover:rotate-12 transition-transform shrink-0">
+                      <Crosshair className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Tactics & Strategy</span>
+                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
+                        Ask for real-time movesets, competitive strategies, EV spreads, and counter-picks for battles.
+                      </p>
+                    </div>
                   </div>
-                  <div className="bg-slate-900/50 p-4 rounded-xl border border-purple-500/20 flex flex-col items-center text-center gap-2 hover:bg-purple-900/10 transition-colors">
-                    <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-                      <BookOpen className="w-6 h-6 text-purple-400" />
-                    </motion.div>
-                    <span className="font-bold text-white text-[11px] sm:text-xs">Deep Lore & Mythos</span>
-                    <p className="text-[10px] text-slate-400 font-sans">Explore the philosophical origins, historical mythology, and biological traits of any discovered species.</p>
+
+                  <div className="p-4 rounded-xl border border-purple-500/30 bg-slate-900/60 flex items-center gap-4 group">
+                    <div className="p-3 bg-purple-950 rounded-full border border-purple-500/50 group-hover:-rotate-12 transition-transform shrink-0">
+                      <BookOpen className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">World Lore & Anime</span>
+                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
+                        Explore species origins, anime episodes, manga arcs, and historical mythology across all regions.
+                      </p>
+                    </div>
                   </div>
-                  <div className="bg-slate-900/50 p-4 rounded-xl border border-purple-500/20 flex flex-col items-center text-center gap-2 hover:bg-purple-900/10 transition-colors">
-                    <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                      <Activity className="w-6 h-6 text-purple-400" />
-                    </motion.div>
-                    <span className="font-bold text-white text-[11px] sm:text-xs">Data Integration</span>
-                    <p className="text-[10px] text-slate-400 font-sans">The AI interprets live stats and types, offering contextual analysis based on the exact current meta.</p>
+
+                  <div className="p-4 rounded-xl border border-purple-500/30 bg-slate-900/60 flex items-center gap-4 group">
+                    <div className="p-3 bg-purple-950 rounded-full border border-purple-500/50 group-hover:scale-110 transition-transform shrink-0">
+                      <Activity className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Universal Knowledge</span>
+                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
+                        Chat freely about any topic, general questions, creative ideas, or Pokémon theories without restriction.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -273,90 +300,75 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               <motion.div 
                 initial={{ opacity: 0, y: 15 }} 
                 animate={{ opacity: 1, y: 0 }} 
-                className="space-y-6 max-w-2xl mx-auto"
+                className="space-y-5 max-w-2xl mx-auto"
               >
-                <div className="p-4 bg-red-950/20 border-b-4 border-red-500 rounded-t-xl space-y-2 text-center relative overflow-hidden">
-                  <motion.div 
-                    animate={{ rotate: 360 }} 
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="absolute -inset-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"
-                  />
-                  <h3 className="font-hud font-black text-red-400 uppercase text-lg flex items-center justify-center gap-2">
-                    <Swords className="w-6 h-6 text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]" /> Combat Simulation Arena
+                {/* Banner */}
+                <div className="p-4 bg-red-950/20 border-l-4 border-red-500 rounded-r-xl space-y-2 text-left relative overflow-hidden">
+                  <h3 className="font-hud font-black text-red-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
+                    <Swords className="w-4 h-4 text-red-500 animate-pulse" /> Combat Simulation Arena
                   </h3>
-                  <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10 max-w-lg mx-auto">
+                  <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
                     Put theory into practice. The tactical simulation arena allows you to pit two Pokémon against each other, fully testing stats, movesets, and types in extreme algorithmic scenarios.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-                  <motion.div whileHover={{ scale: 1.01 }} className="bg-slate-900/50 p-4 rounded-xl border border-red-500/20 flex gap-3 relative overflow-hidden group">
-                    <Shield className="w-6 h-6 text-red-400 shrink-0 group-hover:text-red-300 transition-colors" />
+                {/* HUD Feature Cards */}
+                <div className="grid grid-cols-1 gap-3 text-left">
+                  <div className="p-4 rounded-xl border border-red-500/30 bg-slate-900/60 flex items-center gap-4 group">
+                    <div className="p-3 bg-red-950 rounded-full border border-red-500/50 group-hover:rotate-12 transition-transform shrink-0">
+                      <Shield className="w-5 h-5 text-red-400" />
+                    </div>
                     <div>
-                      <span className="font-bold text-red-400 text-[11px] sm:text-xs uppercase font-hud tracking-wider">Dual Matchup Preview</span>
-                      <p className="text-[10px] sm:text-[10.5px] text-slate-400 leading-normal font-sans mt-1">
+                      <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider">Dual Matchup Preview</span>
+                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
                         Select two combatants and analyze their matchup side-by-side before the fight. View raw stat advantages instantly.
                       </p>
                     </div>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.01 }} className="bg-slate-900/50 p-4 rounded-xl border border-red-500/20 flex gap-3 relative overflow-hidden group">
-                    <Activity className="w-6 h-6 text-red-400 shrink-0 group-hover:animate-pulse transition-colors" />
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-red-500/30 bg-slate-900/60 flex items-center gap-4 group">
+                    <div className="p-3 bg-red-950 rounded-full border border-red-500/50 group-hover:animate-pulse transition-transform shrink-0">
+                      <Activity className="w-5 h-5 text-red-400" />
+                    </div>
                     <div>
-                      <span className="font-bold text-red-400 text-[11px] sm:text-xs uppercase font-hud tracking-wider">Chaos Mode</span>
-                      <p className="text-[10px] sm:text-[10.5px] text-slate-400 leading-normal font-sans mt-1">
+                      <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider">Chaos Mode</span>
+                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
                         Turn on auto-battling to instantly roll randomized moves based on STAB logic, tracking HP and stat degradation dynamically.
                       </p>
                     </div>
-                  </motion.div>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-cyan-500/30 bg-slate-900/60 flex items-center gap-4 group">
+                    <div className="p-3 bg-cyan-950 rounded-full border border-cyan-500/50 group-hover:rotate-12 transition-transform shrink-0 flex items-center gap-1">
+                      <Image className="w-4 h-4 text-cyan-400" />
+                      <Gamepad2 className="w-4 h-4 text-amber-400" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-hud font-black text-cyan-400 text-xs sm:text-sm uppercase tracking-wider">Artwork & Sprite Mode Toggle</span>
+                        <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[6.5px] font-mono uppercase tracking-widest font-extrabold">NEW</span>
+                      </div>
+                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
+                        Use the <span className="text-cyan-300 font-bold font-hud">[Art / Sprite]</span> button in the arena header or Pokédex to switch visual rendering between official HD Sugimori Artwork (<span className="text-cyan-400 font-semibold">Art</span>) and retro 2D Pixel Sprites (<span className="text-amber-400 font-semibold">Sprite</span>).
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-red-500/30 bg-slate-900/60 flex items-center gap-4 group">
+                    <div className="p-3 bg-red-950 rounded-full border border-red-500/50 group-hover:rotate-12 transition-transform shrink-0">
+                      <Volume2 className="w-5 h-5 text-red-400" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider">Interactive Arena Artwork</span>
+                        <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 text-[6.5px] font-mono uppercase tracking-widest font-extrabold">PRO TIP</span>
+                      </div>
+                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
+                        Touch or click directly on any Pokémon's artwork inside the combat arena to rotate its stance position and play its official species cry in real-time!
+                      </p>
+                    </div>
+                  </div>
                 </div>
-
-                {/* Artwork Mode Toggle Note */}
-                <motion.div 
-                  whileHover={{ scale: 1.01 }} 
-                  className="bg-cyan-950/25 p-3 rounded-xl border border-cyan-500/35 flex items-start gap-3 relative overflow-hidden group shadow-[0_0_15px_rgba(6,182,212,0.15)] text-left"
-                >
-                  <div className="p-2 bg-cyan-900/40 rounded-lg border border-cyan-500/35 text-cyan-400 shrink-0 flex items-center gap-1">
-                    <Image className="w-3.5 h-3.5 text-cyan-400" />
-                    <span className="text-[9px] font-mono font-bold text-slate-500">/</span>
-                    <Gamepad2 className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-cyan-400 text-[10px] sm:text-[11px] uppercase font-hud tracking-wider flex items-center gap-1.5">
-                        <Image className="w-3 h-3 text-cyan-300" /> Artwork & Sprite Mode Toggle
-                      </span>
-                      <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[6.5px] font-mono uppercase tracking-widest font-extrabold">
-                        NEW FEATURE
-                      </span>
-                    </div>
-                    <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-relaxed font-sans">
-                      Use the <span className="text-cyan-300 font-bold font-hud">[Art / Sprite]</span> button in the arena header or before the Shiny button in the Pokédex to switch combat visual rendering between official HD Sugimori Artwork (<span className="text-cyan-400 font-semibold">Art</span>) and retro 2D Pixel Sprites (<span className="text-amber-400 font-semibold">Sprite</span>). Small Pokémon 2D pixel sprites are automatically boosted in scale so they remain crisp and clearly visible during intense battle sequences!
-                    </p>
-                  </div>
-                </motion.div>
-
-                {/* Interactive Artwork Arena Note */}
-                <motion.div 
-                  whileHover={{ scale: 1.01 }} 
-                  className="bg-red-950/20 p-2 rounded-lg border border-red-500/30 flex items-start gap-2 relative overflow-hidden group shadow-[0_0_10px_rgba(239,68,68,0.1)] text-left"
-                >
-                  <div className="p-1.5 bg-red-900/30 rounded-md border border-red-500/25 text-red-400 shrink-0">
-                    <Volume2 className="w-3.5 h-3.5 text-red-400" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-red-400 text-[9px] sm:text-[10px] uppercase font-hud tracking-wider flex items-center gap-1">
-                        <RotateCcw className="w-2.5 h-2.5 text-red-300" /> Interactive Arena Artwork
-                      </span>
-                      <span className="px-1 py-0.2 rounded bg-red-500/20 text-red-300 border border-red-500/30 text-[6px] font-mono uppercase tracking-widest font-extrabold">
-                        PRO TIP
-                      </span>
-                    </div>
-                    <p className="text-[9px] sm:text-[9.5px] text-slate-300 leading-tight font-sans">
-                      Touch or click directly on any Pokémon's artwork inside the combat arena to rotate its battle stance facing position and play its official species cry in real-time!
-                    </p>
-                  </div>
-                </motion.div>
               </motion.div>
             )}
 
@@ -365,10 +377,10 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               <motion.div 
                 initial={{ opacity: 0, x: 20 }} 
                 animate={{ opacity: 1, x: 0 }}
-                className="space-y-6 max-w-2xl mx-auto"
+                className="space-y-5 max-w-2xl mx-auto"
               >
                 <div className="p-4 bg-amber-950/20 border-l-4 border-amber-500 rounded-r-xl space-y-2 text-left relative overflow-hidden">
-                  <h3 className="font-hud font-black text-amber-400 uppercase text-sm flex items-center gap-2">
+                  <h3 className="font-hud font-black text-amber-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
                     <Calendar className="w-4 h-4 animate-bounce" /> Daily Hub & Activities
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
@@ -377,25 +389,25 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 </div>
                 
                 <div className="grid grid-cols-1 gap-3 text-left">
-                  <div className="p-4 rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 to-transparent flex items-center gap-4 group">
-                    <div className="p-3 bg-amber-950 rounded-full border border-amber-500/50 group-hover:rotate-12 transition-transform">
+                  <div className="p-4 rounded-xl border border-amber-500/30 bg-slate-900/60 flex items-center gap-4 group">
+                    <div className="p-3 bg-amber-950 rounded-full border border-amber-500/50 group-hover:rotate-12 transition-transform shrink-0">
                       <Sparkles className="w-5 h-5 text-amber-400" />
                     </div>
                     <div>
-                      <span className="font-bold text-amber-400 text-[11px] sm:text-xs uppercase font-hud tracking-wider">Daily Scan</span>
-                      <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-relaxed font-sans mt-0.5">
+                      <span className="font-hud font-black text-amber-400 text-xs sm:text-sm uppercase tracking-wider">Daily Scan</span>
+                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
                         A unique, randomly featured Pokémon every single day, complete with official Pokédex entry and live academic analysis.
                       </p>
                     </div>
                   </div>
                   
-                  <div className="p-4 rounded-xl border border-orange-500/30 bg-gradient-to-r from-orange-500/10 to-transparent flex items-center gap-4 group">
-                    <div className="p-3 bg-orange-950 rounded-full border border-orange-500/50 group-hover:-rotate-12 transition-transform">
+                  <div className="p-4 rounded-xl border border-orange-500/30 bg-slate-900/60 flex items-center gap-4 group">
+                    <div className="p-3 bg-orange-950 rounded-full border border-orange-500/50 group-hover:-rotate-12 transition-transform shrink-0">
                       <Cpu className="w-5 h-5 text-orange-400" />
                     </div>
                     <div>
-                      <span className="font-bold text-orange-400 text-[11px] sm:text-xs uppercase font-hud tracking-wider">Theory Exam</span>
-                      <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-relaxed font-sans mt-0.5">
+                      <span className="font-hud font-black text-orange-400 text-xs sm:text-sm uppercase tracking-wider">Theory Exam</span>
+                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
                         Test your intellect. The AI dynamically generates rigorous questions based on biology, stats, and lore.
                       </p>
                     </div>
@@ -409,10 +421,10 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }} 
                 animate={{ opacity: 1, scale: 1 }}
-                className="space-y-6 max-w-xl mx-auto text-left"
+                className="space-y-5 max-w-2xl mx-auto text-left"
               >
                 <div className="p-4 bg-pink-950/20 border-l-4 border-pink-500 rounded-r-xl space-y-2 text-left relative overflow-hidden">
-                  <h3 className="font-hud font-black text-pink-400 uppercase text-sm flex items-center gap-2">
+                  <h3 className="font-hud font-black text-pink-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
                     <Share2 className="w-4 h-4 animate-pulse" /> Pokéthology Community & Social
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
@@ -420,41 +432,43 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-                  {/* GitHub Button */}
+                <div className="grid grid-cols-1 gap-3 pt-1">
+                  {/* GitHub Button Card */}
                   <a
                     href="https://github.com/massimoanzalone2204-hash/Pokethology"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-cyan-500/40 hover:border-cyan-400 text-cyan-400 transition-all group shadow-md shadow-cyan-950/50 cursor-pointer"
+                    className="p-4 rounded-xl border border-cyan-500/30 bg-slate-900/60 flex items-center justify-between gap-4 group hover:border-cyan-400 transition-all shadow-md cursor-pointer"
                   >
-                    <div className="flex items-center gap-2.5">
-                      <Github className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform shrink-0" />
-                      <div className="flex flex-col text-left">
-                        <span className="font-hud text-[10px] font-black tracking-wider uppercase">GitHub repository</span>
-                        <span className="text-[8.5px] font-mono text-slate-400">massimoanzalone2204-hash/Pokethology</span>
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="p-3 bg-cyan-950 rounded-full border border-cyan-500/50 group-hover:scale-110 transition-transform shrink-0">
+                        <Github className="w-5 h-5 text-cyan-400" />
+                      </div>
+                      <div className="flex flex-col text-left min-w-0">
+                        <span className="font-hud font-black text-cyan-400 text-xs sm:text-sm uppercase tracking-wider">GitHub Repository</span>
+                        <span className="text-[9px] sm:text-[10px] font-mono text-slate-400 truncate">massimoanzalone2204-hash/Pokethology</span>
                       </div>
                     </div>
-                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-300 transition-colors shrink-0" />
+                    <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-cyan-300 transition-colors shrink-0" />
                   </a>
 
-                  {/* Instagram Button */}
+                  {/* Instagram Button Card */}
                   <a
                     href="https://www.instagram.com/__.pokethology.__?igsh=YjZrejluMDd5dHoz"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-purple-950/80 via-pink-950/80 to-slate-900/90 hover:from-purple-900/90 hover:to-slate-800 border border-pink-500/40 hover:border-pink-400 text-pink-400 transition-all group shadow-lg shadow-pink-950/40 cursor-pointer"
+                    className="p-4 rounded-xl border border-pink-500/30 bg-slate-900/60 flex items-center justify-between gap-4 group hover:border-pink-400 transition-all shadow-md cursor-pointer"
                   >
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <div className="p-2 rounded-lg bg-slate-950 border border-pink-500/30 text-pink-400 group-hover:scale-105 transition-transform shrink-0">
-                        <Instagram className="w-5 h-5" />
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="p-3 bg-pink-950 rounded-full border border-pink-500/50 group-hover:scale-110 transition-transform shrink-0">
+                        <Instagram className="w-5 h-5 text-pink-400" />
                       </div>
-                      <div className="flex flex-col text-left overflow-hidden">
-                        <span className="font-hud text-[10px] sm:text-[11px] font-black tracking-wider uppercase truncate">Official Instagram</span>
-                        <span className="text-[8.5px] font-mono text-pink-300/80 truncate">@__.pokethology.__</span>
+                      <div className="flex flex-col text-left min-w-0">
+                        <span className="font-hud font-black text-pink-400 text-xs sm:text-sm uppercase tracking-wider">Official Instagram</span>
+                        <span className="text-[9px] sm:text-[10px] font-mono text-pink-300/80 truncate">@__.pokethology.__</span>
                       </div>
                     </div>
-                    <ExternalLink className="w-4 h-4 text-pink-400/70 group-hover:text-pink-300 transition-colors shrink-0" />
+                    <ExternalLink className="w-4 h-4 text-pink-400 group-hover:text-pink-300 transition-colors shrink-0" />
                   </a>
                 </div>
               </motion.div>
@@ -462,15 +476,12 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 
             {/* TAB: NEWS */}
             {activeTab === 'news' && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 max-w-xl mx-auto text-left">
-                <div className="space-y-4">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5 max-w-2xl mx-auto text-left">
+                <div className="p-4 bg-cyan-950/20 border-l-4 border-cyan-500 rounded-r-xl space-y-2 text-left relative overflow-hidden">
                   <div className="flex items-center justify-between border-b border-cyan-500/25 pb-2">
-                    <div className="flex items-center gap-2">
-                      <Globe className="w-4 h-4 text-cyan-400 animate-spin-slow" />
-                      <h4 className="text-[10px] sm:text-[11px] font-hud font-black text-cyan-400 uppercase tracking-widest">
-                        REAL-WORLD POKÉMON GROUNDED BRIEFINGS
-                      </h4>
-                    </div>
+                    <h3 className="font-hud font-black text-cyan-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-cyan-400 animate-spin-slow" /> Real-World Pokémon Grounded Briefings
+                    </h3>
                     <div className="flex items-center gap-1.5">
                       <span className={cn(
                         "inline-block w-2 h-2 rounded-full animate-pulse mr-1",
@@ -481,7 +492,12 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       </span>
                     </div>
                   </div>
+                  <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs">
+                    Stay up to date with official global Pokémon news, game updates, competitive tournament briefings, and media releases directly fetched in real-time.
+                  </p>
+                </div>
 
+                <div className="space-y-4">
                   {loadingNews ? (
                     <div className="flex flex-col items-center justify-center p-10 bg-slate-900/30 border border-slate-800/80 rounded-xl space-y-3">
                       <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
@@ -493,7 +509,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     </div>
                   ) : newsError ? (
                     <div className="p-4 bg-red-950/20 border border-red-500/25 rounded-xl text-center space-y-1">
-                      <span className="text-red-400 text-[10px] font-black uppercase tracking-wider">Interface Anomaly Detected</span>
+                      <span className="text-red-400 text-[10px] font-black uppercase tracking-wider font-hud">Interface Anomaly Detected</span>
                       <p className="text-[9.5px] font-mono text-slate-400 leading-relaxed">{newsError}</p>
                     </div>
                   ) : pokemonNews.length > 0 ? (
@@ -523,7 +539,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                           <motion.div 
                             key={`news-${idx}`} 
                             whileHover={{ scale: 1.01 }}
-                            className="bg-slate-900/40 p-4 rounded-xl border border-slate-850 hover:border-cyan-500/20 transition-all duration-300 flex flex-col gap-2.5"
+                            className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-cyan-500/30 transition-all duration-300 flex flex-col gap-2.5"
                           >
                             <div className="flex items-center justify-between gap-2 flex-wrap">
                               <span className={cn("text-[7.5px] font-mono font-black border px-2 py-0.5 rounded uppercase tracking-widest flex items-center gap-1", tagColor)}>
@@ -536,10 +552,10 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                             </div>
                             
                             <div className="space-y-1">
-                              <h5 className="text-[11px] sm:text-xs font-hud font-black text-slate-100 uppercase tracking-wide leading-snug">
+                              <h5 className="text-[11px] sm:text-xs font-hud font-black text-cyan-400 uppercase tracking-wide leading-snug">
                                 {item.title}
                               </h5>
-                              <p className="text-[10px] sm:text-[10.5px] text-slate-400 leading-relaxed font-sans mt-1">
+                              <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-relaxed font-sans mt-1">
                                 {item.description}
                               </p>
                             </div>
@@ -568,29 +584,43 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     </div>
                   )}
 
-                  {!isFallback && groundingSources && groundingSources.length > 0 && (
-                    <div className="pt-2.5 border-t border-slate-800/60 space-y-1.5 text-left">
-                       <span className="text-[8px] font-hud font-black text-cyan-500/70 uppercase tracking-widest block">
-                         INTELLIGENCE CITATIONS (REAL-WORLD RETRIEVED SOURCES)
-                       </span>
-                       <div className="flex flex-wrap gap-1.5">
-                         {groundingSources.slice(0, 4).map((src, sidx) => (
-                           <a
-                             key={`sources-${sidx}`}
-                             href={src.url}
-                             target="_blank"
-                             rel="noopener noreferrer"
-                             referrerPolicy="no-referrer"
-                             className="inline-flex items-center gap-1 px-2 py-0.5 border border-slate-800 text-[8.5px] font-mono text-slate-400 hover:text-cyan-400 transition-all cursor-pointer hover:border-cyan-500/30 group"
-                             title={src.title}
-                           >
-                             <Link className="w-2.5 h-2.5 text-cyan-500 shrink-0 group-hover:rotate-12 transition-transform" />
-                             <span className="truncate max-w-[120px]">{src.title}</span>
-                           </a>
-                         ))}
-                       </div>
+                  {/* Official Pokémon TCG Portal Section Card */}
+                  <motion.div 
+                    whileHover={{ scale: 1.01 }}
+                    className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-cyan-500/30 transition-all duration-300 flex flex-col gap-2.5 text-left"
+                  >
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className="text-[7.5px] font-mono font-black border border-amber-500/35 text-amber-400 px-2 py-0.5 rounded uppercase tracking-widest flex items-center gap-1">
+                        <Sparkles className="w-2.5 h-2.5 shrink-0" />
+                        CARD / TCG
+                      </span>
+                      <div className="flex items-center gap-1 text-[7.5px] font-mono text-slate-400 font-bold">
+                        <span className="uppercase">OFFICIAL PORTAL</span>
+                      </div>
                     </div>
-                  )}
+                    
+                    <div className="space-y-1">
+                      <h5 className="text-[11px] sm:text-xs font-hud font-black text-cyan-400 uppercase tracking-wide leading-snug">
+                        OFFICIAL POKÉMON TCG PORTAL
+                      </h5>
+                      <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-relaxed font-sans mt-1">
+                        Explore official Trading Card Game expansions, card databases, deck strategy guides, and competitive circuit updates directly on the official Pokémon TCG website.
+                      </p>
+                    </div>
+
+                    <div className="flex justify-end pt-1">
+                      <a 
+                        href="https://tcg.pokemon.com/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        referrerPolicy="no-referrer"
+                        className="flex items-center gap-1 px-2 py-1 bg-transparent hover:bg-slate-900 border border-slate-800 hover:border-cyan-500/20 rounded text-[8px] font-mono text-cyan-400 uppercase tracking-widest transition-all cursor-pointer group"
+                      >
+                        <span>VISIT TCG SITE</span>
+                        <ExternalLink className="w-2.5 h-2.5 text-cyan-400 group-hover:scale-110 transition-transform" />
+                      </a>
+                    </div>
+                  </motion.div>
                 </div>
               </motion.div>
             )}

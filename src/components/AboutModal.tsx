@@ -79,7 +79,7 @@ export function AboutModal({ isOpen, onClose, isLightMode = false }: AboutModalP
               {/* About Description */}
               <div className="space-y-2 text-[11px] leading-relaxed text-slate-300 font-sans">
                 <p>
-                  <strong className="text-cyan-400 font-hud">Pokéthology Core OS</strong> is an advanced tactical Pokémon research index and real-time combat simulation system. Built with authentic PokeAPI data, dynamic damage calculators, speed tier analysis, and Gemini-powered tactical coaching.
+                  <strong className="text-cyan-400 font-hud">Pokéthology Core OS</strong> is an advanced tactical Pokémon research index, real-time combat simulation system, and universal AI assistant. Built with authentic PokeAPI data, dynamic damage calculators, speed tier analysis, and Gemini-powered conversational AI for all Pokémon lore, combat strategies, and general topics.
                 </p>
               </div>
 

@@ -5,6 +5,9 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import './i18n';
 import App from './App.tsx';
 import './index.css';
+import { registerServiceWorker } from './utils/notificationManager';
+
+registerServiceWorker();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
