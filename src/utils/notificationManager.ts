@@ -14,6 +14,8 @@ export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration
   try {
     const reg = await navigator.serviceWorker.register('/sw.js');
     console.log('Pokéthology Service Worker registered successfully:', reg.scope);
+    // Check for Service Worker updates on page load
+    reg.update().catch(() => {});
     return reg;
   } catch (error) {
     console.warn('Service Worker registration failed or unsupported in this context:', error);
