@@ -577,72 +577,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     true, false, true
   ]);
 
-  // --- PERSISTENCE EFFECT FOR TODAY'S ACTIVITIES ---
-  useEffect(() => {
-    if (!todayStr) return;
-    try {
-      const savedMed = localStorage.getItem(`pokethology_hub_med_${todayStr}`);
-      if (savedMed === 'completed') setMedCheckinStatus('completed');
-
-      const savedEasyA = localStorage.getItem(`pokethology_hub_easyA_${todayStr}`);
-      if (savedEasyA === 'correct' || savedEasyA === 'incorrect') {
-        setEasyTriviaStatus(savedEasyA as any);
-        const opt = localStorage.getItem(`pokethology_hub_easyA_opt_${todayStr}`);
-        if (opt !== null) setEasyChosenOption(parseInt(opt, 10));
-      }
-
-      const savedEasyB = localStorage.getItem(`pokethology_hub_easyB_${todayStr}`);
-      if (savedEasyB === 'correct' || savedEasyB === 'incorrect') {
-        setEasyTriviaStatusB(savedEasyB as any);
-        const opt = localStorage.getItem(`pokethology_hub_easyB_opt_${todayStr}`);
-        if (opt !== null) setEasyChosenOptionB(parseInt(opt, 10));
-      }
-
-      const savedScan = localStorage.getItem(`pokethology_hub_scan_${todayStr}`);
-      if (savedScan === 'completed') setScanStatus('completed');
-
-      const savedMedA = localStorage.getItem(`pokethology_hub_medA_${todayStr}`);
-      if (savedMedA === 'correct' || savedMedA === 'incorrect') {
-        setMedTriviaStatus(savedMedA as any);
-        const opt = localStorage.getItem(`pokethology_hub_medA_opt_${todayStr}`);
-        if (opt !== null) setMedChosenOption(parseInt(opt, 10));
-      }
-
-      const savedMedB = localStorage.getItem(`pokethology_hub_medB_${todayStr}`);
-      if (savedMedB === 'correct' || savedMedB === 'incorrect') {
-        setMedTriviaStatusB(savedMedB as any);
-        const opt = localStorage.getItem(`pokethology_hub_medB_opt_${todayStr}`);
-        if (opt !== null) setMedChosenOptionB(parseInt(opt, 10));
-      }
-
-      const savedChrono = localStorage.getItem(`pokethology_hub_chrono_${todayStr}`);
-      if (savedChrono === 'true') setChronoClaimed(true);
-
-      const savedCore = localStorage.getItem(`pokethology_hub_core_${todayStr}`);
-      if (savedCore === 'completed') setCoreRechargeStatus('completed');
-
-      const savedHardA = localStorage.getItem(`pokethology_hub_hardA_${todayStr}`);
-      if (savedHardA === 'correct' || savedHardA === 'incorrect') {
-        setMasterExamStatus(savedHardA as any);
-        const opt = localStorage.getItem(`pokethology_hub_hardA_opt_${todayStr}`);
-        if (opt !== null) setMasterChosenOption(parseInt(opt, 10));
-      }
-
-      const savedHardB = localStorage.getItem(`pokethology_hub_hardB_${todayStr}`);
-      if (savedHardB === 'correct' || savedHardB === 'incorrect') {
-        setMasterExamStatusB(savedHardB as any);
-        const opt = localStorage.getItem(`pokethology_hub_hardB_opt_${todayStr}`);
-        if (opt !== null) setMasterChosenOptionB(parseInt(opt, 10));
-      }
-
-      const savedSpeed = localStorage.getItem(`pokethology_hub_speed_${todayStr}`);
-      if (savedSpeed === 'completed') setSpeedTrialStatus('completed');
-
-      const savedMatrix = localStorage.getItem(`pokethology_hub_matrix_${todayStr}`);
-      if (savedMatrix === 'completed') setMatrixLockdownStatus('completed');
-    } catch (_) {}
-  }, [todayStr]);
-
   // Handlers
   const startRaidChallenge = () => {
     try { sounds.scan(); } catch (_) {}
@@ -720,7 +654,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     try { sounds.scan(); } catch (_) {}
     if (speedTrialCurrent >= 365) {
       setSpeedTrialStatus('completed');
-      if (todayStr) localStorage.setItem(`pokethology_hub_speed_${todayStr}`, 'completed');
     } else {
       setSpeedTrialCurrent(60);
     }
@@ -749,7 +682,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       if (allEnabled) {
         setTimeout(() => {
           setMatrixLockdownStatus('completed');
-          if (todayStr) localStorage.setItem(`pokethology_hub_matrix_${todayStr}`, 'completed');
         }, 80);
       }
       
@@ -768,14 +700,13 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     if (medCheckinStatus !== 'breathing') return;
     if (medSeconds <= 0) {
       setMedCheckinStatus('completed');
-      if (todayStr) localStorage.setItem(`pokethology_hub_med_${todayStr}`, 'completed');
       return;
     }
     const timer = setTimeout(() => {
       setMedSeconds(prev => prev - 1);
     }, 1000);
     return () => clearTimeout(timer);
-  }, [medCheckinStatus, medSeconds, todayStr]);
+  }, [medCheckinStatus, medSeconds]);
 
   // Sweet spot game loop
   useEffect(() => {
@@ -812,14 +743,12 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       setMeditationFlash(false);
     }, 1500);
     setMedCheckinStatus('completed');
-    if (todayStr) localStorage.setItem(`pokethology_hub_med_${todayStr}`, 'completed');
   };
 
   const handleEasyTriviaAnswer = (optIdx: number) => {
     if (easyTriviaStatus !== 'unanswered') return;
     setEasyChosenOption(optIdx);
     const correct = optIdx === easyTriviaQuestion.answerIndex;
-    const status = correct ? 'correct' : 'incorrect';
     
     if (correct) {
       setEasyTriviaStatus('correct');
@@ -828,17 +757,12 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       setEasyTriviaStatus('incorrect');
       try { sounds.error(); } catch (_) {}
     }
-    if (todayStr) {
-      localStorage.setItem(`pokethology_hub_easyA_${todayStr}`, status);
-      localStorage.setItem(`pokethology_hub_easyA_opt_${todayStr}`, String(optIdx));
-    }
   };
 
   const handleEasyTriviaAnswerB = (optIdx: number) => {
     if (easyTriviaStatusB !== 'unanswered') return;
     setEasyChosenOptionB(optIdx);
     const correct = optIdx === easyTriviaQuestionB.answerIndex;
-    const status = correct ? 'correct' : 'incorrect';
     
     if (correct) {
       setEasyTriviaStatusB('correct');
@@ -847,17 +771,12 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       setEasyTriviaStatusB('incorrect');
       try { sounds.error(); } catch (_) {}
     }
-    if (todayStr) {
-      localStorage.setItem(`pokethology_hub_easyB_${todayStr}`, status);
-      localStorage.setItem(`pokethology_hub_easyB_opt_${todayStr}`, String(optIdx));
-    }
   };
 
   const handleMasterExamAnswer = (optIdx: number) => {
     if (masterExamStatus !== 'unanswered') return;
     setMasterChosenOption(optIdx);
     const correct = optIdx === hardTriviaQuestion.answerIndex;
-    const status = correct ? 'correct' : 'incorrect';
     
     if (correct) {
       setMasterExamStatus('correct');
@@ -866,17 +785,12 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       setMasterExamStatus('incorrect');
       try { sounds.error(); } catch (_) {}
     }
-    if (todayStr) {
-      localStorage.setItem(`pokethology_hub_hardA_${todayStr}`, status);
-      localStorage.setItem(`pokethology_hub_hardA_opt_${todayStr}`, String(optIdx));
-    }
   };
 
   const handleMasterExamAnswerB = (optIdx: number) => {
     if (masterExamStatusB !== 'unanswered') return;
     setMasterChosenOptionB(optIdx);
     const correct = optIdx === hardTriviaQuestionB.answerIndex;
-    const status = correct ? 'correct' : 'incorrect';
     
     if (correct) {
       setMasterExamStatusB('correct');
@@ -884,10 +798,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     } else {
       setMasterExamStatusB('incorrect');
       try { sounds.error(); } catch (_) {}
-    }
-    if (todayStr) {
-      localStorage.setItem(`pokethology_hub_hardB_${todayStr}`, status);
-      localStorage.setItem(`pokethology_hub_hardB_opt_${todayStr}`, String(optIdx));
     }
   };
 
@@ -907,7 +817,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     setScanStatus('scanning');
     setTimeout(() => {
       setScanStatus('completed');
-      if (todayStr) localStorage.setItem(`pokethology_hub_scan_${todayStr}`, 'completed');
     }, 2800);
   };
 
@@ -916,7 +825,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     if (medTriviaStatus !== 'unanswered') return;
     setMedChosenOption(optIdx);
     const correct = optIdx === medTriviaQuestion.answerIndex;
-    const status = correct ? 'correct' : 'incorrect';
     
     if (correct) {
       setMedTriviaStatus('correct');
@@ -925,17 +833,12 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       setMedTriviaStatus('incorrect');
       try { sounds.error(); } catch (_) {}
     }
-    if (todayStr) {
-      localStorage.setItem(`pokethology_hub_medA_${todayStr}`, status);
-      localStorage.setItem(`pokethology_hub_medA_opt_${todayStr}`, String(optIdx));
-    }
   };
 
   const handleMedTriviaAnswerB = (optIdx: number) => {
     if (medTriviaStatusB !== 'unanswered') return;
     setMedChosenOptionB(optIdx);
     const correct = optIdx === medTriviaQuestionB.answerIndex;
-    const status = correct ? 'correct' : 'incorrect';
     
     if (correct) {
       setMedTriviaStatusB('correct');
@@ -943,10 +846,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     } else {
       setMedTriviaStatusB('incorrect');
       try { sounds.error(); } catch (_) {}
-    }
-    if (todayStr) {
-      localStorage.setItem(`pokethology_hub_medB_${todayStr}`, status);
-      localStorage.setItem(`pokethology_hub_medB_opt_${todayStr}`, String(optIdx));
     }
   };
 
@@ -956,66 +855,41 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
 
   const handleChronoClaim = () => {
     setChronoClaimed(true);
-    if (todayStr) localStorage.setItem(`pokethology_hub_chrono_${todayStr}`, 'true');
   };
 
   const handleRetryEasyTrivia = () => {
     setEasyTriviaStatus('unanswered');
     setEasyChosenOption(null);
-    if (todayStr) {
-      localStorage.removeItem(`pokethology_hub_easyA_${todayStr}`);
-      localStorage.removeItem(`pokethology_hub_easyA_opt_${todayStr}`);
-    }
     try { sounds.scan(); } catch (_) {}
   };
 
   const handleRetryEasyTriviaB = () => {
     setEasyTriviaStatusB('unanswered');
     setEasyChosenOptionB(null);
-    if (todayStr) {
-      localStorage.removeItem(`pokethology_hub_easyB_${todayStr}`);
-      localStorage.removeItem(`pokethology_hub_easyB_opt_${todayStr}`);
-    }
     try { sounds.scan(); } catch (_) {}
   };
 
   const handleRetryMedTrivia = () => {
     setMedTriviaStatus('unanswered');
     setMedChosenOption(null);
-    if (todayStr) {
-      localStorage.removeItem(`pokethology_hub_medA_${todayStr}`);
-      localStorage.removeItem(`pokethology_hub_medA_opt_${todayStr}`);
-    }
     try { sounds.scan(); } catch (_) {}
   };
 
   const handleRetryMedTriviaB = () => {
     setMedTriviaStatusB('unanswered');
     setMedChosenOptionB(null);
-    if (todayStr) {
-      localStorage.removeItem(`pokethology_hub_medB_${todayStr}`);
-      localStorage.removeItem(`pokethology_hub_medB_opt_${todayStr}`);
-    }
     try { sounds.scan(); } catch (_) {}
   };
 
   const handleRetryMasterExam = () => {
     setMasterExamStatus('unanswered');
     setMasterChosenOption(null);
-    if (todayStr) {
-      localStorage.removeItem(`pokethology_hub_hardA_${todayStr}`);
-      localStorage.removeItem(`pokethology_hub_hardA_opt_${todayStr}`);
-    }
     try { sounds.scan(); } catch (_) {}
   };
 
   const handleRetryMasterExamB = () => {
     setMasterExamStatusB('unanswered');
     setMasterChosenOptionB(null);
-    if (todayStr) {
-      localStorage.removeItem(`pokethology_hub_hardB_${todayStr}`);
-      localStorage.removeItem(`pokethology_hub_hardB_opt_${todayStr}`);
-    }
     try { sounds.scan(); } catch (_) {}
   };
 
@@ -1027,7 +901,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     if (inSweetSpot) {
       setGameResult('success');
       setCoreRechargeStatus('completed');
-      if (todayStr) localStorage.setItem(`pokethology_hub_core_${todayStr}`, 'completed');
     } else {
       setGameResult('failed');
       setTimeout(() => {
@@ -1065,23 +938,6 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
   }, [masterExamStatusB, speedTrialStatus, masterExamStatus, matrixLockdownStatus]);
 
   const totalCompletedCount = easyCompletedCount + medCompletedCount + hardCompletedCount;
-
-  // Persist overall progress count and mission completed status for today
-  useEffect(() => {
-    if (!todayStr) return;
-    try {
-      const countKey = `pokethology_mission_progress_count_${todayStr}`;
-      const completedKey = `pokethology_mission_completed_${todayStr}`;
-      
-      const currentSaved = parseInt(localStorage.getItem(countKey) || '0', 10);
-      if (totalCompletedCount > currentSaved) {
-        localStorage.setItem(countKey, String(totalCompletedCount));
-      }
-      if (totalCompletedCount >= 1) {
-        localStorage.setItem(completedKey, 'true');
-      }
-    } catch (_) {}
-  }, [totalCompletedCount, todayStr]);
 
   const operatorRank = useMemo(() => {
     if (totalCompletedCount >= 3) return { title: 'Expert', color: 'text-amber-400 border-amber-500/30' };
@@ -1159,16 +1015,21 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       <ParticleExplosion active={showMissionExplosion} onComplete={() => setShowMissionExplosion(false)} />
       {/* Dynamic Header Metrics Dashboard */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-950/70 p-4.5 rounded-2xl border border-cyan-500/10 text-left shadow-lg">
-        <div className="space-y-1.5 border-b sm:border-b-0 sm:border-r border-slate-900 pb-3 sm:pb-0 sm:pr-4 flex flex-col justify-center">
+        <div className="space-y-1.5 border-b sm:border-b-0 sm:border-r border-slate-900 pb-3 sm:pb-0 sm:pr-4">
           <div className="flex items-center gap-1.5 md:gap-2">
             <Award className="w-5 h-5 text-cyan-400" />
-            <span className="text-xs sm:text-sm font-hud font-black text-cyan-400 uppercase tracking-widest">Rank</span>
+            <span className="text-[10px] sm:text-xs font-hud font-black text-cyan-400 uppercase tracking-widest">Operator Rank</span>
           </div>
-          <p className="text-lg sm:text-2xl font-hud font-black uppercase tracking-wider mt-1">
-            <span className={cn(operatorRank.color)}>
+          <p className="text-[10px] font-mono text-slate-300 uppercase font-bold">
+            <span className={cn("tracking-wider", operatorRank.color)}>
               {operatorRank.title}
             </span>
           </p>
+          <div className="flex items-center gap-2 mt-1">
+            <div className="text-xl sm:text-2xl font-hud font-black text-white leading-none">
+              {totalCompletedCount} <span className="text-xs text-cyan-400/80 font-bold">COMPLETED</span>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-1 sm:pl-4 flex flex-col justify-center">
