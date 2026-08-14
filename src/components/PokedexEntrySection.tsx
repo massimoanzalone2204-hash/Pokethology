@@ -166,22 +166,22 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
       )}>
         {/* Simple Section Header */}
         <div className={cn(
-          "font-hud text-[13px] uppercase tracking-wider mb-4 flex items-center justify-between pb-3 border-b gap-2",
+          "font-hud text-[13px] uppercase tracking-wider mb-4 flex flex-wrap sm:flex-nowrap items-center justify-between pb-3 border-b gap-2",
           isLightMode ? "text-cyan-900 border-slate-200" : "text-cyan-400 border-cyan-900/40"
         )}>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <BookOpen className="w-4 h-4 text-cyan-400" />
-            <span className="font-bold">Pokédex Entry</span>
+            <span className="font-bold whitespace-nowrap">Pokédex Entry</span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-nowrap">
             {cryUrl && (
               <button
                 type="button"
                 onClick={handlePlayCry}
                 title="Play Pokémon Cry"
                 className={cn(
-                  "flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-hud uppercase tracking-wider border transition-all cursor-pointer font-bold",
+                  "flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-[10px] font-hud uppercase tracking-wider border transition-all cursor-pointer font-bold shrink-0 whitespace-nowrap",
                   isPlayingCry
                     ? "bg-amber-500 text-slate-950 border-amber-300"
                     : isLightMode
@@ -199,7 +199,7 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
               onClick={handleTTS}
               title={isSpeaking ? "Stop Voice" : "Read Entry"}
               className={cn(
-                "flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-hud uppercase tracking-wider border transition-all cursor-pointer font-bold",
+                "flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-[10px] font-hud uppercase tracking-wider border transition-all cursor-pointer font-bold shrink-0 whitespace-nowrap",
                 isSpeaking
                   ? "bg-cyan-500 text-slate-950 border-cyan-300"
                   : isLightMode

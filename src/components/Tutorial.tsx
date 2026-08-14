@@ -54,32 +54,6 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 
   if (!isOpen) return null;
 
-  const getSourceActionLabel = (item: any) => {
-    const tagLower = (item?.tag || '').toLowerCase();
-    const urlLower = (item?.url || '').toLowerCase();
-    const titleLower = (item?.title || '').toLowerCase();
-
-    if (urlLower.includes('tcg.pokemon.com') || tagLower.includes('tcg') || tagLower.includes('card') || tagLower.includes('pocket')) {
-      return 'VISIT TCG SITE';
-    }
-    if (urlLower.includes('play-pokemon') || tagLower.includes('tournament') || tagLower.includes('championship') || tagLower.includes('vgc') || tagLower.includes('competitive') || titleLower.includes('competitive')) {
-      return 'VISIT COMPETITIVE HUB';
-    }
-    if (urlLower.includes('watch.pokemon.com') || tagLower.includes('anime') || tagLower.includes('series') || tagLower.includes('movie') || tagLower.includes('tv')) {
-      return 'WATCH POKÉMON TV';
-    }
-    if (urlLower.includes('pokemongolive') || tagLower.includes('go') || tagLower.includes('mobile') || tagLower.includes('niantic')) {
-      return 'VISIT POKÉMON GO';
-    }
-    if (tagLower.includes('update') || tagLower.includes('patch')) {
-      return 'VIEW GAME UPDATES';
-    }
-    if (urlLower.includes('pokemon.com')) {
-      return 'VISIT OFFICIAL PORTAL';
-    }
-    return 'VISIT OFFICIAL SOURCE';
-  };
-
   return (
     <AnimatePresence>
       <motion.div
@@ -200,7 +174,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Radar className="w-5 h-5 text-emerald-400 animate-spin-slow" />
                   </div>
                   <div className="space-y-1 w-full min-w-0">
-                    <div className="border-b border-emerald-500/20 pb-1.5">
+                    <div className="flex items-center justify-between border-b border-emerald-500/20 pb-1.5">
                       <span className="font-hud font-black text-emerald-400 text-xs sm:text-sm uppercase tracking-wider">
                         Complete New Stats Section
                       </span>
@@ -217,7 +191,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Swords className="w-5 h-5 text-cyan-400 animate-pulse" />
                   </div>
                   <div className="space-y-1 w-full min-w-0">
-                    <div className="border-b border-cyan-500/20 pb-1.5">
+                    <div className="flex items-center justify-between border-b border-cyan-500/20 pb-1.5">
                       <span className="font-hud font-black text-cyan-400 text-xs sm:text-sm uppercase tracking-wider">
                         Advanced Compare Section
                       </span>
@@ -364,7 +338,9 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <Gamepad2 className="w-4 h-4 text-amber-400" />
                     </div>
                     <div>
-                      <span className="font-hud font-black text-cyan-400 text-xs sm:text-sm uppercase tracking-wider">Artwork & Sprite Mode Toggle</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-hud font-black text-cyan-400 text-xs sm:text-sm uppercase tracking-wider">Artwork & Sprite Mode Toggle</span>
+                      </div>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
                         Use the <span className="text-cyan-300 font-bold font-hud">[Art / Sprite]</span> button in the arena header or Pokédex to switch visual rendering between official HD Sugimori Artwork (<span className="text-cyan-400 font-semibold">Art</span>) and retro 2D Pixel Sprites (<span className="text-amber-400 font-semibold">Sprite</span>).
                       </p>
@@ -376,7 +352,9 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <Volume2 className="w-5 h-5 text-red-400" />
                     </div>
                     <div>
-                      <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider">Interactive Arena Artwork</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider">Interactive Arena Artwork</span>
+                      </div>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
                         Touch or click directly on any Pokémon's artwork inside the combat arena to rotate its stance position and play its official species cry in real-time!
                       </p>
@@ -492,10 +470,18 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
             {activeTab === 'news' && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5 max-w-2xl mx-auto text-left">
                 <div className="p-4 bg-cyan-950/20 border-l-4 border-cyan-500 rounded-r-xl space-y-2 text-left relative overflow-hidden">
-                  <div className="border-b border-cyan-500/25 pb-2">
+                  <div className="flex items-center justify-between border-b border-cyan-500/25 pb-2">
                     <h3 className="font-hud font-black text-cyan-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
                       <Globe className="w-4 h-4 text-cyan-400 animate-spin-slow" /> Real-World Pokémon Grounded Briefings
                     </h3>
+                    {isFallback && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="inline-block w-2 h-2 rounded-full animate-pulse mr-1 bg-amber-500" />
+                        <span className="text-[7px] font-mono text-slate-400 uppercase tracking-widest">
+                          LOCAL ARCHIVE BACKUP
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs">
                     Stay up to date with official global Pokémon news, game updates, competitive tournament briefings, and media releases directly fetched in real-time.
@@ -574,7 +560,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                                   referrerPolicy="no-referrer"
                                   className="flex items-center gap-1 px-2 py-1 bg-transparent hover:bg-slate-900 border border-slate-800 hover:border-cyan-500/20 rounded text-[8px] font-mono text-cyan-400 uppercase tracking-widest transition-all cursor-pointer group"
                                 >
-                                  <span>{getSourceActionLabel(item)}</span>
+                                  <span>SOURCE DIRECT</span>
                                   <ExternalLink className="w-2.5 h-2.5 text-cyan-400 group-hover:scale-110 transition-transform" />
                                 </a>
                               </div>
