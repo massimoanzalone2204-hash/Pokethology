@@ -1,11 +1,13 @@
 import React from 'react';
 import { cn } from '../lib/utils';
+import { PokemonTypeIcon } from './PokemonTypeIcon';
 
 export interface TypeBadgeProps {
   type: string;
   label?: string;
   size?: 'xs' | 'sm' | 'md' | 'lg';
   className?: string;
+  showIcon?: boolean;
 }
 
 export const typeBadgeConfig: Record<string, { bg: string; text: string; border: string }> = {
@@ -30,16 +32,23 @@ export const typeBadgeConfig: Record<string, { bg: string; text: string; border:
   stellar: { bg: 'from-[#70E0FF] via-[#40A8FF] to-[#1040A0]', text: 'text-white', border: 'border-[#082050]' },
 };
 
-export const TypeBadge: React.FC<TypeBadgeProps> = ({ type, label, size = 'md', className }) => {
+export const TypeBadge: React.FC<TypeBadgeProps> = ({ type, label, size = 'md', className, showIcon = true }) => {
   const normalizedType = (type || 'normal').toLowerCase();
   const config = typeBadgeConfig[normalizedType] || typeBadgeConfig.normal;
   const displayLabel = (label || type || '').toUpperCase();
 
   const sizeClasses = {
-    xs: 'px-1.5 py-0.5 text-[7px] sm:text-[8px]',
-    sm: 'px-2 py-0.5 text-[8px] sm:text-[9.5px]',
-    md: 'px-2.5 py-1 text-[9px] sm:text-[11px]',
-    lg: 'px-3.5 py-1.5 text-[11px] sm:text-[13px]',
+    xs: 'px-1.5 py-0.5 text-[7px] sm:text-[8px] gap-0.5',
+    sm: 'px-2 py-0.5 text-[8px] sm:text-[9.5px] gap-1',
+    md: 'px-2.5 py-1 text-[9px] sm:text-[11px] gap-1',
+    lg: 'px-3.5 py-1.5 text-[11px] sm:text-[13px] gap-1.5',
+  }[size];
+
+  const iconSizes = {
+    xs: 'xs' as const,
+    sm: 'xs' as const,
+    md: 'sm' as const,
+    lg: 'md' as const,
   }[size];
 
   return (
@@ -57,7 +66,15 @@ export const TypeBadge: React.FC<TypeBadgeProps> = ({ type, label, size = 'md', 
     >
       {/* Top half glossy sheen (Gen 5 B/W iconic cartridge badge highlight) */}
       <span className="absolute top-0 inset-x-0 h-[48%] bg-gradient-to-b from-white/45 via-white/15 to-transparent pointer-events-none rounded-t-[3px]" />
-      <span className="relative z-10 drop-shadow-[0_1px_1.5px_rgba(0,0,0,0.95)]">{displayLabel}</span>
+      {showIcon && (
+        <PokemonTypeIcon
+          type={normalizedType}
+          size={iconSizes}
+          className="relative z-10 opacity-95 shrink-0"
+          showShadow={false}
+        />
+      )}
+      <span className="relative z-10 drop-shadow-[0_1px_1.5px_rgba(0,0,0,0.95)] leading-none">{displayLabel}</span>
     </span>
   );
 };

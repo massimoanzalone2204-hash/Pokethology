@@ -4,7 +4,13 @@ import { cn, hudButtonClass, playHaptic } from '../lib/utils';
 import { sounds } from '../lib/sounds';
 import { HUDCorners } from './HUDCorners';
 import { ParticleExplosion } from './ParticleExplosion';
+import { TierCompleted3DBadge } from './TierCompleted3DBadge';
 import { MissionCategory } from '../types';
+import { 
+  DAILY_COMBAT_CHALLENGES, 
+  getAllCombatChallengesProgress, 
+  DailyCombatChallenge 
+} from '../lib/dailyCombatChallenges';
 import { 
   Swords, 
   Trophy, 
@@ -34,7 +40,8 @@ import {
   ShieldCheck,
   Crown,
   Scroll,
-  Puzzle
+  Puzzle,
+  ChevronRight
 } from 'lucide-react';
 
 export interface CombatMission {
@@ -402,10 +409,33 @@ interface PokethologyCombatMissionWidgetProps {
   isCompleted: boolean;
   missionProgressCount?: number;
   missionRequiredCount?: number;
+  onNavigateToArena?: () => void;
 }
 
-export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWidgetProps> = memo(({ todayStr, isCompleted, missionProgressCount, missionRequiredCount }) => {
+export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWidgetProps> = memo(({ 
+  todayStr, 
+  isCompleted, 
+  missionProgressCount, 
+  missionRequiredCount,
+  onNavigateToArena 
+}) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<'bronze' | 'silver' | 'gold'>('bronze');
+
+  // Real-time synchronization of the 6 Combat Arena Challenges
+  const [challengesProgress, setChallengesProgress] = useState<Record<string, number>>(() => getAllCombatChallengesProgress(todayStr));
+
+  useEffect(() => {
+    const syncProgress = () => {
+      setChallengesProgress(getAllCombatChallengesProgress(todayStr));
+    };
+    syncProgress();
+    window.addEventListener('daily-challenge-progress', syncProgress);
+    window.addEventListener('storage', syncProgress);
+    return () => {
+      window.removeEventListener('daily-challenge-progress', syncProgress);
+      window.removeEventListener('storage', syncProgress);
+    };
+  }, [todayStr]);
   
   // Session level overrides for API fetched questions
   const [sessionEasyTriviaQuestion, setSessionEasyTriviaQuestion] = useState<TriviaQuestion | null>(null);
@@ -910,40 +940,195 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     }
   };
 
+  const bronze3Done = (challengesProgress['bronze_3'] || 0) >= 1;
+  const bronze4Done = (challengesProgress['bronze_4'] || 0) >= 2;
+  const silver3Done = (challengesProgress['silver_3'] || 0) >= 2;
+  const silver4Done = (challengesProgress['silver_4'] || 0) >= 3;
+  const gold3Done = (challengesProgress['gold_3'] || 0) >= 3;
+  const gold4Done = (challengesProgress['gold_4'] || 0) >= 5;
+
   const easyCompletedCount = useMemo(() => {
     let count = 0;
-    if (medCheckinStatus === 'completed') count++;
     if (easyTriviaStatus === 'correct') count++;
     if (easyTriviaStatusB === 'correct') count++;
-    if (scanStatus === 'completed') count++;
+    if (bronze3Done) count++;
+    if (bronze4Done) count++;
     return count;
-  }, [medCheckinStatus, easyTriviaStatus, easyTriviaStatusB, scanStatus]);
+  }, [easyTriviaStatus, easyTriviaStatusB, bronze3Done, bronze4Done]);
 
   const medCompletedCount = useMemo(() => {
     let count = 0;
     if (medTriviaStatus === 'correct') count++;
     if (medTriviaStatusB === 'correct') count++;
-    if (chronoClaimed) count++;
-    if (coreRechargeStatus === 'completed') count++;
+    if (silver3Done) count++;
+    if (silver4Done) count++;
     return count;
-  }, [medTriviaStatus, medTriviaStatusB, chronoClaimed, coreRechargeStatus]);
+  }, [medTriviaStatus, medTriviaStatusB, silver3Done, silver4Done]);
 
   const hardCompletedCount = useMemo(() => {
     let count = 0;
-    if (masterExamStatusB === 'correct') count++;
-    if (speedTrialStatus === 'completed') count++;
     if (masterExamStatus === 'correct') count++;
-    if (matrixLockdownStatus === 'completed') count++;
+    if (masterExamStatusB === 'correct') count++;
+    if (gold3Done) count++;
+    if (gold4Done) count++;
     return count;
-  }, [masterExamStatusB, speedTrialStatus, masterExamStatus, matrixLockdownStatus]);
+  }, [masterExamStatus, masterExamStatusB, gold3Done, gold4Done]);
 
   const totalCompletedCount = easyCompletedCount + medCompletedCount + hardCompletedCount;
 
+  const renderCombatChallengeCard = (challengeId: string, tierTheme: 'bronze' | 'silver' | 'gold') => {
+    const challenge = DAILY_COMBAT_CHALLENGES.find(c => c.id === challengeId);
+    if (!challenge) return null;
+    const current = challengesProgress[challengeId] || 0;
+    const req = challenge.requirement;
+    const isDone = current >= req;
+    const percent = Math.min(100, Math.round((current / req) * 100));
+
+    const tierColors = {
+      bronze: {
+        border: isDone ? "border-emerald-500/50" : "border-amber-500/30 hover:border-amber-500/50",
+        title: "text-amber-400",
+        badge: "text-amber-400 border-amber-500/40 bg-amber-950/40",
+        progress: "from-amber-500 to-yellow-400 shadow-[0_0_8px_rgba(245,158,11,0.4)]",
+        btn: "bg-amber-600/30 hover:bg-amber-500/40 text-amber-200 border-amber-500/40"
+      },
+      silver: {
+        border: isDone ? "border-emerald-500/50" : "border-slate-700 hover:border-cyan-500/40",
+        title: "text-slate-200",
+        badge: "text-slate-300 border-slate-600 bg-slate-800/60",
+        progress: "from-cyan-500 to-blue-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]",
+        btn: "bg-cyan-900/40 hover:bg-cyan-800/60 text-cyan-200 border-cyan-500/40"
+      },
+      gold: {
+        border: isDone ? "border-emerald-500/50" : "border-yellow-600/40 hover:border-yellow-500/60",
+        title: "text-yellow-400",
+        badge: "text-yellow-400 border-yellow-500/40 bg-yellow-950/40",
+        progress: "from-yellow-500 to-amber-400 shadow-[0_0_8px_rgba(234,179,8,0.4)]",
+        btn: "bg-yellow-900/40 hover:bg-yellow-800/60 text-yellow-200 border-yellow-500/40"
+      }
+    }[tierTheme];
+
+    const getIcon = () => {
+      switch (challenge.icon) {
+        case 'Swords': return <Swords className="w-4 h-4 text-inherit" />;
+        case 'Zap': return <Zap className="w-4 h-4 text-inherit" />;
+        case 'ShieldCheck': return <ShieldCheck className="w-4 h-4 text-inherit" />;
+        case 'Target': return <Target className="w-4 h-4 text-inherit" />;
+        case 'Crown': return <Crown className="w-4 h-4 text-inherit" />;
+        case 'Flame': return <Flame className="w-4 h-4 text-inherit" />;
+        default: return <Swords className="w-4 h-4 text-inherit" />;
+      }
+    };
+
+    return (
+      <div className={cn(
+        "bg-slate-950/80 border rounded-xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden shadow-lg text-left transition-all",
+        tierColors.border,
+        isDone && "bg-emerald-950/15"
+      )}>
+        <HUDCorners />
+        <div>
+          <div className="flex justify-between items-start gap-2 mb-1.5">
+            <h4 className={cn("text-xs sm:text-sm font-hud uppercase font-bold tracking-wider flex items-center gap-2", tierColors.title)}>
+              <span className={isDone ? "text-emerald-400" : tierColors.title}>{getIcon()}</span>
+              {challenge.title}
+            </h4>
+          </div>
+
+          <p className="text-[10px] text-slate-300 leading-normal">
+            {challenge.description}
+          </p>
+        </div>
+
+        <div className="space-y-2 pt-1 border-t border-white/5">
+          <div className="flex justify-between items-center text-[9px] font-mono">
+            <span className="text-slate-400 uppercase tracking-wider">Battle Progress</span>
+            <span className={cn("font-bold", isDone ? "text-emerald-400" : "text-cyan-400")}>
+              {current} / {req} ({percent}%)
+            </span>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-white/10 relative">
+            <motion.div 
+              className={cn("h-full rounded-full bg-gradient-to-r", isDone ? "from-emerald-500 to-teal-400" : tierColors.progress)}
+              initial={{ width: 0 }}
+              animate={{ width: `${percent}%` }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            />
+          </div>
+
+          <div>
+            {isDone ? (
+              <div className="w-full py-2 bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                Arena Challenge Completed
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  if (onNavigateToArena) {
+                    onNavigateToArena();
+                  }
+                }}
+                className={cn(
+                  "w-full py-2.5 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-95 border",
+                  tierColors.btn
+                )}
+              >
+                <Swords className="w-3.5 h-3.5" />
+                Enter Combat Arena
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const operatorRank = useMemo(() => {
-    if (totalCompletedCount >= 3) return { title: 'Expert', color: 'text-amber-400 border-amber-500/30' };
-    if (totalCompletedCount >= 2) return { title: 'Intermediate', color: 'text-purple-400 border-purple-500/30' };
-    if (totalCompletedCount >= 1) return { title: 'Beginner', color: 'text-emerald-400 border-emerald-500/30' };
-    return { title: 'Novice', color: 'text-slate-400 border-slate-700/50' };
+    if (totalCompletedCount >= 10) return { 
+      title: 'MASTER CHAMPION', 
+      textColor: 'text-amber-400', 
+      badgeBg: 'bg-amber-950/60 border-amber-500/50 text-amber-300',
+      subtitle: 'Elite Apex Clearance',
+      tierLabel: 'Division Apex'
+    };
+    if (totalCompletedCount >= 7) return { 
+      title: 'ACE STRATEGIST', 
+      textColor: 'text-yellow-400', 
+      badgeBg: 'bg-yellow-950/60 border-yellow-500/50 text-yellow-300',
+      subtitle: 'Senior Battle Tactician',
+      tierLabel: 'Gold Division'
+    };
+    if (totalCompletedCount >= 4) return { 
+      title: 'EXPERT', 
+      textColor: 'text-cyan-400', 
+      badgeBg: 'bg-cyan-950/60 border-cyan-500/50 text-cyan-300',
+      subtitle: 'Advanced Field Operative',
+      tierLabel: 'Silver Division'
+    };
+    if (totalCompletedCount >= 2) return { 
+      title: 'INTERMEDIATE', 
+      textColor: 'text-purple-400', 
+      badgeBg: 'bg-purple-950/60 border-purple-500/50 text-purple-300',
+      subtitle: 'Certified Field Researcher',
+      tierLabel: 'Bronze Division'
+    };
+    if (totalCompletedCount >= 1) return { 
+      title: 'BEGINNER', 
+      textColor: 'text-emerald-400', 
+      badgeBg: 'bg-emerald-950/60 border-emerald-500/50 text-emerald-300',
+      subtitle: 'Initiate Cadet Operative',
+      tierLabel: 'Cadet Clearance'
+    };
+    return { 
+      title: 'NOVICE', 
+      textColor: 'text-slate-300', 
+      badgeBg: 'bg-slate-900/60 border-slate-700/50 text-slate-400',
+      subtitle: 'Tactical Trainee',
+      tierLabel: 'Initiate'
+    };
   }, [totalCompletedCount]);
 
   if (isWidgetLoading) {
@@ -1018,35 +1203,40 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
         <div className="space-y-1.5 border-b sm:border-b-0 sm:border-r border-slate-900 pb-3 sm:pb-0 sm:pr-4">
           <div className="flex items-center gap-1.5 md:gap-2">
             <Award className="w-5 h-5 text-cyan-400" />
-            <span className="text-[10px] sm:text-xs font-hud font-black text-cyan-400 uppercase tracking-widest">Operator Rank</span>
+            <span className="text-[10px] sm:text-xs font-hud font-black text-cyan-400 uppercase tracking-widest">Operator Clearance Level</span>
           </div>
-          <p className="text-[10px] font-mono text-slate-300 uppercase font-bold">
-            <span className={cn("tracking-wider", operatorRank.color)}>
+          <div className="flex flex-col mt-0.5">
+            <span className={cn("text-2xl sm:text-3xl font-hud font-black uppercase tracking-wider leading-tight drop-shadow-sm", operatorRank.textColor)}>
               {operatorRank.title}
             </span>
-          </p>
-          <div className="flex items-center gap-2 mt-1">
-            <div className="text-xl sm:text-2xl font-hud font-black text-white leading-none">
-              {totalCompletedCount} <span className="text-xs text-cyan-400/80 font-bold">COMPLETED</span>
+            <div className="flex items-center gap-2 mt-1">
+              <span className={cn("text-[9px] font-hud font-black uppercase tracking-wider px-2 py-0.5 rounded border", operatorRank.badgeBg)}>
+                {operatorRank.tierLabel}
+              </span>
+              <span className="text-[9.5px] font-mono text-slate-400 uppercase tracking-wider">
+                {operatorRank.subtitle}
+              </span>
             </div>
           </div>
         </div>
 
         <div className="space-y-1 sm:pl-4 flex flex-col justify-center">
           <div className="flex justify-between items-center">
-            <span className="text-[10px] font-hud font-extrabold text-slate-400 uppercase tracking-wider">Daily Progress</span>
-            <span className="text-xs font-hud font-black text-white">{totalCompletedCount} / 12</span>
+            <span className="text-[10px] font-hud font-extrabold text-slate-400 uppercase tracking-wider">Operational Calibration</span>
+            <span className={cn("text-xs font-hud font-black uppercase tracking-wider", operatorRank.textColor)}>
+              {operatorRank.title}
+            </span>
           </div>
-          <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-[1px] mt-1.5">
+          <div className="h-2.5 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-[1px] mt-1.5">
             <motion.div 
               className="h-full rounded-full bg-gradient-to-r from-cyan-500 via-indigo-500 to-emerald-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]"
               initial={{ width: 0 }}
-              animate={{ width: `${(totalCompletedCount / 12) * 100}%` }}
+              animate={{ width: `${Math.max(10, Math.min(100, (totalCompletedCount / 12) * 100))}%` }}
               transition={{ duration: 0.8 }}
             />
           </div>
           <p className="text-[9px] font-mono text-slate-400 uppercase mt-1 tracking-wider text-right">
-            {12 - totalCompletedCount} remaining today
+            Daily Operations Hub Active
           </p>
         </div>
       </div>
@@ -1112,8 +1302,8 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                   </div>
                   
                   <div className="flex items-center gap-1 shrink-0 font-mono text-xs font-semibold">
-                    <span className={cn("px-2 py-0.5 rounded text-[10px] tracking-tight leading-none font-bold", isActive ? "bg-slate-950/80 text-current" : "bg-slate-950/30 text-slate-500")}>
-                      {tier.completed}/4
+                    <span className={cn("px-2 py-0.5 rounded text-[10px] tracking-tight leading-none font-bold uppercase", isActive ? "bg-slate-950/80 text-current" : "bg-slate-950/30 text-slate-500")}>
+                      {tier.completed >= 4 ? 'Conquered' : `${tier.completed}/4`}
                     </span>
                   </div>
                 </motion.button>
@@ -1127,13 +1317,26 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
       <div className="text-left w-full">
         <AnimatePresence mode="wait">
           {selectedDifficulty === 'bronze' ? (
-            <motion.div
-              key="bronze-dashboard"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex flex-col md:grid md:grid-cols-2 gap-3 sm:gap-4 md:gap-5 w-full max-w-full"
-            >
+            easyCompletedCount >= 4 ? (
+              <TierCompleted3DBadge
+                key="bronze-completed-badge"
+                tier="bronze"
+                onNavigateToArena={onNavigateToArena}
+                onSwitchTier={(t) => setSelectedDifficulty(t)}
+                otherTiersProgress={{
+                  bronze: easyCompletedCount,
+                  silver: medCompletedCount,
+                  gold: hardCompletedCount
+                }}
+              />
+            ) : (
+              <motion.div
+                key="bronze-dashboard"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="flex flex-col md:grid md:grid-cols-2 gap-3 sm:gap-4 md:gap-5 w-full max-w-full"
+              >
               {/* ACTIVITY 01 • Theory Challenge */}
               <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg text-left max-w-full">
                 <HUDCorners />
@@ -1142,10 +1345,8 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                     <BookOpen className="w-4 h-4 text-amber-400" />
                     Activity 01 • Theory Question
                   </h4>
-                  {easyTriviaStatus === 'correct' ? (
+                  {easyTriviaStatus === 'correct' && (
                     <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
-                  ) : (
-                    <span className="text-[9px] font-bold text-amber-400 bg-amber-950/30 border border-amber-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                   )}
                 </div>
 
@@ -1212,10 +1413,8 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                     <Swords className="w-4 h-4 text-amber-400" />
                     Activity 02 • Type Knowledge
                   </h4>
-                  {easyTriviaStatusB === 'correct' ? (
+                  {easyTriviaStatusB === 'correct' && (
                     <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
-                  ) : (
-                    <span className="text-[9px] font-bold text-amber-400 bg-amber-950/30 border border-amber-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                   )}
                 </div>
 
@@ -1274,129 +1473,34 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 )}
               </div>
 
-              {/* ACTIVITY 03 • Pokédex Challenge */}
-              <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden shadow-lg text-left">
-                <HUDCorners />
-                <div className="flex justify-between items-center">
-                  <h4 className="text-xs sm:text-sm font-hud text-amber-400 uppercase font-bold tracking-wider flex items-center gap-2">
-                    <Compass className="w-4 h-4 text-amber-400" />
-                    Activity 03 • Pokédex Scan
-                  </h4>
-                  {scanStatus === 'completed' ? (
-                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
-                  ) : (
-                    <span className="text-[9px] font-bold text-amber-400 bg-amber-950/30 border border-amber-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
-                  )}
-                </div>
+              {/* ACTIVITY 03 • Combat Challenge 01 */}
+              {renderCombatChallengeCard('bronze_3', 'bronze')}
 
-                <p className="text-[10px] text-slate-400 leading-normal">
-                  Scan the Pokédex to load new highlights and complete this daily activity.
-                </p>
-
-                <div>
-                  {scanStatus === 'idle' && (
-                    <button
-                      onClick={handleCosmicScan}
-                      className="w-full py-2.5 bg-indigo-900/40 hover:bg-indigo-800/60 text-indigo-300 border border-indigo-500/30 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
-                    >
-                      <Search className="w-3.5 h-3.5" />
-                      Start Pokédex Scan
-                    </button>
-                  )}
-
-                  {scanStatus === 'scanning' && (
-                    <div className="w-full py-2 bg-indigo-950/40 border border-indigo-500/30 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg flex flex-col items-center justify-center gap-1 p-2">
-                      <div className="flex items-center gap-1.5 text-cyan-400">
-                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                        <span>Scanning Pokédex logs...</span>
-                      </div>
-                      <div className="w-full bg-slate-900 h-1 rounded-full overflow-hidden mt-1.5">
-                        <motion.div 
-                          className="h-full bg-cyan-400"
-                          initial={{ width: 0 }}
-                          animate={{ width: '100%' }}
-                          transition={{ duration: 2.8, ease: "linear" }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {scanStatus === 'completed' && (
-                    <div className="w-full py-2 bg-emerald-950/20 border border-emerald-500/20 text-emerald-400 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5">
-                      <Check className="w-3.5 h-3.5" />
-                      Pokédex scan completed 
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* ACTIVITY 04 • Smart & Reactivity Challenge */}
-              <div className={cn(
-                "bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden shadow-lg transition-all duration-300 text-left",
-                meditationFlash ? "ring-2 ring-emerald-400 border-emerald-400 shadow-[0_0_25px_rgba(52,211,153,0.8)] bg-emerald-950/10 scale-[1.01]" : ""
-              )}>
-                <HUDCorners />
-                <div className="flex justify-between items-center">
-                  <h4 className="text-xs sm:text-sm font-hud text-amber-400 uppercase font-bold tracking-wider flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-amber-400" />
-                    Activity 04 • Focus Breathing
-                  </h4>
-                  {medCheckinStatus === 'completed' ? (
-                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
-                  ) : (
-                    <span className="text-[9px] font-bold text-amber-400 bg-amber-950/30 border border-amber-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
-                  )}
-                </div>
-
-                <p className="text-[10px] text-slate-400 leading-normal">
-                  Take a quick 6-second deep breath to relax and focus before your battles.
-                </p>
-
-                <div className="mt-2.5">
-                  {medCheckinStatus === 'idle' && (
-                    <button
-                      onClick={handleMeditationStart}
-                      className="w-full py-2.5 bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 hover:border-cyan-400 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
-                    >
-                      <Timer className="w-3.5 h-3.5" />
-                      Begin Focused Breathing (6s)
-                    </button>
-                  )}
-
-                  {medCheckinStatus === 'breathing' && (
-                    <div className="w-full py-2 bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg flex items-center justify-center gap-2">
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-cyan-400" />
-                      <span>Inhale deeply... {medSeconds}s</span>
-                    </div>
-                  )}
-
-                  {medCheckinStatus === 'claimable' && (
-                    <button
-                      onClick={handleMeditationClaim}
-                      className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-lg active:scale-95 animate-bounce"
-                    >
-                      <Trophy className="w-3.5 h-3.5" />
-                      Claim  Reward!
-                    </button>
-                  )}
-
-                  {medCheckinStatus === 'completed' && (
-                    <div className="w-full py-2 bg-emerald-950/20 border border-emerald-500/20 text-emerald-400 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5 select-none opacity-80">
-                      <Check className="w-3.5 h-3.5" />
-                      Completed 
-                    </div>
-                  )}
-                </div>
-              </div>
+              {/* ACTIVITY 04 • Combat Challenge 02 */}
+              {renderCombatChallengeCard('bronze_4', 'bronze')}
             </motion.div>
+            )
           ) : selectedDifficulty === 'silver' ? (
-            <motion.div
-              key="silver-dashboard"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex flex-col md:grid md:grid-cols-2 gap-3 sm:gap-4 md:gap-5 w-full max-w-full"
-            >
+            medCompletedCount >= 4 ? (
+              <TierCompleted3DBadge
+                key="silver-completed-badge"
+                tier="silver"
+                onNavigateToArena={onNavigateToArena}
+                onSwitchTier={(t) => setSelectedDifficulty(t)}
+                otherTiersProgress={{
+                  bronze: easyCompletedCount,
+                  silver: medCompletedCount,
+                  gold: hardCompletedCount
+                }}
+              />
+            ) : (
+              <motion.div
+                key="silver-dashboard"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="flex flex-col md:grid md:grid-cols-2 gap-3 sm:gap-4 md:gap-5 w-full max-w-full"
+              >
               {/* ACTIVITY 05 • Theory Challenge */}
               <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg text-left">
                 <HUDCorners />
@@ -1405,10 +1509,8 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                     <GraduationCap className="w-4 h-4 text-slate-400" />
                     Activity 05 • Theory Question
                   </h4>
-                  {medTriviaStatus === 'correct' ? (
+                  {medTriviaStatus === 'correct' && (
                     <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
-                  ) : (
-                    <span className="text-[9px] font-bold text-slate-400 bg-slate-950/30 border border-slate-500/20 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                   )}
                 </div>
 
@@ -1475,10 +1577,8 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                     <Target className="w-4 h-4 text-slate-400" />
                     Activity 06 • Move Strategy
                   </h4>
-                  {medTriviaStatusB === 'correct' ? (
+                  {medTriviaStatusB === 'correct' && (
                     <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
-                  ) : (
-                    <span className="text-[9px] font-bold text-slate-400 bg-slate-950/30 border border-slate-500/20 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                   )}
                 </div>
 
@@ -1537,142 +1637,34 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 )}
               </div>
 
-              {/* ACTIVITY 07 • Pokédex Challenge */}
-              <div className={cn(
-                "bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden shadow-lg scale-100 transition-all duration-300 text-left",
-                chronoFlash ? "ring-2 ring-emerald-400 border-emerald-400 shadow-[0_0_25px_rgba(52,211,153,0.8)] bg-emerald-950/10 scale-[1.01]" : ""
-              )}>
-                <HUDCorners />
-                <div className="flex justify-between items-center">
-                  <h4 className="text-xs sm:text-sm font-hud text-slate-300 uppercase font-bold tracking-wider flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-slate-400" />
-                    Activity 07 • High Defense Scan
-                  </h4>
-                  {chronoClaimed ? (
-                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
-                  ) : (
-                    <span className="text-[9px] font-bold text-slate-400 bg-slate-950/30 border border-slate-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
-                  )}
-                </div>
+              {/* ACTIVITY 07 • Combat Arena Challenge 01 */}
+              {renderCombatChallengeCard('silver_3', 'silver')}
 
-                <p className="text-[10px] text-slate-400 leading-normal">
-                  Search and register a heavy-defense species (greater than 100 Base Defense) in your active collection logs.
-                </p>
-
-                <div>
-                  {isCompleted ? (
-                    chronoClaimed ? (
-                      <div className="w-full py-2 bg-emerald-950/20 border border-emerald-500/20 text-emerald-400 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5">
-                        <Check className="w-3.5 h-3.5" />
-                        Defense metrics verified!
-                      </div>
-                    ) : (
-                      <button
-                        onClick={handleChronoClaim}
-                        className="w-full py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white text-[10px] font-hud font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md active:scale-95 animate-bounce"
-                      >
-                        <Trophy className="w-3.5 h-3.5 animate-pulse" />
-                        Claim Activity
-                      </button>
-                    )
-                  ) : (
-                    <div className="w-full py-2.5 bg-slate-900 border border-slate-800 text-slate-500 text-[10px] font-hud font-semibold uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5 select-none">
-                      <ShieldAlert className="w-3.5 h-3.5" />
-                      Pending heavy defense species detection...
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* ACTIVITY 08 • Smart & Reactivity Challenge */}
-              <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden shadow-lg text-left">
-                <HUDCorners />
-                <div className="flex justify-between items-center">
-                  <h4 className="text-xs sm:text-sm font-hud text-slate-300 uppercase font-bold tracking-wider flex items-center gap-2">
-                    <Timer className="w-4 h-4 text-slate-400" />
-                    Activity 08 • Reflex Calibration
-                  </h4>
-                  {coreRechargeStatus === 'completed' ? (
-                    <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
-                  ) : (
-                    <span className="text-[9px] font-bold text-slate-400 bg-slate-950/30 border border-slate-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
-                  )}
-                </div>
-
-                <p className="text-[10px] text-slate-400 leading-normal">
-                  Test your quick decision skills. Click the calibration lock precisely within the optimal 42% to 58% buffer range.
-                </p>
-
-                <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-800 relative select-none">
-                  <div className="flex justify-between items-center text-[8px] font-mono text-slate-500 mb-1">
-                    <span>MIN ENERGY</span>
-                    <span className="text-emerald-500 font-bold">SWEET SPOT (42% - 58%)</span>
-                    <span>MAX CAPACITY</span>
-                  </div>
-                  
-                  {/* Energy bar visual */}
-                  <div className="h-6 w-full bg-slate-950 rounded border border-slate-800 relative overflow-hidden">
-                    {/* Perfect target marker in the center */}
-                    <div className="absolute top-0 bottom-0 left-[42%] right-[42%] bg-emerald-500/20 border-x border-dashed border-emerald-400/40" />
-                    
-                    {/* The slider dial */}
-                    <div 
-                      className="absolute top-0 bottom-0 w-2.5 bg-gradient-to-r from-cyan-400 to-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.8)] rounded-sm transition-all"
-                      style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
-                    />
-                  </div>
-
-                  {gameResult === 'failed' && (
-                    <p className="text-[8px] font-mono text-rose-500 uppercase mt-1.5 animate-pulse text-center">
-                      ❌ ENERGY INSTABILITY! TRY AGAIN...
-                    </p>
-                  )}
-
-                  {gameResult === 'success' && (
-                    <p className="text-[8px] font-mono text-emerald-400 uppercase mt-1.5 animate-pulse text-center">
-                      ✔️ CALIBRATION LOCK SUCCESS!
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  {coreRechargeStatus === 'idle' && (
-                    <button
-                      onClick={() => setCoreRechargeStatus('playing')}
-                      className="w-full py-2.5 bg-indigo-900/40 hover:bg-indigo-800/60 text-indigo-300 border border-indigo-500/30 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
-                    >
-                      <Gauge className="w-3.5 h-3.5" />
-                      Calibrate Temporal Core (Play)
-                    </button>
-                  )}
-
-                  {coreRechargeStatus === 'playing' && (
-                    <button
-                      onClick={handleLockCoreEnergy}
-                      className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md active:scale-95 animate-pulse"
-                    >
-                      <Zap className="w-3.5 h-3.5" />
-                      LOCK CORE ENERGY NOW!
-                    </button>
-                  )}
-
-                  {coreRechargeStatus === 'completed' && (
-                    <div className="w-full py-2 bg-emerald-950/20 border border-emerald-500/20 text-emerald-400 text-[10px] font-hud font-black uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5">
-                      <Check className="w-3.5 h-3.5" />
-                      Grid Calibration Perfect 
-                    </div>
-                  )}
-                </div>
-              </div>
+              {/* ACTIVITY 08 • Combat Arena Challenge 02 */}
+              {renderCombatChallengeCard('silver_4', 'silver')}
             </motion.div>
+            )
           ) : (
-            <motion.div
-              key="hard-dashboard"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="grid grid-cols-1 gap-4"
-            >
+            hardCompletedCount >= 4 ? (
+              <TierCompleted3DBadge
+                key="gold-completed-badge"
+                tier="gold"
+                onNavigateToArena={onNavigateToArena}
+                onSwitchTier={(t) => setSelectedDifficulty(t)}
+                otherTiersProgress={{
+                  bronze: easyCompletedCount,
+                  silver: medCompletedCount,
+                  gold: hardCompletedCount
+                }}
+              />
+            ) : (
+              <motion.div
+                key="hard-dashboard"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="grid grid-cols-1 gap-4"
+              >
               {/* ACTIVITY 09: Master Strategist Exam (Hard Trivia) */}
               <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg text-left">
                 <HUDCorners />
@@ -1681,10 +1673,8 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                     <Crown className="w-4 h-4 text-yellow-400" />
                     Activity 09 • Strategy Exam
                   </h4>
-                  {masterExamStatus === 'correct' ? (
+                  {masterExamStatus === 'correct' && (
                     <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
-                  ) : (
-                    <span className="text-[9px] font-bold text-yellow-400 bg-yellow-950/30 border border-yellow-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                   )}
                 </div>
 
@@ -1753,10 +1743,8 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                       <Scroll className="w-4 h-4 text-yellow-400" />
                       Activity 10 • Legendary Lore
                     </h4>
-                    {masterExamStatusB === 'correct' ? (
+                    {masterExamStatusB === 'correct' && (
                       <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
-                    ) : (
-                      <span className="text-[9px] font-bold text-yellow-400 bg-yellow-950/30 border border-yellow-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
                     )}
                   </div>
 
@@ -1815,129 +1803,22 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                   )}
                 </div>
 
-                {/* Activity 11: Pokédex Challenge */}
-                <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg text-left">
-                  <HUDCorners />
-                  <div className="flex justify-between items-center">
-                    <h4 className="text-xs sm:text-sm font-hud text-yellow-400 uppercase font-bold tracking-wider flex items-center gap-2">
-                      <Puzzle className="w-4 h-4 text-yellow-400" />
-                      Activity 11 • Grid Puzzle
-                    </h4>
-                    {matrixLockdownStatus === 'completed' ? (
-                      <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
-                    ) : (
-                      <span className="text-[9px] font-bold text-yellow-400 bg-yellow-950/30 border border-yellow-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
-                    )}
-                  </div>
+                {/* Activity 11: Gold Combat Challenge 01 */}
+                {renderCombatChallengeCard('gold_3', 'gold')}
 
-                  <p className="text-[9px] text-slate-400 leading-relaxed font-sans mt-0.5">
-                    Click cells to toggle them and their neighbors. Turn all cells green (value 1) to solve the puzzle!
-                  </p>
-
-                  {matrixLockdownStatus === 'completed' ? (
-                    <div className="mt-auto pt-2 flex items-center gap-2 text-emerald-400 text-[10px] font-medium font-hud uppercase font-black">
-                      <CheckCircle className="w-4 h-4 text-emerald-400" />
-                      Puzzle Completed!
-                    </div>
-                  ) : (
-                    <div className="mt-auto space-y-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="grid grid-cols-3 gap-1 w-20 h-20 shrink-0">
-                          {matrixGrid.map((val, idx) => (
-                            <button
-                              key={`matrix-cell-${idx}`}
-                              onClick={() => handleMatrixCellToggle(idx)}
-                              className={cn(
-                                "w-full h-full rounded border font-mono font-black text-[10px] sm:text-[11px] transition-all cursor-pointer flex items-center justify-center",
-                                val 
-                                  ? "bg-emerald-900/40 border-emerald-400 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.3)]" 
-                                  : "bg-red-950/40 border-red-500/30 text-red-500"
-                              )}
-                            >
-                              {val ? '1' : '0'}
-                            </button>
-                          ))}
-                        </div>
-                        <div className="flex flex-col justify-between py-1 shrink-0 h-20">
-                          <span className="text-[7.5px] font-mono text-slate-500 uppercase leading-none block">TARGET:<br/>ALL 1s</span>
-                          <button
-                            onClick={handleResetMatrix}
-                            className="px-1.5 py-1 text-[7px] text-zinc-400 hover:text-white border border-slate-700 hover:border-slate-500 bg-slate-900 rounded font-bold uppercase transition-all cursor-pointer"
-                          >
-                            RESET GRID
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Activity 12: Smart & Reactivity Challenge */}
-                <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg text-left">
-                  <HUDCorners />
-                  <div className="flex justify-between items-center">
-                    <h4 className="text-xs sm:text-sm font-hud text-yellow-400 uppercase font-bold tracking-wider flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-yellow-400" />
-                      Activity 12 • Speed Trial
-                    </h4>
-                    {speedTrialStatus === 'completed' ? (
-                      <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider">COMPLETED</span>
-                    ) : (
-                      <span className="text-[9px] font-bold text-yellow-400 bg-yellow-950/30 border border-yellow-500/25 px-2 py-0.5 rounded uppercase tracking-wider font-mono">ACTIVE</span>
-                    )}
-                  </div>
-
-                  <p className="text-[9px] text-slate-400 leading-relaxed font-sans mt-0.5">
-                    Test your reaction speed! Click the STRIKE button exactly when the speed indicator goes above 365 MPH.
-                  </p>
-
-                  {speedTrialStatus === 'completed' ? (
-                    <div className="mt-auto pt-2 flex items-center gap-2 text-emerald-400 text-[10px] font-medium font-hud uppercase">
-                      <CheckCircle className="w-4 h-4 text-emerald-400" />
-                      Target speed reached!
-                    </div>
-                  ) : (
-                    <div className="mt-auto space-y-2">
-                      {speedTrialStatus === 'running' ? (
-                        <div className="bg-slate-900 border border-slate-800 p-2.5 rounded-lg space-y-2 text-center">
-                          <div className="flex justify-between items-center text-[8px] font-mono text-slate-400">
-                            <span>SWEET SPOT: <strong className="text-emerald-400">365+ MPH</strong></span>
-                            <span>SPEED: <strong className={cn(speedTrialCurrent >= 365 ? "text-emerald-400 animate-pulse" : "text-amber-500")}>{speedTrialCurrent} MPH</strong></span>
-                          </div>
-                          {/* Speedometer line graph mockup */}
-                          <div className="w-full bg-slate-950 h-3 rounded overflow-hidden p-[1px] border border-slate-800 relative">
-                            <div className="absolute right-0 top-0 bottom-0 w-[40px] bg-emerald-500/10 border-l border-emerald-500/30" />
-                            <div className="h-full bg-cyan-500 transition-all duration-75" style={{ width: `${Math.min(100, (speedTrialCurrent / 430) * 100)}%` }} />
-                          </div>
-                          <button
-                            onClick={handleSpeedStrike}
-                            className="w-full py-1.5 bg-emerald-900/60 hover:bg-emerald-800 text-emerald-200 border border-emerald-500/30 rounded text-[9px] font-hud uppercase font-black tracking-wider shadow cursor-pointer"
-                          >
-                            ⚡ STRIKE!
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={startSpeedTrial}
-                          className="w-full py-2 bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-slate-700 hover:border-cyan-500/30 rounded text-[9px] font-hud uppercase tracking-wider font-extrabold flex items-center justify-center gap-1.5 cursor-pointer"
-                        >
-                          <Activity className="w-3.5 h-3.5 text-cyan-400" />
-                          START SPEED TRIAL
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
+                {/* Activity 12: Gold Combat Challenge 02 */}
+                {renderCombatChallengeCard('gold_4', 'gold')}
               </div>
             </motion.div>
+            )
           )}
         </AnimatePresence>
       </div>
 
       {/* FOOTER GENERAL STATUS */}
       <div className="flex flex-col sm:flex-row justify-center items-center mt-3 border-t border-slate-900/80 pt-3 text-[9px] font-mono gap-2 text-center w-full px-2">
-        <span className="text-cyan-400 font-extrabold uppercase tracking-widest text-[9.5px]">
-          AGGREGATE OPERATIONAL POWER: {totalCompletedCount} ACTIVITIES COMPLETED
+        <span className={cn("font-extrabold uppercase tracking-widest text-[9.5px]", operatorRank.textColor)}>
+          OPERATOR STATUS: {operatorRank.title} • {operatorRank.subtitle.toUpperCase()}
         </span>
       </div>
     </div>

@@ -5,9 +5,10 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import './i18n';
 import App from './App.tsx';
 import './index.css';
-import { registerServiceWorker } from './utils/notificationManager';
+import { registerServiceWorker, scheduleDeviceActivityNotifications } from './utils/notificationManager';
 
 registerServiceWorker();
+scheduleDeviceActivityNotifications();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

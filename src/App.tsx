@@ -18,9 +18,12 @@ import { Pokemon, EvolutionNode, Move, LogEntry } from './types';
 import { sounds } from './lib/sounds';
 import { cn, abbreviateType, hudButtonClass, playHaptic } from './lib/utils';
 import { PokethologyCombatMissionWidget, getDailyCombatMission, COMBAT_MISSIONS, getRequiredCount } from './components/PokethologyCombatMissionWidget';
+import { updateCombatChallengesOnBattle, ChallengeProgressResult } from './lib/dailyCombatChallenges';
 import { generateCompetitiveMoveset } from './utils/moveset';
 import { OpponentStatusBar, PlayerStatusBar } from './components/BattleStatusBars';
 import { TypeBadge } from './components/TypeBadge';
+import { OfficialMoveBox } from './components/OfficialMoveBox';
+import { PokemonTypeIcon, DamageClassIcon } from './components/PokemonTypeIcon';
 import { BattleErrorBoundary } from './components/BattleErrorBoundary';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
@@ -908,6 +911,10 @@ interface PokethologyRadarScannerProps {
 
 const PokethologyRadarScanner = memo(({ onAbort, targetName }: PokethologyRadarScannerProps) => {
   const [progress, setProgress] = useState(0);
+  const [isGlitching, setIsGlitching] = useState(false);
+  const [glitchMilestone, setGlitchMilestone] = useState<'50' | '90' | null>(null);
+  const reached50Ref = useRef(false);
+  const reached90Ref = useRef(false);
 
   useEffect(() => {
     const progressTimer = setInterval(() => {
@@ -927,39 +934,120 @@ const PokethologyRadarScanner = memo(({ onAbort, targetName }: PokethologyRadarS
     };
   }, [onAbort]);
 
+  // Trigger subtle holographic glitch bursts when reaching 50% and 90%
+  useEffect(() => {
+    if (progress >= 50 && !reached50Ref.current) {
+      reached50Ref.current = true;
+      setIsGlitching(true);
+      setGlitchMilestone('50');
+      const timer = setTimeout(() => {
+        setIsGlitching(false);
+        setGlitchMilestone(null);
+      }, 420);
+      return () => clearTimeout(timer);
+    }
+    if (progress >= 90 && !reached90Ref.current) {
+      reached90Ref.current = true;
+      setIsGlitching(true);
+      setGlitchMilestone('90');
+      const timer = setTimeout(() => {
+        setIsGlitching(false);
+        setGlitchMilestone(null);
+      }, 440);
+      return () => clearTimeout(timer);
+    }
+  }, [progress]);
+
   const formattedName = targetName ? targetName.replace(/-/g, ' ').toUpperCase() : "POKÉMON";
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center min-h-[300px] w-full max-w-sm mx-auto p-6 text-center select-none relative overflow-hidden my-auto">
+    <div className={cn(
+      "flex-1 flex flex-col items-center justify-center min-h-[300px] w-full max-w-sm mx-auto p-6 text-center select-none relative overflow-hidden my-auto transition-all",
+      isGlitching && "animate-radar-glitch"
+    )}>
+      {/* Subtle Digital Hologram / Scanline Glitch Overlays */}
+      {isGlitching && (
+        <>
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-cyan-500/10 to-transparent animate-glitch-slice z-30" />
+          <div className="absolute inset-x-0 top-1/3 h-1 bg-cyan-400/40 blur-[1px] animate-glitch-slice z-30" />
+          <div className="absolute inset-x-0 top-2/3 h-0.5 bg-rose-500/40 blur-[1px] animate-glitch-slice z-30" />
+        </>
+      )}
+
       {/* Sleek Glowing Pokéball Spinner */}
       <div className="relative w-24 h-24 mb-5 flex items-center justify-center shrink-0">
-        <div className="absolute inset-0 rounded-full bg-cyan-500/15 blur-xl animate-pulse" />
+        <div className={cn(
+          "absolute inset-0 rounded-full blur-xl transition-colors duration-300",
+          isGlitching 
+            ? "bg-rose-500/25 shadow-[0_0_30px_rgba(244,63,94,0.4)]" 
+            : "bg-cyan-500/15 animate-pulse"
+        )} />
         
         {/* Modern Pokeball vector spinner */}
-        <div className="relative w-16 h-16 rounded-full border-3 border-slate-950 bg-white overflow-hidden shadow-[0_0_20px_rgba(34,211,238,0.3)] animate-spin" style={{ animationDuration: '1.6s' }}>
-          <div className="absolute top-0 inset-x-0 h-8 bg-gradient-to-b from-red-500 to-rose-600 border-b-3 border-slate-950" />
+        <div 
+          className={cn(
+            "relative w-16 h-16 rounded-full border-3 border-slate-950 bg-white overflow-hidden animate-spin transition-all",
+            isGlitching 
+              ? "shadow-[0_0_25px_rgba(244,63,94,0.6)] ring-2 ring-cyan-400/60" 
+              : "shadow-[0_0_20px_rgba(34,211,238,0.3)]"
+          )} 
+          style={{ animationDuration: isGlitching ? '0.8s' : '1.6s' }}
+        >
+          <div className={cn(
+            "absolute top-0 inset-x-0 h-8 border-b-3 border-slate-950 transition-colors",
+            isGlitching 
+              ? "bg-gradient-to-b from-rose-500 to-amber-500" 
+              : "bg-gradient-to-b from-red-500 to-rose-600"
+          )} />
           <div className="absolute top-1/2 left-1/2 -ml-3 -mt-3 w-6 h-6 bg-white border-3 border-slate-950 rounded-full flex items-center justify-center z-10 shadow-sm">
-            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
+            <div className={cn(
+              "w-2 h-2 rounded-full animate-ping",
+              isGlitching ? "bg-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.8)]" : "bg-cyan-400"
+            )} />
           </div>
         </div>
       </div>
 
-      {/* Clean Status Text */}
+      {/* Clean Status Text with Dynamic Glitch Readout */}
       <div className="space-y-1 mb-5 z-10">
-        <h2 className="font-hud text-base sm:text-lg font-black tracking-wider text-slate-100 uppercase">
-          SCANNING {formattedName}...
+        <h2 className={cn(
+          "font-hud text-base sm:text-lg font-black tracking-wider uppercase transition-colors duration-150",
+          isGlitching 
+            ? "text-cyan-200 drop-shadow-[-2px_0_0_rgba(244,63,94,0.8)] drop-shadow-[2px_0_0_rgba(6,182,212,0.8)]" 
+            : "text-slate-100"
+        )}>
+          {isGlitching 
+            ? (glitchMilestone === '50' ? `SYNC HARMONICS // 50%` : `FREQUENCY LOCK // 90%`)
+            : `SCANNING ${formattedName}...`
+          }
         </h2>
-        <p className="text-[11px] font-mono text-cyan-400/90 tracking-widest uppercase animate-pulse">
-          Syncing Pokédex Registry
+        <p className={cn(
+          "text-[11px] font-mono tracking-widest uppercase transition-colors duration-150",
+          isGlitching 
+            ? "text-rose-400 font-bold animate-pulse" 
+            : "text-cyan-400/90 animate-pulse"
+        )}>
+          {isGlitching 
+            ? `[CALIBRATING MATRIX BUFFER]` 
+            : "Syncing Pokédex Registry"
+          }
         </p>
       </div>
 
       {/* Minimalist Progress Line */}
       <div className="w-full max-w-xs flex flex-col items-center gap-3 z-10">
-        <div className="w-full h-1.5 bg-slate-900/90 rounded-full overflow-hidden border border-slate-800/80 relative">
+        <div className={cn(
+          "w-full h-1.5 bg-slate-900/90 rounded-full overflow-hidden border relative transition-all duration-200",
+          isGlitching ? "border-cyan-400/60 shadow-[0_0_12px_rgba(34,211,238,0.5)]" : "border-slate-800/80"
+        )}>
           <div 
             style={{ width: `${Math.min(100, progress)}%` }}
-            className="absolute top-0 left-0 h-full bg-gradient-to-r from-cyan-500 to-blue-500 shadow-[0_0_10px_rgba(34,211,238,0.7)] transition-all duration-200"
+            className={cn(
+              "absolute top-0 left-0 h-full transition-all duration-200",
+              isGlitching 
+                ? "bg-gradient-to-r from-rose-500 via-amber-400 to-cyan-400 shadow-[0_0_14px_rgba(244,63,94,0.9)]" 
+                : "bg-gradient-to-r from-cyan-500 to-blue-500 shadow-[0_0_10px_rgba(34,211,238,0.7)]"
+            )}
           />
         </div>
         
@@ -2206,6 +2294,9 @@ export default function App() {
   const [battleLog, setBattleLog] = useState<(LogEntry & { turn?: number })[]>([]);
   const [isBattling, setIsBattling] = useState(false);
   const [usedSuperEffectiveCurrentBattle, setUsedSuperEffectiveCurrentBattle] = useState(false);
+  const battleSuperEffectiveHitsRef = useRef(0);
+  const battleCriticalHitsRef = useRef(0);
+  const [recentChallengeProgress, setRecentChallengeProgress] = useState<ChallengeProgressResult[]>([]);
 
   // --- WebSocket Integration ---
   const [wsStatus, setWsStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
@@ -2395,6 +2486,9 @@ export default function App() {
   useEffect(() => {
     if (isBattling) {
       setUsedSuperEffectiveCurrentBattle(false);
+      battleSuperEffectiveHitsRef.current = 0;
+      battleCriticalHitsRef.current = 0;
+      setRecentChallengeProgress([]);
     }
   }, [isBattling]);
 
@@ -3602,7 +3696,12 @@ export default function App() {
       for (let i = 0; i < numHits; i++) {
         // Critical Hit (6.25% chance)
         const isCrit = Math.random() < 0.0625;
-        if (isCrit) anyCrit = true;
+        if (isCrit) {
+          anyCrit = true;
+          if (isPlayer) {
+            battleCriticalHitsRef.current += 1;
+          }
+        }
         const critMultiplier = isCrit ? 1.5 : 1;
         const stabMultiplier = attackerTypes.includes(move.type) ? 1.5 : 1;
         
@@ -3688,6 +3787,7 @@ export default function App() {
         log("It's super effective!", 'effective');
         if (isPlayer) {
           setUsedSuperEffectiveCurrentBattle(true);
+          battleSuperEffectiveHitsRef.current += (numHits || 1);
         }
       } else if (effectiveness < 1 && effectiveness > 0) {
         log("It's not very effective...", 'not-effective');
@@ -4067,6 +4167,22 @@ export default function App() {
           sessionStorage.setItem('pokethology_session_losses', String(next));
           return next;
         });
+
+        // Record combat arena challenge progress (super-effective & crits)
+        try {
+          const progressResults = updateCombatChallengesOnBattle({
+            todayStr: today,
+            isVictory: false,
+            superEffectiveHits: battleSuperEffectiveHitsRef.current,
+            criticalHits: battleCriticalHitsRef.current
+          });
+          if (progressResults && progressResults.length > 0) {
+            setRecentChallengeProgress(progressResults);
+          }
+        } catch (e) {
+          console.error("Error updating combat challenges on defeat", e);
+        }
+
         setScreenShake(true);
         setTimeout(() => setScreenShake(false), 1000);
         sounds.defeat();
@@ -4089,6 +4205,22 @@ export default function App() {
           sessionStorage.setItem('pokethology_session_wins', String(next));
           return next;
         });
+
+        // Record combat arena challenge progress (wins, super-effective, crits)
+        try {
+          const progressResults = updateCombatChallengesOnBattle({
+            todayStr: today,
+            isVictory: true,
+            superEffectiveHits: battleSuperEffectiveHitsRef.current,
+            criticalHits: battleCriticalHitsRef.current
+          });
+          if (progressResults && progressResults.length > 0) {
+            setRecentChallengeProgress(progressResults);
+          }
+        } catch (e) {
+          console.error("Error updating combat challenges on victory", e);
+        }
+
         sounds.victory();
 
         // Check and update Daily Combat Mission progress on victory
@@ -5280,7 +5412,7 @@ export default function App() {
             <div className="absolute inset-0 z-0 select-none pointer-events-none overflow-hidden">
               <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-72 h-72 sm:w-96 sm:h-96 bg-cyan-500/15 rounded-full blur-3xl" />
               <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-72 h-72 sm:w-96 sm:h-96 bg-red-500/15 rounded-full blur-3xl" />
-              <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:20px_20px] sm:[background-size:24px_24px]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-cyan-950/20 via-transparent to-red-950/20 pointer-events-none" />
             </div>
 
             {/* Main Content Container - Fitted for Mobile & Desktop */}
@@ -6270,13 +6402,8 @@ export default function App() {
                                           isLightMode ? "bg-[#efeae2]" : "bg-[#0b141a]"
                                         )}
                                       >
-                                        {/* WhatsApp Wallpaper Pattern Overlay */}
-                                        <div 
-                                          className="absolute inset-0 pointer-events-none opacity-[0.06] dark:opacity-[0.07] bg-repeat z-0"
-                                          style={{
-                                            backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M11 18h2v2h-2v-2zm10 0h2v2h-2v-2zm-10 10h2v2h-2v-2zm10 0h2v2h-2v-2zM3 39h2v2H3v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zM3 49h2v2H3v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zM51 18h2v2h-2v-2zm10 0h2v2h-2v-2zm-10 10h2v2h-2v-2zm10 0h2v2h-2v-2zM43 39h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zM43 49h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2z'/%3E%3C/g%3E%3C/svg%3E")`,
-                                          }}
-                                        />
+                                        {/* Chat Wallpaper Ambient Overlay */}
+                                        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-cyan-950/5 via-transparent to-black/10 z-0" />
 
                                         {quotaLimitReached && (
                                           <div className="bg-red-950/40 border border-red-500/30 p-2 rounded flex flex-col gap-1 mb-2 animate-in fade-in slide-in-from-top-1">
@@ -6564,7 +6691,7 @@ export default function App() {
                                         
                                         <div 
                                           ref={arenaRef}
-                                          className="bg-slate-900/80 backdrop-blur-md rounded-2xl relative shadow-[0_8px_32px_rgba(0,0,0,0.6)] flex flex-col mb-1.5 sm:mb-2 overflow-hidden w-full max-w-full h-auto z-10 arena-container no-scrollbar"
+                                          className="bg-slate-900/80 backdrop-blur-md rounded-2xl relative shadow-[0_8px_32px_rgba(0,0,0,0.6)] flex flex-col mb-1.5 sm:mb-2 overflow-hidden w-full max-w-full h-auto z-10 arena-container no-scrollbar touch-none select-none overscroll-none"
                                         >
                                       {/* Battle Background / Field */}
                                       <div className="absolute inset-0 z-0 rounded-xl sm:rounded-2xl overflow-hidden pointer-events-none">
@@ -6710,8 +6837,8 @@ export default function App() {
                                         ref={arenaCallbackRef}
                                         transition={{ duration: 0.25, ease: "easeOut" }}
                                         id="battle-arena-container"
-                                        className="relative flex-1 flex flex-col justify-center min-h-[220px] xs:min-h-[260px] sm:min-h-[300px] md:min-h-[320px] lg:min-h-[340px] h-[300px] sm:h-[340px] lg:h-[380px] max-h-[40vh] z-10 p-[clamp(0.5rem,2vw,1.5rem)] font-bold overflow-hidden w-full max-w-full transform-gpu will-change-transform"
-                                        style={{ touchAction: 'pan-y', boxSizing: 'border-box' }}
+                                        className="relative flex-1 flex flex-col justify-center min-h-[220px] xs:min-h-[260px] sm:min-h-[300px] md:min-h-[320px] lg:min-h-[340px] h-[300px] sm:h-[340px] lg:h-[380px] max-h-[40vh] z-10 p-[clamp(0.5rem,2vw,1.5rem)] font-bold overflow-hidden w-full max-w-full transform-gpu will-change-transform select-none"
+                                        style={{ touchAction: 'none', overscrollBehavior: 'none', boxSizing: 'border-box' }}
                                       >
                                         {/* Battle Flash Overlay */}
                                         <AnimatePresence>
@@ -7124,75 +7251,22 @@ export default function App() {
                                             {selectedMoves.map((move, i) => {
                                               const opponentTypes = battleOpponent?.types?.map((t: any) => t.type.name) || [];
                                               const effectiveness = getTypeEffectiveness(move.type, opponentTypes);
-                                              
-                                              let effectivenessLabel = '';
-                                              let effectivenessBadgeColor = 'bg-slate-800 border-slate-700 text-slate-400';
-                                              if (effectiveness > 1) {
-                                                effectivenessLabel = `x${effectiveness}`;
-                                                effectivenessBadgeColor = 'bg-green-950/80 border-green-500/30 text-green-400';
-                                              } else if (effectiveness < 1 && effectiveness > 0) {
-                                                effectivenessLabel = `x${effectiveness}`;
-                                                effectivenessBadgeColor = 'bg-red-950/80 border-red-500/30 text-red-400';
-                                              } else if (effectiveness === 0) {
-                                                effectivenessLabel = `x0`;
-                                                effectivenessBadgeColor = 'bg-slate-900 border-slate-850 text-slate-500';
-                                              }
-                                              const isOutOfPP = (move.currentPP ?? move.pp) === 0;
-                                              
+                                              const isStab = pokemon?.types?.some((t: any) => t.type.name.toLowerCase() === move.type?.toLowerCase());
+
                                               return (
-                                                <button
+                                                <OfficialMoveBox
                                                   key={`${move.name}-${i}`}
+                                                  move={move}
+                                                  variant="battle"
+                                                  effectiveness={effectiveness}
+                                                  isStab={isStab}
+                                                  isLightMode={isLightMode}
+                                                  onHover={() => sounds.hover()}
                                                   onClick={() => {
-                                                    if (!isOutOfPP) {
-                                                      handlePlayerMove(move);
-                                                      setIsCombatMoveModalOpen(false);
-                                                    }
+                                                    handlePlayerMove(move);
+                                                    setIsCombatMoveModalOpen(false);
                                                   }}
-                                                  onMouseEnter={() => sounds.hover()}
-                                                  disabled={isOutOfPP}
-                                                  className={cn(
-                                                    "w-full text-left p-2 rounded-lg border transition-all relative overflow-hidden flex flex-col gap-1 cursor-pointer",
-
-                                                    isOutOfPP
-                                                       ? "bg-slate-950/60 text-slate-600 border-slate-900/60 cursor-not-allowed opacity-40"
-                                                       : cn(
-                                                          "hover:scale-[1.02] active:scale-98 shadow-sm",
-                                                          getMoveButtonClasses(move.type)
-                                                        )
-                                                  )}
-                                                >
-
-                                                  <div className="flex justify-between items-start w-full gap-1">
-                                                    <div className="flex flex-col min-w-0">
-                                                      <span className="text-[9px] sm:text-[10px] font-hud font-black uppercase tracking-wider truncate">
-                                                        {move.name.replace('-', ' ')}
-                                                      </span>
-                                                    </div>
-                                                    <div className="flex items-center gap-1 shrink-0">
-                                                      {effectivenessLabel && (
-                                                        <span className={cn("text-[7px] font-mono font-bold px-1 rounded border uppercase", effectivenessBadgeColor)}>
-                                                          {effectivenessLabel}
-                                                        </span>
-                                                      )}
-                                                      {move.power && (
-                                                        <span className="text-[7px] font-mono font-bold bg-black/30 px-1 rounded">
-                                                          {move.power}
-                                                        </span>
-                                                      )}
-                                                    </div>
-                                                  </div>
-                                                  <div className="flex items-center justify-between w-full">
-                                                    <span className="text-[7px] font-mono opacity-80 uppercase">
-                                                      {move.type}
-                                                    </span>
-                                                    <span className={cn(
-                                                      "text-[7px] font-mono font-bold",
-                                                      isOutOfPP ? "text-red-500" : "text-white/80"
-                                                    )}>
-                                                      PP {move.currentPP ?? move.pp}/{move.pp}
-                                                    </span>
-                                                  </div>
-                                                </button>
+                                                />
                                               );
                                             })}
                                           </div>
@@ -7350,7 +7424,6 @@ export default function App() {
                                               className={cn("w-full relative py-4 group overflow-hidden rounded-xl transition-all active:scale-95 shadow-[0_0_20px_rgba(34,211,238,0.2)]", loadingPokemon && "opacity-50 cursor-not-allowed")}
                                             >
                                               <div className="absolute inset-0 bg-gradient-to-r from-cyan-950 via-blue-900/40 to-cyan-950 border-2 border-cyan-400 group-hover:border-white transition-colors" />
-                                              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
                                               <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-transparent via-cyan-400/10 to-transparent -translate-y-full group-hover:translate-y-full transition-transform duration-1000" />
                                               
                                               <div className="relative flex items-center justify-center gap-3">
@@ -7397,7 +7470,6 @@ export default function App() {
                                               disabled={loadingPokemon}
                                             >
                                               <div className="absolute inset-0 bg-gradient-to-r from-purple-950 via-indigo-900/40 to-purple-950 border-2 border-purple-500 group-hover:border-white transition-colors" />
-                                              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
                                               <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-r from-transparent via-purple-400/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                                               
                                               <div className="relative flex items-center justify-center gap-3">
@@ -7589,9 +7661,14 @@ export default function App() {
                                                   {pokemon.moves
                                                     .map((move, idx) => {
                                                       const isSelected = selectedMoves.some(m => m.name === move.name);
+                                                      const isStab = pokemon.types.some((t: any) => t.type.name.toLowerCase() === move.type.toLowerCase());
                                                       return (
-                                                        <button
+                                                        <OfficialMoveBox
                                                           key={`${move.name}-${idx}`}
+                                                          move={move}
+                                                          variant="selector"
+                                                          isSelected={isSelected}
+                                                          isStab={isStab}
                                                           disabled={!isSelected && selectedMoves.length >= 4}
                                                           onClick={() => {
                                                             if (isSelected) {
@@ -7601,24 +7678,7 @@ export default function App() {
                                                             }
                                                             sounds.scan();
                                                           }}
-                                                          className={cn(
-                                                            "text-[9px] font-bold tracking-wider sm:text-[10px] p-2 border rounded-xl flex flex-col items-start gap-1 transition-all group cursor-pointer text-left w-full",
-                                                            isSelected 
-                                                              ? "bg-cyan-950/90 border-cyan-400 text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.25)]" 
-                                                              : "bg-slate-900/60 border-slate-800/80 text-slate-300 hover:border-cyan-500/50 hover:bg-slate-800",
-                                                            !isSelected && selectedMoves.length >= 4 && "opacity-40 cursor-not-allowed"
-                                                          )}
-                                                        >
-                                                          <div className="flex justify-between w-full items-center gap-1">
-                                                            <span className={cn("font-hud uppercase tracking-wider truncate", isLightMode ? "text-slate-900 group-hover:text-slate-950" : "text-cyan-300 group-hover:text-white")}>{move.name.replace('-', ' ')}</span>
-                                                            <TypeBadge type={move.type} size="xs" />
-                                                          </div>
-                                                          <div className="flex gap-2.5 text-[8px] font-mono text-slate-400 font-bold">
-                                                            <span>PWR: <strong className="text-cyan-400">{move.power || '-'}</strong></span>
-                                                            <span>ACC: <strong className="text-cyan-400">{move.accuracy ? `${move.accuracy}%` : '-'}</strong></span>
-                                                            <span>PP: <strong className="text-cyan-400">{move.pp}</strong></span>
-                                                          </div>
-                                                        </button>
+                                                        />
                                                       );
                                                   })}
                                                 </div>
@@ -8667,6 +8727,11 @@ export default function App() {
                     isCompleted={isMissionCompleted} 
                     missionProgressCount={missionProgressCount}
                     missionRequiredCount={missionRequiredCount}
+                    onNavigateToArena={() => {
+                      setActiveTab('battle');
+                      setIsDailyHubOpen(false);
+                      sounds.scan();
+                    }}
                   />
                 </div>
               </motion.div>
@@ -8791,9 +8856,6 @@ export default function App() {
                         <span className="text-[10px] sm:text-xs font-hud font-black text-amber-400 tracking-wider uppercase flex items-center gap-1.5">
                           <Eye className="w-3.5 h-3.5 text-amber-400 shrink-0" /> SPECIMEN SCANNER
                         </span>
-                        <span className="text-[8.5px] font-mono text-amber-300/90 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-500/30 font-bold">
-                          ACTIVE
-                        </span>
                       </div>
 
                       {/* Top Action Bar (Gender Toggles & Cry Sound) */}
@@ -8886,7 +8948,6 @@ export default function App() {
                             <BarChart className="w-4 h-4 text-amber-400 shrink-0" />
                             <span className="text-xs font-hud font-black text-amber-400 tracking-wider uppercase">BASE STATS ANALYTICS</span>
                           </div>
-                          <span className="text-[8px] bg-amber-950/60 border border-amber-500/40 px-2 py-0.5 rounded text-amber-300 font-bold uppercase font-hud shrink-0">MAX DEPTH</span>
                         </div>
 
                         {/* Stat Bars Grid */}
@@ -9051,6 +9112,11 @@ export default function App() {
           pokemonStatus={pokemonStatus}
           opponentStatus={opponentStatus}
           isLightMode={isLightMode}
+          recentChallengeProgress={recentChallengeProgress}
+          onOpenDailyHub={() => {
+            setIsDailyHubOpen(true);
+            sounds.scan();
+          }}
           onRematch={() => {
             sounds.battleStart();
             setIsBattling(false);

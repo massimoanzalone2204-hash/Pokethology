@@ -3,6 +3,9 @@ import { Move } from '../types';
 import { cn } from '../lib/utils';
 import { Swords, TrendingUp, Disc, Sparkles, GraduationCap, ChevronDown, Info, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { TypeBadge } from './TypeBadge';
+import { DamageClassIcon, PokemonTypeIcon } from './PokemonTypeIcon';
+import { officialMoveBoxStyles } from './OfficialMoveBox';
 
 interface MovesetAnalysisSectionProps {
   moves: Move[];
@@ -23,7 +26,6 @@ const methodDisplayNames: Record<string, string> = {
 export const MovesetAnalysisSection: React.FC<MovesetAnalysisSectionProps> = ({
   moves,
   isLightMode,
-  typeColors,
   sounds,
   setSelectedMoveDetail,
   setIsMoveDetailOpen
@@ -65,7 +67,7 @@ export const MovesetAnalysisSection: React.FC<MovesetAnalysisSectionProps> = ({
       )}>
         <div className="flex items-center gap-2">
           <Swords className="w-4 h-4 text-emerald-400" />
-          <span className="font-bold">Moveset</span>
+          <span className="font-bold">Moveset Analysis</span>
         </div>
 
         <span className={cn(
@@ -84,7 +86,7 @@ export const MovesetAnalysisSection: React.FC<MovesetAnalysisSectionProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search moves..."
+            placeholder="Search moves by name or type..."
             className={cn(
               "w-full pl-9 pr-4 py-1.5 rounded-xl text-[11px] font-sans border transition-all outline-none",
               isLightMode
@@ -155,49 +157,54 @@ export const MovesetAnalysisSection: React.FC<MovesetAnalysisSectionProps> = ({
                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 mt-2 pt-2 border-t border-cyan-900/20 overflow-hidden"
                   >
                     {methodMoves.length > 0 ? (
-                      methodMoves.map((move, moveIdx) => (
-                        <button
-                          key={`${move.name}-${moveIdx}`}
-                          type="button"
-                          onClick={() => {
-                            setSelectedMoveDetail(move);
-                            setIsMoveDetailOpen(true);
-                            try { sounds?.scan?.(); } catch (_) {}
-                          }}
-                          className={cn(
-                            "w-full p-2 rounded-lg border flex justify-between items-center group transition-all text-left cursor-pointer",
-                            isLightMode
-                              ? "bg-white border-slate-200 hover:border-cyan-500/50"
-                              : "bg-slate-900/80 border-cyan-900/30 hover:border-cyan-400/80"
-                          )}
-                        >
-                          <div className="flex flex-col gap-1 min-w-0">
-                            <span className={cn("text-[10.5px] font-bold font-hud uppercase tracking-wider truncate", isLightMode ? "text-slate-900" : "text-cyan-100")}>
-                              {move.name.replace(/-/g, ' ')}
-                            </span>
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className={cn(
-                                "text-[7.5px] font-mono font-bold px-1.5 py-0.2 rounded uppercase text-white",
-                                typeColors[move.type] || "bg-slate-600"
-                              )}>
-                                {move.type}
-                              </span>
-                              {move.power ? (
-                                <span className={cn("text-[8px] font-mono font-bold", isLightMode ? "text-slate-600" : "text-amber-300")}>
-                                  PWR: {move.power}
+                      methodMoves.map((move, moveIdx) => {
+                        const normType = (move.type || 'normal').toLowerCase();
+                        const theme = officialMoveBoxStyles[normType] || officialMoveBoxStyles.normal;
+                        return (
+                          <button
+                            key={`${move.name}-${moveIdx}`}
+                            type="button"
+                            onClick={() => {
+                              setSelectedMoveDetail(move);
+                              setIsMoveDetailOpen(true);
+                              try { sounds?.scan?.(); } catch (_) {}
+                            }}
+                            className={cn(
+                              "w-full p-2.5 rounded-xl border flex flex-col justify-between gap-1 group transition-all text-left cursor-pointer relative overflow-hidden",
+                              "bg-gradient-to-br",
+                              theme.bgGradient,
+                              theme.border,
+                              "hover:scale-[1.01] active:scale-[0.99]"
+                            )}
+                          >
+                            <div className="flex justify-between items-start w-full gap-1.5 relative z-10">
+                              <div className="flex flex-col min-w-0">
+                                <span className={cn(
+                                  "text-[10px] sm:text-[11px] font-hud font-bold uppercase tracking-wider truncate",
+                                  isLightMode ? "text-slate-900" : "text-white group-hover:text-cyan-200"
+                                )}>
+                                  {move.name.replace(/-/g, ' ')}
                                 </span>
-                              ) : null}
-                            </div>
-                          </div>
+                                <div className="flex items-center gap-1 mt-0.5">
+                                  <DamageClassIcon damageClass={move.damage_class} size="xs" />
+                                  {move.power ? (
+                                    <span className="text-[7.5px] font-mono font-bold text-amber-300">
+                                      PWR: {move.power}
+                                    </span>
+                                  ) : null}
+                                </div>
+                              </div>
 
-                          <div className="text-right flex flex-col items-end gap-1 shrink-0">
-                            <span className={cn("font-mono text-[8.5px] font-bold uppercase", isLightMode ? "text-slate-500" : "text-cyan-500")}>
-                              PP: {move.pp}
-                            </span>
-                            <Info className={cn("w-3 h-3 transition-colors", isLightMode ? "text-slate-400 group-hover:text-cyan-600" : "text-cyan-600 group-hover:text-cyan-300")} />
-                          </div>
-                        </button>
-                      ))
+                              <TypeBadge type={move.type} size="xs" showIcon={true} />
+                            </div>
+
+                            <div className="flex items-center justify-between w-full relative z-10 pt-1 border-t border-white/10 text-[7.5px] font-mono text-slate-300">
+                              <span>ACC: {move.accuracy ? `${move.accuracy}%` : '--'}</span>
+                              <span className="font-bold text-slate-200">PP {move.pp}</span>
+                            </div>
+                          </button>
+                        );
+                      })
                     ) : (
                       <p className="col-span-full text-[9px] font-mono text-slate-500 p-2 italic text-center">
                         No moves found matching "{searchQuery}".

@@ -936,9 +936,6 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
             {React.createElement(REGION_ICONS[currentRegionData.region] || BookOpen, { className: "w-4 h-4 text-amber-400 shrink-0" })}
             <span className="truncate">{currentRegionData.region}: {currentRegionData.themeTitle}</span>
           </h3>
-          <span className={cn('px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider border shrink-0', currentRegionData.badgeColor)}>
-            THEORY QUIZ
-          </span>
         </div>
         <div className="text-xs text-slate-300 font-sans leading-relaxed">
           {stripHtmlTags(currentRegionData.themeDescription)}
