@@ -77,7 +77,7 @@ function detectLanguage(text: string): 'it' | 'es' | 'fr' | 'de' | 'en' {
   
   // Italian keywords
   const itKeywords = [
-    'ciao', 'chi sei', 'come', 'perché', 'perche', 'combattimento', 'arena', 'squadra', 'statistiche', 
+    'ciao', 'chi sei', 'come', 'perché', 'perche', 'combattimento', 'arena', 'statistiche', 
     'debole', 'efficace', 'mosse', 'consiglio', 'aiuto', 'strategia', 'lore', 'storia', 'tuo', 'mio', 
     'drago', 'fuoco', 'acqua', 'erba', 'elettro', 'chi è', 'chi e', 'combatti', 'vincitore', 'vincere'
   ];
@@ -85,7 +85,7 @@ function detectLanguage(text: string): 'it' | 'es' | 'fr' | 'de' | 'en' {
   
   // Spanish keywords
   const esKeywords = [
-    'hola', 'quién eres', 'quien', 'cómo', 'como', 'por qué', 'por que', 'combate', 'arena', 'equipo', 
+    'hola', 'quién eres', 'quien', 'cómo', 'como', 'por qué', 'por que', 'combate', 'arena', 
     'estadísticas', 'debil', 'debilitado', 'movimiento', 'consejo', 'ayuda', 'estrategia', 'historia', 
     'tuyo', 'mi', 'fuego', 'agua', 'hierba', 'viento', 'luchar'
   ];
@@ -93,14 +93,14 @@ function detectLanguage(text: string): 'it' | 'es' | 'fr' | 'de' | 'en' {
   
   // French keywords
   const frKeywords = [
-    'salut', 'qui es-tu', 'qui', 'comment', 'pourquoi', 'combat', 'arène', 'équipe', 'statistiques', 
+    'salut', 'qui es-tu', 'qui', 'comment', 'pourquoi', 'combat', 'arène', 'statistiques', 
     'faible', 'mouvement', 'conseil', 'aide', 'stratégie', 'histoire', 'ton', 'mon', 'feu', 'eau', 'herbe'
   ];
   if (frKeywords.some(kw => lower.includes(kw))) return 'fr';
   
   // German keywords
   const deKeywords = [
-    'hallo', 'wer bist du', 'wie', 'warum', 'kampf', 'arena', 'team', 'statistiken', 'schwach', 
+    'hallo', 'wer bist du', 'wie', 'warum', 'kampf', 'arena', 'statistiken', 'schwach', 
     'bewegung', 'rat', 'hilfe', 'strategie', 'geschichte', 'dein', 'mein', 'feuer', 'wasser', 'gras'
   ];
   if (deKeywords.some(kw => lower.includes(kw))) return 'de';
@@ -265,7 +265,7 @@ function generateOfflineChatResponse(messages: any[], context: any, lang: 'it' |
     recommendedEVs = "252 Atk / 4 SpD / 252 Spe";
     recommendedItem = "Bendascelta / Assorbisfera";
     keySTABMove = "Terremoto / Retromarcia";
-    strategicProTip = lang === 'it' ? "Lancia colpi fisici STAB devastanti." : "Deliver massive STAB hits to clear opposing teams.";
+    strategicProTip = lang === 'it' ? "Lancia colpi fisici STAB devastanti per chiudere velocemente il duello 1v1." : "Deliver massive STAB hits to secure quick K.O.s in 1v1 duels.";
   } else if (isTank) {
     archetype = lang === 'it' ? "Muro Defensivo" : "Defensive Bulky Tank";
     recommendedNature = lang === 'it' ? "Placida o Sicura" : "Relaxed or Careful";
@@ -1141,6 +1141,15 @@ app.post("/api/chat", async (req, res) => {
         maxOutputTokens: 280,
         systemInstruction: `You are Pokéthology, the Supreme Omniscient AI Professor, Grand Master Lore Archivist, and Ultimate Pokémon Encyclopedia.
         You possess absolute, omniscient mastery over every dimension of the Pokémon universe — spanning official game data, manga canon, anime lore, competitive VGC/Smogon metagames, trading card game history, developer interviews, cultural impact, fan theories, speculative biology, mythical folklore, and deep-dive creative community lore.
+
+        APPLICATION CONTEXT & ACTUAL REAL FEATURES:
+        Pokéthology is composed strictly of these core modules:
+        1. Complete Pokédex Registry: All 9 Generations + Alternate Forms (Mega, Gigantamax, Regional Alolan/Galarian/Hisuian/Paldean, Primal, Origin) with official artwork, shiny sprites, showdown 3D sprites, audio cries, base stat radials, type weaknesses/resistances matrix, abilities, movesets, and lore entries. Filtering is done exclusively by Generation/Region and text search (there is NO type filter button).
+        2. Full-Screen 2-Pokémon Comparator: Direct side-by-side comparative diagnostics between two selected species.
+        3. 1v1 Turn-Based Combat Arena: Direct singles duels where the player and opponent command 4 selected moves (with PP, power, accuracy, STAB, critical hits, status conditions, stat modifications, and weather). Includes Chaos Mode for randomized combatants and movesets. There is NO team builder / 6v6 squad builder and NO auto-battle simulator.
+        4. Daily Hub & Utilities: Daily Theory Exam (3 theological lore questions), Daily Combat Missions (6 trivia/battle challenges), Daily Featured Scan, and Favorites Vault.
+        
+        DO NOT hallucinate non-existent features (e.g. do not tell the user to use a "team builder", "filter by type button", or "auto-battle simulation mode").
 
         ABSOLUTE OMNISCIENCE & EXPANDED UNIVERSE MANDATE:
         - You embrace the entire Pokémon world in its fullest breadth: official stats and game mechanics as well as rich fan interpretations, cultural mythos, historical theories (like the Great War of Kanto), anime adaptations, manga arcs (Special/Adventures), and creative worldbuilding.

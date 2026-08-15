@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Download, Smartphone, Laptop, X, Check, Sparkles, Bell, Bot, Swords } from 'lucide-react';
+import { Download, Bell, Sparkles, CheckCircle2, X, Smartphone, Monitor, ShieldCheck, Share, PlusSquare } from 'lucide-react';
+import {
+  isPwaInstallable,
+  promptPwaInstall,
+  isPushSupported,
+  getNotificationPermissionState,
+  requestNotificationPermission,
+  sendDiscoveryNotifications
+} from '../lib/pwa';
 import { HUDCorners } from './HUDCorners';
-import { requestNotificationPermission, sendDiscoveryNotifications } from '../utils/notificationManager';
+import { sounds } from '../lib/sounds';
 
 interface PwaInstallModalProps {
   isOpen: boolean;
@@ -10,42 +18,31 @@ interface PwaInstallModalProps {
 }
 
 export const PwaInstallModal: React.FC<PwaInstallModalProps> = ({ isOpen, onClose }) => {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isInstalled, setIsInstalled] = useState(false);
+  const [canInstall, setCanInstall] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [installSuccess, setInstallSuccess] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      setNotificationsEnabled(Notification.permission === 'granted');
-    }
+    setCanInstall(isPwaInstallable());
+    setNotificationsEnabled(getNotificationPermissionState() === 'granted');
 
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    };
+    const isIosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    setIsIOS(isIosDevice);
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    const checkInstall = () => setCanInstall(isPwaInstallable());
+    window.addEventListener('beforeinstallprompt', checkInstall);
+    return () => window.removeEventListener('beforeinstallprompt', checkInstall);
+  }, [isOpen]);
 
-    window.addEventListener('appinstalled', () => {
-      setIsInstalled(true);
-      setDeferredPrompt(null);
-      requestNotificationPermission().then(() => setNotificationsEnabled(true));
-    });
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
-
-  const handleInstallClick = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        setIsInstalled(true);
-        requestNotificationPermission().then(() => setNotificationsEnabled(true));
-      }
-      setDeferredPrompt(null);
+  const handleInstall = async () => {
+    const outcome = await promptPwaInstall();
+    if (outcome === 'accepted') {
+      setInstallSuccess(true);
+      try { sounds.shiny(); } catch (_) {}
+      setTimeout(() => {
+        onClose();
+      }, 2000);
     }
   };
 
@@ -54,6 +51,7 @@ export const PwaInstallModal: React.FC<PwaInstallModalProps> = ({ isOpen, onClos
     if (res === 'granted') {
       setNotificationsEnabled(true);
       sendDiscoveryNotifications();
+      try { sounds.shiny(); } catch (_) {}
     }
   };
 
@@ -65,142 +63,136 @@ export const PwaInstallModal: React.FC<PwaInstallModalProps> = ({ isOpen, onClos
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[1000] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
-        onClick={onClose}
+        className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden text-slate-100"
       >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          onClick={(e) => e.stopPropagation()}
-          className="relative w-full max-w-lg bg-slate-900/95 border border-cyan-500/40 rounded-2xl p-5 sm:p-6 shadow-[0_0_30px_rgba(6,182,212,0.2)] overflow-hidden my-auto"
-        >
-          <HUDCorners />
+        {/* Ambient Glows */}
+        <div className="absolute top-0 left-1/3 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
-            <div className="flex items-center gap-3">
-              <div className="relative w-12 h-12 rounded-xl bg-slate-950 border border-cyan-400/50 flex items-center justify-center p-1.5 shadow-lg overflow-hidden shrink-0">
-                <img
-                  src="/icon.svg"
-                  alt="Pokéthology Logo"
-                  className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]"
-                />
-              </div>
-              <div>
-                <h3 className="font-hud font-black text-cyan-300 text-sm sm:text-base uppercase tracking-wider flex items-center gap-2">
-                  <Download className="w-4 h-4 text-cyan-400 animate-bounce" /> Install Pokéthology
-                </h3>
-                <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">
-                  Universal Device PWA & Push Alerts
-                </p>
-              </div>
+        {/* Top Header Bar */}
+        <div className="shrink-0 border-b border-cyan-500/30 bg-slate-900/90 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4 z-20 shadow-lg">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(34,211,238,0.3)]">
+              <Download className="w-5 h-5 text-cyan-400 animate-bounce" />
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div>
+              <h2 className="font-hud font-black text-sm sm:text-lg text-cyan-300 uppercase tracking-widest leading-tight">
+                INSTALL POKÉTHOLOGY APP
+              </h2>
+              <p className="text-[10px] sm:text-xs font-mono text-slate-400">
+                UNIVERSAL DEVICE PWA & PUSH ALERTS
+              </p>
+            </div>
           </div>
 
-          {/* Content */}
-          <div className="space-y-3.5 text-left">
-            <div className="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800 space-y-1.5">
-              <div className="flex items-center gap-2 text-cyan-400 font-hud text-xs font-bold uppercase tracking-wider">
+          <button
+            onClick={() => {
+              onClose();
+              try { sounds.scan(); } catch (_) {}
+            }}
+            className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm"
+            title="Close (Esc)"
+          >
+            <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+            <span className="hidden sm:inline">CLOSE</span>
+          </button>
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-8">
+          <div className="max-w-2xl mx-auto space-y-5">
+            <div className="bg-slate-900/70 p-5 rounded-2xl border border-slate-800 space-y-2 shadow-lg">
+              <div className="flex items-center gap-2 text-cyan-400 font-hud text-xs sm:text-sm font-bold uppercase tracking-wider">
                 <Sparkles className="w-4 h-4 text-yellow-400" /> Offline Playability & App Launcher
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                Install Pokéthology on your iOS, Android, macOS, or Windows device for full offline access, zero-clipping logo launcher, and tactical battle simulation.
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
+                Install Pokéthology on your iOS, Android, macOS, or Windows device for full offline access, zero-clipping launcher icon, fast cold start, and full-screen tactical battle simulation.
               </p>
             </div>
 
             {/* Notification Activation Bar */}
-            <div className="bg-gradient-to-r from-purple-950/50 to-cyan-950/50 p-3.5 rounded-xl border border-purple-500/30 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-lg bg-purple-900/60 border border-purple-400/40 text-purple-300">
-                  <Bell className="w-4 h-4 animate-pulse" />
+            <div className="bg-gradient-to-r from-purple-950/60 to-cyan-950/60 p-4 sm:p-5 rounded-2xl border border-purple-500/30 flex items-center justify-between gap-4 shadow-lg">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-purple-900/60 border border-purple-400/40 text-purple-300">
+                  <Bell className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-hud font-bold text-[11px] text-purple-200 uppercase tracking-wider flex items-center gap-1.5">
-                    <Bot className="w-3.5 h-3.5 text-cyan-400" /> World Push Discovery
+                  <h4 className="text-xs sm:text-sm font-hud font-bold text-purple-300 uppercase tracking-wider">
+                    Push Notifications
                   </h4>
-                  <p className="text-[10px] text-slate-300 font-mono">
-                    AI Chatbot & Battle Tactics Alerts
+                  <p className="text-[11px] text-slate-300 font-sans">
+                    Receive daily battle alerts and legendary discovery notifications
                   </p>
                 </div>
               </div>
+
               <button
                 onClick={handleEnableNotifications}
                 disabled={notificationsEnabled}
-                className={
+                className={`px-3.5 py-2 rounded-xl text-xs font-hud font-bold uppercase tracking-wider transition-all shrink-0 cursor-pointer shadow-md ${
                   notificationsEnabled
-                    ? 'px-3 py-1.5 rounded-lg bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-[10px] font-mono font-bold flex items-center gap-1 shrink-0'
-                    : 'px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-hud font-black uppercase tracking-wider shadow-[0_0_12px_rgba(168,85,247,0.4)] transition-all shrink-0 cursor-pointer'
-                }
+                    ? 'bg-emerald-950 border border-emerald-500 text-emerald-400 cursor-default'
+                    : 'bg-purple-600 hover:bg-purple-500 text-white border border-purple-400 active:scale-95 shadow-[0_0_15px_rgba(168,85,247,0.4)]'
+                }`}
               >
                 {notificationsEnabled ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-emerald-400" /> Enabled
-                  </>
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> ENABLED
+                  </span>
                 ) : (
-                  'Enable Alerts'
+                  'ENABLE'
                 )}
               </button>
             </div>
 
-            {/* Install Action or Instructions */}
-            {isInstalled ? (
-              <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 flex items-center gap-3 text-emerald-300">
-                <Check className="w-5 h-5 shrink-0 text-emerald-400" />
-                <div>
-                  <h4 className="font-hud font-bold text-xs uppercase tracking-wider">Successfully Installed!</h4>
-                  <p className="text-[10px] text-slate-300 font-mono">Launch Pokéthology from your home screen or desktop anytime.</p>
+            {/* Install Action or iOS Guide */}
+            {isIOS ? (
+              <div className="bg-slate-900/80 p-5 rounded-2xl border border-amber-500/30 space-y-3">
+                <div className="flex items-center gap-2 text-amber-400 font-hud text-xs sm:text-sm font-bold uppercase tracking-wider">
+                  <Smartphone className="w-4 h-4" /> Install on Apple iOS (Safari)
                 </div>
+                <p className="text-xs sm:text-sm text-slate-300 font-sans leading-relaxed">
+                  To install Pokéthology on your iPhone or iPad:
+                </p>
+                <ol className="text-xs sm:text-sm text-slate-300 font-sans space-y-2 list-decimal list-inside pl-1">
+                  <li>
+                    Tap the <strong className="text-cyan-400 inline-flex items-center gap-1 font-mono"><Share className="w-3.5 h-3.5" /> Share</strong> button in Safari's bottom toolbar.
+                  </li>
+                  <li>
+                    Scroll down and select <strong className="text-cyan-400 inline-flex items-center gap-1 font-mono"><PlusSquare className="w-3.5 h-3.5" /> Add to Home Screen</strong>.
+                  </li>
+                  <li>
+                    Tap <strong className="text-emerald-400 font-hud">Add</strong> in the top right corner.
+                  </li>
+                </ol>
               </div>
-            ) : deferredPrompt ? (
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleInstallClick}
-                className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-hud font-black text-xs sm:text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(6,182,212,0.4)] flex items-center justify-center gap-2.5 transition-all cursor-pointer"
+            ) : canInstall ? (
+              <button
+                onClick={handleInstall}
+                disabled={installSuccess}
+                className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-emerald-500 to-cyan-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-hud font-black text-xs sm:text-sm uppercase tracking-widest flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all cursor-pointer active:scale-[0.99]"
               >
-                <Download className="w-5 h-5 animate-pulse" />
-                Install App Now
-              </motion.button>
+                {installSuccess ? (
+                  <>
+                    <CheckCircle2 className="w-5 h-5 text-slate-950" />
+                    <span>INSTALLED SUCCESSFULLY!</span>
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-5 h-5 text-slate-950 animate-bounce" />
+                    <span>INSTALL AS DESKTOP / MOBILE APP</span>
+                  </>
+                )}
+              </button>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div className="p-3 rounded-xl bg-slate-950/40 border border-slate-800 space-y-1.5">
-                  <div className="flex items-center gap-2 text-cyan-300 font-hud text-[11px] font-bold uppercase">
-                    <Smartphone className="w-4 h-4 text-cyan-400" /> Mobile / iOS / Android
-                  </div>
-                  <ol className="text-[10.5px] text-slate-300 space-y-1 list-decimal list-inside font-sans">
-                    <li>Tap browser menu (<span className="text-cyan-400 font-bold">⋮</span> or <span className="text-cyan-400 font-bold">Share</span>).</li>
-                    <li>Select <span className="text-cyan-400 font-bold">"Add to Home Screen"</span>.</li>
-                    <li>Launch with full unclipped logo icon!</li>
-                  </ol>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-950/40 border border-slate-800 space-y-1.5">
-                  <div className="flex items-center gap-2 text-cyan-300 font-hud text-[11px] font-bold uppercase">
-                    <Laptop className="w-4 h-4 text-cyan-400" /> PC / Mac Desktop
-                  </div>
-                  <ol className="text-[10.5px] text-slate-300 space-y-1 list-decimal list-inside font-sans">
-                    <li>Click install icon (<span className="text-cyan-400 font-bold">⊕</span> or <span className="text-cyan-400 font-bold">Install</span>) in address bar.</li>
-                    <li>Confirm installation.</li>
-                    <li>Enjoy offline native app performance!</li>
-                  </ol>
-                </div>
+              <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 text-center">
+                <p className="text-xs sm:text-sm text-slate-400 font-mono">
+                  App already installed or browser supports direct URL pinning.
+                </p>
               </div>
             )}
           </div>
-
-          {/* Footer */}
-          <div className="mt-5 pt-3.5 border-t border-slate-800 flex justify-between items-center text-[10px] font-mono text-slate-500 uppercase tracking-widest">
-            <span>Pokéthology World Engine</span>
-            <span>v2.6.5</span>
-          </div>
-        </motion.div>
+        </div>
       </motion.div>
     </AnimatePresence>
   );

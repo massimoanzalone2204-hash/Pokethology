@@ -784,11 +784,33 @@ function hashCode(str: string): number {
 let examCacheKey = '';
 let cachedExams: any = null;
 
+
+function usePersistentState<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
+  const [state, setState] = useState<T>(() => {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      return initialValue;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(key, JSON.stringify(state));
+    } catch (error) {
+      // Ignore
+    }
+  }, [key, state]);
+
+  return [state, setState];
+}
+
 export const PokethologyQuizWidget: React.FC = memo(() => {
   const [activeRegionIndex, setActiveRegionIndex] = useState<number>(0);
-  const [userAnswersMap, setUserAnswersMap] = useState<Record<string, number>>({});
-  const [selectedOptionMap, setSelectedOptionMap] = useState<Record<string, number>>({});
-  const [lockedMap, setLockedMap] = useState<Record<string, boolean>>({});
+  const [userAnswersMap, setUserAnswersMap] = usePersistentState<Record<string, number>>(`pokethology_quiz_answers_${new Date().toISOString().split('T')[0]}`, {});
+  const [selectedOptionMap, setSelectedOptionMap] = usePersistentState<Record<string, number>>(`pokethology_quiz_selected_${new Date().toISOString().split('T')[0]}`, {});
+  const [lockedMap, setLockedMap] = usePersistentState<Record<string, boolean>>(`pokethology_quiz_locked_${new Date().toISOString().split('T')[0]}`, {});
   const [customSeed, setCustomSeed] = useState<number>(0);
 
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
@@ -944,7 +966,22 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
 
       {/* REGION QUESTIONS LIST */}
       <div className="flex flex-col gap-4">
-        {currentRegionData.questions.map((q, qIndex) => {
+        {(() => {
+          const allLocked = currentRegionData.questions.every((q: any) => lockedMap[q.id]);
+          if (allLocked) {
+             return (
+                <div className="py-12 flex flex-col items-center justify-center gap-4 bg-slate-950/60 rounded-2xl border border-emerald-500/20 mt-2">
+                  <div className="w-20 h-20 rounded-full bg-emerald-500/10 border-2 border-emerald-500/40 flex items-center justify-center shadow-[0_0_40px_rgba(52,211,153,0.2)]">
+                    <Award className="w-10 h-10 text-emerald-400" />
+                  </div>
+                  <h3 className="text-xl font-hud font-black text-emerald-400 tracking-widest uppercase text-center">{currentRegionData.region} Cleared</h3>
+                  <p className="text-xs text-slate-400 font-mono text-center max-w-sm px-4">
+                    All theory questions for this region have been successfully completed. Check back tomorrow for new challenges!
+                  </p>
+                </div>
+             );
+          }
+          return currentRegionData.questions.map((q, qIndex) => {
           const isLocked = !!lockedMap[q.id];
           const selectedOption = selectedOptionMap[q.id] ?? userAnswersMap[q.id];
           const isCorrect = isLocked && userAnswersMap[q.id] === q.answerIndex;
@@ -1003,14 +1040,16 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
 
                   if (isLocked) {
                     if (optIdx === q.answerIndex) {
-                      optStyle = 'bg-emerald-950/80 border-emerald-500 text-emerald-200 font-bold shadow-[0_0_10px_rgba(16,185,129,0.2)]';
+                      optStyle = 'bg-emerald-950/80 border-emerald-500 text-emerald-300 font-bold shadow-[0_0_15px_rgba(16,185,129,0.3)]';
                     } else if (isSelected && !isCorrect) {
-                      optStyle = 'bg-rose-950/80 border-rose-500 text-rose-200 line-through';
+                      optStyle = 'bg-rose-950/80 border-rose-500 text-rose-300 line-through opacity-80 shadow-[0_0_15px_rgba(244,63,94,0.3)]';
                     } else {
                       optStyle = 'bg-slate-950/40 border-slate-900 text-slate-500 opacity-60';
                     }
                   } else if (isSelected) {
-                    optStyle = 'bg-cyan-950/80 border-cyan-400 text-cyan-200 font-bold shadow-[0_0_10px_rgba(6,182,212,0.25)]';
+                    optStyle = 'bg-cyan-950/80 border-cyan-400 text-cyan-200 font-bold shadow-[0_0_15px_rgba(6,182,212,0.3)]';
+                  } else {
+                    optStyle = 'bg-slate-800 border-slate-700 text-slate-300 hover:border-cyan-500/50 hover:bg-slate-700 transition-colors';
                   }
 
                   return (
@@ -1023,7 +1062,10 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
                         optStyle
                       )}
                     >
-                      <span className="break-words font-medium">{stripHtmlTags(opt)}</span>
+                      <div className="flex items-start gap-2">
+                        <span className="font-mono font-bold opacity-80 mt-0.5">{String.fromCharCode(65 + optIdx)}.</span>
+                        <span className="break-words font-medium">{stripHtmlTags(opt)}</span>
+                      </div>
                       {isLocked && optIdx === q.answerIndex && (
                         <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                       )}
@@ -1050,6 +1092,14 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
                 </div>
               ) : (
                 <div className="mt-2 p-3 rounded-lg bg-slate-950/80 border border-slate-800 text-xs text-slate-300 leading-relaxed font-sans">
+                  <div className="flex justify-between items-center mb-1.5 border-b border-slate-800 pb-1.5">
+                    <strong className={cn("font-hud uppercase tracking-wider text-[10px]", isCorrect ? "text-emerald-400" : "text-rose-400")}>
+                      {isCorrect ? "CORRECT" : "INCORRECT"}
+                    </strong>
+                    <span className="font-mono text-[9px] text-slate-400 uppercase tracking-widest">
+                      Correct Answer: {String.fromCharCode(65 + q.answerIndex)}
+                    </span>
+                  </div>
                   <strong className="text-cyan-400 font-hud block mb-1 uppercase tracking-wider text-[9px]">
                     EXPLANATION
                   </strong>
@@ -1058,7 +1108,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
               )}
             </div>
           );
-        })}
+        })})()}
       </div>
     </div>
   );

@@ -145,7 +145,16 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
     }
-  }, [selectedGameDescIndex, pokemon.id]);
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, [selectedGameDescIndex, pokemon.id, pokemon.name]);
 
   const weightKg = pokemon.weight / 10;
   const weightLbs = weightKg * 2.20462;
@@ -174,7 +183,7 @@ export const PokedexEntrySection: React.FC<PokedexEntrySectionProps> = ({
             <span className="font-bold">Pokédex Entry</span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-nowrap items-center gap-1.5 sm:gap-2 shrink-0">
             {cryUrl && (
               <button
                 type="button"

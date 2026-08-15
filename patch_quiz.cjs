@@ -1,19 +1,38 @@
 const fs = require('fs');
-let code = fs.readFileSync('server/websocket.ts', 'utf8');
 
-const newQuestions = `[
-            { question: "Quale Pokémon ha la stessa somma di statistiche della forma Base di Mew?", options: ["Celebi", "Jirachi", "Manaphy", "Tutti questi"], answer: 3 },
-            { question: "Which Pokémon is known as the Virtual Pokemon made entirely of code?", options: ["Porygon", "Rotom", "Mewtwo", "Deoxys"], answer: 0 },
-            { question: "What element type is completely immune to the Poison status effect?", options: ["Steel", "Poison", "Both Steel and Poison", "Grass"], answer: 2 },
-            { question: "Which Legendary Pokémon is said to have created the Hoenn region's landmass?", options: ["Kyogre", "Groudon", "Rayquaza", "Regigigas"], answer: 1 },
-            { question: "Which Pokémon is considered the deity of time in Sinnoh mythology?", options: ["Palkia", "Giratina", "Dialga", "Arceus"], answer: 2 },
-            { question: "What is the name of the Unova Dragon that represents ideals?", options: ["Reshiram", "Kyurem", "Zekrom", "Victini"], answer: 2 },
-            { question: "Which Pokémon from the Kalos region is known as the Destruction Pokémon?", options: ["Xerneas", "Zygarde", "Hoopa", "Yveltal"], answer: 3 },
-            { question: "In Alola, which Pokémon is the guardian deity of Melemele Island?", options: ["Tapu Lele", "Tapu Koko", "Tapu Bulu", "Tapu Fini"], answer: 1 },
-            { question: "Which Galarian Pokémon uses a leek as a lance?", options: ["Farfetch'd", "Sirfetch'd", "Zacian", "Corviknight"], answer: 1 },
-            { question: "Which Johto Pokémon is said to resurrect from the ashes?", options: ["Lugia", "Entei", "Suicune", "Ho-Oh"], answer: 3 },
-            { question: "Which Pokémon is responsible for moving the continents in ancient lore?", options: ["Groudon", "Regigigas", "Arceus", "Heatran"], answer: 1 }
-          ]`;
+const content = fs.readFileSync('src/components/PokethologyQuizWidget.tsx', 'utf8');
+const lines = content.split('\n');
 
-code = code.replace(/const triviaQuestions = \[[\s\S]*?\];/, "const triviaQuestions = " + newQuestions + ";");
-fs.writeFileSync('server/websocket.ts', code, 'utf8');
+const hookCode = `
+function usePersistentState<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
+  const [state, setState] = useState<T>(() => {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      return initialValue;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(key, JSON.stringify(state));
+    } catch (error) {
+      // Ignore
+    }
+  }, [key, state]);
+
+  return [state, setState];
+}
+`;
+
+let newContent = content;
+if (!newContent.includes('usePersistentState')) {
+  newContent = newContent.replace("export const PokethologyQuizWidget: React.FC = memo(() => {", hookCode + "\nexport const PokethologyQuizWidget: React.FC = memo(() => {");
+}
+
+newContent = newContent.replace(/const \[userAnswersMap, setUserAnswersMap\] = useState<Record<string, number>>\({}\);/, "const [userAnswersMap, setUserAnswersMap] = usePersistentState<Record<string, number>>(`pokethology_quiz_answers_${new Date().toISOString().split('T')[0]}`, {});");
+newContent = newContent.replace(/const \[selectedOptionMap, setSelectedOptionMap\] = useState<Record<string, number>>\({}\);/, "const [selectedOptionMap, setSelectedOptionMap] = usePersistentState<Record<string, number>>(`pokethology_quiz_selected_${new Date().toISOString().split('T')[0]}`, {});");
+newContent = newContent.replace(/const \[lockedMap, setLockedMap\] = useState<Record<string, boolean>>\({}\);/, "const [lockedMap, setLockedMap] = usePersistentState<Record<string, boolean>>(`pokethology_quiz_locked_${new Date().toISOString().split('T')[0]}`, {});");
+
+fs.writeFileSync('src/components/PokethologyQuizWidget.tsx', newContent);

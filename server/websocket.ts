@@ -36,16 +36,16 @@ function detectLanguage(text: string): 'it' | 'es' | 'fr' | 'de' | 'en' {
   if (!text) return 'en';
   const lower = text.toLowerCase();
   
-  const itKeywords = ['ciao', 'chi sei', 'come', 'perché', 'perche', 'combattimento', 'arena', 'squadra', 'statistiche'];
+  const itKeywords = ['ciao', 'chi sei', 'come', 'perché', 'perche', 'combattimento', 'arena', 'statistiche'];
   if (itKeywords.some(kw => lower.includes(kw))) return 'it';
   
-  const esKeywords = ['hola', 'quién eres', 'cómo', 'por qué', 'combate', 'arena', 'equipo', 'estadísticas'];
+  const esKeywords = ['hola', 'quién eres', 'cómo', 'por qué', 'combate', 'arena', 'estadísticas'];
   if (esKeywords.some(kw => lower.includes(kw))) return 'es';
   
-  const frKeywords = ['salut', 'qui es-tu', 'comment', 'pourquoi', 'combat', 'arène', 'équipe'];
+  const frKeywords = ['salut', 'qui es-tu', 'comment', 'pourquoi', 'combat', 'arène', 'statistiques'];
   if (frKeywords.some(kw => lower.includes(kw))) return 'fr';
   
-  const deKeywords = ['hallo', 'wer bist du', 'wie', 'warum', 'kampf', 'arena', 'team'];
+  const deKeywords = ['hallo', 'wer bist du', 'wie', 'warum', 'kampf', 'arena', 'statistiken'];
   if (deKeywords.some(kw => lower.includes(kw))) return 'de';
   
   return 'en';
@@ -96,7 +96,7 @@ function generateOfflineChatResponse(messages: any[], context: any, lang: 'it' |
 
 * **⚠️ Core Weaknesses:** \`${weaksStr}\`
 * **💪 Suggested Role:** \`${archetype}\`
-* **🎒 Arena Directives:** Avoid taking direct super-effective hits as we have no bench backups.`;
+* **🎒 Arena Directives:** Avoid taking direct super-effective hits in 1v1 duels.`;
   }
 
   if (rawPokeName) {

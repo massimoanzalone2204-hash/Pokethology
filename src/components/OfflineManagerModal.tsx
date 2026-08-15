@@ -236,38 +236,38 @@ export const OfflineManagerModal: React.FC<OfflineManagerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-lg animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-cyan-500/40 rounded-2xl shadow-[0_0_50px_rgba(6,182,212,0.25)] w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden text-slate-100 font-sans relative">
-        
-        {/* Top Header Bar */}
-        <div className="flex items-center justify-between px-5 py-4 bg-slate-950/90 border-b border-cyan-500/30 relative">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/50 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-              <HardDrive className="w-5 h-5 animate-pulse" />
-            </div>
-            <div>
-              <h2 className="text-base sm:text-lg font-hud font-black text-cyan-300 tracking-wider uppercase flex items-center gap-2">
-                LOCAL STORAGE & API QUOTA ENGINE
-              </h2>
-              <p className="text-[11px] font-mono text-slate-400">
-                Automated LRU Cache Pruning • Offline IndexedDB Sync • Local Quota Enforcement
-              </p>
-            </div>
+    <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden text-slate-100">
+      {/* Top Header Bar */}
+      <div className="shrink-0 flex items-center justify-between px-4 sm:px-8 py-3.5 bg-slate-900/90 border-b border-cyan-500/30 z-20 shadow-lg">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/50 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+            <HardDrive className="w-5 h-5 animate-pulse" />
           </div>
-
-          <button
-            onClick={() => {
-              if (onPlaySound) onPlaySound('hover');
-              onClose();
-            }}
-            className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div>
+            <h2 className="text-sm sm:text-lg font-hud font-black text-cyan-300 tracking-wider uppercase flex items-center gap-2">
+              LOCAL STORAGE & API QUOTA ENGINE
+            </h2>
+            <p className="text-[10px] sm:text-xs font-mono text-slate-400">
+              Automated LRU Cache Pruning • Offline IndexedDB Sync • Local Quota Enforcement
+            </p>
+          </div>
         </div>
 
-        {/* Tab Selection */}
-        <div className="flex items-center border-b border-slate-800 bg-slate-950/50 px-4 pt-2 gap-2 overflow-x-auto no-scrollbar">
+        <button
+          onClick={() => {
+            if (onPlaySound) onPlaySound('hover');
+            onClose();
+          }}
+          className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm"
+          title="Close (Esc)"
+        >
+          <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+          <span className="hidden sm:inline">CLOSE</span>
+        </button>
+      </div>
+
+      {/* Tab Selection */}
+      <div className="shrink-0 flex items-center border-b border-slate-800 bg-slate-900/60 px-4 sm:px-8 pt-2 gap-2 overflow-x-auto no-scrollbar z-10">
           <button
             onClick={() => { setActiveTab('cache'); if (onPlaySound) onPlaySound('hover'); }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-hud font-bold tracking-wider uppercase transition-all cursor-pointer border-t border-x ${
@@ -799,6 +799,5 @@ export const OfflineManagerModal: React.FC<OfflineManagerModalProps> = ({
         </div>
 
       </div>
-    </div>
   );
 };

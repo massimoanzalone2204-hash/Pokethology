@@ -1,14 +1,40 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, BookOpen, Sparkles, Swords, Cpu, Newspaper, Info, Globe, ExternalLink, Calendar, Link, MessageSquare, ArrowUp, Activity, Database, Radar, Brain, Shield, Crosshair, Map, Volume2, RotateCcw, Share2, Github, Instagram, Image, Gamepad2 } from 'lucide-react';
+import { 
+  X, 
+  BookOpen, 
+  Sparkles, 
+  Swords, 
+  Cpu, 
+  Newspaper, 
+  Globe, 
+  ExternalLink, 
+  Calendar, 
+  Activity, 
+  Database, 
+  Radar, 
+  Brain, 
+  Shield, 
+  Crosshair, 
+  Map, 
+  Volume2, 
+  Share2, 
+  Github, 
+  Instagram, 
+  Image, 
+  Gamepad2,
+  Search,
+  Star,
+  Settings as SettingsIcon,
+  Sliders,
+  Layers,
+  Award
+} from 'lucide-react';
 import { cn } from '../lib/utils';
-import { HUDCorners } from './HUDCorners';
 
 export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [activeTab, setActiveTab] = useState<'pokedex' | 'pokethology' | 'combat' | 'daily' | 'social' | 'news'>('pokedex');
   const [pokemonNews, setPokemonNews] = useState<any[]>([]);
-  const [groundingSources, setGroundingSources] = useState<any[]>([]);
-  const [searchQueries, setSearchQueries] = useState<string[]>([]);
   const [isFallback, setIsFallback] = useState<boolean>(false);
   const [loadingNews, setLoadingNews] = useState<boolean>(false);
   const [newsError, setNewsError] = useState<string | null>(null);
@@ -31,8 +57,6 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
           const data = await res.json();
           if (isMounted) {
             setPokemonNews(data.news || []);
-            setGroundingSources(data.groundingSources || []);
-            setSearchQueries(data.searchQueries || []);
             setIsFallback(data.isFallback ?? false);
           }
         } catch (err: any) {
@@ -60,47 +84,35 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[300] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-2 sm:p-6"
+        className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden text-slate-100"
       >
-        <motion.div
-          initial={{ scale: 0.95, y: 15 }}
-          animate={{ scale: 1, y: 0 }}
-          exit={{ scale: 0.95, y: 15 }}
-          transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-          className="bg-slate-950/95 border border-cyan-500/35 w-full max-w-3xl max-h-[92vh] flex flex-col rounded-2xl relative shadow-[0_0_60px_rgba(6,182,212,0.22)]"
-        >
-          <HUDCorners />
-          
-          {/* Header */}
-          <div className="flex justify-between items-center px-4 sm:px-6 py-4 border-b border-cyan-500/20 shrink-0 w-full bg-slate-900/10">
-            <div className="w-8 shrink-0 sm:block hidden" />
-            <div className="flex items-center justify-center gap-3 flex-grow text-center">
-              <motion.div 
-                animate={{ rotate: 360 }}
-                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                className="p-1.5 bg-cyan-950/60 border border-cyan-500/35 rounded-lg text-cyan-300 relative"
-              >
-                <BookOpen className="w-5 h-5 text-cyan-400 shrink-0" />
-              </motion.div>
-              <div className="text-center">
-                <h2 className="text-xs sm:text-base font-hud font-black text-cyan-400 uppercase tracking-widest leading-none">
-                  Pokéthology Academy Guide
-                </h2>
-                <p className="text-[7.5px] sm:text-[8.5px] font-mono text-slate-500 uppercase tracking-wider mt-1.5">
-                  Master the Registry, AI Coach, and Arena Mechanics
-                </p>
-              </div>
-            </div>
-            <button 
-              onClick={onClose} 
-              className="text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 p-1.5 rounded-lg border border-slate-800 transition-colors cursor-pointer shrink-0"
+        {/* Header */}
+        <div className="shrink-0 flex justify-between items-center px-4 sm:px-8 py-3.5 border-b border-cyan-500/30 w-full bg-slate-900/90 z-20 shadow-lg">
+          <div className="flex items-center gap-3">
+            <motion.div 
+              animate={{ rotate: 360 }}
+              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+              className="p-2 bg-cyan-950/80 border border-cyan-500/50 rounded-xl text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.3)]"
             >
-              <X className="w-4 h-4" />
-            </button>
+              <BookOpen className="w-5 h-5 text-cyan-400 shrink-0" />
+            </motion.div>
+            <div>
+              <h2 className="text-sm sm:text-lg font-hud font-black text-cyan-300 uppercase tracking-widest leading-none">
+                Pokéthology tutorial
+              </h2>
+            </div>
           </div>
+          <button 
+            onClick={onClose} 
+            className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm"
+          >
+            <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+            <span className="hidden sm:inline">CLOSE</span>
+          </button>
+        </div>
 
-          {/* Tab Selection Row */}
-          <div className="flex gap-1.5 overflow-x-auto custom-scrollbar no-scrollbar px-3 py-2.5 border-b border-slate-900 bg-slate-900/40 shrink-0 select-none justify-start sm:justify-center">
+        {/* Tab Selection Row */}
+        <div className="shrink-0 flex gap-1.5 overflow-x-auto custom-scrollbar no-scrollbar px-4 sm:px-8 py-2.5 border-b border-slate-800 bg-slate-900/60 select-none z-10">
             {(['pokedex', 'pokethology', 'combat', 'daily', 'social', 'news'] as const).map(tab => {
               const icons = {
                 pokedex: <Database className="w-3 h-3 text-emerald-400" />,
@@ -114,7 +126,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 pokedex: 'POKÉDEX',
                 pokethology: 'POKÉTHOLOGY',
                 combat: 'COMBAT',
-                daily: 'DAILY',
+                daily: 'DAILY & UTILITIES',
                 social: 'SOCIAL',
                 news: 'NEWS'
               };
@@ -151,77 +163,61 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 initial={{ opacity: 0, x: -20 }} 
                 animate={{ opacity: 1, x: 0 }} 
                 exit={{ opacity: 0, x: 20 }}
-                className="space-y-5 max-w-2xl mx-auto"
+                className="space-y-4 max-w-2xl mx-auto"
               >
                 {/* Banner */}
-                <div className="p-4 bg-emerald-950/20 border-l-4 border-emerald-500 rounded-r-xl space-y-2 text-left relative overflow-hidden group">
-                  <motion.div 
-                    animate={{ x: [-100, 400], opacity: [0, 0.5, 0] }} 
-                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                    className="absolute inset-y-0 w-32 bg-emerald-500/10 skew-x-12"
-                  />
+                <div className="p-4 bg-emerald-950/20 border-l-4 border-emerald-500 rounded-r-xl space-y-1.5 text-left relative overflow-hidden group">
                   <h3 className="font-hud font-black text-emerald-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
-                    <Map className="w-4 h-4 animate-pulse" /> Multigenerational Pokédex Exploration
+                    <Map className="w-4 h-4 animate-pulse" /> Pokédex Registry
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    The core registry acts as your definitive database. Seamlessly navigate across all Generations of Pokémon right from the home dashboard. Use advanced filtering to quickly find exact species matches across regions.
+                    Explore all 9 Generations of Pokémon. Filter by region and sort criteria with live stats, audio cries, and artwork switching.
                   </p>
                 </div>
                 
-                {/* Complete New Stats Section */}
-                <div className="p-4 rounded-xl border border-emerald-500/30 bg-slate-900/60 flex items-start gap-4 group text-left shadow-[0_0_20px_rgba(16,185,129,0.12)]">
-                  <div className="p-3 bg-emerald-950 rounded-full border border-emerald-500/50 shrink-0 group-hover:rotate-12 transition-transform">
-                    <Radar className="w-5 h-5 text-emerald-400 animate-spin-slow" />
+                {/* Direct Card Star Feature */}
+                <div className="p-4 rounded-xl border border-yellow-500/30 bg-slate-900/60 flex items-start gap-4 group text-left">
+                  <div className="p-3 bg-yellow-950 rounded-full border border-yellow-500/50 shrink-0 group-hover:scale-110 transition-transform">
+                    <Star className="w-5 h-5 text-yellow-400 fill-yellow-400/30 animate-pulse" />
                   </div>
                   <div className="space-y-1 w-full min-w-0">
-                    <div className="flex items-center justify-between border-b border-emerald-500/20 pb-1.5">
-                      <span className="font-hud font-black text-emerald-400 text-xs sm:text-sm uppercase tracking-wider">
-                        Complete New Stats Section
-                      </span>
-                    </div>
+                    <span className="font-hud font-black text-yellow-300 text-xs sm:text-sm uppercase tracking-wider block">
+                      Favorites Star
+                    </span>
                     <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      The Pokédex diagnostic view has been entirely overhauled with the <span className="text-emerald-300 font-bold">Complete New Stats Section</span>. Explore rigorous mathematical breakdowns of Base Stat Totals (BST), individual attribute weightings (HP, Attack, Defense, Sp. Atk, Sp. Def, Speed), dynamic speed tier assessments, and live effectiveness counters.
+                      Tap the star icon on any card or detail page to instantly add or remove Pokémon from your Favorites vault.
                     </p>
                   </div>
                 </div>
 
-                {/* Compare Section */}
-                <div className="p-4 rounded-xl border border-cyan-500/30 bg-slate-900/60 flex items-start gap-4 group text-left shadow-[0_0_20px_rgba(6,182,212,0.12)]">
+                {/* Complete Stats Diagnostics */}
+                <div className="p-4 rounded-xl border border-emerald-500/30 bg-slate-900/60 flex items-start gap-4 group text-left">
+                  <div className="p-3 bg-emerald-950 rounded-full border border-emerald-500/50 shrink-0 group-hover:rotate-12 transition-transform">
+                    <Radar className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div className="space-y-1 w-full min-w-0">
+                    <span className="font-hud font-black text-emerald-400 text-xs sm:text-sm uppercase tracking-wider block">
+                      Stats & Radar Charts
+                    </span>
+                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
+                      View Base Stat Totals (BST), individual stat distributions (HP, Attack, Defense, Sp. Atk, Sp. Def, Speed), type matchups, and sound cries.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Stat Comparator */}
+                <div className="p-4 rounded-xl border border-cyan-500/30 bg-slate-900/60 flex items-start gap-4 group text-left">
                   <div className="p-3 bg-cyan-950 rounded-full border border-cyan-500/50 shrink-0 group-hover:rotate-12 transition-transform">
                     <Swords className="w-5 h-5 text-cyan-400 animate-pulse" />
                   </div>
                   <div className="space-y-1 w-full min-w-0">
-                    <div className="flex items-center justify-between border-b border-cyan-500/20 pb-1.5">
-                      <span className="font-hud font-black text-cyan-400 text-xs sm:text-sm uppercase tracking-wider">
-                        Advanced Compare Section
-                      </span>
-                    </div>
+                    <span className="font-hud font-black text-cyan-400 text-xs sm:text-sm uppercase tracking-wider block">
+                      Stat Comparison
+                    </span>
                     <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      Pin any species to activate the <span className="text-cyan-300 font-bold">Compare Section & Side-by-Side Comparison Sidebar</span>. Evaluate head-to-head stat differentials with color-coded advantage highlights (green for superiority, red for deficit), type coverage overlaps, and direct competitive matchup advantages.
+                      Compare two Pokémon side-by-side in a full-screen view. Compare forms, stats, and advantages directly.
                     </p>
                   </div>
-                </div>
-
-                <h4 className="font-hud font-black text-[10px] text-emerald-400 uppercase tracking-[0.2em] border-b border-emerald-500/20 pb-1.5 mt-6 text-left flex items-center gap-1.5">
-                  <Database className="w-3.5 h-3.5" /> THE STATS SCHEDULE
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-left">
-                  <motion.div whileHover={{ scale: 1.01 }} className="bg-slate-900/60 p-4 rounded-xl border border-emerald-500/30 hover:border-emerald-400/50 transition-all flex flex-col gap-1.5">
-                    <span className="font-hud font-black text-emerald-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
-                      <Radar className="w-3.5 h-3.5 animate-spin-slow" /> Comprehensive Diagnostics
-                    </span>
-                    <p className="text-[10.5px] text-slate-300 leading-relaxed font-sans">
-                      Upon selecting a Pokémon, dive deep into its core metrics. View base stats, type advantages, weaknesses, and height/weight attributes dynamically generated on the fly.
-                    </p>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.01 }} className="bg-slate-900/60 p-4 rounded-xl border border-emerald-500/30 hover:border-emerald-400/50 transition-all flex flex-col gap-1.5">
-                    <span className="font-hud font-black text-emerald-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 animate-pulse" /> Advanced Visuals
-                    </span>
-                    <p className="text-[10.5px] text-slate-300 leading-relaxed font-sans">
-                      Experience immersive retro radar charts mapping exact stat distributions and dynamic 3D-style sprites bridging the gap between generations.
-                    </p>
-                  </motion.div>
                 </div>
               </motion.div>
             )}
@@ -231,24 +227,19 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }} 
                 animate={{ opacity: 1, scale: 1 }}
-                className="space-y-5 max-w-2xl mx-auto"
+                className="space-y-4 max-w-2xl mx-auto"
               >
                 {/* Banner */}
-                <div className="p-4 bg-purple-950/20 border-l-4 border-purple-500 rounded-r-xl space-y-2 text-left relative overflow-hidden">
-                  <motion.div 
-                    animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.3, 0.1] }} 
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -right-10 -top-10 w-48 h-48 bg-purple-500 rounded-full blur-3xl pointer-events-none" 
-                  />
+                <div className="p-4 bg-purple-950/20 border-l-4 border-purple-500 rounded-r-xl space-y-1.5 text-left relative overflow-hidden">
                   <h3 className="font-hud font-black text-purple-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
-                    <Brain className="w-4 h-4 animate-pulse" /> The Pokéthology AI Mind
+                    <Brain className="w-4 h-4 animate-pulse" /> Pokéthology AI Assistant
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Your personal, highly-advanced, server-side AI Assistant. Powered by Gemini, the Pokéthology Chatbot isn't limited to combat or encyclopedia data—it's an all-knowing companion ready to discuss everything about the Pokémon world, anime, games, lore, or any general topic and idea!
+                    Ask questions about Pokémon battles, competitive builds, evolution lines, and lore.
                   </p>
                 </div>
 
-                {/* HUD Feature Cards matching Daily Hub style */}
+                {/* HUD Feature Cards */}
                 <div className="grid grid-cols-1 gap-3 text-left">
                   <div className="p-4 rounded-xl border border-purple-500/30 bg-slate-900/60 flex items-center gap-4 group">
                     <div className="p-3 bg-purple-950 rounded-full border border-purple-500/50 group-hover:rotate-12 transition-transform shrink-0">
@@ -257,7 +248,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <div>
                       <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Tactics & Strategy</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Ask for real-time movesets, competitive strategies, EV spreads, and counter-picks for battles.
+                        Get advice on competitive movesets, EV spreads, team synergies, and matchup counters.
                       </p>
                     </div>
                   </div>
@@ -267,9 +258,9 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <BookOpen className="w-5 h-5 text-purple-400" />
                     </div>
                     <div>
-                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">World Lore & Anime</span>
+                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Lore & Biology</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Explore species origins, anime episodes, manga arcs, and historical mythology across all regions.
+                        Discover species evolution paths, regional mythologies, and ecological lore.
                       </p>
                     </div>
                   </div>
@@ -279,9 +270,9 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <Activity className="w-5 h-5 text-purple-400" />
                     </div>
                     <div>
-                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Universal Knowledge</span>
+                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">General Knowledge</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Chat freely about any topic, general questions, creative ideas, or Pokémon theories without restriction.
+                        Chat about game mechanics, trivia, and franchise details with context-aware responses.
                       </p>
                     </div>
                   </div>
@@ -294,15 +285,15 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               <motion.div 
                 initial={{ opacity: 0, y: 15 }} 
                 animate={{ opacity: 1, y: 0 }} 
-                className="space-y-5 max-w-2xl mx-auto"
+                className="space-y-4 max-w-2xl mx-auto"
               >
                 {/* Banner */}
-                <div className="p-4 bg-red-950/20 border-l-4 border-red-500 rounded-r-xl space-y-2 text-left relative overflow-hidden">
+                <div className="p-4 bg-red-950/20 border-l-4 border-red-500 rounded-r-xl space-y-1.5 text-left relative overflow-hidden">
                   <h3 className="font-hud font-black text-red-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
-                    <Swords className="w-4 h-4 text-red-500 animate-pulse" /> Combat Simulation Arena
+                    <Swords className="w-4 h-4 text-red-500 animate-pulse" /> Combat Simulator
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Put theory into practice. The tactical simulation arena allows you to pit two Pokémon against each other, fully testing stats, movesets, and types in extreme algorithmic scenarios.
+                    Test battle matchups between any two Pokémon with real-time health bars and combat calculation logs.
                   </p>
                 </div>
 
@@ -310,24 +301,24 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 <div className="grid grid-cols-1 gap-3 text-left">
                   <div className="p-4 rounded-xl border border-red-500/30 bg-slate-900/60 flex items-center gap-4 group">
                     <div className="p-3 bg-red-950 rounded-full border border-red-500/50 group-hover:rotate-12 transition-transform shrink-0">
-                      <Shield className="w-5 h-5 text-red-400" />
+                      <Crosshair className="w-5 h-5 text-red-400" />
                     </div>
                     <div>
-                      <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider">Dual Matchup Preview</span>
+                      <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider">Select Opponent</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Select two combatants and analyze their matchup side-by-side before the fight. View raw stat advantages instantly.
+                        Click the <span className="text-red-400 font-bold font-hud">SELECT TARGET</span> button to pick any specific rival Pokémon.
                       </p>
                     </div>
                   </div>
 
                   <div className="p-4 rounded-xl border border-red-500/30 bg-slate-900/60 flex items-center gap-4 group">
                     <div className="p-3 bg-red-950 rounded-full border border-red-500/50 group-hover:animate-pulse transition-transform shrink-0">
-                      <Activity className="w-5 h-5 text-red-400" />
+                      <Sparkles className="w-5 h-5 text-red-400" />
                     </div>
                     <div>
                       <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider">Chaos Mode</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Turn on auto-battling to instantly roll randomized moves based on STAB logic, tracking HP and stat degradation dynamically.
+                        Completely randomizes the combatants and movesets, allowing you to battle under fully unpredictable conditions.
                       </p>
                     </div>
                   </div>
@@ -338,11 +329,9 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <Gamepad2 className="w-4 h-4 text-amber-400" />
                     </div>
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-hud font-black text-cyan-400 text-xs sm:text-sm uppercase tracking-wider">Artwork & Sprite Mode Toggle</span>
-                      </div>
+                      <span className="font-hud font-black text-cyan-400 text-xs sm:text-sm uppercase tracking-wider">Art & Sprite Toggle</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Use the <span className="text-cyan-300 font-bold font-hud">[Art / Sprite]</span> button in the arena header or Pokédex to switch visual rendering between official HD Sugimori Artwork (<span className="text-cyan-400 font-semibold">Art</span>) and retro 2D Pixel Sprites (<span className="text-amber-400 font-semibold">Sprite</span>).
+                        Switch between official artwork and classic pixel sprites via the header toggle.
                       </p>
                     </div>
                   </div>
@@ -352,11 +341,9 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <Volume2 className="w-5 h-5 text-red-400" />
                     </div>
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider">Interactive Arena Artwork</span>
-                      </div>
+                      <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider">Sound Cries</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Touch or click directly on any Pokémon's artwork inside the combat arena to rotate its stance position and play its official species cry in real-time!
+                        Click on Pokémon in the arena to play their official sound cries.
                       </p>
                     </div>
                   </div>
@@ -364,43 +351,79 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               </motion.div>
             )}
 
-            {/* TAB: DAILY ACTIVITIES */}
+            {/* TAB: DAILY ACTIVITIES & UTILITIES */}
             {activeTab === 'daily' && (
               <motion.div 
                 initial={{ opacity: 0, x: 20 }} 
                 animate={{ opacity: 1, x: 0 }}
-                className="space-y-5 max-w-2xl mx-auto"
+                className="space-y-4 max-w-2xl mx-auto"
               >
-                <div className="p-4 bg-amber-950/20 border-l-4 border-amber-500 rounded-r-xl space-y-2 text-left relative overflow-hidden">
+                <div className="p-4 bg-amber-950/20 border-l-4 border-amber-500 rounded-r-xl space-y-1.5 text-left relative overflow-hidden">
                   <h3 className="font-hud font-black text-amber-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
-                    <Calendar className="w-4 h-4 animate-bounce" /> Daily Hub & Activities
+                    <Calendar className="w-4 h-4 animate-bounce" /> Daily Activities & Settings
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Return every 24 hours to view the featured daily scan and participate in daily activities.
+                    Overview of daily challenges, search tools, favorites, and settings.
                   </p>
                 </div>
                 
-                <div className="grid grid-cols-1 gap-3 text-left">
-                  <div className="p-4 rounded-xl border border-amber-500/30 bg-slate-900/60 flex items-center gap-4 group">
-                    <div className="p-3 bg-amber-950 rounded-full border border-amber-500/50 group-hover:rotate-12 transition-transform shrink-0">
-                      <Sparkles className="w-5 h-5 text-amber-400" />
+                <div className="grid grid-cols-1 gap-3.5 text-left">
+                  {/* SEARCH BAR */}
+                  <div className="p-4 rounded-xl border border-cyan-500/40 bg-slate-900/70 flex items-start gap-4 group">
+                    <div className="p-3 bg-cyan-950 rounded-full border border-cyan-500/60 group-hover:scale-110 transition-transform shrink-0">
+                      <Search className="w-5 h-5 text-cyan-400" />
                     </div>
-                    <div>
-                      <span className="font-hud font-black text-amber-400 text-xs sm:text-sm uppercase tracking-wider">Daily Scan</span>
-                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        A unique, randomly featured Pokémon every single day, complete with official Pokédex entry and live academic analysis.
+                    <div className="space-y-1">
+                      <span className="font-hud font-black text-cyan-300 text-xs sm:text-sm uppercase tracking-wider block">
+                        Search Bar
+                      </span>
+                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans">
+                        Search by Pokémon number (e.g. <span className="font-mono text-cyan-400">#006</span>), species name, or alternate forms with live filtering.
                       </p>
                     </div>
                   </div>
-                  
-                  <div className="p-4 rounded-xl border border-orange-500/30 bg-slate-900/60 flex items-center gap-4 group">
-                    <div className="p-3 bg-orange-950 rounded-full border border-orange-500/50 group-hover:-rotate-12 transition-transform shrink-0">
-                      <Cpu className="w-5 h-5 text-orange-400" />
+
+                  {/* FAVORITE FEATURE */}
+                  <div className="p-4 rounded-xl border border-yellow-500/40 bg-slate-900/70 flex items-start gap-4 group">
+                    <div className="p-3 bg-yellow-950 rounded-full border border-yellow-500/60 group-hover:rotate-12 transition-transform shrink-0">
+                      <Star className="w-5 h-5 text-yellow-400 fill-yellow-400/40" />
                     </div>
-                    <div>
-                      <span className="font-hud font-black text-orange-400 text-xs sm:text-sm uppercase tracking-wider">Theory Exam</span>
-                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Test your intellect. The AI dynamically generates rigorous questions based on biology, stats, and lore.
+                    <div className="space-y-1">
+                      <span className="font-hud font-black text-yellow-300 text-xs sm:text-sm uppercase tracking-wider block">
+                        Favorites Vault
+                      </span>
+                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans">
+                        Save favorite Pokémon and alternate forms (Mega, Gigantamax, Regional) into your persistent vault.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* DAILY HUB SECTION */}
+                  <div className="p-4 rounded-xl border border-amber-500/40 bg-slate-900/70 flex items-start gap-4 group">
+                    <div className="p-3 bg-amber-950 rounded-full border border-amber-500/60 group-hover:scale-110 transition-transform shrink-0">
+                      <Award className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <div className="space-y-1">
+                      <span className="font-hud font-black text-amber-300 text-xs sm:text-sm uppercase tracking-wider block">
+                        Daily Hub & Theory Exam
+                      </span>
+                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans">
+                        Complete daily featured scans, solve Theory Exam questions, and finish daily challenges to unlock rank tiers.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* SETTINGS SECTION */}
+                  <div className="p-4 rounded-xl border border-purple-500/40 bg-slate-900/70 flex items-start gap-4 group">
+                    <div className="p-3 bg-purple-950 rounded-full border border-purple-500/60 group-hover:rotate-45 transition-transform shrink-0">
+                      <SettingsIcon className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div className="space-y-1">
+                      <span className="font-hud font-black text-purple-300 text-xs sm:text-sm uppercase tracking-wider block">
+                        Settings
+                      </span>
+                      <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans">
+                        Toggle theme mode, adjust audio sound effects and cries, or configure app settings.
                       </p>
                     </div>
                   </div>
@@ -413,14 +436,14 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }} 
                 animate={{ opacity: 1, scale: 1 }}
-                className="space-y-5 max-w-2xl mx-auto text-left"
+                className="space-y-4 max-w-2xl mx-auto text-left"
               >
-                <div className="p-4 bg-pink-950/20 border-l-4 border-pink-500 rounded-r-xl space-y-2 text-left relative overflow-hidden">
+                <div className="p-4 bg-pink-950/20 border-l-4 border-pink-500 rounded-r-xl space-y-1.5 text-left relative overflow-hidden">
                   <h3 className="font-hud font-black text-pink-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
-                    <Share2 className="w-4 h-4 animate-pulse" /> Pokéthology Community & Social
+                    <Share2 className="w-4 h-4 animate-pulse" /> Community & Social
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Connect directly with the Pokéthology ecosystem! Whether you want to inspect our open-source codebase, report bugs, discuss new features, or stay updated with daily Pokémon content, check out our official channels below.
+                    Connect with Pokéthology channels and explore the project.
                   </p>
                 </div>
 
@@ -456,7 +479,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                         <Instagram className="w-5 h-5 text-pink-400" />
                       </div>
                       <div className="flex flex-col text-left min-w-0">
-                        <span className="font-hud font-black text-pink-400 text-xs sm:text-sm uppercase tracking-wider">Official Instagram</span>
+                        <span className="font-hud font-black text-pink-400 text-xs sm:text-sm uppercase tracking-wider">Instagram</span>
                         <span className="text-[9px] sm:text-[10px] font-mono text-pink-300/80 truncate">@__.pokethology.__</span>
                       </div>
                     </div>
@@ -468,43 +491,43 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 
             {/* TAB: NEWS */}
             {activeTab === 'news' && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5 max-w-2xl mx-auto text-left">
-                <div className="p-4 bg-cyan-950/20 border-l-4 border-cyan-500 rounded-r-xl space-y-2 text-left relative overflow-hidden">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 max-w-2xl mx-auto text-left">
+                <div className="p-4 bg-cyan-950/20 border-l-4 border-cyan-500 rounded-r-xl space-y-1.5 text-left relative overflow-hidden">
                   <div className="flex items-center justify-between border-b border-cyan-500/25 pb-2">
                     <h3 className="font-hud font-black text-cyan-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
-                      <Globe className="w-4 h-4 text-cyan-400 animate-spin-slow" /> Real-World Pokémon Grounded Briefings
+                      <Globe className="w-4 h-4 text-cyan-400 animate-spin-slow" /> Pokémon News & Updates
                     </h3>
                     {isFallback && (
                       <div className="flex items-center gap-1.5">
                         <span className="inline-block w-2 h-2 rounded-full animate-pulse mr-1 bg-amber-500" />
                         <span className="text-[7px] font-mono text-slate-400 uppercase tracking-widest">
-                          LOCAL ARCHIVE BACKUP
+                          ARCHIVE BACKUP
                         </span>
                       </div>
                     )}
                   </div>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs">
-                    Stay up to date with official global Pokémon news, game updates, competitive tournament briefings, and media releases directly fetched in real-time.
+                    Updates on Pokémon games, tournaments, and TCG releases.
                   </p>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3.5">
                   {loadingNews ? (
                     <div className="flex flex-col items-center justify-center p-10 bg-slate-900/30 border border-slate-800/80 rounded-xl space-y-3">
                       <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
                       <div className="text-center space-y-1">
                         <span className="text-[9px] font-mono text-cyan-400/80 uppercase tracking-wider block font-bold">
-                          Establishing connection with intelligence grids...
+                          Loading news feed...
                         </span>
                       </div>
                     </div>
                   ) : newsError ? (
                     <div className="p-4 bg-red-950/20 border border-red-500/25 rounded-xl text-center space-y-1">
-                      <span className="text-red-400 text-[10px] font-black uppercase tracking-wider font-hud">Interface Anomaly Detected</span>
+                      <span className="text-red-400 text-[10px] font-black uppercase tracking-wider font-hud">News Feed Error</span>
                       <p className="text-[9.5px] font-mono text-slate-400 leading-relaxed">{newsError}</p>
                     </div>
                   ) : pokemonNews.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-3.5">
+                    <div className="grid grid-cols-1 gap-3">
                       {pokemonNews.map((item, idx) => {
                         let TagIcon = Newspaper;
                         let tagColor = "border-slate-800 text-slate-400";
@@ -530,7 +553,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                           <motion.div 
                             key={`news-${idx}`} 
                             whileHover={{ scale: 1.01 }}
-                            className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-cyan-500/30 transition-all duration-300 flex flex-col gap-2.5"
+                            className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-cyan-500/30 transition-all duration-300 flex flex-col gap-2"
                           >
                             <div className="flex items-center justify-between gap-2 flex-wrap">
                               <span className={cn("text-[7.5px] font-mono font-black border px-2 py-0.5 rounded uppercase tracking-widest flex items-center gap-1", tagColor)}>
@@ -538,7 +561,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                                 {item.tag || 'GLOBAL'}
                               </span>
                               <div className="flex items-center gap-1 text-[7.5px] font-mono text-slate-400 font-bold">
-                                <span className="uppercase">{isFallback ? "ARCHIVED NEWS" : "TODAY"}</span>
+                                <span className="uppercase">{isFallback ? "ARCHIVE" : "TODAY"}</span>
                               </div>
                             </div>
                             
@@ -560,7 +583,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                                   referrerPolicy="no-referrer"
                                   className="flex items-center gap-1 px-2 py-1 bg-transparent hover:bg-slate-900 border border-slate-800 hover:border-cyan-500/20 rounded text-[8px] font-mono text-cyan-400 uppercase tracking-widest transition-all cursor-pointer group"
                                 >
-                                  <span>SOURCE DIRECT</span>
+                                  <span>SOURCE</span>
                                   <ExternalLink className="w-2.5 h-2.5 text-cyan-400 group-hover:scale-110 transition-transform" />
                                 </a>
                               </div>
@@ -571,14 +594,14 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     </div>
                   ) : (
                     <div className="p-4 bg-slate-900/20 border border-slate-800 rounded-xl text-center">
-                      <span className="text-[9.5px] font-mono text-slate-500 uppercase">Grounded news channel temporarily offline. Try switching tabs.</span>
+                      <span className="text-[9.5px] font-mono text-slate-500 uppercase">News feed offline. Try switching tabs.</span>
                     </div>
                   )}
 
                   {/* Official Pokémon TCG Portal Section Card */}
                   <motion.div 
                     whileHover={{ scale: 1.01 }}
-                    className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-cyan-500/30 transition-all duration-300 flex flex-col gap-2.5 text-left"
+                    className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-cyan-500/30 transition-all duration-300 flex flex-col gap-2 text-left"
                   >
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                       <span className="text-[7.5px] font-mono font-black border border-amber-500/35 text-amber-400 px-2 py-0.5 rounded uppercase tracking-widest flex items-center gap-1">
@@ -586,16 +609,16 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                         CARD / TCG
                       </span>
                       <div className="flex items-center gap-1 text-[7.5px] font-mono text-slate-400 font-bold">
-                        <span className="uppercase">OFFICIAL PORTAL</span>
+                        <span className="uppercase">PORTAL</span>
                       </div>
                     </div>
                     
                     <div className="space-y-1">
                       <h5 className="text-[11px] sm:text-xs font-hud font-black text-cyan-400 uppercase tracking-wide leading-snug">
-                        OFFICIAL POKÉMON TCG PORTAL
+                        POKÉMON TCG PORTAL
                       </h5>
                       <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-relaxed font-sans mt-1">
-                        Explore official Trading Card Game expansions, card databases, deck strategy guides, and competitive circuit updates directly on the official Pokémon TCG website.
+                        Explore official Trading Card Game cards, deck strategy, and tournaments.
                       </p>
                     </div>
 
@@ -607,7 +630,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                         referrerPolicy="no-referrer"
                         className="flex items-center gap-1 px-2 py-1 bg-transparent hover:bg-slate-900 border border-slate-800 hover:border-cyan-500/20 rounded text-[8px] font-mono text-cyan-400 uppercase tracking-widest transition-all cursor-pointer group"
                       >
-                        <span>VISIT TCG SITE</span>
+                        <span>VISIT SITE</span>
                         <ExternalLink className="w-2.5 h-2.5 text-cyan-400 group-hover:scale-110 transition-transform" />
                       </a>
                     </div>
@@ -619,20 +642,18 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
           </div>
 
           {/* Footer Controls */}
-          <div className="px-5 py-3.5 border-t border-cyan-500/15 shrink-0 flex justify-between items-center bg-slate-950 rounded-b-2xl w-full">
+          <div className="px-5 py-3.5 border-t border-cyan-500/15 shrink-0 flex justify-between items-center bg-slate-950 w-full">
             <span className="text-[8.5px] sm:text-[9.5px] font-mono text-slate-500 font-bold uppercase tracking-wider">
-              POKÉTHOLOGY ACADEMY v3.0.0
+              POKÉTHOLOGY TUTORIAL
             </span>
             <button
               onClick={onClose}
               className="py-1.5 px-5 bg-cyan-950 hover:bg-cyan-900 text-cyan-300 rounded-xl font-hud text-[9px] sm:text-[10px] font-black uppercase tracking-widest border border-cyan-500/40 transition-all active:scale-95 cursor-pointer"
             >
-              CLOSE HANDBOOK
+              CLOSE
             </button>
           </div>
-        </motion.div>
       </motion.div>
     </AnimatePresence>
   );
 };
-

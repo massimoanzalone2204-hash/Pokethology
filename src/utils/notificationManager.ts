@@ -57,7 +57,7 @@ export const sendPokethologyNotification = async ({
           tag,
           vibrate: [80, 40, 80],
           data: { url: '/' },
-        });
+        } as any);
         return true;
       }
     } catch (_) {}

@@ -1,12 +1,13 @@
 import React, { memo } from 'react';
 import { motion } from 'motion/react';
-import { Loader2, Database, Sparkles, Search, ArrowUpDown, ChevronDown, Check } from 'lucide-react';
+import { Loader2, Database, Sparkles, Search, ArrowUpDown, ChevronDown, Check, Star } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { GENERATIONS } from '../lib/api';
 import { Pokemon } from '../types';
+import { useFavorites } from '../hooks/useFavorites';
 
 interface PokemonListProps {
-  listMode: 'home' | 'pokemon' | 'types';
+  listMode: 'home' | 'pokemon' | 'types' | 'favorites';
   isSelectingOpponent: boolean;
   isSelectingComparison: boolean;
   lowPerformanceMode: boolean;
@@ -26,7 +27,7 @@ interface PokemonListProps {
   setQuery: (q: string) => void;
   setInputValue: (v: string) => void;
   setLastSearched: (s: string) => void;
-  setListMode: (m: 'home' | 'pokemon' | 'types') => void;
+  setListMode: (m: 'home' | 'pokemon' | 'types' | 'favorites') => void;
   setSortBy: (s: 'id' | 'name') => void;
   setSortOrder: (o: 'asc' | 'desc') => void;
   setIsSelectingOpponent: (v: boolean) => void;
@@ -68,7 +69,9 @@ export const PokemonList = memo(({
   sounds,
   hudButtonClass
 }: PokemonListProps) => {
-  if (listMode !== 'pokemon' && !isSelectingOpponent && !isSelectingComparison) return null;
+  const { isFavorite, toggleFavorite } = useFavorites();
+
+  if (listMode !== 'pokemon' && listMode !== 'favorites' && !isSelectingOpponent && !isSelectingComparison) return null;
 
   return (
     <motion.div 
@@ -190,7 +193,7 @@ export const PokemonList = memo(({
                 whileTap={{ scale: 0.97 }}
                 className={cn(
                   "whitespace-nowrap px-3.5 py-1.5 rounded-full text-[10px] sm:text-[11px] font-medium font-sans tracking-wide transition-all duration-200 cursor-pointer select-none border flex items-center gap-1",
-                  viewAllGenerations
+                  viewAllGenerations && listMode !== 'favorites'
                     ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-purple-500 shadow-md shadow-purple-900/30"
                     : "bg-zinc-900 text-purple-400 border-zinc-800 hover:text-purple-300 hover:bg-purple-950/20"
                 )}
@@ -279,6 +282,25 @@ export const PokemonList = memo(({
                     <div className="absolute top-2.5 left-3 text-[9px] font-mono text-slate-500 group-hover:text-slate-400 transition-colors flex items-center gap-1.5 shrink-0">
                       <span>#{String(displayId || "0").padStart(4, '0')}</span>
                     </div>
+
+                    {/* Favorite Star Toggle */}
+                    <button 
+                      type="button"
+                      className="absolute top-2 right-2 z-20 p-1 rounded-full bg-slate-950/70 hover:bg-slate-900 border border-slate-700/60 hover:border-yellow-500/60 transition-all cursor-pointer shadow-sm group/star"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        try { sounds.hover(); } catch (_) {}
+                        toggleFavorite({ name: p.name, url: p.url, displayId });
+                      }}
+                      title={isFavorite(p.name) ? "Remove from Favorites" : "Add to Favorites"}
+                    >
+                      <Star 
+                        className={cn(
+                          "w-3.5 h-3.5 transition-transform duration-200 group-hover/star:scale-115", 
+                          isFavorite(p.name) ? "fill-yellow-400 text-yellow-400 filter drop-shadow-[0_0_6px_rgba(250,204,21,0.6)]" : "text-slate-500 group-hover/star:text-yellow-300"
+                        )} 
+                      />
+                    </button>
 
                     {/* Official Artwork */}
                     <div className="relative w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center mt-2 z-10 shrink-0">

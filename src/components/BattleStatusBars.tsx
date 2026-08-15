@@ -1,7 +1,7 @@
 import React, { memo, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
-import { ChevronLeft, ChevronRight, Flame, Skull, Zap, Snowflake, Moon, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Flame, Skull, Zap, Snowflake, Moon, RefreshCw, Crosshair } from 'lucide-react';
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
   'BRN': <Flame className="w-3 h-3 text-orange-400" />,
@@ -88,6 +88,7 @@ interface OpponentStatusBarProps {
   enableAnimations: boolean;
   isSelectingOpponent: boolean;
   onSelectOpponentClick: () => void;
+  onSearchOpponent?: (name: string) => void;
   statChange?: 'none' | 'boost' | 'lower';
   player?: Pokemon | null;
   showComparison?: boolean;
@@ -105,6 +106,7 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
   turn,
   enableAnimations,
   onSelectOpponentClick,
+  onSearchOpponent,
   statChange,
   player,
   showComparison,
@@ -132,16 +134,23 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
           exit={{ opacity: 0, x: -20, scale: 0.95 }}
           transition={{ duration: 0.3 }}
           className={cn(
-            "z-20 flex flex-col items-start gap-1",
-            isCompact ? "relative w-full max-w-xs mx-auto" : "absolute top-2 left-2 xs:top-3 xs:left-3 sm:top-4 sm:left-4 w-[110px] xs:w-[125px] sm:w-[170px] lg:w-[200px]"
+            "z-20 flex flex-col items-start gap-1 pointer-events-auto",
+            isCompact ? "relative w-full max-w-xs mx-auto" : "absolute top-2 left-2 xs:top-3 xs:left-3 sm:top-4 sm:left-4"
           )}
         >
-          <button 
-            onClick={onSelectOpponentClick}
-            className="w-full h-10 sm:h-12 bg-red-950/20 border border-dashed border-red-500/30 rounded-xl flex flex-col items-center justify-center gap-1 hover:bg-red-900/30 hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 ease-out group pointer-events-auto btn-breathe-red"
-          >
-            <span className="text-[7px] sm:text-[8px] font-bold tracking-wider font-hud text-red-400 uppercase tracking-widest text-center">Select Target</span>
-          </button>
+          <div className="pointer-events-auto">
+            <button 
+              type="button"
+              onClick={onSelectOpponentClick}
+              className="px-3 py-1.5 sm:px-3.5 sm:py-2 min-h-[32px] sm:min-h-[36px] rounded-lg bg-transparent hover:bg-red-500/10 border border-dashed border-red-500/60 hover:border-red-400 text-red-400 hover:text-red-300 transition-all flex items-center gap-1.5 group cursor-pointer"
+              title="Select Rival Target"
+            >
+              <Crosshair className="w-3.5 h-3.5 text-red-400 group-hover:rotate-90 transition-transform duration-300 shrink-0" />
+              <span className="text-[9.5px] sm:text-[10.5px] font-hud font-bold tracking-wider uppercase whitespace-nowrap">
+                SELECT TARGET
+              </span>
+            </button>
+          </div>
         </motion.div>
       ) : (
         <motion.div 

@@ -22,7 +22,9 @@ import {
   TrendingDown,
   Eye,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Layers,
+  ChevronDown
 } from 'lucide-react';
 
 interface PokemonComparisonSidebarProps {
@@ -59,6 +61,7 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [availableFormsForP2, setAvailableFormsForP2] = useState<{ name: string; url: string }[]>([]);
 
   // Sync pinnedPokemon when prop updates
   useEffect(() => {
@@ -74,17 +77,35 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
 
     setIsSearching(true);
     setSearchError(null);
+    setAvailableFormsForP2([]);
 
     try {
       const result = await searchPokemon(q);
       if (result) {
         setSecondPokemon(result);
         setSearchQuery('');
+        if (result.varieties && result.varieties.length > 1) {
+          setAvailableFormsForP2(result.varieties.map((v: any) => ({ name: v.pokemon.name, url: v.pokemon.url })));
+        }
       } else {
         setSearchError(`No Pokémon found matching "${q}"`);
       }
     } catch (err: any) {
       setSearchError(err?.message || `Failed to find "${q}"`);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSelectForm = async (formName: string) => {
+    setIsSearching(true);
+    try {
+      const result = await searchPokemon(formName);
+      if (result) {
+        setSecondPokemon(result);
+      }
+    } catch (err: any) {
+      setSearchError(err?.message || `Failed to switch form`);
     } finally {
       setIsSearching(false);
     }
@@ -130,104 +151,92 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[150] flex justify-end overflow-hidden">
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
-            onClick={onClose}
-            className="absolute inset-0 bg-black/75 backdrop-blur-md cursor-pointer"
-          />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className={cn(
+            "fixed inset-0 z-[200] flex flex-col overflow-hidden",
+            isLightMode
+              ? "bg-slate-50 text-slate-900"
+              : "bg-slate-950/98 text-slate-100 backdrop-blur-2xl"
+          )}
+        >
+          {/* Ambient Glows */}
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          {/* Sidebar Panel */}
-          <motion.div
-            initial={{ x: '100%', opacity: 0.8 }}
-            animate={{ x: '0%', opacity: 1 }}
-            exit={{ x: '100%', opacity: 0 }}
-            transition={{ 
-              type: 'spring', 
-              damping: 28, 
-              stiffness: 280, 
-              mass: 0.85 
-            }}
-            className={cn(
-              "relative z-[160] w-full max-w-2xl h-full flex flex-col shadow-2xl border-l transition-colors duration-200 overflow-hidden",
-              isLightMode
-                ? "bg-slate-50 text-slate-900 border-slate-300"
-                : "bg-slate-950 text-slate-100 border-cyan-500/30"
-            )}
-          >
-            {/* Header Bar */}
-            <div className={cn(
-              "px-5 py-4 border-b flex items-center justify-between shrink-0 relative overflow-hidden",
-              isLightMode
-                ? "bg-white border-slate-200"
-                : "bg-slate-900/90 border-cyan-900/50"
-            )}>
-              <HUDCorners />
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-400 shrink-0">
-                  <ArrowLeftRight className="w-5 h-5 animate-pulse" />
-                </div>
-                <div>
-                  <h2 className="text-base sm:text-lg font-hud font-black uppercase tracking-wider text-cyan-400 flex items-center gap-2">
-                    Pokémon Stat Comparator
-                  </h2>
-                  <p className="text-[11px] text-slate-400 font-sans">
-                    Pin stats and analyze head-to-head combat metrics
-                  </p>
-                </div>
+          {/* Top Header Bar */}
+          <div className={cn(
+            "shrink-0 px-4 sm:px-8 py-3.5 border-b flex items-center justify-between gap-3 z-20 shadow-lg relative overflow-hidden",
+            isLightMode
+              ? "bg-white border-slate-200"
+              : "bg-slate-900/90 border-cyan-900/50"
+          )}>
+            <HUDCorners />
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)] shrink-0">
+                <ArrowLeftRight className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 animate-pulse" />
               </div>
-
-              <button
-                onClick={onClose}
-                className={cn(
-                  "p-2 rounded-xl border transition-all cursor-pointer",
-                  isLightMode
-                    ? "bg-slate-100 border-slate-300 hover:bg-slate-200 text-slate-700"
-                    : "bg-slate-800/80 border-slate-700 hover:bg-slate-700 text-slate-300"
-                )}
-                title="Close Comparator"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div>
+                <h2 className="text-sm sm:text-base font-hud font-black uppercase tracking-wider text-cyan-400 flex items-center gap-2">
+                  Pokémon Stat Comparator
+                </h2>
+                <p className="text-[10px] sm:text-[11px] text-slate-400 font-sans">
+                  Pin stats, choose specific forms, and analyze head-to-head combat metrics
+                </p>
+              </div>
             </div>
 
-            {/* Scrollable Content Body */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 space-y-6">
+            <button
+              onClick={onClose}
+              className={cn(
+                "p-2 sm:px-3.5 sm:py-2 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm shrink-0",
+                isLightMode
+                  ? "bg-slate-100 border-slate-300 hover:bg-slate-200 text-slate-700"
+                  : "bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700"
+              )}
+              title="Close (Esc)"
+            >
+              <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+              <span className="hidden sm:inline">CLOSE</span>
+            </button>
+          </div>
+
+          {/* Scrollable Content Body */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-3.5 sm:p-6 md:p-8 space-y-6 max-w-6xl w-full mx-auto relative z-10">
 
               {/* DUAL POKEMON SELECTOR CARDS */}
               <div className="grid grid-cols-2 gap-3 sm:gap-4 relative">
                 
                 {/* POKEMON 1 CARD */}
                 <div className={cn(
-                  "rounded-2xl p-3.5 sm:p-4 border relative overflow-hidden flex flex-col items-center text-center transition-all",
+                  "rounded-2xl p-3 sm:p-4 border relative overflow-hidden flex flex-col items-center text-center transition-all",
                   isLightMode
                     ? "bg-white border-slate-200 shadow-sm"
                     : "bg-slate-900/80 border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
                 )}>
-                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-widest bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-widest bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
                     P1 (Pinned)
                   </span>
 
                   {pokemon1 ? (
                     <>
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 my-2 relative flex items-center justify-center">
+                      <div className="w-20 h-20 sm:w-28 sm:h-28 my-1 relative flex items-center justify-center">
                         <img
                           src={getSpriteUrl(pokemon1)}
                           alt={pokemon1.name}
-                          className="w-full h-full object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
+                          className="max-w-full max-h-full object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
                         />
                       </div>
-                      <h3 className="font-hud font-black uppercase text-sm sm:text-base tracking-wider truncate w-full text-cyan-300">
-                        {pokemon1.name}
+                      <h3 className="font-hud font-black uppercase text-xs sm:text-base tracking-wider truncate w-full text-cyan-300">
+                        {pokemon1.name.replace(/-/g, ' ')}
                       </h3>
                       <p className="text-[10px] font-mono text-slate-400">
-                        #{String(pokemon1.id).padStart(3, '0')}
+                        #{String(pokemon1.baseId || pokemon1.id).padStart(3, '0')}
                       </p>
-                      <div className="flex flex-wrap justify-center gap-1 mt-2">
+                      <div className="flex flex-wrap justify-center gap-1 mt-1.5">
                         {pokemon1.types.map((t, idx) => (
                           <TypeBadge key={idx} type={t.type.name} size="sm" />
                         ))}
@@ -245,58 +254,61 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                   <button
                     onClick={handleSwap}
                     title="Swap P1 and P2"
-                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-cyan-500 text-slate-950 font-bold shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:scale-110 active:scale-95 transition-all border border-cyan-300 cursor-pointer"
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 p-2 sm:p-2.5 rounded-full bg-cyan-500 text-slate-950 font-bold shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:scale-110 active:scale-95 transition-all border border-cyan-300 cursor-pointer"
                   >
-                    <RotateCcw className="w-4 h-4" />
+                    <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
                 )}
 
                 {/* POKEMON 2 CARD */}
                 <div className={cn(
-                  "rounded-2xl p-3.5 sm:p-4 border relative overflow-hidden flex flex-col items-center text-center transition-all",
+                  "rounded-2xl p-3 sm:p-4 border relative overflow-hidden flex flex-col items-center text-center transition-all",
                   isLightMode
                     ? "bg-white border-slate-200 shadow-sm"
                     : "bg-slate-900/80 border-purple-500/40 shadow-[0_0_15px_rgba(168,85,247,0.1)]"
                 )}>
-                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-widest bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-widest bg-purple-500/20 text-purple-400 border border-purple-500/30">
                     P2 (Compare)
                   </span>
 
                   {secondPokemon ? (
                     <>
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 my-2 relative flex items-center justify-center">
+                      <div className="w-20 h-20 sm:w-28 sm:h-28 my-1 relative flex items-center justify-center">
                         <img
                           src={getSpriteUrl(secondPokemon)}
                           alt={secondPokemon.name}
-                          className="w-full h-full object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
+                          className="max-w-full max-h-full object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
                         />
                       </div>
-                      <h3 className="font-hud font-black uppercase text-sm sm:text-base tracking-wider truncate w-full text-purple-300">
-                        {secondPokemon.name}
+                      <h3 className="font-hud font-black uppercase text-xs sm:text-base tracking-wider truncate w-full text-purple-300">
+                        {secondPokemon.name.replace(/-/g, ' ')}
                       </h3>
                       <p className="text-[10px] font-mono text-slate-400">
-                        #{String(secondPokemon.id).padStart(3, '0')}
+                        #{String(secondPokemon.baseId || secondPokemon.id).padStart(3, '0')}
                       </p>
-                      <div className="flex flex-wrap justify-center gap-1 mt-2">
+                      <div className="flex flex-wrap justify-center gap-1 mt-1.5">
                         {secondPokemon.types.map((t, idx) => (
                           <TypeBadge key={idx} type={t.type.name} size="sm" />
                         ))}
                       </div>
 
                       <button
-                        onClick={() => setSecondPokemon(null)}
-                        className="mt-3 text-[10px] font-hud uppercase tracking-wider text-rose-400 hover:text-rose-300 underline cursor-pointer"
+                        onClick={() => {
+                          setSecondPokemon(null);
+                          setAvailableFormsForP2([]);
+                        }}
+                        className="mt-2 text-[9px] sm:text-[10px] font-hud uppercase tracking-wider text-rose-400 hover:text-rose-300 underline cursor-pointer"
                       >
                         Change P2
                       </button>
                     </>
                   ) : (
-                    <div className="py-4 w-full flex flex-col items-center justify-center space-y-2">
-                      <div className="w-12 h-12 rounded-full bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 my-1">
+                    <div className="py-6 w-full flex flex-col items-center justify-center space-y-2">
+                      <div className="w-10 h-10 rounded-full bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 my-1">
                         <Search className="w-5 h-5" />
                       </div>
                       <span className="text-xs font-hud font-bold text-slate-300">Select Pokémon 2</span>
-                      <p className="text-[10px] text-slate-400 px-2">Use search below to select rival</p>
+                      <p className="text-[10px] text-slate-400 px-2 font-sans">Use search below to select rival</p>
                     </div>
                   )}
                 </div>
@@ -305,7 +317,7 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
 
               {/* SEARCH INPUT BAR FOR POKEMON 2 */}
               <div className={cn(
-                "p-4 rounded-2xl border space-y-3 relative overflow-hidden",
+                "p-3.5 sm:p-4 rounded-2xl border space-y-3 relative overflow-hidden",
                 isLightMode ? "bg-white border-slate-200" : "bg-slate-900/60 border-slate-800"
               )}>
                 <HUDCorners />
@@ -321,7 +333,7 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      placeholder="Enter Pokémon name or ID (e.g. Mewtwo, 150)..."
+                      placeholder="Enter Pokémon name or ID (e.g. Charizard, Mewtwo, 150)..."
                       className={cn(
                         "w-full px-3.5 py-2.5 rounded-xl text-xs font-sans border outline-none transition-all",
                         isLightMode
@@ -352,6 +364,33 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                   </button>
                 </div>
 
+                {/* If Multiple Forms Discovered on Search, Display Form Selection Pills */}
+                {availableFormsForP2.length > 1 && (
+                  <div className="p-3 rounded-xl bg-purple-950/40 border border-purple-500/40 space-y-2">
+                    <span className="text-[10px] font-hud uppercase tracking-wider text-purple-300 font-bold flex items-center gap-1.5">
+                      <Layers className="w-3.5 h-3.5 text-purple-400" />
+                      Multiple Forms Available — Click to Select:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {availableFormsForP2.map((f) => (
+                        <button
+                          key={f.name}
+                          type="button"
+                          onClick={() => handleSelectForm(f.name)}
+                          className={cn(
+                            "px-2.5 py-1 rounded-lg text-[9.5px] font-hud uppercase tracking-wider border transition-all cursor-pointer",
+                            secondPokemon?.name.toLowerCase() === f.name.toLowerCase()
+                              ? "bg-purple-500 text-slate-950 border-purple-300 font-black shadow-md"
+                              : "bg-slate-900/90 text-purple-200 border-purple-500/40 hover:bg-purple-900/60 hover:text-white"
+                          )}
+                        >
+                          {f.name.replace(/-/g, ' ')}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {searchError && (
                   <div className="flex items-center gap-1.5 text-xs text-rose-400 bg-rose-950/40 border border-rose-800/50 p-2.5 rounded-xl font-mono">
                     <AlertCircle className="w-4 h-4 shrink-0" />
@@ -372,7 +411,7 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                           onClick={() => handleSearch(name)}
                           disabled={isSearching}
                           className={cn(
-                            "px-2.5 py-1 rounded-lg text-[10px] font-hud uppercase tracking-wider border transition-all cursor-pointer capitalize",
+                            "px-2.5 py-1 rounded-lg text-[10px] font-hud uppercase tracking-wider border transition-all cursor-pointer",
                             isLightMode
                               ? "bg-slate-100 border-slate-300 text-slate-700 hover:bg-cyan-50 hover:border-cyan-400 hover:text-cyan-800"
                               : "bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-cyan-950/60 hover:border-cyan-500/80 hover:text-cyan-300"
@@ -391,11 +430,11 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="space-y-6"
+                  className="space-y-5"
                 >
                   {/* WINNER BANNER HIGHLIGHT */}
                   <div className={cn(
-                    "p-4 rounded-2xl border flex items-center justify-between gap-3 relative overflow-hidden",
+                    "p-3.5 sm:p-4 rounded-2xl border flex items-center justify-between gap-3 relative overflow-hidden",
                     p1Total === p2Total
                       ? "bg-amber-950/30 border-amber-500/40 text-amber-300"
                       : p1Total > p2Total
@@ -403,28 +442,28 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                         : "bg-purple-950/40 border-purple-500/50 text-purple-300"
                   )}>
                     <HUDCorners />
-                    <div className="flex items-center gap-3">
-                      <div className="p-2.5 rounded-xl bg-white/10 border border-white/20 shrink-0">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="p-2 sm:p-2.5 rounded-xl bg-white/10 border border-white/20 shrink-0">
                         <Trophy className="w-5 h-5 text-amber-400 animate-bounce" />
                       </div>
-                      <div>
-                        <span className="text-[10px] font-hud uppercase tracking-widest text-slate-400">
+                      <div className="min-w-0">
+                        <span className="text-[9.5px] font-hud uppercase tracking-widest text-slate-400 block">
                           Total Base Stat Advantage
                         </span>
-                        <h4 className="font-hud font-black text-sm sm:text-base uppercase tracking-wider">
+                        <h4 className="font-hud font-black text-xs sm:text-sm uppercase tracking-wider truncate">
                           {p1Total === p2Total ? (
                             "Exact Stat Parity Tie!"
                           ) : p1Total > p2Total ? (
-                            `${pokemon1.name} leads by +${p1Total - p2Total} BST`
+                            `${pokemon1.name.replace(/-/g, ' ')} leads by +${p1Total - p2Total} BST`
                           ) : (
-                            `${secondPokemon.name} leads by +${p2Total - p1Total} BST`
+                            `${secondPokemon.name.replace(/-/g, ' ')} leads by +${p2Total - p1Total} BST`
                           )}
                         </h4>
                       </div>
                     </div>
 
                     <div className="text-right shrink-0">
-                      <div className="text-xs font-mono font-bold text-slate-300">
+                      <div className="text-xs sm:text-sm font-mono font-bold text-slate-300">
                         <span className="text-cyan-400 font-extrabold">{p1Total}</span> vs <span className="text-purple-400 font-extrabold">{p2Total}</span>
                       </div>
                     </div>
@@ -441,89 +480,69 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                         <Swords className="w-4 h-4" />
                         <span>Base Stat Head-to-Head</span>
                       </h4>
-                      <div className="flex items-center gap-4 text-[10px] font-hud uppercase tracking-wider">
-                        <span className="text-cyan-400 font-bold flex items-center gap-1">
-                          <span className="w-2 h-2 rounded-full bg-cyan-400" />
-                          {pokemon1.name}
+                      <div className="flex items-center gap-3 sm:gap-4 text-[9px] sm:text-[10px] font-hud uppercase tracking-wider">
+                        <span className="text-cyan-400 font-bold flex items-center gap-1 truncate max-w-[120px]">
+                          <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0" />
+                          {pokemon1.name.replace(/-/g, ' ')}
                         </span>
-                        <span className="text-purple-400 font-bold flex items-center gap-1">
-                          <span className="w-2 h-2 rounded-full bg-purple-400" />
-                          {secondPokemon.name}
+                        <span className="text-purple-400 font-bold flex items-center gap-1 truncate max-w-[120px]">
+                          <span className="w-2 h-2 rounded-full bg-purple-400 shrink-0" />
+                          {secondPokemon.name.replace(/-/g, ' ')}
                         </span>
                       </div>
                     </div>
 
-                    <div className="space-y-3.5 pt-1">
-                      {[
-                        { key: 'hp', label: 'HP' },
-                        { key: 'attack', label: 'Attack' },
-                        { key: 'defense', label: 'Defense' },
-                        { key: 'special-attack', label: 'Sp. Atk' },
-                        { key: 'special-defense', label: 'Sp. Def' },
-                        { key: 'speed', label: 'Speed' },
-                      ].map(({ key, label }) => {
-                        const val1 = getStatValue(pokemon1, key);
-                        const val2 = getStatValue(secondPokemon, key);
+                    <div className="space-y-3.5">
+                      {['hp', 'attack', 'defense', 'special-attack', 'special-defense', 'speed'].map((statKey) => {
+                        const val1 = getStatValue(pokemon1, statKey);
+                        const val2 = getStatValue(secondPokemon, statKey);
+                        const maxVal = Math.max(val1, val2, 160);
                         const diff = val1 - val2;
-                        const maxVal = Math.max(val1, val2, 120);
 
                         return (
-                          <div key={key} className="space-y-1">
-                            <div className="flex items-center justify-between text-xs font-hud">
-                              <span className="text-slate-300 font-bold uppercase tracking-wider">
-                                {label}
-                              </span>
-                              <div className="flex items-center gap-3 font-mono font-bold text-[11px]">
+                          <div key={statKey} className="space-y-1.5">
+                            <div className="flex justify-between items-center text-xs">
+                              <div className="flex items-center gap-2">
+                                <span className="font-hud font-bold text-slate-300 w-10">
+                                  {STAT_NAMES_MAP[statKey]}
+                                </span>
                                 <span className={cn(
-                                  val1 > val2 ? "text-cyan-400 font-extrabold" : "text-slate-400"
+                                  "text-[10px] font-mono font-bold px-1.5 py-0.5 rounded",
+                                  diff > 0 
+                                    ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30" 
+                                    : diff < 0 
+                                      ? "bg-purple-500/20 text-purple-400 border border-purple-500/30" 
+                                      : "bg-slate-800 text-slate-400"
                                 )}>
+                                  {diff > 0 ? `+${diff} P1` : diff < 0 ? `+${Math.abs(diff)} P2` : 'EQUAL'}
+                                </span>
+                              </div>
+
+                              <div className="font-mono text-xs flex items-center gap-3">
+                                <span className={cn("font-bold", val1 >= val2 ? "text-cyan-400" : "text-slate-400")}>
                                   {val1}
                                 </span>
-                                <span className="text-slate-600">vs</span>
-                                <span className={cn(
-                                  val2 > val1 ? "text-purple-400 font-extrabold" : "text-slate-400"
-                                )}>
+                                <span className="text-slate-600">/</span>
+                                <span className={cn("font-bold", val2 >= val1 ? "text-purple-400" : "text-slate-400")}>
                                   {val2}
                                 </span>
-
-                                {/* Diff badge */}
-                                {diff !== 0 && (
-                                  <span className={cn(
-                                    "px-1.5 py-0.2 rounded text-[9px] font-mono font-bold ml-1",
-                                    diff > 0 
-                                      ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40" 
-                                      : "bg-purple-500/20 text-purple-300 border border-purple-500/40"
-                                  )}>
-                                    {diff > 0 ? `+${diff} P1` : `+${Math.abs(diff)} P2`}
-                                  </span>
-                                )}
                               </div>
                             </div>
 
-                            {/* Dual Bar Display */}
-                            <div className="grid grid-cols-2 gap-2 h-2.5 bg-slate-950/80 p-0.5 rounded-full border border-slate-800/80 overflow-hidden">
-                              {/* P1 Bar (Align Right) */}
-                              <div className="flex justify-end items-center h-full">
-                                <div
-                                  className={cn(
-                                    "h-full rounded-full transition-all duration-500",
-                                    val1 >= val2
-                                      ? "bg-gradient-to-l from-cyan-400 to-blue-500 shadow-[0_0_8px_rgba(6,182,212,0.6)]"
-                                      : "bg-slate-700/80"
-                                  )}
+                            {/* Dual Dynamic Bar */}
+                            <div className="grid grid-cols-2 gap-1.5 h-2 bg-slate-950 rounded-full p-0.5 border border-slate-800">
+                              {/* P1 Bar (Fills to the left or scaled right) */}
+                              <div className="w-full flex justify-end bg-slate-900 rounded-l-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-gradient-to-l from-cyan-400 to-cyan-600 rounded-l-full transition-all duration-500"
                                   style={{ width: `${Math.min(100, (val1 / maxVal) * 100)}%` }}
                                 />
                               </div>
 
-                              {/* P2 Bar (Align Left) */}
-                              <div className="flex justify-start items-center h-full">
-                                <div
-                                  className={cn(
-                                    "h-full rounded-full transition-all duration-500",
-                                    val2 >= val1
-                                      ? "bg-gradient-to-r from-purple-400 to-indigo-500 shadow-[0_0_8px_rgba(168,85,247,0.6)]"
-                                      : "bg-slate-700/80"
-                                  )}
+                              {/* P2 Bar (Fills to the right) */}
+                              <div className="w-full flex justify-start bg-slate-900 rounded-r-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-r-full transition-all duration-500"
                                   style={{ width: `${Math.min(100, (val2 / maxVal) * 100)}%` }}
                                 />
                               </div>
@@ -534,56 +553,54 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                     </div>
                   </div>
 
-                  {/* PHYSICAL SPECS & ABILITIES COMPARISON */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* PHYSICAL SPECS & ABILITIES BREAKDOWN */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     
-                    {/* HEIGHT & WEIGHT */}
+                    {/* PHYSICAL MEASUREMENTS */}
                     <div className={cn(
-                      "p-4 rounded-2xl border space-y-3 relative overflow-hidden",
+                      "p-4 rounded-2xl border space-y-3",
                       isLightMode ? "bg-white border-slate-200" : "bg-slate-900/80 border-slate-800"
                     )}>
-                      <HUDCorners />
-                      <h5 className="text-xs font-hud font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2 border-b pb-2 border-slate-800">
+                      <h5 className="text-xs font-hud font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2 border-b border-slate-800 pb-2">
                         <Scale className="w-3.5 h-3.5" />
                         <span>Physical Metrics</span>
                       </h5>
 
-                      <div className="space-y-2 text-xs font-mono">
-                        <div className="flex justify-between items-center py-1 border-b border-slate-800/50">
-                          <span className="text-slate-400 flex items-center gap-1 font-sans">
-                            <Ruler className="w-3 h-3 text-amber-400" /> Height:
-                          </span>
-                          <span className="text-slate-200">
-                            <span className="text-cyan-300 font-bold">{pokemon1.height / 10}m</span> vs <span className="text-purple-300 font-bold">{secondPokemon.height / 10}m</span>
-                          </span>
+                      <div className="space-y-2 text-xs font-sans">
+                        <div className="flex justify-between items-center">
+                          <span className="text-slate-400">Height:</span>
+                          <div className="font-mono text-[11px] flex gap-2">
+                            <span className="text-cyan-400 font-bold">{(pokemon1.height / 10).toFixed(1)}m</span>
+                            <span className="text-slate-600">vs</span>
+                            <span className="text-purple-400 font-bold">{(secondPokemon.height / 10).toFixed(1)}m</span>
+                          </div>
                         </div>
 
-                        <div className="flex justify-between items-center py-1">
-                          <span className="text-slate-400 flex items-center gap-1 font-sans">
-                            <Scale className="w-3 h-3 text-emerald-400" /> Weight:
-                          </span>
-                          <span className="text-slate-200">
-                            <span className="text-cyan-300 font-bold">{pokemon1.weight / 10}kg</span> vs <span className="text-purple-300 font-bold">{secondPokemon.weight / 10}kg</span>
-                          </span>
+                        <div className="flex justify-between items-center">
+                          <span className="text-slate-400">Weight:</span>
+                          <div className="font-mono text-[11px] flex gap-2">
+                            <span className="text-cyan-400 font-bold">{(pokemon1.weight / 10).toFixed(1)}kg</span>
+                            <span className="text-slate-600">vs</span>
+                            <span className="text-purple-400 font-bold">{(secondPokemon.weight / 10).toFixed(1)}kg</span>
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* ABILITIES OVERVIEW */}
+                    {/* ABILITIES COMPARISON */}
                     <div className={cn(
-                      "p-4 rounded-2xl border space-y-3 relative overflow-hidden",
+                      "p-4 rounded-2xl border space-y-3",
                       isLightMode ? "bg-white border-slate-200" : "bg-slate-900/80 border-slate-800"
                     )}>
-                      <HUDCorners />
-                      <h5 className="text-xs font-hud font-bold uppercase tracking-wider text-purple-400 flex items-center gap-2 border-b pb-2 border-slate-800">
-                        <Sparkles className="w-3.5 h-3.5" />
+                      <h5 className="text-xs font-hud font-bold uppercase tracking-wider text-purple-400 flex items-center gap-2 border-b border-slate-800 pb-2">
+                        <Zap className="w-3.5 h-3.5" />
                         <span>Abilities</span>
                       </h5>
 
                       <div className="grid grid-cols-2 gap-2 text-[11px]">
                         <div>
-                          <span className="text-[9px] font-hud uppercase text-cyan-400 font-bold block mb-1">
-                            {pokemon1.name}
+                          <span className="text-[9px] font-hud uppercase text-cyan-400 font-bold block mb-1 truncate">
+                            {pokemon1.name.replace(/-/g, ' ')}
                           </span>
                           <ul className="space-y-1">
                             {pokemon1.abilities?.map((a, i) => (
@@ -596,8 +613,8 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                         </div>
 
                         <div>
-                          <span className="text-[9px] font-hud uppercase text-purple-400 font-bold block mb-1">
-                            {secondPokemon.name}
+                          <span className="text-[9px] font-hud uppercase text-purple-400 font-bold block mb-1 truncate">
+                            {secondPokemon.name.replace(/-/g, ' ')}
                           </span>
                           <ul className="space-y-1">
                             {secondPokemon.abilities?.map((a, i) => (
@@ -615,16 +632,16 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
 
                   {/* ACTION: INSPECT SECOND POKEMON IN MAIN APP */}
                   {onSelectMainPokemon && (
-                    <div className="pt-2">
+                    <div className="pt-1">
                       <button
                         onClick={() => {
                           onSelectMainPokemon(secondPokemon);
                           onClose();
                         }}
-                        className="w-full py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-hud font-bold text-xs uppercase tracking-wider border border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.4)] flex items-center justify-center gap-2 transition-all cursor-pointer"
+                        className="w-full py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-hud font-bold text-xs uppercase tracking-wider border border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.4)] flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.98]"
                       >
                         <Eye className="w-4 h-4" />
-                        <span>Inspect {secondPokemon.name} in Full Pokédex</span>
+                        <span>Inspect {secondPokemon.name.replace(/-/g, ' ')} in Full Pokédex</span>
                       </button>
                     </div>
                   )}
@@ -632,9 +649,8 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                 </motion.div>
               )}
 
-            </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

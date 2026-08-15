@@ -13,11 +13,13 @@ import { StatChangeEffect } from './components/StatChangeEffect';
 import { FloatingText } from './components/FloatingText';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { searchPokemon, getPokemonList, getPokemonByType, GENERATIONS } from './lib/api';
+import { useFavorites } from './hooks/useFavorites';
 import { useBattleSimulation } from './hooks/useBattleSimulation';
 import { Pokemon, EvolutionNode, Move, LogEntry } from './types';
 import { sounds } from './lib/sounds';
 import { cn, abbreviateType, hudButtonClass, playHaptic } from './lib/utils';
 import { PokethologyCombatMissionWidget, getDailyCombatMission, COMBAT_MISSIONS, getRequiredCount } from './components/PokethologyCombatMissionWidget';
+import { getDailyHubCombatChallenges } from './utils/dailyHubChallenges';
 import { generateCompetitiveMoveset } from './utils/moveset';
 import { OpponentStatusBar, PlayerStatusBar } from './components/BattleStatusBars';
 import { TypeBadge } from './components/TypeBadge';
@@ -47,6 +49,7 @@ import { AbilitiesSection } from './components/AbilitiesSection';
 import { TypeWeaknessesSection } from './components/TypeWeaknessesSection';
 import { CombatStatsSection } from './components/CombatStatsSection';
 import { MovesetAnalysisSection } from './components/MovesetAnalysisSection';
+import { FavoritesVaultModal } from './components/FavoritesVaultModal';
 
 const getShowdownName = (name: string, isFemale: boolean = false) => {
   if (!name) return '';
@@ -1205,7 +1208,7 @@ const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny, use2dSpri
   );
 });
 
-const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations, onClick, isShiny, isCardView, isLightMode, use2dSprite }: any) => {
+const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations, onClick, isShiny, isCardView, isLightMode, use2dSprite, isFav, onToggleFavorite }: any) => {
     const id = p.url.split('/').filter(Boolean).pop();
   const displayId = p.displayId || p.baseId || id;
   const isSpecial = parseInt(id || "0") > 1025 && !p.displayId;
@@ -1378,6 +1381,27 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
         </div>
       )}
 
+      {/* Favorite Star Toggle (Opposite side of ID badge) */}
+      {!isCardView && onToggleFavorite && (
+        <button 
+          type="button"
+          className="absolute top-2 right-2.5 z-30 p-1 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-yellow-500/60 transition-all cursor-pointer shadow-sm group/star"
+          onClick={(e) => {
+            e.stopPropagation();
+            try { sounds.hover(); } catch (_) {}
+            onToggleFavorite({ name: p.name, url: p.url, displayId: p.displayId || p.baseId || id });
+          }}
+          title={isFav ? "Remove from Favorites" : "Add to Favorites"}
+        >
+          <Star 
+            className={cn(
+              "w-3.5 h-3.5 transition-transform duration-200 group-hover/star:scale-110", 
+              isFav ? "fill-yellow-400 text-yellow-400 filter drop-shadow-[0_0_6px_rgba(250,204,21,0.6)]" : "text-slate-500 group-hover/star:text-yellow-300"
+            )} 
+          />
+        </button>
+      )}
+
       {/* Scanline Effect */}
       {!isCardView && <div className="absolute inset-0 pointer-events-none opacity-[0.03] group-hover:opacity-[0.07] transition-opacity z-30 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]"></div>}
 
@@ -1481,7 +1505,7 @@ if (typeof window !== 'undefined') {
 // PokethologyQuizWidget is imported from ./components/PokethologyQuizWidget
 
 
-const PokemonGrid = memo(({ list, displayLimit, selectedName, opponentName, enableAnimations, onClick, isShiny, isCardView, isLightMode, use2dSprite }: any) => {
+const PokemonGrid = memo(({ list, displayLimit, selectedName, opponentName, enableAnimations, onClick, isShiny, isCardView, isLightMode, use2dSprite, isFavorite, onToggleFavorite }: any) => {
   return (
     <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-4 py-2 px-1">
       {list.slice(0, displayLimit).map((p: any, i: number) => (
@@ -1496,6 +1520,8 @@ const PokemonGrid = memo(({ list, displayLimit, selectedName, opponentName, enab
           isCardView={isCardView}
           isLightMode={isLightMode}
           use2dSprite={use2dSprite}
+          isFav={isFavorite ? isFavorite(p.name) : false}
+          onToggleFavorite={onToggleFavorite}
         />
       ))}
     </div>
@@ -1937,10 +1963,12 @@ export default function App() {
     setSelectedGameDescIndex(0);
   }, [pokemon?.id, pokemon?.name]);
   const [currentVariety, setCurrentVariety] = useState<string | null>(null);
-  const [listMode, setListMode] = useState<'home' | 'pokemon' | 'types'>('home');
+  const [listMode, setListMode] = useState<'home' | 'pokemon' | 'types' | 'favorites'>('home');
   const [currentGenId, setCurrentGenId] = useState<number>(1);
   const [isSelectingOpponent, setIsSelectingOpponent] = useState(false);
   const [filteredList, setFilteredList] = useState<any[]>([]);
+  const { favorites, isFavorite, toggleFavorite, loadFavorites } = useFavorites();
+  const [isFavoritesModalOpen, setIsFavoritesModalOpen] = useState(false);
   const [currentType, setCurrentType] = useState<string | null>(null);
   const [loadingList, setLoadingList] = useState<boolean>(false);
   const [isInitializingDb, setIsInitializingDb] = useState<boolean>(false);
@@ -2020,6 +2048,10 @@ export default function App() {
   }, []);
 
   const handleTabChange = useCallback((tab: 'data' | 'chat' | 'battle') => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    setChatSpeakingIndex(null);
     setActiveTab(tab);
     setShowDetailsScrollTop(false);
 
@@ -2055,6 +2087,9 @@ export default function App() {
       setOpponentStatStages({ attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0, evasion: 0, accuracy: 0 });
       setBattleState('setup');
       setIsBattling(false);
+      setBattleResult(null);
+      setBattleLog([]);
+      setIsBattleHistoryExpanded(false);
     }
 
     setTimeout(() => {
@@ -2702,6 +2737,7 @@ export default function App() {
   // Celebratory overlay state for Daily Combat Mission completes
   const [showMissionCelebration, setShowMissionCelebration] = useState<boolean>(false);
   const [showMissionUpdateHUD, setShowMissionUpdateHUD] = useState<boolean>(false);
+  const [hubChallengeProgressMessage, setHubChallengeProgressMessage] = useState<string | null>(null);
   const [celebratedMission, setCelebratedMission] = useState<any>(null);
 
   const today = new Date().toISOString().split('T')[0];
@@ -4182,6 +4218,37 @@ export default function App() {
                   );
                 }
               }
+            } else {
+              // Check Daily Hub Combat Challenges ONLY if main daily mission didn't match
+              const hubChallenges = getDailyHubCombatChallenges(today);
+              let challengeMatched = false;
+              
+              for (const challenge of hubChallenges) {
+                const stateKey = `pokethology_hub_combat_${today}_${challenge.id}`;
+                const currentProgress = parseInt(localStorage.getItem(stateKey) || '0', 10);
+                
+                if (currentProgress < challenge.required) {
+                  let isMatch = false;
+                  if (challenge.type === 'type') {
+                     const opponentTypes = battleOpponent.types.map((t: any) => t.type.name.toLowerCase());
+                     if (opponentTypes.includes(challenge.target.toLowerCase())) isMatch = true;
+                  } else if (challenge.type === 'stat' && challenge.target === 'defense') {
+                     const defenseStat = battleOpponent.stats.find((s: any) => s.stat.name === 'defense')?.base_stat || 0;
+                     if (defenseStat >= 150) isMatch = true;
+                  }
+                  
+                  if (isMatch) {
+                    const newProgress = currentProgress + 1;
+                    localStorage.setItem(stateKey, String(newProgress));
+                    
+                    if (!challengeMatched) {
+                      setHubChallengeProgressMessage(`DAILY HUB: ${challenge.title} (${newProgress}/${challenge.required})`);
+                      setTimeout(() => setHubChallengeProgressMessage(null), 8000);
+                      challengeMatched = true; // only show one message
+                    }
+                  }
+                }
+              }
             }
           } catch (e) {
             console.error("Error evaluating combat mission progress", e);
@@ -4607,6 +4674,14 @@ export default function App() {
     }
   }, [activeTab]);
 
+  // Stop any active voices/speech synthesis when changing sections, tabs, or Pokemon
+  useEffect(() => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    setChatSpeakingIndex(null);
+  }, [activeTab, pokemon?.id, pokemon?.name, currentVariety]);
+
   useEffect(() => {
     if (listMode === 'home') return;
     if (currentType) {
@@ -4916,7 +4991,7 @@ export default function App() {
     }
   }, [viewAllGenerations, currentGenId]);
 
-  const performSearch = useCallback(async (searchQuery: string, fromChat: boolean = false) => {
+  const performSearch = useCallback(async (searchQuery: string, fromChat: boolean = false, targetTab?: 'data' | 'chat' | 'battle') => {
     const formatted = searchQuery.trim().toLowerCase();
     if (!formatted) return;
 
@@ -4958,7 +5033,7 @@ export default function App() {
           text: getChatWelcomeMessage(pokeData.name)
         }]);
       }
-      setActiveTab('data');
+      setActiveTab(targetTab || 'data');
       
       setBattleOpponent(null);
       setIsBattling(false);
@@ -5038,7 +5113,7 @@ export default function App() {
   }, []);
 
   const sortedAndFilteredList = useMemo(() => {
-    let list = [...filteredList];
+    let list = listMode === 'favorites' ? [...favorites] : [...filteredList];
     
     // Search filtering
     if (debouncedQuery.trim()) {
@@ -5067,7 +5142,7 @@ export default function App() {
     });
 
     return list;
-  }, [filteredList, sortBy, sortOrder, debouncedQuery]);
+  }, [filteredList, sortBy, sortOrder, debouncedQuery, listMode, favorites]);
 
   const isSelectingOpponentRef = useRef(isSelectingOpponent);
   useEffect(() => {
@@ -5424,21 +5499,6 @@ export default function App() {
           {/* Compact Top Bar with Integrated Search */}
           <div className="bg-slate-900/60 border-b border-slate-800/60 shadow-[0_4px_20px_rgba(0,0,0,0.4)] backdrop-blur-md z-40 relative overflow-x-hidden w-full flex justify-center">
             <div className="w-full max-w-[1920px] px-2 lg:px-4 xl:px-6 flex items-center justify-between gap-3 sm:gap-4 py-2 sm:py-3">
-            <div className="flex items-center gap-3 shrink-0">
-              <div className="relative">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-100 border-2 border-slate-300 shadow-[inset_0_-2px_4px_rgba(0,0,0,0.4),0_2px_4px_rgba(0,0,0,0.5)] flex items-center justify-center">
-                  <div className="w-5 h-5 sm:w-7 sm:h-7 rounded-full bg-blue-500 border-2 border-blue-400 shadow-[inset_0_0_10px_rgba(255,255,255,0.8),0_0_8px_rgba(59,130,246,0.8)] animate-pulse">
-                    <div className="w-1 h-1 rounded-full bg-white opacity-60 absolute top-1 left-1"></div>
-                  </div>
-                </div>
-              </div>
-              <div className="hidden xs:flex gap-1">
-                <div className="w-2 h-2 rounded-full bg-red-500 border border-red-900 shadow-[inset_0_1px_1px_rgba(255,255,255,0.5),0_0_3px_rgba(239,68,68,0.5)]"></div>
-                <div className="w-2 h-2 rounded-full bg-yellow-400 border border-yellow-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.5),0_0_3px_rgba(250,204,21,0.5)]"></div>
-                <div className="w-2 h-2 rounded-full bg-green-500 border border-green-900 shadow-[inset_0_1px_1px_rgba(255,255,255,0.5),0_0_3px_rgba(34,197,94,0.5)]"></div>
-              </div>
-            </div>
-
             <AnimatePresence>
               <motion.form 
                 initial={{ opacity: 0, y: -10 }}
@@ -5486,46 +5546,35 @@ export default function App() {
                     )}
                   </AnimatePresence>
                 </motion.div>
-                <div className="flex gap-1 sm:gap-2">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    type="button"
-                    onClick={() => {
-                      setViewAllGenerations(!viewAllGenerations);
-                      setQuery('');
-                      setInputValue('');
-                      setLastSearched('');
-                      setListMode('pokemon');
-                      sounds.scan();
-                    }}
-                    className={cn(
-                      hudButtonClass(viewAllGenerations, 'purple'),
-                      "px-2 h-10 flex items-center justify-center min-w-[36px] !rounded-lg border-2 shadow-[0_0_10px_rgba(168,85,247,0.4)] transition-all hover:scale-105 active:scale-95 group/viewall"
-                    )}
-                    title="View All Generations"
-                  >
-                    <HUDCorners />
-                    {viewAllGenerations ? (
-                      <motion.div
-                         initial={false}
-                         animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
-                         transition={{ duration: 0.5 }}
-                      >
-                         <BookOpen className={cn("w-4 h-4 text-yellow-400", viewAllGenerations && "animate-pulse")} />
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                         whileHover={{ scale: 1.1, rotate: [0, 10, -10, 0] }}
-                         transition={{ duration: 0.4 }}
-                      >
-                        <Book className="w-4 h-4 text-purple-400" />
-                      </motion.div>
-                    )}
-                  </motion.button>
-                </div>
               </motion.form>
             </AnimatePresence>
+
+            <motion.button
+              whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(250,204,21,0.35)" }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                setIsFavoritesModalOpen(true);
+                sounds.hover();
+              }}
+              className={cn(
+                "px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg transition-all shrink-0 flex items-center justify-center gap-1.5 sm:gap-2 border-2 text-[10px] uppercase font-hud font-extrabold tracking-widest leading-none outline-none ml-auto relative overflow-hidden group cursor-pointer",
+                isFavoritesModalOpen || listMode === 'favorites'
+                   ? "text-yellow-300 bg-yellow-950/60 border-yellow-400 shadow-[0_0_16px_rgba(250,204,21,0.4)]"
+                   : "text-yellow-400 border-yellow-500/40 hover:text-white hover:border-yellow-400 bg-slate-900/60 shadow-[0_0_12px_rgba(250,204,21,0.2)]"
+              )}
+              title="Favorites Vault (Full Screen)"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-300/25 to-transparent pointer-events-none z-10 animate-scan-shimmer" />
+              <motion.div 
+                 animate={isFavoritesModalOpen || listMode === 'favorites' ? { rotate: [0, 15, -15, 0] } : {}}
+                 whileHover={{ scale: 1.2, rotate: [0, -15, 15, 0] }}
+                 transition={{ duration: 0.4 }}
+                 className="relative z-10"
+              >
+                <Star className={cn("w-4 h-4 filter drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]", isFavoritesModalOpen || listMode === 'favorites' ? "text-yellow-300 animate-pulse fill-yellow-300" : "text-yellow-400 fill-yellow-400")} />
+              </motion.div>
+              <span className="hidden sm:inline font-hud tracking-[0.1em] relative z-10 font-black">{t('FAVS') || 'Favs'}</span>
+            </motion.button>
             
             <motion.button
               whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(34,211,238,0.35)" }}
@@ -5661,9 +5710,11 @@ export default function App() {
                             className="flex-1 bg-transparent relative overflow-hidden flex flex-col p-1 sm:p-2 w-full max-w-[1920px] mx-auto lg:px-4 xl:px-6"
                           >
                         {loadingPokemon && (
-                           <div className="absolute inset-0 bg-slate-950/40 z-[100] flex flex-col items-center justify-center pointer-events-auto backdrop-blur-[2px]">
-                               <Loader2 className="w-8 h-8 text-cyan-400 animate-spin mb-3 shadow-lg" />
-                               <span className="font-hud text-xs text-cyan-400 animate-pulse tracking-widest uppercase drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]">Fetching Data...</span>
+                           <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-950/80 border border-cyan-500/50 rounded-full px-4 py-2 z-[100] flex items-center gap-3 pointer-events-auto backdrop-blur-md shadow-[0_0_20px_rgba(34,211,238,0.2)]">
+                               <Loader2 className="w-4 h-4 text-cyan-400 animate-spin" />
+                               <span className="font-hud text-[10px] text-cyan-400 animate-pulse tracking-widest uppercase">
+                                 {activeTab === 'battle' || isSelectingOpponent ? 'SEARCHING OPPONENT...' : (query ? `Fetching ${query}...` : 'Fetching Data...')}
+                               </span>
                            </div>
                         )}
                         <div className="absolute inset-0 bg-cyan-500/5 pointer-events-none"></div>
@@ -5740,28 +5791,28 @@ export default function App() {
                                   handleTabChange('chat');
                                 }
                               }}
-                              whileHover={{ scale: 1.03, boxShadow: activeTab === 'chat' ? "0 0 22px rgba(168,85,247,0.35)" : "0 0 16px rgba(168,85,247,0.2)" }}
+                              whileHover={{ scale: 1.03, boxShadow: activeTab === 'chat' ? "0 0 22px rgba(220,161,29,0.45)" : "0 0 16px rgba(220,161,29,0.25)" }}
                               whileTap={{ scale: 0.97 }}
                               className={cn(
-                                hudButtonClass(activeTab === 'chat', 'purple'),
-                                "w-full text-center !px-0.5 xxs:!px-1 sm:!px-2 py-2.5 sm:py-3 text-[8.5px] min-[330px]:text-[9.5px] min-[380px]:text-[10.5px] sm:text-xs font-hud font-black !rounded-xl relative flex items-center justify-center gap-0.5 xxs:gap-1 sm:gap-1.5 cursor-pointer !tracking-tight xxs:!tracking-normal sm:!tracking-wider overflow-hidden shadow-[0_0_14px_rgba(168,85,247,0.15)] border-purple-500/40 group/chat"
+                                hudButtonClass(activeTab === 'chat', 'mustard'),
+                                "w-full text-center !px-0.5 xxs:!px-1 sm:!px-2 py-2.5 sm:py-3 text-[8.5px] min-[330px]:text-[9.5px] min-[380px]:text-[10.5px] sm:text-xs font-hud font-black !rounded-xl relative flex items-center justify-center gap-0.5 xxs:gap-1 sm:gap-1.5 cursor-pointer !tracking-tight xxs:!tracking-normal sm:!tracking-wider overflow-hidden shadow-[0_0_14px_rgba(220,161,29,0.2)] border-[#dca11d]/50 group/chat"
                               )}
                             >
                               {/* Scan Ready Shimmer Light Sweep */}
-                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-300/25 to-transparent pointer-events-none z-10 animate-scan-shimmer" />
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-200/30 to-transparent pointer-events-none z-10 animate-scan-shimmer" />
                               
                               {activeTab === 'chat' && (
                                 <motion.div
                                   layoutId="activeTabPill"
-                                  className="absolute inset-0 bg-purple-500/20 border border-purple-400/40 rounded-xl pointer-events-none"
+                                  className="absolute inset-0 bg-amber-500/25 border border-yellow-400/50 rounded-xl pointer-events-none"
                                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                 />
                               )}
                               
                               <div className="relative z-10 shrink-0">
-                                <User className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4 filter drop-shadow-[0_0_6px_rgba(168,85,247,0.85)]", activeTab === 'chat' ? "text-white font-black" : "text-purple-400")} />
+                                <User className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4 filter drop-shadow-[0_0_6px_rgba(220,161,29,0.85)]", activeTab === 'chat' ? "text-slate-950 font-black" : "text-[#dca11d]")} />
                               </div>
-                              <span className="whitespace-nowrap relative z-10 uppercase text-center">Pokéthology</span>
+                              <span className={cn("whitespace-nowrap relative z-10 uppercase text-center", activeTab === 'chat' ? "text-slate-950 font-black" : "text-[#dca11d]")}>Pokéthology</span>
                             </motion.button>
 
                             {/* Combat Section Button */}
@@ -5864,6 +5915,42 @@ export default function App() {
                                   />
                                 </div>
                                 
+                                {/* Left Visual Toggles (Favorite Star) */}
+                                <div className="absolute -left-4 top-0 flex flex-col gap-2 z-20">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (pokemon) {
+                                        toggleFavorite({
+                                          name: pokemon.name,
+                                          url: pokemon.sprites?.front_default || pokemon.sprites?.other?.['official-artwork']?.front_default || '',
+                                          displayId: pokemon.baseId || pokemon.id
+                                        });
+                                        try { sounds.shiny(); } catch (_) {}
+                                      }
+                                    }}
+                                    onMouseEnter={() => { try { sounds.hover(); } catch (_) {} }}
+                                    className={cn(
+                                      hudButtonClass(pokemon ? isFavorite(pokemon.name) : false, 'yellow'),
+                                      "!p-1.5 !rounded-full shadow-lg flex items-center justify-center cursor-pointer transition-all",
+                                      pokemon && isFavorite(pokemon.name)
+                                        ? "bg-yellow-950/80 border-yellow-400 text-yellow-300 shadow-[0_0_15px_rgba(250,204,21,0.5)]"
+                                        : "bg-slate-900/80 border-slate-700 text-slate-400 hover:text-yellow-300 hover:border-yellow-500/50"
+                                    )}
+                                    title={pokemon && isFavorite(pokemon.name) ? "Remove from Favorites" : "Add to Favorites"}
+                                  >
+                                    <HUDCorners />
+                                    <Star
+                                      className={cn(
+                                        "w-4 h-4 transition-transform duration-300 hover:scale-110",
+                                        pokemon && isFavorite(pokemon.name)
+                                          ? "fill-yellow-400 text-yellow-400 animate-pulse filter drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]"
+                                          : "text-slate-400 hover:text-yellow-300"
+                                      )}
+                                    />
+                                  </button>
+                                </div>
+
                                 {/* Visual Toggles */}
                                 <div className="absolute -right-4 top-0 flex flex-col gap-2 z-20">
                                   {/* Shiny Toggle Button */}
@@ -6748,6 +6835,20 @@ export default function App() {
                                           turn={turn}
                                           enableAnimations={enableAnimations}
                                           isSelectingOpponent={isSelectingOpponent}
+                                          onSearchOpponent={async (name) => {
+                                            sounds.scan();
+                                            setLoadingPokemon(true);
+                                            try {
+                                              const opp = await searchPokemon(name.toLowerCase(), selectedLang);
+                                              setBattleOpponent(opp);
+                                              setIsOpponentShiny(false);
+                                              setIsSelectingOpponent(false);
+                                            } catch (err) {
+                                              console.error("Failed to search opponent:", err);
+                                            } finally {
+                                              setLoadingPokemon(false);
+                                            }
+                                          }}
                                           onSelectOpponentClick={() => {
                                             setIsSelectingOpponent(true);
                                             setViewAllGenerations(true);
@@ -7279,7 +7380,7 @@ export default function App() {
                                         </div>
                                         )}
                                         <AnimatePresence mode="wait">
-                                          {!isBattling && battleLog.length === 0 ? (
+                                          {!isBattling ? (
                                             <motion.div
                                               key="arena-setup"
                                               initial={{ opacity: 0, scale: 0.98, y: 15 }}
@@ -7626,73 +7727,6 @@ export default function App() {
                                             )}
                                           </div>
 
-                                        </motion.div>
-                                      ) : false ? (
-                                        <motion.div
-                                          key="arena-finished"
-                                          initial={{ opacity: 0, scale: 0.95, y: 15 }}
-                                          animate={{ opacity: 1, scale: 1, y: 0 }}
-                                          exit={{ opacity: 0, scale: 0.95, y: -15 }}
-                                          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                                          className="space-y-4 bg-slate-950/90 p-4 rounded-xl border-2 border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.2)]"
-                                        >
-                                          <div className="text-center space-y-2">
-                                            <span className={cn(
-                                              "text-[10px] sm:text-xs font-hud font-black tracking-[0.2em] uppercase px-5 py-2 rounded border inline-block",
-                                              battleResult === 'victory' 
-                                                ? "bg-green-950/60 text-green-400 border-green-500/40 shadow-[0_0_10px_rgba(34,197,94,0.2)]" 
-                                                : "bg-red-950/60 text-red-100 border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.2)]"
-                                            )}>
-                                              {battleResult === 'victory' ? "🏆 Victory Achieved!" : "💀 Defeat!"}
-                                            </span>
-                                            <p className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mt-4">
-                                              {battleResult === 'victory' 
-                                                ? `${pokemon?.name?.toUpperCase()} fainted the opponent!` 
-                                                : `${pokemon?.name?.toUpperCase()} has fainted.`}
-                                            </p>
-                                          </div>
-
-                                          <div className="h-[1px] bg-slate-900" />
-
-                                          <div className="flex flex-col gap-2.5">
-                                            <motion.button
-                                              whileHover={{ scale: 1.02 }}
-                                              whileTap={{ scale: 0.95 }}
-                                              onClick={() => {
-                                                sounds.battleStart();
-                                                setIsBattling(false);
-                                                setBattleState('setup');
-                                                setTimeout(() => {
-                                                  runBattle();
-                                                }, 100);
-                                              }}
-                                              className="w-full py-3 bg-green-900/40 hover:bg-green-800/60 text-green-300 font-hud rounded-lg border border-green-500/40 transition-all text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 relative overflow-hidden active:scale-95 shadow-[0_0_15px_rgba(34,197,94,0.1)] cursor-pointer animate-btn-entrance btn-breathe-cyan"
-                                            >
-                                              <HUDCorners />
-                                              <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, ease: "linear", repeat: Infinity }}>
-                                                <RefreshCw className="w-3.5 h-3.5" />
-                                              </motion.div>
-                                              REMATCH NOW
-                                            </motion.button>
-
-                                            <motion.button
-                                              whileHover={{ scale: 1.02 }}
-                                              whileTap={{ scale: 0.95 }}
-                                              onClick={resetSimulation}
-                                              className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 font-hud rounded-lg border border-slate-700 transition-all text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 cursor-pointer animate-btn-entrance"
-                                            >
-                                              <RotateCcw className="w-3.5 h-3.5" />
-                                              CHOOSE NEW BATTLE
-                                            </motion.button>
-                                          </div>
-
-                                          {autoResetTime !== null && (
-                                            <div className="text-center pt-1 animate-pulse">
-                                              <span className="text-[8px] sm:text-[9px] font-mono text-cyan-500 uppercase tracking-widest">
-                                                Auto-resetting in {autoResetTime}s...
-                                              </span>
-                                            </div>
-                                          )}
                                         </motion.div>
                                       ) : (
                                         <motion.div
@@ -8204,6 +8238,8 @@ export default function App() {
                               isCardView={isCardView}
                               isLightMode={isLightMode}
                               use2dSprite={arenaArtworkMode === '2d'}
+                              isFavorite={isFavorite}
+                              onToggleFavorite={toggleFavorite}
                             />
                             {displayLimit < sortedAndFilteredList.length && (
                               <div className="flex justify-center mt-4 mb-8">
@@ -8623,58 +8659,63 @@ export default function App() {
           isLightMode={isLightMode}
         />
 
-        {/* Daily Hub Modal */}
+        {/* Daily Hub Fullscreen Modal */}
         <AnimatePresence>
           {isDailyHubOpen && (
             <motion.div
+              key="daily-hub-modal"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto custom-scrollbar"
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
             >
-              <motion.div
-                initial={{ scale: 0.98, y: 6, opacity: 0 }}
-                animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.98, y: 6, opacity: 0 }}
-                transition={{ duration: 0.15, ease: 'easeOut' }}
-                className="bg-slate-950 border-2 border-cyan-500/50 rounded-2xl w-full max-w-4xl max-h-[92dvh] sm:max-h-[88vh] shadow-[0_0_50px_rgba(34,211,238,0.2)] p-4 sm:p-6 flex flex-col gap-3 relative my-auto mx-auto overflow-hidden"
-              >
-                {/* Clean inline top header with touch-safe close action */}
-                <div className="flex justify-between items-center pb-2.5 border-b border-cyan-900/40 relative z-30 shrink-0">
-                  <div className="flex items-center gap-2 group">
-                    <motion.div whileHover={{ scale: 1.2, rotate: 180 }} transition={{ duration: 0.4 }}>
-                      <Star className="w-4 h-4 text-cyan-400 animate-spin" style={{ animationDuration: '6s' }} />
-                    </motion.div>
-                    <h2 className="text-xs sm:text-sm font-hud text-cyan-400 uppercase tracking-[0.15em] sm:tracking-[0.2em] font-black group-hover:text-cyan-300 transition-colors">
-                      {t('DAILY HUB') || 'Daily Hub'}
-                    </h2>
+              {/* Ambient Glows */}
+              <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Top System Header Bar */}
+              <div className="shrink-0 border-b border-cyan-500/30 bg-slate-900/90 px-4 sm:px-8 py-3 flex items-center justify-between gap-3 z-20 shadow-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)] shrink-0">
+                    <Star className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 animate-spin" style={{ animationDuration: '8s' }} />
                   </div>
-                  <motion.button 
-                    whileHover={{ scale: 1.1, rotate: 90 }}
-                    whileTap={{ scale: 0.9 }}
-                    transition={{ duration: 0.4 }}
-                    onClick={() => { setIsDailyHubOpen(false); sounds.scan(); }} 
-                    className="p-1.5 rounded-lg bg-slate-900/80 hover:bg-cyan-500/20 text-slate-400 hover:text-cyan-300 transition-colors cursor-pointer border border-slate-800 hover:border-cyan-500/40 flex items-center justify-center shrink-0"
-                    title="Close Operations Hub"
-                  >
-                    <X className="w-5 h-5" />
-                  </motion.button>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-widest leading-none">
+                      {t('DAILY HUB') || 'DAILY OPERATIONS HUB'}
+                    </h2>
+                    <span className="px-2 py-0.5 rounded-full bg-cyan-950/90 border border-cyan-500/40 text-cyan-300 text-[10px] sm:text-xs font-mono font-bold whitespace-nowrap shadow-sm">
+                      {today}
+                    </span>
+                  </div>
                 </div>
-                
-                <div className="flex-1 overflow-y-auto custom-scrollbar pb-1">
-                  <PokethologyCombatMissionWidget 
-                    todayStr={today} 
-                    isCompleted={isMissionCompleted} 
-                    missionProgressCount={missionProgressCount}
-                    missionRequiredCount={missionRequiredCount}
-                  />
-                </div>
-              </motion.div>
+
+                <button
+                  onClick={() => {
+                    setIsDailyHubOpen(false);
+                    try { sounds.scan(); } catch (_) {}
+                  }}
+                  className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm shrink-0"
+                  title="Close (Esc)"
+                >
+                  <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+                  <span className="hidden sm:inline">CLOSE</span>
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto custom-scrollbar p-3.5 sm:p-6 md:p-8 max-w-5xl mx-auto w-full flex flex-col">
+                <PokethologyCombatMissionWidget 
+                  todayStr={today} 
+                  isCompleted={isMissionCompleted} 
+                  missionProgressCount={missionProgressCount}
+                  missionRequiredCount={missionRequiredCount}
+                />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Daily Featured Cosmic Scans Modal */}
+        {/* Daily Featured Cosmic Scans Fullscreen Modal */}
         <AnimatePresence>
           {isDailyScanOpen && dailyPokemon && (() => {
             const activePokemonData = (dailyGender === 'female' && dailyFemalePokemon) ? dailyFemalePokemon : dailyPokemon;
@@ -8702,94 +8743,56 @@ export default function App() {
 
             const getStatPercent = (val: number) => Math.min(100, Math.round((val / 160) * 100));
 
-            const getDailyTheologicalNote = (types: any[]) => {
-              const mainType = types?.[0]?.type?.name || 'normal';
-              switch (mainType) {
-                case 'fire':
-                  return "Detected primordial solar-core radiation signatures. Ancient texts describe this species as a thermal catalyst in the formation of volcanic domains.";
-                case 'water':
-                  return "Abyssal hydro-vibration matrix active. Governs liquid density cycles, linked directly to oceanic tidal resonance in early continental theology.";
-                case 'grass':
-                  return "Organic chlorophyll ether field detected. Exhibits ancient chloroplast linkages capable of channeling deep planetary life force and flora cycles.";
-                case 'electric':
-                  return "High-frequency electromagnetic aura ionized. Emits concentrated ion-bursts matching early storm-god records across primeval highlands.";
-                case 'psychic':
-                  return "Telepathic brainwave emissions peaking. Reality-bending psychic vectors suggest deep dimensional awareness and cerebral folding.";
-                case 'ice':
-                  return "Extremely low-entropy thermal field active. Capable of slowing molecular velocity down to absolute zero in mythological cryosphere studies.";
-                case 'dragon':
-                  return "Concentrated divine draconic legacy detected. Possesses high resistance to elementary arrays, revered since pre-history as ancient keepers of order.";
-                case 'ghost':
-                case 'dark':
-                  return "Parallel twilight dimensional density registered. Exists at the boundary threshold of physical matter, interacting directly with human spiritual frequencies.";
-                case 'steel':
-                case 'rock':
-                case 'ground':
-                  return "Dense metamorphic mineral sub-structure active. Outstanding structural resilience, reflecting tectonic compression theology and geological epochs.";
-                case 'fairy':
-                  return "High-purity lunar light resonance detected. Emits standard calming radiation fields that dismantle hostile combat energy vectors through aura neutralization.";
-                case 'fighting':
-                  return "Peak muscular and kinetic feedback observed. Represents perfect somatic cultivation, channeling raw willpower into destructive velocity grids.";
-                case 'poison':
-                  return "Complex mutagenic bio-toxin signature detected. Capable of altering biological cellular bonds, highly studied in ancient alchemical lore.";
-                case 'flying':
-                  return "Atmospheric pressure dispersion pockets detected. Harnesses low-resistance air currents, mirroring ancient wind-spirit mythology.";
-                case 'bug':
-                  return "Highly efficient exoskeletal neural network. Shows incredible evolutionary adaptation speeds and ancient chitin structure integrity.";
-                default:
-                  return "Stable genetic configuration observed. Highly adaptable biological construct holding ancient code vectors for general species evolution.";
-              }
-            };
-
             return (
               <motion.div
                 key="daily-scan-modal"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[150] flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-xl overflow-y-auto custom-scrollbar"
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
               >
-                <motion.div
-                  initial={{ scale: 0.92, y: 20 }}
-                  animate={{ scale: 1, y: 0 }}
-                  exit={{ scale: 0.92, y: 20 }}
-                  className="bg-slate-950 border-2 border-amber-500/60 rounded-2xl w-full max-w-6xl h-[88dvh] max-h-[880px] shadow-[0_0_60px_rgba(245,158,11,0.3)] flex flex-col relative my-auto overflow-hidden mx-auto"
-                >
-                  <HUDCorners />
+                {/* Ambient Glows */}
+                <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
 
-                  {/* Top System bar with high contrast banner */}
-                  <div className="flex justify-between items-center px-3 py-2.5 sm:px-6 sm:py-3 border-b-2 border-amber-500/40 relative z-30 shrink-0 gap-2 bg-gradient-to-r from-slate-900 via-amber-950/40 to-slate-900 shadow-md">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="p-1.5 rounded-lg bg-amber-500/20 border border-amber-400/40 text-amber-300 shrink-0">
-                        <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-                      </div>
-                      <h2 className="text-sm sm:text-base font-hud text-amber-300 uppercase tracking-widest font-black leading-none truncate">
-                        {t('DAILY SCAN') || 'DAILY SCAN'}
-                      </h2>
+                {/* Top System bar with high contrast banner */}
+                <div className="shrink-0 border-b border-amber-500/30 bg-slate-900/90 px-4 sm:px-8 py-3 flex items-center justify-between gap-3 z-20 shadow-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
+                      <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 animate-pulse" />
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button 
-                        onClick={() => { setIsDailyScanOpen(false); sounds.scan(); }} 
-                        className="px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 transition-all cursor-pointer border border-amber-400/50 flex items-center gap-1.5 shrink-0 text-xs font-hud font-bold uppercase shadow-[0_0_10px_rgba(245,158,11,0.2)]"
-                        title="Close Scan"
-                      >
-                        <X className="w-4 h-4 shrink-0" />
-                        <span className="hidden sm:inline">CLOSE SCAN</span>
-                      </button>
+                    <div className="flex items-center gap-2">
+                      <h2 className="font-hud font-black text-base sm:text-xl text-amber-300 uppercase tracking-widest leading-none">
+                        {t('DAILY SCAN') || 'DAILY SPECIMEN SCAN'}
+                      </h2>
                     </div>
                   </div>
 
-                  {/* Scrollable Content Body Container */}
-                  <div className="daily-scans-container flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 flex flex-col lg:grid lg:grid-cols-2 gap-5 min-h-0 overscroll-contain touch-pan-y items-start">
-                    
+                  <button 
+                    onClick={() => { setIsDailyScanOpen(false); sounds.scan(); }} 
+                    className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm shrink-0"
+                    title="Close (Esc)"
+                  >
+                    <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+                    <span className="hidden sm:inline">CLOSE</span>
+                  </button>
+                </div>
+
+                {/* Scrollable Content Body Container */}
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                     {/* Left Column - Holographic Specimen Container & Metrics */}
-                    <div className="w-full shrink-0 bg-slate-900/95 border-2 border-amber-500/30 rounded-xl p-4 sm:p-5 flex flex-col items-center gap-4 relative shadow-lg text-center">
+                    <div className="w-full shrink-0 bg-slate-900/95 border-2 border-amber-500/30 rounded-2xl p-4 sm:p-6 flex flex-col items-center gap-4 relative shadow-xl text-center">
                       <HUDCorners />
 
-                      {/* Explicit Inner Card Header for Mobile Clarity */}
+                      {/* Explicit Inner Card Header */}
                       <div className="w-full flex items-center justify-between border-b border-amber-500/25 pb-2 mb-0.5 shrink-0">
                         <span className="text-[10px] sm:text-xs font-hud font-black text-amber-400 tracking-wider uppercase flex items-center gap-1.5">
                           <Eye className="w-3.5 h-3.5 text-amber-400 shrink-0" /> SPECIMEN SCANNER
+                        </span>
+                        <span className="text-[10px] font-mono text-amber-400/80 font-bold">
+                          #{String(activePokemonData.baseId || activePokemonData.id).padStart(3, '0')}
                         </span>
                       </div>
 
@@ -8830,23 +8833,23 @@ export default function App() {
                       </div>
 
                       {/* High-Fidelity Artwork Showcase */}
-                      <div className="relative w-32 h-32 sm:w-44 sm:h-44 flex items-center justify-center bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-amber-500/10 via-slate-950 to-slate-950 rounded-full border-2 border-amber-500/40 p-3 shrink-0 overflow-hidden my-0.5 shadow-[inset_0_0_25px_rgba(245,158,11,0.2)]">
+                      <div className="relative w-40 h-40 sm:w-56 sm:h-56 flex items-center justify-center bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-amber-500/15 via-slate-950 to-slate-950 rounded-full border-2 border-amber-500/40 p-4 shrink-0 overflow-hidden my-1 shadow-[inset_0_0_35px_rgba(245,158,11,0.25)]">
                         <div className="absolute inset-0 bg-gradient-to-t from-amber-500/15 to-transparent pointer-events-none rounded-full animate-pulse" />
                         
                         <img 
                           src={artworkUrl} 
                           alt={activePokemonData.name} 
-                          className="max-w-full max-h-full object-contain filter drop-shadow-[0_0_20px_rgba(245,158,11,0.5)] z-10 select-none pointer-events-none"
+                          className="max-w-full max-h-full object-contain filter drop-shadow-[0_0_25px_rgba(245,158,11,0.55)] z-10 select-none pointer-events-none transition-transform duration-300 hover:scale-105"
                           referrerPolicy="no-referrer"
                         />
                       </div>
 
                       {/* Pokemon Name & types */}
-                      <div className="text-center w-full bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80">
-                        <h3 className="text-lg sm:text-2xl font-hud font-black text-amber-300 uppercase tracking-wider mb-1 flex items-center justify-center gap-2">
+                      <div className="text-center w-full bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
+                        <h3 className="text-xl sm:text-2xl font-hud font-black text-amber-300 uppercase tracking-wider mb-1 flex items-center justify-center gap-2">
                           {activePokemonData.name.replace(/-/g, ' ')}
                         </h3>
-                        <div className="flex flex-wrap gap-1.5 justify-center mt-1">
+                        <div className="flex flex-wrap gap-1.5 justify-center mt-1.5">
                           {activePokemonData.types.map((t: any, i: number) => (
                             <TypeBadge key={`${t.type.name}-${i}`} type={t.type.name} label={t.type.localized_name || t.type.name} size="sm" />
                           ))}
@@ -8854,29 +8857,28 @@ export default function App() {
                       </div>
 
                       {/* Metrology & Physical metrics grid */}
-                      <div className="grid grid-cols-2 gap-2 w-full font-mono">
-                        <div className="bg-slate-950/90 p-2 sm:p-2.5 rounded-xl border border-slate-800 text-center">
+                      <div className="grid grid-cols-2 gap-2.5 w-full font-mono">
+                        <div className="bg-slate-950/90 p-2.5 rounded-xl border border-slate-800 text-center">
                           <span className="text-[9px] text-amber-500/90 block uppercase tracking-wider font-bold mb-0.5 font-hud">HEIGHT</span>
                           <span className="text-xs font-black text-cyan-300">{heightM} m / {heightFeet}'{heightInches}"</span>
                         </div>
-                        <div className="bg-slate-950/90 p-2 sm:p-2.5 rounded-xl border border-slate-800 text-center">
+                        <div className="bg-slate-950/90 p-2.5 rounded-xl border border-slate-800 text-center">
                           <span className="text-[9px] text-amber-500/90 block uppercase tracking-wider font-bold mb-0.5 font-hud">WEIGHT</span>
                           <span className="text-xs font-black text-purple-300">{weightKg} kg / {weightLbs} lbs</span>
                         </div>
                       </div>
 
                       {/* Primary Abilities */}
-                      <div className="w-full bg-slate-950/90 p-2.5 rounded-xl border border-slate-800 text-center font-mono">
+                      <div className="w-full bg-slate-950/90 p-3 rounded-xl border border-slate-800 text-center font-mono">
                         <span className="text-[9px] text-slate-400 block uppercase tracking-wider font-bold mb-0.5 font-hud font-black">PRIMARY ABILITIES</span>
-                        <span className="text-[10px] sm:text-xs font-bold text-amber-300 uppercase">{abilitiesStr}</span>
+                        <span className="text-xs font-bold text-amber-300 uppercase">{abilitiesStr}</span>
                       </div>
                     </div>
 
-                    {/* Right Column - Base Stats & Theological Lore Analysis */}
-                    <div className="flex flex-col gap-4 font-mono w-full min-w-0 shrink-0">
-                      
+                    {/* Right Column - Base Stats & Lore */}
+                    <div className="flex flex-col gap-4 font-mono w-full min-w-0">
                       {/* Technical Stats visual indicator segment */}
-                      <div className="bg-slate-900/95 border-2 border-slate-800/90 rounded-xl p-3 sm:p-4 flex flex-col gap-2.5 relative shadow-lg text-left max-w-full">
+                      <div className="bg-slate-900/95 border-2 border-slate-800/90 rounded-2xl p-4 sm:p-5 flex flex-col gap-3 relative shadow-xl text-left max-w-full">
                         <HUDCorners />
                         <div className="flex items-center gap-1.5 border-b border-slate-800/80 pb-2 mb-0.5 justify-between">
                           <div className="flex items-center gap-1.5">
@@ -8886,14 +8888,14 @@ export default function App() {
                         </div>
 
                         {/* Stat Bars Grid */}
-                        <div className="flex flex-col gap-2 text-left w-full">
+                        <div className="flex flex-col gap-2.5 text-left w-full">
                           {/* HP */}
                           <div className="flex flex-col gap-0.5 w-full text-left">
                             <div className="flex justify-between items-center text-[10px] sm:text-xs font-bold text-slate-300">
                               <span>HEALTH POINTS (HP)</span>
                               <span className="text-cyan-400 font-bold">{hp}</span>
                             </div>
-                            <div className="w-full h-2 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
+                            <div className="w-full h-2.5 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
                               <div className="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 rounded-full transition-all duration-1000" style={{ width: `${getStatPercent(hp)}%` }} />
                             </div>
                           </div>
@@ -8904,7 +8906,7 @@ export default function App() {
                               <span>PHYSICAL ATTACK</span>
                               <span className="text-amber-400 font-bold">{attack}</span>
                             </div>
-                            <div className="w-full h-2 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
+                            <div className="w-full h-2.5 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
                               <div className="h-full bg-gradient-to-r from-amber-500 to-orange-400 rounded-full transition-all duration-1000" style={{ width: `${getStatPercent(attack)}%` }} />
                             </div>
                           </div>
@@ -8915,7 +8917,7 @@ export default function App() {
                               <span>PHYSICAL DEFENSE</span>
                               <span className="text-blue-400 font-bold">{defense}</span>
                             </div>
-                            <div className="w-full h-2 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
+                            <div className="w-full h-2.5 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
                               <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full transition-all duration-1000" style={{ width: `${getStatPercent(defense)}%` }} />
                             </div>
                           </div>
@@ -8926,7 +8928,7 @@ export default function App() {
                               <span>SPECIAL ATTACK</span>
                               <span className="text-pink-400 font-bold">{spAtk}</span>
                             </div>
-                            <div className="w-full h-2 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
+                            <div className="w-full h-2.5 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
                               <div className="h-full bg-gradient-to-r from-pink-500 to-purple-400 rounded-full transition-all duration-1000" style={{ width: `${getStatPercent(spAtk)}%` }} />
                             </div>
                           </div>
@@ -8937,7 +8939,7 @@ export default function App() {
                               <span>SPECIAL DEFENSE</span>
                               <span className="text-purple-400 font-bold">{spDef}</span>
                             </div>
-                            <div className="w-full h-2 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
+                            <div className="w-full h-2.5 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
                               <div className="h-full bg-gradient-to-r from-purple-500 to-indigo-400 rounded-full transition-all duration-1000" style={{ width: `${getStatPercent(spDef)}%` }} />
                             </div>
                           </div>
@@ -8948,7 +8950,7 @@ export default function App() {
                               <span>KINETIC SPEED</span>
                               <span className="text-emerald-400 font-bold">{speed}</span>
                             </div>
-                            <div className="w-full h-2 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
+                            <div className="w-full h-2.5 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
                               <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-1000" style={{ width: `${getStatPercent(speed)}%` }} />
                             </div>
                           </div>
@@ -8956,12 +8958,12 @@ export default function App() {
                       </div>
 
                       {/* Academic lore analyzer segment */}
-                      <div className="bg-slate-900/95 border-2 border-slate-800/90 rounded-xl p-3.5 sm:p-4 flex flex-col gap-2.5 relative shadow-lg text-left max-w-full">
+                      <div className="bg-slate-900/95 border-2 border-slate-800/90 rounded-2xl p-4 sm:p-5 flex flex-col gap-3 relative shadow-xl text-left max-w-full">
                         <HUDCorners />
                         <div className="flex items-center gap-1.5 text-xs font-hud font-black text-amber-400 tracking-wider border-b border-slate-800/80 pb-2 uppercase">
                           <Info className="w-4 h-4 shrink-0 animate-pulse text-amber-400" /> Lore Analysis
                         </div>
-                        <div className="bg-slate-950/80 p-2.5 rounded-lg border border-slate-800/80">
+                        <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
                           <strong className="text-cyan-300 block mb-1 font-hud uppercase tracking-widest text-[9px] sm:text-[10px]">Pokédex Entry</strong>
                           <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans font-medium break-words whitespace-pre-line" style={{ overflowWrap: 'anywhere' }}>
                             {activePokemonData.description}
@@ -8970,30 +8972,29 @@ export default function App() {
                       </div>
 
                       {/* Action Desk buttons */}
-                      <div className="flex justify-end items-center gap-3 w-full mt-auto">
+                      <div className="flex justify-end items-center gap-3 w-full mt-2">
                         <button 
                           onClick={() => {
                             handlePokemonClick(activePokemonData.name);
                             setIsDailyScanOpen(false);
                           }}
-                          className={cn(hudButtonClass(false, 'amber'), "w-full font-hud font-black px-5 py-3.5 !text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 relative shadow-lg cursor-pointer group overflow-hidden")}
+                          className={cn(hudButtonClass(false, 'amber'), "w-full font-hud font-black px-6 py-4 !text-xs uppercase tracking-widest flex items-center justify-center gap-2 relative shadow-xl cursor-pointer group overflow-hidden rounded-xl")}
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-300/20 to-transparent pointer-events-none z-10 animate-scan-shimmer" />
                           <HUDCorners />
                           <BrainCircuit className="w-4 h-4 shrink-0 text-amber-300 relative z-10" />
-                          <span className="relative z-10">VIEW POKÉMON DETAILS</span>
+                          <span className="relative z-10">VIEW FULL SPECIMEN ARCHIVE</span>
                         </button>
                       </div>
-
                     </div>
                   </div>
-                </motion.div>
+                </div>
               </motion.div>
             );
           })()}
         </AnimatePresence>
 
-        {/* Theological Exam Popup Modal */}
+        {/* Theological Exam Fullscreen Modal */}
         <AnimatePresence>
           {isDailyQuizOpen && (
             <motion.div
@@ -9001,32 +9002,39 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto custom-scrollbar"
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
             >
-              <motion.div
-                initial={{ scale: 0.9, y: 30 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 30 }}
-                className="bg-slate-950 border-2 border-cyan-500/50 rounded-2xl w-full max-w-2xl max-h-[90dvh] sm:max-h-[85vh] shadow-[0_0_50px_rgba(6,182,212,0.25)] flex flex-col relative p-4 sm:p-6 my-auto mx-auto overflow-hidden"
-              >
-                <div className="flex justify-between items-center border-b border-cyan-900/30 pb-3 mb-3 shrink-0">
-                  <h2 className="text-xs sm:text-base font-hud text-cyan-400 font-black uppercase tracking-widest flex items-center gap-2 min-w-0">
-                    <BrainCircuit className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 animate-pulse shrink-0" />
-                    <span className="truncate">THEORY EXAM</span>
-                  </h2>
-                  <button 
-                    onClick={() => { setIsDailyQuizOpen(false); sounds.scan(); }} 
-                    className="p-1.5 rounded-lg bg-slate-900/80 hover:bg-cyan-500/20 text-slate-400 hover:text-cyan-300 transition-colors border border-slate-800 hover:border-cyan-500/40 shrink-0"
-                    title="Close Exam"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+              {/* Ambient Glows */}
+              <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Top Header Bar */}
+              <div className="shrink-0 border-b border-cyan-500/30 bg-slate-900/90 px-4 sm:px-8 py-3 flex items-center justify-between gap-3 z-20 shadow-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)] shrink-0">
+                    <BrainCircuit className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 animate-pulse" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-widest leading-none">
+                      THEORY EXAM
+                    </h2>
+                  </div>
                 </div>
 
-                <div className="w-full flex-1 overflow-y-auto custom-scrollbar pb-1">
-                  <PokethologyQuizWidget />
-                </div>
-              </motion.div>
+                <button 
+                  onClick={() => { setIsDailyQuizOpen(false); sounds.scan(); }} 
+                  className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm shrink-0"
+                  title="Close (Esc)"
+                >
+                  <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+                  <span className="hidden sm:inline">CLOSE</span>
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto custom-scrollbar p-3.5 sm:p-6 md:p-8 max-w-4xl mx-auto w-full flex flex-col">
+                <PokethologyQuizWidget />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -9103,66 +9111,81 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className={cn("fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto custom-scrollbar")}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
             >
-              <motion.div
-                initial={{ scale: 0.98, y: 6, opacity: 0 }}
-                animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.98, y: 6, opacity: 0 }}
-                transition={{ duration: 0.15, ease: 'easeOut' }}
-                className="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md max-h-[92dvh] sm:max-h-[85vh] overflow-hidden overflow-x-hidden shadow-[0_0_50px_rgba(34,211,238,0.3)] p-4 sm:p-6 flex flex-col gap-4 text-center items-center my-auto mx-auto"
-              >
-                <div className="flex justify-between items-center border-b border-cyan-900/20 pb-3 w-full shrink-0">
-                  <div className="w-6" /> {/* Spacer to center heading truly */}
-                  <h2 className="text-sm sm:text-lg font-hud text-cyan-400 font-black uppercase tracking-widest flex items-center justify-center gap-2 flex-grow text-center truncate">
-                    <Settings className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 animate-spin-slow" style={{ animationDuration: '8s' }} />
-                    <span className="truncate">SETTINGS</span>
-                  </h2>
-                  <button onClick={() => { setIsSettingsOpen(false); sounds.scan(); }} className="text-slate-500 hover:text-cyan-400 transition-colors shrink-0">
-                    <X className="w-6 h-6" />
-                  </button>
+              {/* Ambient Glows */}
+              <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Top Header Bar */}
+              <div className="shrink-0 border-b border-cyan-500/30 bg-slate-900/90 px-4 sm:px-8 py-3 flex items-center justify-between gap-3 z-20 shadow-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)] shrink-0">
+                    <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 animate-spin-slow" style={{ animationDuration: '10s' }} />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-widest leading-none">
+                      SETTINGS
+                    </h2>
+                  </div>
                 </div>
 
-                <div className="w-full flex-1 flex flex-col gap-4 text-center items-center pb-2 overflow-y-auto overflow-x-hidden custom-scrollbar max-w-full">
+                <button 
+                  onClick={() => { setIsSettingsOpen(false); sounds.scan(); }} 
+                  className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm shrink-0"
+                  title="Close (Esc)"
+                >
+                  <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+                  <span className="hidden sm:inline">CLOSE</span>
+                </button>
+              </div>
 
-                {/* Vol & Toggles Area */}
-                <div className="flex flex-col gap-3 bg-slate-950/40 p-3.5 sm:p-4 rounded-xl border border-slate-800/60 shadow-inner w-full text-center">
-                    <AudioSettings mode="simple" />
-
+              {/* Scrollable Content Body */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-8 max-w-2xl mx-auto w-full flex flex-col gap-5">
+                {/* Audio & Visuals Settings */}
+                <div className="flex flex-col gap-3 bg-slate-900/90 p-4 sm:p-6 rounded-2xl border border-cyan-500/30 shadow-xl w-full">
+                  <HUDCorners />
+                  <span className="text-[10px] font-hud font-black text-cyan-400 uppercase tracking-widest block mb-1">
+                    AUDIO & DISPLAY CONTROLS
+                  </span>
                   
-                  
+                  <AudioSettings mode="simple" />
 
                   {/* Theme Toggle Selector */}
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-                    <div className="flex flex-col text-center sm:text-left items-center sm:items-start">
-                      <span className="text-cyan-300 font-hud uppercase text-[9px] font-bold tracking-widest">Theme</span>
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-800/80">
+                    <div className="flex flex-col text-center sm:text-left">
+                      <span className="text-cyan-300 font-hud uppercase text-xs font-bold tracking-widest">Interface Theme</span>
+                      <span className="text-[10px] font-mono text-slate-400">Toggle dark / light display mode</span>
                     </div>
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       onClick={handleThemeToggle}
-                      className="relative w-12 h-6 rounded-full bg-slate-900/30 border border-slate-700/50 transition-colors focus:outline-none"
+                      className="relative w-14 h-7 rounded-full bg-slate-950 border border-slate-700/80 transition-colors focus:outline-none cursor-pointer"
                     >
                       <motion.div 
                         initial={false}
-                        animate={{ x: isLightMode ? 24 : 0 }}
+                        animate={{ x: isLightMode ? 28 : 0 }}
                         transition={{ type: "spring", stiffness: 500, damping: 30 }}
                         className={cn(
-                          "absolute top-1 w-4 h-4 rounded-full flex items-center justify-center left-1",
-                          isLightMode ? "bg-amber-500" : "bg-slate-500"
+                          "absolute top-1 w-5 h-5 rounded-full flex items-center justify-center left-1 shadow-md",
+                          isLightMode ? "bg-amber-500 text-slate-950" : "bg-slate-500 text-white"
                         )}
                       >
-                        {isLightMode ? <Sun className="w-2.5 h-2.5" /> : <Moon className="w-2.5 h-2.5 text-slate-900" /> }
+                        {isLightMode ? <Sun className="w-3 h-3" /> : <Moon className="w-3 h-3 text-slate-900" /> }
                       </motion.div>
                     </motion.button>
                   </div>
-
-                  
                 </div>
 
-                <div className="flex flex-col gap-2 w-full text-center">
-                  <span className="text-[9px] font-hud font-black text-cyan-500/80 uppercase tracking-widest block mb-1 text-center">REGISTRY UTILITIES</span>
+                {/* Registry & Utilities */}
+                <div className="flex flex-col gap-3 bg-slate-900/90 p-4 sm:p-6 rounded-2xl border border-cyan-500/30 shadow-xl w-full">
+                  <HUDCorners />
+                  <span className="text-[10px] font-hud font-black text-cyan-400 uppercase tracking-widest block mb-1">
+                    REGISTRY & COMMUNITY UTILITIES
+                  </span>
                   
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2.5">
                     {isInstallable && (
                       <motion.button
                         whileTap={{ scale: 0.98 }}
@@ -9170,20 +9193,21 @@ export default function App() {
                           handleInstallPWA();
                           sounds.scan();
                         }}
-                        className="flex items-center justify-between p-3.5 bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/50 hover:border-cyan-400 rounded-xl transition-all group w-full text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.25)]"
+                        className="flex items-center justify-between p-3.5 bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/50 hover:border-cyan-400 rounded-xl transition-all group w-full text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.25)] cursor-pointer"
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2.5">
                           <Download className="w-4 h-4 shrink-0 text-cyan-400 group-hover:scale-110 transition-transform animate-bounce" />
                           <div className="flex flex-col text-left">
-                            <span className="font-hud text-[8px] font-bold tracking-wider uppercase tracking-widest whitespace-nowrap">Install App (PWA)</span>
-                            <span className="text-[7.5px] font-mono text-cyan-400/80 leading-none mt-0.5">Install Pokéthology on your device</span>
+                            <span className="font-hud text-[9px] sm:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Install App (PWA)</span>
+                            <span className="text-[8px] sm:text-[9px] font-mono text-cyan-400/80 leading-none mt-0.5">Install Pokéthology locally on your device</span>
                           </div>
                         </div>
-                        <span className="text-[7px] font-mono text-cyan-300 group-hover:text-white uppercase tracking-widest bg-cyan-900/60 px-2 py-1 rounded border border-cyan-500/40">
+                        <span className="text-[8px] font-mono text-cyan-300 group-hover:text-white uppercase tracking-widest bg-cyan-900/60 px-2.5 py-1 rounded border border-cyan-500/40">
                           Install
                         </span>
                       </motion.button>
                     )}
+
                     <motion.button
                       whileTap={{ scale: 0.98 }}
                       onClick={() => {
@@ -9191,16 +9215,16 @@ export default function App() {
                         setIsTutorialOpen(true);
                         sounds.scan();
                       }}
-                      className="flex items-center justify-between p-3.5 bg-slate-950/40 hover:bg-slate-950/80 border border-cyan-900/30 hover:border-cyan-500/40 rounded-xl transition-all group w-full"
+                      className="flex items-center justify-between p-3.5 bg-slate-950/60 hover:bg-slate-950/90 border border-cyan-900/40 hover:border-cyan-500/50 rounded-xl transition-all group w-full cursor-pointer"
                     >
-                      <div className="flex items-center gap-2 text-cyan-400">
+                      <div className="flex items-center gap-2.5 text-cyan-400">
                         <BookOpen className="w-4 h-4 shrink-0 text-cyan-400 group-hover:scale-110 transition-transform" />
                         <div className="flex flex-col text-left">
-                          <span className="font-hud text-[8px] font-bold tracking-wider uppercase tracking-widest whitespace-nowrap">Tutorial</span>
-                          <span className="text-[7.5px] font-mono text-slate-400 leading-none mt-0.5">Interactive guide & controls walkthrough</span>
+                          <span className="font-hud text-[9px] sm:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Pokéthology Tutorial</span>
+                          <span className="text-[8px] sm:text-[9px] font-mono text-slate-400 leading-none mt-0.5">Guided walkthrough of controls & HUD features</span>
                         </div>
                       </div>
-                      <span className="text-[7px] font-mono text-cyan-600 group-hover:text-cyan-300 uppercase tracking-widest">
+                      <span className="text-[8px] font-mono text-cyan-500 group-hover:text-cyan-300 uppercase tracking-widest">
                         Open
                       </span>
                     </motion.button>
@@ -9210,16 +9234,16 @@ export default function App() {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => sounds.scan()}
-                      className="flex items-center justify-between p-3.5 bg-gradient-to-r from-purple-950/40 via-pink-950/40 to-slate-950/40 hover:from-purple-900/60 hover:to-slate-900/80 border border-pink-500/30 hover:border-pink-400/60 rounded-xl transition-all group w-full text-pink-400"
+                      className="flex items-center justify-between p-3.5 bg-gradient-to-r from-purple-950/40 via-pink-950/40 to-slate-950/40 hover:from-purple-900/60 hover:to-slate-900/80 border border-pink-500/30 hover:border-pink-400/60 rounded-xl transition-all group w-full text-pink-400 cursor-pointer"
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2.5">
                         <Instagram className="w-4 h-4 shrink-0 text-pink-400 group-hover:scale-110 transition-transform" />
                         <div className="flex flex-col text-left">
-                          <span className="font-hud text-[8px] font-bold tracking-wider uppercase tracking-widest whitespace-nowrap">Pokéthology Instagram</span>
-                          <span className="text-[7.5px] font-mono text-pink-300/70 leading-none mt-0.5">Follow @__.pokethology.__ on Instagram</span>
+                          <span className="font-hud text-[9px] sm:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Pokéthology Instagram</span>
+                          <span className="text-[8px] sm:text-[9px] font-mono text-pink-300/70 leading-none mt-0.5">Follow @__.pokethology.__ for updates & lore</span>
                         </div>
                       </div>
-                      <span className="text-[7px] font-mono text-pink-400 group-hover:text-pink-200 uppercase tracking-widest">
+                      <span className="text-[8px] font-mono text-pink-400 group-hover:text-pink-200 uppercase tracking-widest">
                         Visit
                       </span>
                     </a>
@@ -9229,16 +9253,16 @@ export default function App() {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => sounds.scan()}
-                      className="flex items-center justify-between p-3.5 bg-slate-950/40 hover:bg-slate-950/80 border border-cyan-900/30 hover:border-cyan-500/40 rounded-xl transition-all group w-full text-cyan-400"
+                      className="flex items-center justify-between p-3.5 bg-slate-950/60 hover:bg-slate-950/90 border border-cyan-900/40 hover:border-cyan-500/50 rounded-xl transition-all group w-full text-cyan-400 cursor-pointer"
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2.5">
                         <Github className="w-4 h-4 shrink-0 text-cyan-400 group-hover:scale-110 transition-transform" />
                         <div className="flex flex-col text-left">
-                          <span className="font-hud text-[8px] font-bold tracking-wider uppercase tracking-widest whitespace-nowrap">GitHub Repository</span>
-                          <span className="text-[7.5px] font-mono text-slate-400 leading-none mt-0.5">Visit official GitHub repository</span>
+                          <span className="font-hud text-[9px] sm:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">GitHub Repository</span>
+                          <span className="text-[8px] sm:text-[9px] font-mono text-slate-400 leading-none mt-0.5">Explore source code & documentation</span>
                         </div>
                       </div>
-                      <span className="text-[7px] font-mono text-cyan-600 group-hover:text-cyan-300 uppercase tracking-widest">
+                      <span className="text-[8px] font-mono text-cyan-500 group-hover:text-cyan-300 uppercase tracking-widest">
                         Visit
                       </span>
                     </a>
@@ -9248,11 +9272,11 @@ export default function App() {
                     whileTap={{ scale: 0.98 }}
                     onClick={handleSystemRestart}
                     disabled={isRebooting}
-                    className="flex items-center justify-between p-3.5 bg-red-950/20 hover:bg-red-900/40 border border-red-900/40 hover:border-red-500/50 rounded-xl transition-all group mt-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center justify-between p-3.5 bg-red-950/20 hover:bg-red-900/40 border border-red-900/40 hover:border-red-500/50 rounded-xl transition-all group mt-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <div className="flex items-center gap-2.5 text-red-400">
                       <RotateCcw className={cn("w-4 h-4", isRebooting && "animate-spin")} />
-                      <span className="font-hud text-[9px] font-black tracking-wider uppercase tracking-widest">
+                      <span className="font-hud text-[9px] sm:text-[10px] font-black uppercase tracking-widest">
                         {isRebooting ? 'REBOOTING POKÉDEX...' : 'RESTART POKÉDEX SYSTEM'}
                       </span>
                     </div>
@@ -9262,7 +9286,6 @@ export default function App() {
                   </motion.button>
                 </div>
               </div>
-            </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -9717,6 +9740,29 @@ export default function App() {
           </AnimatePresence>
         </div>
 
+        {/* Hub Challenge Progress Message */}
+        <AnimatePresence>
+          {hubChallengeProgressMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -40, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="fixed top-20 left-0 right-0 z-[110] pointer-events-none flex justify-center px-4"
+            >
+              <div className="bg-slate-900/90 backdrop-blur-md border border-cyan-500/30 px-5 py-3 rounded-2xl shadow-[0_4px_30px_rgba(6,182,212,0.3)] flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center border border-cyan-400/50">
+                  <Swords className="w-4 h-4 text-cyan-400 animate-pulse" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-hud font-bold text-slate-400 uppercase tracking-widest">Progress Updated</span>
+                  <span className="text-xs sm:text-sm font-hud font-black text-white">{hubChallengeProgressMessage}</span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Daily Combat Mission Status Update HUD */}
         <AnimatePresence>
           {showMissionUpdateHUD && !isMissionCompleted && (
@@ -9860,6 +9906,22 @@ export default function App() {
         <PwaInstallModal
           isOpen={isPwaModalOpen}
           onClose={() => setIsPwaModalOpen(false)}
+        />
+        {/* Full-Screen Favorites Management Vault Modal */}
+        <FavoritesVaultModal
+          isOpen={isFavoritesModalOpen}
+          onClose={() => setIsFavoritesModalOpen(false)}
+          favorites={favorites}
+          toggleFavorite={toggleFavorite}
+          onSelectPokemon={(name) => {
+            performSearch(name);
+          }}
+          onStartBattleWithPokemon={async (name) => {
+            await performSearch(name, false, 'battle');
+            handleTabChange('battle');
+          }}
+          isLightMode={isLightMode}
+          sounds={sounds}
         />
       </div>
       </Suspense>
