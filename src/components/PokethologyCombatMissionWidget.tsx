@@ -499,7 +499,19 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                         (combatProgress['gold_3'] || 0) >= combatChallenges[4].required && 
                         (combatProgress['gold_4'] || 0) >= combatChallenges[5].required;
 
-  const totalCompletedCount = (bronzeCompleted ? 4 : 0) + (silverCompleted ? 4 : 0) + (goldCompleted ? 4 : 0);
+  const totalCompletedCount = 
+    (easyStatusA === 'correct' ? 1 : 0) +
+    (easyStatusB === 'correct' ? 1 : 0) +
+    ((combatProgress['bronze_3'] || 0) >= combatChallenges[0].required ? 1 : 0) +
+    ((combatProgress['bronze_4'] || 0) >= combatChallenges[1].required ? 1 : 0) +
+    (medStatusA === 'correct' ? 1 : 0) +
+    (medStatusB === 'correct' ? 1 : 0) +
+    ((combatProgress['silver_3'] || 0) >= combatChallenges[2].required ? 1 : 0) +
+    ((combatProgress['silver_4'] || 0) >= combatChallenges[3].required ? 1 : 0) +
+    (hardStatusA === 'correct' ? 1 : 0) +
+    (hardStatusB === 'correct' ? 1 : 0) +
+    ((combatProgress['gold_3'] || 0) >= combatChallenges[4].required ? 1 : 0) +
+    ((combatProgress['gold_4'] || 0) >= combatChallenges[5].required ? 1 : 0);
 
   const operatorRank = useMemo(() => {
     if (goldCompleted) return { title: 'Expert', color: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/40 shadow-[0_0_15px_rgba(234,179,8,0.3)]' };

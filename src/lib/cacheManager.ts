@@ -417,8 +417,16 @@ export async function searchOfflinePokemon(query: string): Promise<any | null> {
       if (match) return match;
     }
 
-    // 3. Partial name match
-    match = all.find((p: any) => p.name?.toLowerCase().includes(formatted));
+    // 3. Partial name match (ignoring mega/gmax unless requested)
+    const wantsMega = formatted.includes('mega');
+    const wantsGmax = formatted.includes('gmax') || formatted.includes('gigantamax');
+    match = all.find((p: any) => {
+      const nameLower = p.name?.toLowerCase() || '';
+      if (!nameLower.includes(formatted)) return false;
+      if (!wantsMega && nameLower.includes('-mega')) return false;
+      if (!wantsGmax && nameLower.includes('-gmax')) return false;
+      return true;
+    });
     if (match) return match;
 
     return null;

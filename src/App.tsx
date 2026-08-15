@@ -8283,7 +8283,7 @@ export default function App() {
                 animate={{ scale: 1, y: 0, opacity: 1 }}
                 exit={{ scale: 0.98, y: 6, opacity: 0 }}
                 transition={{ duration: 0.15, ease: 'easeOut' }}
-                className="bg-slate-900 border-2 border-red-500/50 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(239,68,68,0.3)]"
+                className="bg-slate-900 border-2 border-red-500/50 rounded-2xl w-full max-w-[96vw] xl:max-w-7xl max-h-[95vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(239,68,68,0.3)]"
               >
                 <div className="p-4 border-b border-red-900/30 flex justify-between items-center bg-slate-950 shrink-0">
                   <div className="flex items-center gap-2 sm:gap-3">
@@ -8306,7 +8306,7 @@ export default function App() {
                 <div className="flex-1 overflow-auto p-0 sm:p-4 custom-scrollbar bg-slate-900 relative">
                   <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-5 bg-[linear-gradient(rgba(18,24,27,0)_50%,rgba(32,32,32,0.5)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]"></div>
                   <div className="w-max min-w-full relative z-10 pb-8 pr-4 sm:pr-8">
-                    <div className="sticky top-0 z-30 grid grid-cols-[40px_repeat(18,minmax(20px,1fr))] sm:grid-cols-[100px_repeat(18,minmax(40px,1fr))] gap-0.5 sm:gap-1.5 mb-2 sm:mb-4 bg-slate-900/95 pt-2 pb-2 px-1 sm:px-0">
+                    <div className="sticky top-0 z-30 grid grid-cols-[48px_repeat(18,minmax(18px,1fr))] sm:grid-cols-[100px_repeat(18,minmax(32px,1fr))] lg:grid-cols-[120px_repeat(18,1fr)] gap-0.5 sm:gap-1 mb-2 sm:mb-4 bg-slate-900/95 pt-2 pb-2 px-1 sm:px-0">
                       <div className="sticky left-0 z-40 h-10 sm:h-12 flex items-center justify-center bg-slate-950 rounded-lg border border-slate-800 shadow-[4px_0_10px_rgba(0,0,0,0.5)]">
                         <span className="text-[6px] font-bold tracking-wider sm:text-[8px] font-bold tracking-wider text-slate-300 font-medium font-hud uppercase tracking-tighter text-center leading-none">ATK \ DEF</span>
                       </div>
@@ -8323,7 +8323,7 @@ export default function App() {
                     </div>
                     <div className="px-2 sm:px-0">
                       {Object.keys(typeColors).map(attackerType => (
-                        <div key={`typerow-${attackerType}`} className="grid grid-cols-[50px_repeat(18,minmax(28px,1fr))] sm:grid-cols-[100px_repeat(18,minmax(40px,1fr))] gap-1 sm:gap-1.5 mb-1 sm:mb-1.5 group/row">
+                        <div key={`typerow-${attackerType}`} className="grid grid-cols-[48px_repeat(18,minmax(18px,1fr))] sm:grid-cols-[100px_repeat(18,minmax(32px,1fr))] lg:grid-cols-[120px_repeat(18,1fr)] gap-0.5 sm:gap-1 mb-1 sm:mb-1.5 group/row">
                           <div className={cn(
                             "sticky left-0 z-20 h-7 sm:h-10 flex items-center justify-center sm:justify-start sm:px-4 rounded sm:rounded-lg text-[6px] font-bold tracking-wider sm:text-[9px] font-bold tracking-wider font-black uppercase tracking-widest sm:tracking-[0.2em] shadow-[4px_0_10px_rgba(0,0,0,0.5)] group-hover/row:scale-105 transition-transform",
                             typeColors[attackerType]

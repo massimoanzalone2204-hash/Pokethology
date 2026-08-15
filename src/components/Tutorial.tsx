@@ -171,7 +171,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Map className="w-4 h-4 animate-pulse" /> Pokédex Registry
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Explore all 9 Generations of Pokémon. Filter by region and sort criteria with live stats, audio cries, and artwork switching.
+                    Embark on a comprehensive journey through all 9 official Generations of the Pokémon universe, mapping species spanning from Kanto (Gen I) through Paldea (Gen IX). Leverage our advanced query matching and granular regional filters to explore base stats distributions, dynamic type matchup vulnerabilities, and official audio cries, with the ability to switch dynamically between high-definition official media assets and classic retro sprites.
                   </p>
                 </div>
                 
@@ -235,7 +235,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Brain className="w-4 h-4 animate-pulse" /> Pokéthology AI Assistant
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Ask questions about Pokémon battles, competitive builds, evolution lines, and lore.
+                    Connect with our context-aware Pokéthology AI Assistant, powered by advanced language models designed specifically for competitive Pokémon analysis, deep biology studies, and franchise lore. Ask anything from optimal EV/IV spreads, nature synergy, and custom competitive movesets for official VGC tournaments, to complex evolutionary pathways, regional folklore, and the ecological habitats of rare species.
                   </p>
                 </div>
 
@@ -293,7 +293,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Swords className="w-4 h-4 text-red-500 animate-pulse" /> Combat Simulator
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Test battle matchups between any two Pokémon with real-time health bars and combat calculation logs.
+                    Step into the virtual arena and run real-time battle simulations between any two Pokémon across any generation. Our custom combat engine calculates move damage classes, type-effectiveness multipliers (from complete immunities up to 4x super-effective damage), STAB bonuses, and base stat distributions, displaying active health point bars and rich turn-by-turn combat logs. Test competitive matchups or activate Chaos Mode to completely randomize participants and movesets.
                   </p>
                 </div>
 
@@ -363,7 +363,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Calendar className="w-4 h-4 animate-bounce" /> Daily Activities & Settings
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Overview of daily challenges, search tools, favorites, and settings.
+                    Challenge your wisdom and level up your Trainer Rank by checking in daily. Solve the competitive Theory Exam, scan the daily featured Pokémon, and complete tasks to earn experience points. Configure your user preferences directly, manage your personal persistent Favorites Vault—designed for rapid tracking of Mega, Gigantamax, and Regional forms—and toggle audio settings for game sounds and cries.
                   </p>
                 </div>
                 
@@ -443,7 +443,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Share2 className="w-4 h-4 animate-pulse" /> Community & Social
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Connect with Pokéthology channels and explore the project.
+                    Join the global community of competitive Pokémon theorists and Pokéthology enthusiasts. Expand your trainer horizons by checking out our official Instagram hub for deep lore infographics, trivia, and competitive meta breakdowns, or explore our active GitHub repository to see the behind-the-scenes engine, submit code issues, contribute features, and star our project.
                   </p>
                 </div>
 
@@ -507,7 +507,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     )}
                   </div>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs">
-                    Updates on Pokémon games, tournaments, and TCG releases.
+                    Stay fully updated with real-time global news feeds spanning the entire franchise. Get live details on official video game updates (such as VGC championship balance patches and active Scarlet & Violet tera raid events), physical and digital Trading Card Game (TCG & Pokémon TCG Pocket) expansion releases, community tournaments, mobile updates from Pokémon GO, and official media launches.
                   </p>
                 </div>
 
