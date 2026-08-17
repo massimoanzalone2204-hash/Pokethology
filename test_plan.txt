@@ -1,2 +1,0 @@
-1. Redesign BattleMessage.tsx to have a single "unique style" (e.g. a sleek unified HUD banner).
-2. Modify App.tsx to construct a SINGLE consolidated event text for a move, OR just use the unified style for all sequential popups so they feel like updates to the same UI element.

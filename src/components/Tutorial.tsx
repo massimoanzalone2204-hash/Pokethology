@@ -171,7 +171,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Map className="w-4 h-4 animate-pulse" /> Pokédex Registry
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Embark on a comprehensive journey through all 9 official Generations of the Pokémon universe, mapping species spanning from Kanto (Gen I) through Paldea (Gen IX). Leverage our advanced query matching and granular regional filters to explore base stats distributions, dynamic type matchup vulnerabilities, and official audio cries, with the ability to switch dynamically between high-definition official media assets and classic retro sprites.
+                    Explore the complete Pokémon registry. Use the grid to filter by generation or search by ID and name. View interactive 3D and 2D models, toggle shiny and gender differences, listen to authentic audio cries, and explore detailed stats, evolution nodes, and complete movesets.
                   </p>
                 </div>
                 
@@ -232,10 +232,10 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 {/* Banner */}
                 <div className="p-4 bg-purple-950/20 border-l-4 border-purple-500 rounded-r-xl space-y-1.5 text-left relative overflow-hidden">
                   <h3 className="font-hud font-black text-purple-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
-                    <Brain className="w-4 h-4 animate-pulse" /> Pokéthology AI Assistant
+                    <Gamepad2 className="w-4 h-4 animate-pulse" /> Mini-games & Utilities
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Connect with our context-aware Pokéthology AI Assistant, powered by advanced language models designed specifically for competitive Pokémon analysis, deep biology studies, and franchise lore. Ask anything from optimal EV/IV spreads, nature synergy, and custom competitive movesets for official VGC tournaments, to complex evolutionary pathways, regional folklore, and the ecological habitats of rare species.
+                    Access special mini-games and utility tools. Test your knowledge in the Pokéthology Quiz, track and manage your daily combat missions, and control your device cache and APIs.
                   </p>
                 </div>
 
@@ -246,9 +246,9 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <Crosshair className="w-5 h-5 text-purple-400" />
                     </div>
                     <div>
-                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Tactics & Strategy</span>
+                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Pokéthology Quiz</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Get advice on competitive movesets, EV spreads, team synergies, and matchup counters.
+                        Test your knowledge! Guess the Pokémon by identifying its silhouette, and use hints like their cry or generation to win.
                       </p>
                     </div>
                   </div>
@@ -258,9 +258,9 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <BookOpen className="w-5 h-5 text-purple-400" />
                     </div>
                     <div>
-                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Lore & Biology</span>
+                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Favorites Vault</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Discover species evolution paths, regional mythologies, and ecological lore.
+                        Access a dedicated vault to view, organize, and manage all your starred favorite Pokémon in one place.
                       </p>
                     </div>
                   </div>
@@ -270,9 +270,9 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <Activity className="w-5 h-5 text-purple-400" />
                     </div>
                     <div>
-                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">General Knowledge</span>
+                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Offline Cache Manager</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Chat about game mechanics, trivia, and franchise details with context-aware responses.
+                        Pre-download sprites and data to your device, allowing you to browse the Pokédex seamlessly even without an internet connection.
                       </p>
                     </div>
                   </div>
@@ -293,7 +293,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Swords className="w-4 h-4 text-red-500 animate-pulse" /> Combat Simulator
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Step into the virtual arena and run real-time battle simulations between any two Pokémon across any generation. Our custom combat engine calculates move damage classes, type-effectiveness multipliers (from complete immunities up to 4x super-effective damage), STAB bonuses, and base stat distributions, displaying active health point bars and rich turn-by-turn combat logs. Test competitive matchups or activate Chaos Mode to completely randomize participants and movesets.
+                    Simulate turn-based battles between any two Pokémon. Calculations use real base stats, type advantages, and randomized critical hits. Play out complete attack sequences using authentic Pokémon move pools.
                   </p>
                 </div>
 
@@ -316,7 +316,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <Sparkles className="w-5 h-5 text-red-400" />
                     </div>
                     <div>
-                      <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider">Chaos Mode</span>
+                      <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider">Random Opponent</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
                         Completely randomizes the combatants and movesets, allowing you to battle under fully unpredictable conditions.
                       </p>
@@ -363,7 +363,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Calendar className="w-4 h-4 animate-bounce" /> Daily Activities & Settings
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Challenge your wisdom and level up your Trainer Rank by checking in daily. Solve the competitive Theory Exam, scan the daily featured Pokémon, and complete tasks to earn experience points. Configure your user preferences directly, manage your personal persistent Favorites Vault—designed for rapid tracking of Mega, Gigantamax, and Regional forms—and toggle audio settings for game sounds and cries.
+                    Overview of daily challenges, search tools, favorites, and settings.
                   </p>
                 </div>
                 
@@ -443,7 +443,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Share2 className="w-4 h-4 animate-pulse" /> Community & Social
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Join the global community of competitive Pokémon theorists and Pokéthology enthusiasts. Expand your trainer horizons by checking out our official Instagram hub for deep lore infographics, trivia, and competitive meta breakdowns, or explore our active GitHub repository to see the behind-the-scenes engine, submit code issues, contribute features, and star our project.
+                    Connect with Pokéthology channels and explore the project.
                   </p>
                 </div>
 
@@ -507,7 +507,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     )}
                   </div>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs">
-                    Stay fully updated with real-time global news feeds spanning the entire franchise. Get live details on official video game updates (such as VGC championship balance patches and active Scarlet & Violet tera raid events), physical and digital Trading Card Game (TCG & Pokémon TCG Pocket) expansion releases, community tournaments, mobile updates from Pokémon GO, and official media launches.
+                    Updates on Pokémon games, tournaments, and TCG releases.
                   </p>
                 </div>
 

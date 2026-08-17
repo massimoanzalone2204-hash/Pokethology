@@ -55,13 +55,32 @@ export const OfflineManagerModal: React.FC<OfflineManagerModalProps> = ({
   const [report, setReport] = useState<StorageUsageReport | null>(null);
   const [quotas, setQuotas] = useState<Record<ServiceName, QuotaStatus>>(getAllQuotaStatuses());
   const [isPruning, setIsPruning] = useState(false);
+
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; message: string; onConfirm: () => void }>({
+    isOpen: false,
+    message: '',
+    onConfirm: () => {}
+  });
+
+  const handleClearAllCaches = () => {
+    setConfirmModal({
+      isOpen: true,
+      message: "Are you sure you want to purge all cached Pokémon data and images?\n\nBattle history will not be affected.",
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        await clearAllLocalCaches();
+        await refreshStorageAndDB();
+        showNotify("All local Pokémon data & image caches cleared.", 'warn');
+      }
+    });
+  };
+
   const [pruneResult, setPruneResult] = useState<PruneResult | null>(null);
   const [dbStats, setDbStats] = useState<{
-    teamsCount: number;
     battlesCount: number;
     favoritesCount: number;
     quizCount: number;
-  }>({ teamsCount: 0, battlesCount: 0, favoritesCount: 0, quizCount: 0 });
+  }>({ battlesCount: 0, favoritesCount: 0, quizCount: 0 });
 
   const [customThreshold, setCustomThreshold] = useState<number>(50);
   const [quotaInputMap, setQuotaInputMap] = useState<Record<ServiceName, number>>({
@@ -99,13 +118,11 @@ export const OfflineManagerModal: React.FC<OfflineManagerModalProps> = ({
       setCustomThreshold(rep.thresholdMB);
 
       // Fetch DB stats
-      const teams = await idbGetAll(STORES.USER_TEAMS);
       const battles = await idbGetAll(STORES.BATTLE_HISTORY);
       const favs = await idbGetAll(STORES.FAVORITES);
       const quiz = await idbGetAll(STORES.QUIZ_RECORDS);
 
       setDbStats({
-        teamsCount: teams.length,
         battlesCount: battles.length,
         favoritesCount: favs.length,
         quizCount: quiz.length
@@ -157,14 +174,7 @@ export const OfflineManagerModal: React.FC<OfflineManagerModalProps> = ({
     }
   };
 
-  const handleClearAllCaches = async () => {
-    if (!window.confirm("Are you sure you want to purge all cached Pokémon data and images? Saved user teams and battle history will not be affected.")) {
-      return;
-    }
-    await clearAllLocalCaches();
-    await refreshStorageAndDB();
-    showNotify("All local Pokémon data & image caches cleared.", 'warn');
-  };
+  
 
   const handleSaveThreshold = (newMB: number) => {
     setCustomThreshold(newMB);
@@ -190,12 +200,10 @@ export const OfflineManagerModal: React.FC<OfflineManagerModalProps> = ({
         app: 'Pokethology',
         version: 2,
         exportedAt: new Date().toISOString(),
-        teams: await idbGetAll(STORES.USER_TEAMS),
         battleHistory: await idbGetAll(STORES.BATTLE_HISTORY),
         favorites: await idbGetAll(STORES.FAVORITES),
         quizRecords: await idbGetAll(STORES.QUIZ_RECORDS),
         localStorage: {
-          teams: localStorage.getItem('pokethology_saved_teams'),
           battleHistory: localStorage.getItem('pokethology_battle_history'),
           favorites: localStorage.getItem('pokethology_favorites')
         }
@@ -386,15 +394,7 @@ export const OfflineManagerModal: React.FC<OfflineManagerModalProps> = ({
                   </p>
                 </div>
 
-                <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3.5 space-y-1">
-                  <span className="text-[10px] font-hud font-bold uppercase text-slate-400">User Teams & Custom Builds</span>
-                  <div className="text-base font-bold text-purple-300 font-mono">
-                    {((report?.breakdown.userTeamsBytes || 0) / 1024).toFixed(1)} KB
-                  </div>
-                  <p className="text-[10px] text-slate-500 font-mono">
-                    {dbStats.teamsCount} saved team compositions
-                  </p>
-                </div>
+                
 
                 <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3.5 space-y-1">
                   <span className="text-[10px] font-hud font-bold uppercase text-slate-400">Battle Logs & History</span>
@@ -420,7 +420,7 @@ export const OfflineManagerModal: React.FC<OfflineManagerModalProps> = ({
                 </div>
 
                 <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                  When local storage reaches this threshold, Pokethology automatically runs a Least Recently Used (LRU) algorithm to prune outdated Pokémon data and images while preserving user custom teams, battle history, and favorites.
+                  When local storage reaches this threshold, Pokethology automatically runs a Least Recently Used (LRU) algorithm to prune outdated Pokémon data and images while preserving battle history and favorites.
                 </p>
 
                 <div className="flex items-center gap-3">
@@ -615,26 +615,12 @@ export const OfflineManagerModal: React.FC<OfflineManagerModalProps> = ({
                   </h3>
                 </div>
                 <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                  Pokethology operates as a fully offline-capable web application. All user teams, EV/IV builds, battle telemetry records, and theological quiz stats are synchronized automatically to IndexedDB store <code className="text-purple-300 font-mono">PokethologyDB (v2)</code>.
+                  Pokethology operates as a fully offline-capable web application. All battle telemetry records and theological quiz stats are synchronized automatically to IndexedDB store <code className="text-purple-300 font-mono">PokethologyDB (v2)</code>.
                 </p>
               </div>
 
               {/* Database Store Counters Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-hud font-bold text-cyan-300 uppercase flex items-center gap-2">
-                      <Users className="w-4 h-4 text-cyan-400" />
-                      User Team Compositions
-                    </span>
-                    <span className="px-2 py-0.5 bg-cyan-950 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold rounded">
-                      {dbStats.teamsCount} Saved
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-400 font-sans">
-                    Complete teams, custom movesets, EVs/IVs, items, and team synergy scores.
-                  </p>
-                </div>
 
                 <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-2">
                   <div className="flex items-center justify-between">
@@ -751,7 +737,7 @@ export const OfflineManagerModal: React.FC<OfflineManagerModalProps> = ({
                   Offline Data Backup & Restore
                 </h4>
                 <p className="text-xs text-slate-400 font-sans leading-relaxed">
-                  Export your full IndexedDB database (teams, battle history, quiz scores, favorites) into a single portable JSON file, or restore from a previous backup.
+                  Export your full IndexedDB database (battle history, quiz scores, favorites) into a single portable JSON file, or restore from a previous backup.
                 </p>
 
                 <div className="flex flex-wrap items-center gap-3 pt-2">

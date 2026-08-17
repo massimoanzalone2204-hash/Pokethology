@@ -159,7 +159,7 @@ export const FavoritesVaultModal: React.FC<FavoritesVaultModalProps> = ({
       await toggleFavorite({
         name: form.name,
         url: form.artwork || form.sprite,
-        displayId: form.baseId || form.id
+        displayId: form.id
       });
       const isNowFav = !favorites.some(f => f.name.toLowerCase() === form.name.toLowerCase());
       if (isNowFav) {

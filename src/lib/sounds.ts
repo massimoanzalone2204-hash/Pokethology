@@ -57,6 +57,16 @@ function playTone(freq: number, type: OscillatorType, duration: number, vol: num
 let lastScanSoundTime = 0;
 
 export const sounds = {
+  haptic: (intensity: 'light' | 'medium' | 'heavy' = 'light') => {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        if (intensity === 'light') navigator.vibrate(15);
+        else if (intensity === 'medium') navigator.vibrate(30);
+        else if (intensity === 'heavy') navigator.vibrate([40, 20, 40]);
+      }
+    } catch (_) {}
+  },
+
   setTempoMultiplier: (mult: number) => {
     tempoMultiplier = mult;
     if (currentTheme) {
@@ -725,10 +735,12 @@ export const sounds = {
     setTimeout(() => playTone(120, 'triangle', 0.25, 0.06), 90);
   },
   physicalMove: () => {
+    sounds.haptic("medium");
     playTone(120, 'sawtooth', 0.12, 0.12);
     playTone(85, 'square', 0.12, 0.1);
   },
   specialMove: () => {
+    sounds.haptic("medium");
     playTone(550, 'sine', 0.22, 0.08);
     playTone(750, 'sine', 0.22, 0.08);
     playTone(950, 'sine', 0.22, 0.08);
@@ -742,6 +754,7 @@ export const sounds = {
     setTimeout(() => playTone(180, 'sine', 0.25, 0.1), 150);
   },
   criticalHit: () => {
+    sounds.haptic("heavy");
     const ctx = getAudioContext();
     const now = ctx.currentTime;
     
@@ -907,6 +920,7 @@ export const sounds = {
     currentTheme = null;
   },
   playMoveSound: (type: string, isSpecial: boolean) => {
+    sounds.haptic("heavy");
     const ctx = getAudioContext();
     switch (type) {
       case 'fire':

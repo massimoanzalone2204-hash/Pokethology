@@ -23,8 +23,6 @@ export interface StorageUsageReport {
     pokemonCacheItems: number;
     imageCacheBytes: number;
     imageCacheItems: number;
-    userTeamsBytes: number;
-    userTeamsCount: number;
     battleHistoryBytes: number;
     battleHistoryCount: number;
     localStorageBytes: number;
@@ -74,8 +72,6 @@ export async function getStorageUsageReport(): Promise<StorageUsageReport> {
   let pokemonCacheItems = 0;
   let imageCacheBytes = 0;
   let imageCacheItems = 0;
-  let userTeamsBytes = 0;
-  let userTeamsCount = 0;
   let battleHistoryBytes = 0;
   let battleHistoryCount = 0;
 
@@ -114,11 +110,6 @@ export async function getStorageUsageReport(): Promise<StorageUsageReport> {
       imgReq.onerror = () => res();
     });
 
-    // 3. User Teams
-    userTeamsBytes = await getStoreByteSize(STORES.USER_TEAMS);
-    const teamsList: any[] = (await idbGet(STORES.USER_TEAMS, 'all_list')) || [];
-    userTeamsCount = Array.isArray(teamsList) ? teamsList.length : 0;
-
     // 4. Battle History
     battleHistoryBytes = await getStoreByteSize(STORES.BATTLE_HISTORY);
     const battlesList: any[] = (await idbGet(STORES.BATTLE_HISTORY, 'all_list')) || [];
@@ -140,7 +131,7 @@ export async function getStorageUsageReport(): Promise<StorageUsageReport> {
     }
   } catch (_) {}
 
-  const totalBytes = pokemonCacheBytes + imageCacheBytes + userTeamsBytes + battleHistoryBytes + localStorageBytes;
+  const totalBytes = pokemonCacheBytes + imageCacheBytes + battleHistoryBytes + localStorageBytes;
   const totalMB = totalBytes / (1024 * 1024);
   const percentageUsed = Math.min(100, Math.round((totalBytes / thresholdBytes) * 100));
 
@@ -154,8 +145,6 @@ export async function getStorageUsageReport(): Promise<StorageUsageReport> {
       pokemonCacheItems,
       imageCacheBytes,
       imageCacheItems,
-      userTeamsBytes,
-      userTeamsCount,
       battleHistoryBytes,
       battleHistoryCount,
       localStorageBytes

@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { idbGet, idbSet, idbGetAll, idbDelete, STORES } from "./lib/indexedDB";
+import { idbSet, idbGetAll, idbDelete, STORES } from "./lib/indexedDB";
 import { checkQuotaAllowed, recordApiUsage } from "./lib/quotaManager";
 import { useState, useEffect, useRef, useTransition, useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,6 @@ import { EvolutionNodeComponent } from './components/EvolutionNodeComponent';
 import { PokethologyLogo } from './components/PokethologyLogo';
 import { PokeballIcon } from './components/PokeballIcon';
 import { BattleMessage } from './components/BattleMessage';
-import { StatChangeEffect } from './components/StatChangeEffect';
 import { FloatingText } from './components/FloatingText';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { searchPokemon, getPokemonList, getPokemonByType, GENERATIONS } from './lib/api';
@@ -26,8 +25,6 @@ import { TypeBadge } from './components/TypeBadge';
 import { BattleErrorBoundary } from './components/BattleErrorBoundary';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
-import { StatRadar } from './components/StatRadar';
-import { SingleStatRadar } from './components/SingleStatRadar';
 import Markdown from 'react-markdown';
 import { AudioSettings } from './components/AudioSettings';
 import ReactPlayer from 'react-player';
@@ -777,42 +774,7 @@ const typeColors: Record<string, string> = {
   stellar: `${baseBadge} bg-gradient-to-br from-[#40A8FF] to-[#1068C0] ring-1 ring-[#40A8FF]/50`,
 };
 
-const statExplanations: Record<string, string> = {
-  hp: "Hit Points: Determines how much damage a Pokémon can take before fainting.",
-  attack: "Physical Attack: Affects the damage dealt by physical moves.",
-  defense: "Physical Defense: Reduces the damage taken from physical moves.",
-  "special-attack": "Special Attack: Affects the damage dealt by special moves.",
-  "special-defense": "Special Defense: Reduces the damage taken from special moves.",
-  speed: "Speed: Determines which Pokémon moves first in battle.",
-};
 
-const NATURES = [
-  { name: 'Hardy', plus: null, minus: null },
-  { name: 'Lonely', plus: 'attack', minus: 'defense' },
-  { name: 'Brave', plus: 'attack', minus: 'speed' },
-  { name: 'Adamant', plus: 'attack', minus: 'special-attack' },
-  { name: 'Naughty', plus: 'attack', minus: 'special-defense' },
-  { name: 'Bold', plus: 'defense', minus: 'attack' },
-  { name: 'Docile', plus: null, minus: null },
-  { name: 'Relaxed', plus: 'defense', minus: 'speed' },
-  { name: 'Impish', plus: 'defense', minus: 'special-attack' },
-  { name: 'Lax', plus: 'defense', minus: 'special-defense' },
-  { name: 'Timid', plus: 'speed', minus: 'attack' },
-  { name: 'Hasty', plus: 'speed', minus: 'defense' },
-  { name: 'Serious', plus: null, minus: null },
-  { name: 'Jolly', plus: 'speed', minus: 'special-attack' },
-  { name: 'Naive', plus: 'speed', minus: 'special-defense' },
-  { name: 'Modest', plus: 'special-attack', minus: 'attack' },
-  { name: 'Mild', plus: 'special-attack', minus: 'defense' },
-  { name: 'Quiet', plus: 'special-attack', minus: 'speed' },
-  { name: 'Bashful', plus: null, minus: null },
-  { name: 'Rash', plus: 'special-attack', minus: 'special-defense' },
-  { name: 'Calm', plus: 'special-defense', minus: 'attack' },
-  { name: 'Gentle', plus: 'special-defense', minus: 'defense' },
-  { name: 'Sassy', plus: 'special-defense', minus: 'speed' },
-  { name: 'Careful', plus: 'special-defense', minus: 'special-attack' },
-  { name: 'Quirky', plus: null, minus: null },
-];
 
 const TYPE_CHART: Record<string, Record<string, number>> = {
   normal: { rock: 0.5, ghost: 0, steel: 0.5 },
@@ -836,52 +798,6 @@ const TYPE_CHART: Record<string, Record<string, number>> = {
 };
 
 
-const getBattleBackground = (playerType?: string, opponentType?: string) => {
-  const map: Record<string, string> = {
-    normal: 'grassy meadow with wild daisies and soft rustic plains', 
-    grass: 'mystical deep forest filled with lush bioluminescent ferns and ancient moss-covered trees', 
-    bug: 'vibrant retro overgrown jungle canopy with glowing fireflies and twisted hanging vines',
-    fire: 'epic dynamic volcanic crater with bubbling hot neon orange flowing lava rivers',
-    water: 'crashing ocean shore waves under a dark marine crest with spray and sea foam', 
-    ice: 'crystal glacier ice cavern glittering with sapphire icicles and frozen walls',
-    rock: 'sharp dramatic mountain peak summit with crumbling stones and high thin atmosphere', 
-    ground: 'sandy desert canyons with windblown sand dunes and dry cracked earth', 
-    fighting: 'legendary martial arts temple dojo with sacred tatami mats and stone lanterns',
-    electric: 'high-tech high-voltage electrical power plant grid with blue sparks and generator coils', 
-    steel: 'brutal industrial mechanical gear factory with turning steel cogs and steam escape vents',
-    psychic: 'mystical abstract celestial galaxy warp with cosmic nebulas, purple star clusters, and space dimensional rifts', 
-    ghost: 'spooky gothic haunted cemetery path lined with tombstones under an ethereal low-hanging violet fog', 
-    dark: 'cool low-key retro moonlit city rooftops at midnight under a purple starry night sky', 
-    poison: 'toxic glowing acid swamp pools with bubbling purple sludge and mossy tree trunks',
-    dragon: 'ancient misty mountain valley ruins of a forgotten dragon temple with stone runic pillars', 
-    flying: 'soaring high-altitude sky filled with epic turbulent thunderstorm clouds and sky ribbons', 
-    fairy: 'magical glowing fantasy dreamscape meadow with pastel crystal spires and sparkling glitter dust'
-  };
-
-  const pType = playerType || 'normal';
-  const oType = opponentType || 'normal';
-
-  const pDesc = map[pType] || `${pType} wilderness`;
-  const oDesc = map[oType] || `${oType} sanctuary`;
-
-  let keyword = '';
-  if (pType === oType) {
-    keyword = `pure majestic landscape of a ${pDesc}`;
-  } else {
-    keyword = `epic symmetric split-screen Pokémon stadium battleground arena: on the left side is a gorgeous ${pDesc} fading into a stunning ${oDesc} on the right side, seamlessly merged at the vertical center line`;
-  }
-
-  const basePrompt = `16-bit vintage retro pixel art aesthetic pokemon showdown battle stadium arena background, high detail pixel texture, beautiful scenic landscape environment, ${keyword}, epic cinematic mood, high-contrast, beautiful rich colors, native game screen capture`;
-  const prompt = encodeURIComponent(basePrompt);
-  
-  const textSeed = `${pType}-${oType}-clear`;
-  let seedVal = 42;
-  for (let i = 0; i < textSeed.length; i++) {
-    seedVal = (seedVal * 31 + textSeed.charCodeAt(i)) % 1000;
-  }
-  
-  return `https://image.pollinations.ai/prompt/${prompt}?width=1024&height=576&nologo=true&seed=${seedVal || 42}`;
-};
 
 const getBattleFallbackGradient = (playerType?: string, opponentType?: string) => {
   const pType = playerType || 'normal';
@@ -1210,7 +1126,7 @@ const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny, use2dSpri
 
 const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations, onClick, isShiny, isCardView, isLightMode, use2dSprite, isFav, onToggleFavorite }: any) => {
     const id = p.url.split('/').filter(Boolean).pop();
-  const displayId = p.displayId || p.baseId || id;
+  const displayId = p.id || id;
   const isSpecial = parseInt(id || "0") > 1025 && !p.displayId;
   const isMega = p.name.includes('-mega');
   const isGmax = p.name.includes('-gmax');
@@ -1389,7 +1305,7 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
           onClick={(e) => {
             e.stopPropagation();
             try { sounds.hover(); } catch (_) {}
-            onToggleFavorite({ name: p.name, url: p.url, displayId: p.displayId || p.baseId || id });
+            onToggleFavorite({ name: p.name, url: p.url, displayId: p.id || id });
           }}
           title={isFav ? "Remove from Favorites" : "Add to Favorites"}
         >
@@ -1784,77 +1700,6 @@ const StatusOverlay = memo(({ status }: { status: string | null }) => {
   );
 });
 
-const HPBar = memo(({ current, max, enableAnimations }: { current: number; max: number; enableAnimations: boolean }) => {
-  const percent = max > 0 ? Math.max(0, Math.min(1, current / max)) : 0;
-  const color = percent > 0.5 ? "#4ade80" : percent > 0.2 ? "#facc15" : "#f87171";
-  
-  const prevPercentRef = useRef(percent);
-  const [isDamaged, setIsDamaged] = useState(false);
-  const [glowTrigger, setGlowTrigger] = useState(0);
-  
-  useEffect(() => {
-    if (percent < prevPercentRef.current) {
-      setIsDamaged(true);
-      setGlowTrigger(prev => prev + 1);
-      const timer = setTimeout(() => setIsDamaged(false), 900);
-      prevPercentRef.current = percent;
-      return () => clearTimeout(timer);
-    } else {
-      setIsDamaged(false);
-    }
-    prevPercentRef.current = percent;
-  }, [percent]);
-
-  return (
-    <motion.div 
-      className="relative h-2.5 sm:h-3.5 bg-slate-950/90 rounded-full overflow-hidden mb-1 mt-1 shadow-inner"
-      animate={glowTrigger > 0 ? {
-        boxShadow: [
-          "0 0 0px rgba(0, 0, 0, 0)",
-          "0 0 16px rgba(239, 68, 68, 0.9)",
-          "0 0 0px rgba(0, 0, 0, 0)"
-        ],
-        borderColor: [
-          "rgba(255, 255, 255, 0.1)",
-          "rgba(239, 68, 68, 0.8)",
-          "rgba(255, 255, 255, 0.1)"
-        ]
-      } : {}}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      key={`app-hp-bar-glow-${glowTrigger}`}
-    >
-      {/* Secondary delay translucent red catch-up bar (staggered trailing damage) */}
-      <motion.div 
-        className="absolute top-0 left-0 h-full w-full bg-red-500/60 origin-left z-0"
-        initial={{ scaleX: percent }}
-        animate={{ scaleX: percent }}
-        transition={{ 
-          delay: enableAnimations && isDamaged ? 0.35 : 0,
-          duration: enableAnimations ? (isDamaged ? 0.85 : 0.35) : 0,
-          ease: [0.16, 1, 0.3, 1]
-        }}
-        style={{ transformOrigin: 'left' }}
-      />
-      {/* Primary HP color bar - drains smoothly and swiftly first */}
-      <motion.div 
-        className="h-full w-full relative z-10 origin-left"
-        initial={{ scaleX: percent }}
-        animate={{ scaleX: percent }}
-        transition={{ 
-          duration: enableAnimations ? (isDamaged ? 0.6 : 0.35) : 0, 
-          ease: [0.25, 1, 0.5, 1] 
-        }}
-        style={{ 
-          transformOrigin: 'left',
-          backgroundColor: color
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-black/20"></div>
-        <div className="absolute top-0 bottom-0 right-0 w-[2px] bg-white/70 shadow-[0_0_6px_#fff]"></div>
-      </motion.div>
-    </motion.div>
-  );
-});
 
 
 const VictoryConfetti = () => {
@@ -1992,10 +1837,6 @@ export default function App() {
     const saved = sessionStorage.getItem('pokethology_session_losses');
     return saved ? parseInt(saved, 10) : 0;
   });
-  
-  const [activePlayerIndex, setActivePlayerIndex] = useState(0);
-  const [opponentTeam, setOpponentTeam] = useState<Pokemon[]>([]);
-  const [activeOpponentIndex, setActiveOpponentIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<'data' | 'chat' | 'battle'>('data');
   const [showScanHistory, setShowScanHistory] = useState(false);
   const [showClearScanConfirm, setShowClearScanConfirm] = useState(false);
@@ -2007,7 +1848,6 @@ export default function App() {
     'level-up': false,
   });
   const [showDetailsScrollTop, setShowDetailsScrollTop] = useState(false);
-  const [playerTeam, setPlayerTeam] = useState<Pokemon[]>([]);
   const [inspectingOpponent, setInspectingOpponent] = useState<boolean>(false);
   const basePlayerPokemonRef = useRef<Pokemon | null>(null);
 
@@ -2885,29 +2725,6 @@ export default function App() {
     }
   }, []);
 
-  useEffect(() => {
-    const loadSavedTeam = async () => {
-      try {
-        const stored = await idbGet(STORES.USER_TEAMS, 'pokethology_player_team');
-        if (stored && stored.teamNames) {
-          const names: string[] = stored.teamNames;
-          const loaded = await Promise.all(names.slice(0, 6).map(async (name) => {
-            try {
-              return await searchPokemon(name, selectedLang);
-            } catch (err) {
-              console.error("Failed to load team member", name, err);
-              return null;
-            }
-          }));
-          setPlayerTeam(loaded.filter((p): p is Pokemon => p !== null));
-        }
-      } catch (e) {
-        
-      }
-    };
-    loadSavedTeam();
-  }, [searchPokemon]);
-
   const [scanHistory, setScanHistory] = useState<{name: string, id: number, types: string[], bst?: number}[]>(() => {
     try {
       const saved = localStorage.getItem('pokethology_scan_history');
@@ -3323,9 +3140,6 @@ export default function App() {
       setCurrentVariety(null);
       setBattleOpponent(null);
       
-      setOpponentTeam([]);
-      setActivePlayerIndex(0);
-      setActiveOpponentIndex(0);
       setBattleResult(null);
       
       // 4. Interface State
@@ -4218,8 +4032,9 @@ export default function App() {
                   );
                 }
               }
-            } else {
-              // Check Daily Hub Combat Challenges ONLY if main daily mission didn't match
+            }
+
+              // Check Daily Hub Combat Challenges for all battles
               const hubChallenges = getDailyHubCombatChallenges(today);
               let challengeMatched = false;
               
@@ -4242,14 +4057,17 @@ export default function App() {
                     localStorage.setItem(stateKey, String(newProgress));
                     
                     if (!challengeMatched) {
-                      setHubChallengeProgressMessage(`DAILY HUB: ${challenge.title} (${newProgress}/${challenge.required})`);
+                      if (newProgress >= challenge.required) {
+                          setHubChallengeProgressMessage(`MISSION COMPLETE: ${challenge.title}!`);
+                        } else {
+                          setHubChallengeProgressMessage(`DAILY HUB: ${challenge.title} (${newProgress}/${challenge.required})`);
+                        }
                       setTimeout(() => setHubChallengeProgressMessage(null), 8000);
                       challengeMatched = true; // only show one message
                     }
                   }
                 }
               }
-            }
           } catch (e) {
             console.error("Error evaluating combat mission progress", e);
           }
@@ -5924,7 +5742,7 @@ export default function App() {
                                         toggleFavorite({
                                           name: pokemon.name,
                                           url: pokemon.sprites?.front_default || pokemon.sprites?.other?.['official-artwork']?.front_default || '',
-                                          displayId: pokemon.baseId || pokemon.id
+                                          displayId: pokemon.id
                                         });
                                         try { sounds.shiny(); } catch (_) {}
                                       }
@@ -6797,7 +6615,7 @@ export default function App() {
                                         ref={arenaCallbackRef}
                                         transition={{ duration: 0.25, ease: "easeOut" }}
                                         id="battle-arena-container"
-                                        className="relative flex-1 flex flex-col justify-center min-h-[220px] xs:min-h-[260px] sm:min-h-[300px] md:min-h-[320px] lg:min-h-[340px] h-[300px] sm:h-[340px] lg:h-[380px] max-h-[40vh] z-10 p-[clamp(0.5rem,2vw,1.5rem)] font-bold overflow-hidden w-full max-w-full transform-gpu will-change-transform"
+                                        className="relative flex-1 grid grid-cols-2 grid-rows-2 items-center min-h-[220px] xs:min-h-[260px] sm:min-h-[300px] md:min-h-[320px] lg:min-h-[340px] h-[300px] sm:h-[340px] lg:h-[380px] max-h-[40vh] z-10 p-[clamp(0.5rem,2vw,1.5rem)] font-bold overflow-hidden w-full max-w-full transform-gpu will-change-transform"
                                         style={{ touchAction: 'pan-y', boxSizing: 'border-box' }}
                                       >
                                         {/* Battle Flash Overlay */}
@@ -6825,6 +6643,7 @@ export default function App() {
                                         </AnimatePresence>
                                         {/* Top Left: Opponent Status */}
                                         <OpponentStatusBar
+                                          className="col-start-1 row-start-1 w-full max-w-[130px] sm:max-w-[170px] lg:max-w-[200px] justify-self-start self-start"
                                           battleOpponent={battleOpponent}
                                           opponentHP={opponentHP}
                                           opponentMaxHP={opponentMaxHP}
@@ -6861,7 +6680,7 @@ export default function App() {
                                         />
 
                                         {/* Opponent Sprite (Top Right Area) */}
-                                        <div className="absolute top-8 right-2 xs:top-10 xs:right-4 sm:top-10 sm:right-12 md:top-12 md:right-16 lg:top-14 lg:right-24 pointer-events-auto z-10">
+                                        <div className="col-start-2 row-start-1 pointer-events-auto z-10 justify-self-end self-start mt-2 sm:mt-4 mr-2 sm:mr-8">
                                           {battleOpponent && (
                                             <motion.div
                                               key={battleOpponent?.name + '-' + isBattling}
@@ -6871,7 +6690,7 @@ export default function App() {
 
                                               className="relative flex flex-col items-center justify-end will-change-transform transform-gpu group"
                                             >
-                                              <div className="relative h-28 w-28 xs:h-32 xs:w-32 sm:h-40 sm:w-40 md:h-48 md:w-48 lg:h-52 lg:w-52 xl:h-56 xl:w-56 flex items-center justify-center max-h-[40vh]">
+                                              <div className="relative w-[clamp(7rem,25vw,14rem)] aspect-square flex items-center justify-center max-h-[40vh]">
                                               {opponentDialogue && (
                                                 <div 
                                                   className="absolute -top-12 sm:-top-16 left-1/2 -translate-x-1/2 bg-slate-950/95 border border-red-500 rounded-xl px-2.5 py-1.5 sm:px-4 sm:py-2 text-[8px] sm:text-[11px] font-bold text-red-200 shadow-lg select-none z-50 flex items-center gap-1.5 min-w-[max-content]"
@@ -6922,6 +6741,7 @@ export default function App() {
 
                                         {/* Bottom Right: Player Status */}
                                         <PlayerStatusBar
+                                          className="col-start-2 row-start-2 w-full max-w-[130px] sm:max-w-[170px] lg:max-w-[200px] justify-self-end self-end"
                                           pokemon={pokemon}
                                           pokemonHP={pokemonHP}
                                           pokemonMaxHP={pokemonMaxHP}
@@ -6940,7 +6760,7 @@ export default function App() {
                                         {/* OpponentStatusBar is likely already in the file... let me check*/}
 
                                         {/* Player Sprite (Bottom Left Area) */}
-                                        <div className="absolute bottom-1 left-2 xs:bottom-2 xs:left-4 sm:bottom-6 sm:left-12 md:bottom-8 md:left-16 lg:bottom-10 lg:left-24 pointer-events-auto z-10">
+                                        <div className="col-start-1 row-start-2 pointer-events-auto z-10 justify-self-start self-end mb-2 sm:mb-4 ml-2 sm:ml-8">
                                           <motion.div
                                             key={pokemon?.name + '-' + isBattling}
                                             initial={{ opacity: 1, scale: 0.8 }}
@@ -6949,7 +6769,7 @@ export default function App() {
 
                                             className="relative flex flex-col items-center justify-end will-change-transform transform-gpu group"
                                           >
-                                            <div className="relative h-32 w-32 xs:h-36 xs:w-36 sm:h-48 sm:w-48 md:h-56 md:w-56 lg:h-64 lg:w-64 xl:h-72 xl:w-72 flex items-center justify-center max-h-[40vh]">
+                                            <div className="relative w-[clamp(8rem,30vw,18rem)] aspect-square flex items-center justify-center max-h-[40vh]">
                                               {playerDialogue && (
                                                 <div 
                                                   className="absolute -top-12 sm:-top-16 left-1/2 -translate-x-1/2 bg-slate-950/95 border border-cyan-500 rounded-xl px-2.5 py-1.5 sm:px-4 sm:py-2 text-[8px] sm:text-[11px] font-bold text-cyan-200 shadow-lg select-none z-50 flex items-center gap-1.5 min-w-[max-content]"
@@ -7887,9 +7707,12 @@ export default function App() {
                           </div>
 
                           {/* Home Screen Copyright & Legal Disclaimer */}
-                          <p className="text-[9px] sm:text-[10px] text-slate-400 font-mono tracking-wider max-w-2xl mx-auto text-center mt-3 sm:mt-4 md:mt-5 mb-2 leading-relaxed opacity-80 select-none px-2">
-                            Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc. TM, ® and Pokémon character names are trademarks of Nintendo.<br className="hidden sm:inline"/>
-                            No copyright or trademark infringement is intended in using Pokémon content on Pokéthology.
+                          <p className="text-[10px] sm:text-[11px] text-slate-300 font-mono tracking-wider max-w-3xl mx-auto text-center mt-8 sm:mt-10 mb-2 leading-relaxed opacity-90 select-none px-2">
+                            Pokéthology is an unofficial, free fan made app and is NOT affiliated, endorsed or supported by Nintendo, GAME FREAK or The Pokémon company in any way.<br className="hidden sm:inline"/>
+Some images used in this app are copyrighted and are supported under fair use.<br className="hidden sm:inline"/>
+Pokémon and Pokémon character names are trademarks of Nintendo.<br className="hidden sm:inline"/>
+No copyright infringement intended.<br className="hidden sm:inline"/>
+Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc.
                           </p>
                         </div>
 
@@ -8276,16 +8099,10 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90"
+              className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
             >
-              <motion.div
-                initial={{ scale: 0.98, y: 6, opacity: 0 }}
-                animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.98, y: 6, opacity: 0 }}
-                transition={{ duration: 0.15, ease: 'easeOut' }}
-                className="bg-slate-900 border-2 border-red-500/50 rounded-2xl w-full max-w-[96vw] xl:max-w-7xl max-h-[95vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(239,68,68,0.3)]"
-              >
-                <div className="p-4 border-b border-red-900/30 flex justify-between items-center bg-slate-950 shrink-0">
+              <div className="flex flex-col h-full w-full relative">
+                <div className="p-4 sm:px-8 border-b border-red-500/30 flex justify-between items-center bg-slate-900/90 shrink-0 z-20 shadow-lg">
                   <div className="flex items-center gap-2 sm:gap-3">
                     <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(220,38,38,0.4)]">
                       <Layers className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
@@ -8303,10 +8120,10 @@ export default function App() {
                   </button>
                 </div>
 
-                <div className="flex-1 overflow-auto p-0 sm:p-4 custom-scrollbar bg-slate-900 relative">
+                <div className="flex-1 overflow-auto p-0 sm:p-4 custom-scrollbar bg-transparent relative block">
                   <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-5 bg-[linear-gradient(rgba(18,24,27,0)_50%,rgba(32,32,32,0.5)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]"></div>
-                  <div className="w-max min-w-full relative z-10 pb-8 pr-4 sm:pr-8">
-                    <div className="sticky top-0 z-30 grid grid-cols-[48px_repeat(18,minmax(18px,1fr))] sm:grid-cols-[100px_repeat(18,minmax(32px,1fr))] lg:grid-cols-[120px_repeat(18,1fr)] gap-0.5 sm:gap-1 mb-2 sm:mb-4 bg-slate-900/95 pt-2 pb-2 px-1 sm:px-0">
+                  <div className="w-max min-w-full mx-auto relative z-10 pb-8 pr-4 sm:pr-8">
+                    <div className="sticky top-0 z-30 grid grid-cols-[50px_repeat(18,minmax(28px,1fr))] sm:grid-cols-[100px_repeat(18,minmax(40px,1fr))] gap-1 sm:gap-1.5 mb-2 sm:mb-4 bg-slate-900/95 pt-2 pb-2">
                       <div className="sticky left-0 z-40 h-10 sm:h-12 flex items-center justify-center bg-slate-950 rounded-lg border border-slate-800 shadow-[4px_0_10px_rgba(0,0,0,0.5)]">
                         <span className="text-[6px] font-bold tracking-wider sm:text-[8px] font-bold tracking-wider text-slate-300 font-medium font-hud uppercase tracking-tighter text-center leading-none">ATK \ DEF</span>
                       </div>
@@ -8321,9 +8138,9 @@ export default function App() {
                         </div>
                       ))}
                     </div>
-                    <div className="px-2 sm:px-0">
+                    <div>
                       {Object.keys(typeColors).map(attackerType => (
-                        <div key={`typerow-${attackerType}`} className="grid grid-cols-[48px_repeat(18,minmax(18px,1fr))] sm:grid-cols-[100px_repeat(18,minmax(32px,1fr))] lg:grid-cols-[120px_repeat(18,1fr)] gap-0.5 sm:gap-1 mb-1 sm:mb-1.5 group/row">
+                        <div key={`typerow-${attackerType}`} className="grid grid-cols-[50px_repeat(18,minmax(28px,1fr))] sm:grid-cols-[100px_repeat(18,minmax(40px,1fr))] gap-1 sm:gap-1.5 mb-1 sm:mb-1.5 group/row">
                           <div className={cn(
                             "sticky left-0 z-20 h-7 sm:h-10 flex items-center justify-center sm:justify-start sm:px-4 rounded sm:rounded-lg text-[6px] font-bold tracking-wider sm:text-[9px] font-bold tracking-wider font-black uppercase tracking-widest sm:tracking-[0.2em] shadow-[4px_0_10px_rgba(0,0,0,0.5)] group-hover/row:scale-105 transition-transform",
                             typeColors[attackerType]
@@ -8368,7 +8185,7 @@ export default function App() {
                     <span className="text-[10px] font-bold tracking-wider text-slate-300 font-medium uppercase font-hud font-black tracking-widest">No Effect (0x)</span>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

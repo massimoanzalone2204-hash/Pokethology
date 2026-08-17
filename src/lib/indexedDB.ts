@@ -1,5 +1,5 @@
 // Unified IndexedDB Storage Engine for Pokethology
-// Manages local offline persistence for Pokémon data, image blobs, user teams, battle history, quiz logs, and quota telemetry.
+// Manages local offline persistence for Pokémon data, image blobs, battle history, quiz logs, and quota telemetry.
 
 export const DB_NAME = 'PokethologyDB';
 export const DB_VERSION = 2;
@@ -7,7 +7,6 @@ export const DB_VERSION = 2;
 export const STORES = {
   POKEMON_CACHE: 'pokemon_cache',
   IMAGE_CACHE: 'image_cache',
-  USER_TEAMS: 'user_teams',
   BATTLE_HISTORY: 'battle_history',
   FAVORITES: 'favorites',
   QUIZ_RECORDS: 'quiz_records',
@@ -44,12 +43,6 @@ export function getDB(): Promise<IDBDatabase> {
         const imgStore = db.createObjectStore(STORES.IMAGE_CACHE, { keyPath: 'url' });
         imgStore.createIndex('lastAccessed', 'lastAccessed', { unique: false });
         imgStore.createIndex('size', 'size', { unique: false });
-      }
-
-      // 3. User Teams
-      if (!db.objectStoreNames.contains(STORES.USER_TEAMS)) {
-        const teamStore = db.createObjectStore(STORES.USER_TEAMS, { keyPath: 'id' });
-        teamStore.createIndex('updatedAt', 'updatedAt', { unique: false });
       }
 
       // 4. Battle History & Telemetry

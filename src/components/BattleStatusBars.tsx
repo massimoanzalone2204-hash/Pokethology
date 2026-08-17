@@ -93,6 +93,7 @@ interface OpponentStatusBarProps {
   player?: Pokemon | null;
   showComparison?: boolean;
   isCompact?: boolean;
+  className?: string;
 }
 
 export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
@@ -110,7 +111,8 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
   statChange,
   player,
   showComparison,
-  isCompact
+  isCompact,
+  className
 }) => {
   const hpPercent = battleOpponent ? Math.ceil((opponentHP / opponentMaxHP) * 100) : 0;
   
@@ -161,7 +163,7 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
           transition={{ duration: 0.3 }}
           className={cn(
             "OpponentStatusBar z-20 pointer-events-auto flex flex-col gap-1 transform-gpu",
-            isCompact ? "relative w-full max-w-xs mx-auto" : "absolute top-2 left-2 xs:top-3 xs:left-3 sm:top-4 sm:left-4 w-[110px] xs:w-[125px] sm:w-[170px] lg:w-[200px]"
+            className || (isCompact ? "relative w-full max-w-xs mx-auto" : "absolute top-2 left-2 xs:top-3 xs:left-3 sm:top-4 sm:left-4 w-[110px] xs:w-[125px] sm:w-[170px] lg:w-[200px]")
           )}
         >
       <div className={cn(
@@ -271,6 +273,7 @@ interface PlayerStatusBarProps {
   opponent?: Pokemon | null;
   showComparison?: boolean;
   isCompact?: boolean;
+  className?: string;
 }
 
 export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = memo(({
@@ -286,7 +289,8 @@ export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = memo(({
   statChange,
   opponent,
   showComparison,
-  isCompact
+  isCompact,
+  className
 }) => {
   const getStatsMap = (poke: Pokemon) => poke.stats.reduce((acc, s) => ({ ...acc, [s.stat.name]: s.base_stat }), {} as Record<string, number>);
   const pStats = pokemon ? getStatsMap(pokemon) : null;
@@ -303,7 +307,7 @@ export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = memo(({
           transition={{ duration: 0.4 }}
           className={cn(
             "PlayerStatusBar z-20 pointer-events-auto flex flex-col gap-1 transform-gpu",
-            isCompact ? "relative w-full max-w-xs mx-auto" : "absolute bottom-2 right-2 xs:bottom-3 xs:right-3 sm:bottom-4 sm:right-4 w-[110px] xs:w-[125px] sm:w-[170px] lg:w-[200px]"
+            className || (isCompact ? "relative w-full max-w-xs mx-auto" : "absolute bottom-2 right-2 xs:bottom-3 xs:right-3 sm:bottom-4 sm:right-4 w-[110px] xs:w-[125px] sm:w-[170px] lg:w-[200px]")
           )}
         >
       <div className={cn(

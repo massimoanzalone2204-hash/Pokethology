@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../lib/utils';
+import { sounds } from '../lib/sounds';
 
 export interface TypeBadgeProps {
   type: string;
@@ -44,8 +45,9 @@ export const TypeBadge: React.FC<TypeBadgeProps> = ({ type, label, size = 'md', 
 
   return (
     <span
+      onClick={() => { try { sounds.haptic('light'); sounds.scan(); } catch(_) {} }}
       className={cn(
-        "relative overflow-hidden inline-flex items-center justify-center font-hud font-black uppercase tracking-wider rounded-[4px] border select-none shrink-0",
+        "relative overflow-hidden inline-flex items-center justify-center font-hud font-black uppercase tracking-wider rounded-[4px] border select-none shrink-0 cursor-pointer hover:brightness-110 active:brightness-95 transition-all",
         "bg-gradient-to-b",
         config.bg,
         config.text,
