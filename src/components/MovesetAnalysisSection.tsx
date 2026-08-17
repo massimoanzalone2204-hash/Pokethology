@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Move } from '../types';
-import { cn, playHaptic } from '../lib/utils';
+import { cn } from '../lib/utils';
 import { Swords, TrendingUp, Disc, Sparkles, GraduationCap, ChevronDown, Info, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -36,7 +36,6 @@ export const MovesetAnalysisSection: React.FC<MovesetAnalysisSectionProps> = ({
   });
 
   const toggleMethod = (method: string) => {
-    playHaptic('light');
     setCollapsedMethods(prev => ({
       ...prev,
       [method]: !prev[method]
@@ -96,10 +95,7 @@ export const MovesetAnalysisSection: React.FC<MovesetAnalysisSectionProps> = ({
           {searchQuery && (
             <button
               type="button"
-              onClick={() => {
-                playHaptic('light');
-                setSearchQuery('');
-              }}
+              onClick={() => setSearchQuery('')}
               className="absolute right-3 text-[10px] text-slate-400 hover:text-white uppercase font-mono font-bold cursor-pointer"
             >
               Clear
@@ -164,13 +160,12 @@ export const MovesetAnalysisSection: React.FC<MovesetAnalysisSectionProps> = ({
                           key={`${move.name}-${moveIdx}`}
                           type="button"
                           onClick={() => {
-                            playHaptic('selection');
                             setSelectedMoveDetail(move);
                             setIsMoveDetailOpen(true);
                             try { sounds?.scan?.(); } catch (_) {}
                           }}
                           className={cn(
-                            "w-full p-2 rounded-lg border flex justify-between items-center group transition-all text-left cursor-pointer active:scale-98",
+                            "w-full p-2 rounded-lg border flex justify-between items-center group transition-all text-left cursor-pointer",
                             isLightMode
                               ? "bg-white border-slate-200 hover:border-cyan-500/50"
                               : "bg-slate-900/80 border-cyan-900/30 hover:border-cyan-400/80"

@@ -1,6 +1,4 @@
 // Web Audio API based sound synthesizer for UI feedback and retro atmosphere
-import { playHaptic } from './utils';
-
 let audioCtx: AudioContext | null = null;
 let bgmInterval: number | null = null;
 let currentTheme: string | null = null;
@@ -122,7 +120,6 @@ export const sounds = {
     }
   },
   scan: () => {
-    playHaptic('selection');
     const nowTime = Date.now();
     if (nowTime - lastScanSoundTime < 35) return;
     lastScanSoundTime = nowTime;
@@ -206,7 +203,6 @@ export const sounds = {
     }
   },
   error: () => {
-    playHaptic('error');
     try {
       const ctx = getAudioContext();
       const now = ctx.currentTime;
@@ -245,7 +241,6 @@ export const sounds = {
     }
   },
   success: () => {
-    playHaptic('success');
     try {
       const ctx = getAudioContext();
       const now = ctx.currentTime;
@@ -506,7 +501,6 @@ export const sounds = {
     playTone(280, 'triangle', 0.15, 0.06);
   },
   hit: () => {
-    playHaptic('impact');
     const ctx = getAudioContext();
     const now = ctx.currentTime;
     const osc = ctx.createOscillator();
@@ -529,7 +523,6 @@ export const sounds = {
     playTone(45, 'triangle', 0.12, 0.15);
   },
   faint: () => {
-    playHaptic('heavy');
     const ctx = getAudioContext();
     const now = ctx.currentTime;
     const osc = ctx.createOscillator();
@@ -721,14 +714,12 @@ export const sounds = {
     }
   },
   battleStart: () => {
-    playHaptic('heavy');
     playTone(350, 'sawtooth', 0.1, 0.08);
     setTimeout(() => playTone(500, 'sawtooth', 0.1, 0.08), 85);
     setTimeout(() => playTone(700, 'sawtooth', 0.12, 0.08), 170);
     setTimeout(() => playTone(1000, 'square', 0.35, 0.06), 255);
   },
   flee: () => {
-    playHaptic('light');
     playTone(400, 'triangle', 0.08, 0.06);
     setTimeout(() => playTone(250, 'triangle', 0.08, 0.06), 45);
     setTimeout(() => playTone(120, 'triangle', 0.25, 0.06), 90);
@@ -743,17 +734,14 @@ export const sounds = {
     playTone(950, 'sine', 0.22, 0.08);
   },
   superEffective: () => {
-    playHaptic('heavy');
     playTone(900, 'square', 0.15, 0.1);
     setTimeout(() => playTone(1300, 'square', 0.28, 0.1), 150);
   },
   notVeryEffective: () => {
-    playHaptic('light');
     playTone(280, 'sine', 0.18, 0.1);
     setTimeout(() => playTone(180, 'sine', 0.25, 0.1), 150);
   },
   criticalHit: () => {
-    playHaptic('heavy');
     const ctx = getAudioContext();
     const now = ctx.currentTime;
     
