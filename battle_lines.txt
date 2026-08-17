@@ -1,0 +1,171 @@
+6:import { BattleMessage } from './components/BattleMessage';
+13:import { useBattleSimulation } from './hooks/useBattleSimulation';
+19:import { OpponentStatusBar, PlayerStatusBar } from './components/BattleStatusBars';
+20:import { BattleErrorBoundary } from './components/BattleErrorBoundary';
+24:import { BattleHistory } from './components/BattleHistory';
+224:// Custom Sprite Component for perfect Battle Arena sizing and Showdown fallbacks
+225:const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, className, onClick, arenaMode = false, flip }: any) => {
+560:const getBattleBackground = (playerType?: string, opponentType?: string) => {
+607:const getBattleFallbackGradient = (playerType?: string, opponentType?: string) => {
+1446:const BattleLog = memo(({ log, enableAnimations, turn, isBattling }: { log: (LogEntry & { turn?: number })[]; enableAnimations: boolean; turn: string; isBattling: boolean }) => {
+1726:    const { state: simState, dispatch: battleDispatch } = useBattleSimulation();
+1746:  const getBattleSpriteAnimation = (animation: string | null, status: string | null) => {
+1758:  const getBattleSpriteTransition = (animation: string | null): any => ({
+1782:  const [battleOpponent, setBattleOpponent] = useState<Pokemon | null>(null);
+1783:  const [battleResult, setBattleResult] = useState<'victory' | 'defeat' | null>(null);
+1864:  const [battleLog, setBattleLog] = useState<(LogEntry & { turn?: number })[]>([]);
+1866:  const [usedSuperEffectiveCurrentBattle, setUsedSuperEffectiveCurrentBattle] = useState(false);
+1872:  const [wsBattleInsight, setWsBattleInsight] = useState<string | null>(null);
+1973:            setWsBattleInsight(payload.hint);
+2007:      setUsedSuperEffectiveCurrentBattle(false);
+2022:            usedSuperEffective: usedSuperEffectiveCurrentBattle,
+2028:  }, [battleResult, isBattling, pokemon, battleOpponent, usedSuperEffectiveCurrentBattle]);
+2029:  const [battleDuration, setBattleDuration] = useState(0);
+2034:      setBattleDuration(0);
+2036:        setBattleDuration(prev => prev + 1);
+2039:      setBattleDuration(0);
+2077:  const [battleMessage, setBattleMessage] = useState<{ text: string; type: 'default' | 'critical' | 'effective' | 'status' | 'move' } | null>(null);
+2095:  const handleBattleMessageComplete = useCallback(() => setBattleMessage(null), []);
+2113:  const [battleState, setBattleState] = useState<'setup' | 'battling' | 'finished'>('setup');
+2185:  const [isBattleHelpOpen, setIsBattleHelpOpen] = useState(false);
+2192:  const [battleTheme, setBattleTheme] = useState<string>('auto');
+2194:  const battleBackgroundUrl = useMemo(() => getBattleBackground(pokemon?.types?.[0]?.type?.name, battleOpponent?.types?.[0]?.type?.name), [pokemon?.types?.[0]?.type?.name, battleOpponent?.types?.[0]?.type?.name]);
+2363:  const [isBattleHistoryExpanded, setIsBattleHistoryExpanded] = useState(false);
+2373:    setBattleOpponent(null);
+2376:    setBattleState('setup');
+2379:  }, [setLoadingPokemon, setError, setPokemon, setBattleOpponent, setIsBattling, setIsChaosModeActive, setBattleState, setListMode, sounds]);
+2391:  const [battleSuggestion, setBattleSuggestion] = useState<string | null>(null);
+2438:  const getBattleStrategy = useCallback(async () => {
+2449:        setBattleSuggestion(aiCache.current[battleKey]);
+2493:          setBattleSuggestion(data.strategy);
+2501:      setBattleSuggestion(data.strategy);
+2507:        setBattleSuggestion("System high volume. Fallback: Protect your HP and exploit type weaknesses.");
+2509:        setBattleSuggestion("Focus on type advantages and HP management.");
+2554:    setBattleState('battling');
+2556:    setBattleLog([{ text: "BATTLE START!", type: 'system' }]);
+2596:    setBattleSuggestion(null);
+2597:    setBattleState('setup');
+2598:    setBattleLog([]);
+2610:    setBattleMessage(null);
+2628:      setIsBattleHelpOpen(false);
+2645:      setBattleOpponent(null);
+2650:      setBattleResult(null);
+2657:      // 5. Battle & Chaos Reset
+2670:      setBattleSuggestion(null);
+2706:    const log = (msg: string, type: LogEntry['type'] = 'normal') => setBattleLog(prev => [...prev, { text: msg, type, turn: turnNumber }].slice(-50));
+2718:      setBattleMessage({ text: "FLINCHED!", type: 'status' });
+2721:      setBattleMessage(null);
+2726:      setBattleMessage({ text: "FLINCHED!", type: 'status' });
+2729:      setBattleMessage(null);
+2736:      setBattleMessage({ text: "PARALYZED", type: 'status' });
+2740:      setBattleMessage(null);
+2746:        setBattleMessage({ text: "THAWED!", type: 'status' });
+2750:        setBattleMessage(null);
+2753:        setBattleMessage({ text: "FROZEN!", type: 'status' });
+2757:        setBattleMessage(null);
+2763:      setBattleMessage({ text: "ASLEEP", type: 'status' });
+2767:      setBattleMessage(null);
+2774:        setBattleMessage({ text: "SNAPPED OUT!", type: 'status' });
+2778:        setBattleMessage(null);
+2783:          setBattleMessage({ text: "HURT SELF!", type: 'status' });
+2805:          setBattleMessage(null);
+2815:      setBattleMessage({ text: "MISSED!", type: 'status' });
+2819:      setBattleMessage(null);
+2826:      setBattleMessage({ text: "TRANSFORM!", type: 'move' });
+2831:      setBattleMessage({ text: "TRANSFORMED!", type: 'move' });
+2853:        setBattleOpponent(transformedData);
+2859:      setBattleMessage(null);
+2880:    setBattleMessage({ text: move.name.toUpperCase(), type: 'move' });
+2897:      setBattleMessage({ text: "PROTECTED!", type: 'status' });
+2900:      setBattleMessage(null);
+2907:       setBattleMessage({ text: "BLOCKED!", type: 'status' });
+2910:       setBattleMessage(null);
+2932:        setBattleMessage({ text: "SUBSTITUTE!", type: 'status' });
+2936:      setBattleMessage(null);
+2943:      setBattleMessage({ text: "MISSED!", type: 'status' });
+2946:      setBattleMessage(null);
+3016:          setBattleMessage({ text: `${move.name.toUpperCase()} (Hit ${i + 1})`, type: 'move' });
+3019:        setBattleMessage(null);
+3027:          setBattleMessage({ text: "CRITICAL!", type: 'critical' });
+3050:        setBattleMessage({ text: "SUPER EFFECTIVE!", type: 'effective' });
+3053:          setUsedSuperEffectiveCurrentBattle(true);
+3057:        setBattleMessage({ text: "NOT EFFECTIVE", type: 'status' });
+3061:        setBattleMessage({ text: "NO EFFECT", type: 'status' });
+3109:      setBattleMessage(null);
+3112:      setBattleMessage(null);
+3284:  const getAiBattleSuggestion = async () => {
+3299:    setBattleLog(prev => [{ text: "PLAYER FLED THE BATTLE!", type: 'system' }, ...prev]);
+3302:      setBattleState('setup');
+3303:      setBattleLog([]);
+3307:  const runBattle = async () => {
+3309:      setBattleLog([{ text: "SELECT 4 MOVES BEFORE STARTING!", type: 'system' }]);
+3352:    const log = (msg: string, type: LogEntry['type'] = 'status-effect') => setBattleLog(prev => [...prev, { text: msg, type, turn: turnNumber }].slice(-50));
+3384:        setBattleLog(prev => [...prev, { text: `${battleOpponent?.name?.toUpperCase()} IS THE VICTOR!`, type: 'faint' }]);
+3385:        setBattleMessage({ text: "DEFEATED!", type: 'status' });
+3387:        setBattleState('finished');
+3388:        setBattleResult('defeat');
+3427:        setBattleLog(prev => [...prev, { text: `${pokemon?.name?.toUpperCase()} IS THE VICTOR!`, type: 'system' }]);
+3428:        setBattleMessage({ text: "VICTORY!", type: 'effective' });
+3430:        setBattleState('finished');
+3431:        setBattleResult('victory');
+3576:    setBattleSuggestion(null);
+3792:    setBattleLog([]);
+3793:    setBattleState('setup');
+3795:    setBattleSuggestion(null);
+3835:  const handleBattleAnalysis = async () => {
+4126:      setBattleOpponent(null);
+4128:      setBattleLog([]);
+4129:      setBattleState('setup');
+4242:        setBattleOpponent(opp);
+4724:                                setBattleOpponent(null);
+4737:                          {/* Tabs for Stats, AI & Battle - Premium segment-style HUD button bar */}
+4791:                                  <PokemonBattleSprite
+5422:                                            onClick={handleBattleAnalysis}
+5559:                                          ? [`Lore: ${pokemon?.name}`, `Counter for ${pokemon?.name}?`, `Battle usage?`, `Moveset?`]
+5616:                                      {/* Battle Background / Field */}
+5622:                                            background: getBattleFallbackGradient(pokemon?.types?.[0]?.type?.name, battleOpponent?.types?.[0]?.type?.name),
+5629:                                            alt="Battle Arena"
+5799:                                      <BattleErrorBoundary>
+5812:                                        {/* Battle Flash Overlay */}
+5864:                                              animate={getBattleSpriteAnimation(defenderAnimation, opponentStatus)}
+5865:                                              transition={getBattleSpriteTransition(defenderAnimation)}
+5894:                                                <PokemonBattleSprite
+5939:                                            animate={getBattleSpriteAnimation(attackerAnimation, pokemonStatus)}
+5940:                                            transition={getBattleSpriteTransition(attackerAnimation)}
+5968:                                                <PokemonBattleSprite
+5996:                                              <BattleMessage 
+6000:                                                onComplete={handleBattleMessageComplete}
+6038:                                                <p className="text-[8px] sm:text-[10px] text-amber-500/70 font-mono uppercase tracking-[0.2em]">Preparing Random Battle</p>
+6119:                                                        setBattleLog([{ text: 'Starting Chaos Match...', type: 'critical' }]);
+6120:                                                        setBattleState('battling');
+6139:                                      </BattleErrorBoundary>
+6228:                                     {isBattling && <BattleLog log={battleLog} enableAnimations={enableAnimations} turn={turn || 'player'} isBattling={isBattling} />}
+6231:                                     {isBattling && wsBattleInsight && (
+6249:                                             onClick={() => setWsBattleInsight(null)}
+6256:                                           {wsBattleInsight}
+6277:                                              onClick={() => setBattleSuggestion(null)}
+6304:                                              setIsBattleHistoryExpanded(!isBattleHistoryExpanded);
+6315:                                                {isBattleHistoryExpanded ? "COLLAPSE" : "EXPAND"}
+6317:                                              <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-300", isBattleHistoryExpanded ? "rotate-180" : "rotate-0")} />
+6321:                                          {isBattleHistoryExpanded && (
+6323:                                              <BattleHistory isLightMode={isLightMode} />
+6372:                                                  setBattleOpponent(finalOpponent);
+6382:                                                  setBattleState('setup');
+6389:                                                  setBattleLog([{ text: 'CHAOS SETUP INITIATED. SELECT MOVES.', type: 'critical' }]);
+6425:                                                  setBattleOpponent(finalOpponent);
+6635:                                          {/* Battle Setup BGM Selector */}
+6672:                                            onClick={runBattle}
+6716:                                                setBattleState('setup');
+6718:                                                  runBattle();
+6760:                                              onClick={getBattleStrategy}
+6844:                                setBattleOpponent(null);
+6867:                                setBattleOpponent(null);
+7322:                                setBattleLog(prev => [...prev, { text: `${pokemon?.name?.toUpperCase()} LEARNED ${move.name.toUpperCase()}!`, type: 'system' }]);
+7389:                              setBattleLog(prev => [...prev, { text: `${pokemon?.name?.toUpperCase()} FORGOT ${move.name.toUpperCase()} AND LEARNED ${moveBeingLearned.name.toUpperCase()}!`, type: 'system' }]);
+8172:        {/* Battle Exit Confirmation Modal */}
+8237:        {/* Battle Help Modal */}
+8239:          {isBattleHelpOpen && (
+8253:                   <h2 className="text-base sm:text-xl font-hud text-red-400 uppercase tracking-widest text-center">How to Battle</h2>
+8254:                   <button onClick={() => setIsBattleHelpOpen(false)} className="text-slate-500 hover:text-white p-2"><X className="w-5 h-5"/></button>
+8258:                    <h3 className="text-cyan-400 font-bold uppercase text-[10px] tracking-widest border-l-2 border-cyan-500 pl-2">The Battle Screen</h3>
+8280:                   <button onClick={() => setIsBattleHelpOpen(false)} className={cn(hudButtonClass(false, 'red'), "px-8")}>Got it!</button>

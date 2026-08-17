@@ -1,51 +1,45 @@
-import React, { useMemo } from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 
-interface SingleStatRadarProps {
-  stats: {
-    base_stat: number;
-    stat: { name: string };
-  }[];
-  color?: string;
-}
-
-const formatStatName = (name: string) => {
-  const map: Record<string, string> = {
-    'hp': 'HP',
-    'attack': 'ATK',
-    'defense': 'DEF',
-    'special-attack': 'SpA',
-    'special-defense': 'SpD',
-    'speed': 'SPD'
-  };
-  return map[name] || name.toUpperCase();
-}
-
-export const SingleStatRadar: React.FC<SingleStatRadarProps> = ({ stats, color = "#22d3ee" }) => {
-  const data = useMemo(() => {
-    return stats.map(s => ({
-      subject: formatStatName(s.stat.name),
-      value: s.base_stat,
-      fullMark: 255
-    }));
-  }, [stats]);
+export const SingleStatRadar = ({ stats, color = "#22d3ee" }: { stats: any[], color?: string }) => {
+  if (!stats) return null;
+  const data = [
+    { subject: 'HP', val: stats.find(s => s.stat.name === 'hp')?.base_stat || 0 },
+    { subject: 'Atk', val: stats.find(s => s.stat.name === 'attack')?.base_stat || 0 },
+    { subject: 'Def', val: stats.find(s => s.stat.name === 'defense')?.base_stat || 0 },
+    { subject: 'SpA', val: stats.find(s => s.stat.name === 'special-attack')?.base_stat || 0 },
+    { subject: 'SpD', val: stats.find(s => s.stat.name === 'special-defense')?.base_stat || 0 },
+    { subject: 'Spe', val: stats.find(s => s.stat.name === 'speed')?.base_stat || 0 },
+  ];
 
   return (
-    <div className="w-full h-full min-h-[200px]">
-      <ResponsiveContainer width="100%" height="100%">
-        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
-          <PolarGrid stroke="rgba(255,255,255,0.1)" />
-          <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 10 }} />
-          <PolarRadiusAxis angle={30} domain={[0, 255]} tick={false} axisLine={false} />
-          <Radar
-            name="Stats"
-            dataKey="value"
-            stroke={color}
-            fill={color}
-            fillOpacity={0.4}
-          />
-        </RadarChart>
-      </ResponsiveContainer>
-    </div>
+    <ResponsiveContainer width="100%" height={240}>
+      <RadarChart cx="50%" cy="50%" outerRadius="65%" data={data}>
+        <defs>
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <PolarGrid stroke="#1e293b" strokeWidth={1.5} />
+        <PolarAngleAxis dataKey="subject" tick={{ fill: color, fontSize: 11, fontWeight: '900', fontFamily: 'monospace' }} />
+        <PolarRadiusAxis angle={30} domain={[0, 200]} tick={false} axisLine={false} />
+        <Radar 
+          name="Stats" 
+          dataKey="val" 
+          stroke={color} 
+          fill={color} 
+          fillOpacity={0.25} 
+          strokeWidth={3}
+          dot={{ r: 3, fill: '#0f172a', stroke: color, strokeWidth: 2 }}
+          isAnimationActive={true}
+          animationDuration={750}
+          animationEasing="ease-in-out"
+          style={{ filter: `drop-shadow(0px 0px 8px ${color})` }}
+        />
+      </RadarChart>
+    </ResponsiveContainer>
   );
 };

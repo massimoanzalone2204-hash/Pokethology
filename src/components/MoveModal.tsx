@@ -149,7 +149,6 @@ export const MoveModal: React.FC<MoveModalProps> = ({ isOpen, onClose, moves, on
                     <button
                       key={`${move.name}-${i}`}
                       onClick={() => {
-                        try { sounds.haptic("medium"); } catch (_) {}
                         onMoveClick(move);
                         onClose();
                         try { sounds.scan(); } catch (_) {}

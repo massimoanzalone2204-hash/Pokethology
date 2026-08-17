@@ -171,7 +171,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Map className="w-4 h-4 animate-pulse" /> Pokédex Registry
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Explore the complete Pokémon registry. Use the grid to filter by generation or search by ID and name. View interactive 3D and 2D models, toggle shiny and gender differences, listen to authentic audio cries, and explore detailed stats, evolution nodes, and complete movesets.
+                    Explore all 9 Generations of Pokémon. Filter by region and sort criteria with live stats, audio cries, and artwork switching.
                   </p>
                 </div>
                 
@@ -232,10 +232,10 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 {/* Banner */}
                 <div className="p-4 bg-purple-950/20 border-l-4 border-purple-500 rounded-r-xl space-y-1.5 text-left relative overflow-hidden">
                   <h3 className="font-hud font-black text-purple-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
-                    <Gamepad2 className="w-4 h-4 animate-pulse" /> Mini-games & Utilities
+                    <Brain className="w-4 h-4 animate-pulse" /> Pokéthology AI Assistant
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Access special mini-games and utility tools. Test your knowledge in the Pokéthology Quiz, track and manage your daily combat missions, and control your device cache and APIs.
+                    Ask questions about Pokémon battles, competitive builds, evolution lines, and lore.
                   </p>
                 </div>
 
@@ -246,9 +246,9 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <Crosshair className="w-5 h-5 text-purple-400" />
                     </div>
                     <div>
-                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Pokéthology Quiz</span>
+                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Tactics & Strategy</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Test your knowledge! Guess the Pokémon by identifying its silhouette, and use hints like their cry or generation to win.
+                        Get advice on competitive movesets, EV spreads, team synergies, and matchup counters.
                       </p>
                     </div>
                   </div>
@@ -258,9 +258,9 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <BookOpen className="w-5 h-5 text-purple-400" />
                     </div>
                     <div>
-                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Favorites Vault</span>
+                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Lore & Biology</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Access a dedicated vault to view, organize, and manage all your starred favorite Pokémon in one place.
+                        Discover species evolution paths, regional mythologies, and ecological lore.
                       </p>
                     </div>
                   </div>
@@ -270,9 +270,9 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <Activity className="w-5 h-5 text-purple-400" />
                     </div>
                     <div>
-                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">Offline Cache Manager</span>
+                      <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider">General Knowledge</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
-                        Pre-download sprites and data to your device, allowing you to browse the Pokédex seamlessly even without an internet connection.
+                        Chat about game mechanics, trivia, and franchise details with context-aware responses.
                       </p>
                     </div>
                   </div>
@@ -293,7 +293,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     <Swords className="w-4 h-4 text-red-500 animate-pulse" /> Combat Simulator
                   </h3>
                   <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                    Simulate turn-based battles between any two Pokémon. Calculations use real base stats, type advantages, and randomized critical hits. Play out complete attack sequences using authentic Pokémon move pools.
+                    Test battle matchups between any two Pokémon with real-time health bars and combat calculation logs.
                   </p>
                 </div>
 
@@ -316,7 +316,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       <Sparkles className="w-5 h-5 text-red-400" />
                     </div>
                     <div>
-                      <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider">Random Opponent</span>
+                      <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider">Chaos Mode</span>
                       <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans mt-0.5">
                         Completely randomizes the combatants and movesets, allowing you to battle under fully unpredictable conditions.
                       </p>
