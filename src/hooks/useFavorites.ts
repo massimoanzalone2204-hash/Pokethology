@@ -1,11 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { STORES, idbGetAll, idbSet, idbDelete } from '../lib/indexedDB';
+import { getPokemonArtworkUrl, POKEMON_FORM_IDS } from '../lib/pokemonArtwork';
 
 export interface FavoritePokemon {
-  id: string; // usually pokemon name
+  id: string; // pokemon name
   name: string;
   url: string;
   displayId?: number;
+  formId?: number;
+  baseId?: number;
+  artwork?: string;
   addedAt: number;
 }
 
@@ -25,17 +29,38 @@ export function useFavorites() {
     loadFavorites();
   }, [loadFavorites]);
 
-  const toggleFavorite = async (pokemon: { name: string; url: string; displayId?: number }) => {
-    const isFav = favorites.some(f => f.id === pokemon.name);
+  const toggleFavorite = async (pokemon: {
+    name: string;
+    url?: string;
+    displayId?: number;
+    formId?: number;
+    baseId?: number;
+    artwork?: string;
+  }) => {
+    const isFav = favorites.some(f => f.name.toLowerCase() === pokemon.name.toLowerCase() || f.id === pokemon.name);
     if (isFav) {
       await idbDelete(STORES.FAVORITES, pokemon.name);
-      setFavorites(prev => prev.filter(f => f.id !== pokemon.name));
+      setFavorites(prev => prev.filter(f => f.name.toLowerCase() !== pokemon.name.toLowerCase() && f.id !== pokemon.name));
     } else {
-      const newFav: FavoritePokemon = {
-        id: pokemon.name,
+      const normName = pokemon.name.toLowerCase().trim();
+      const resolvedFormId = pokemon.formId || POKEMON_FORM_IDS[normName];
+      const resolvedArtwork = pokemon.artwork || getPokemonArtworkUrl({
         name: pokemon.name,
         url: pokemon.url,
         displayId: pokemon.displayId,
+        formId: resolvedFormId,
+        baseId: pokemon.baseId,
+        artwork: pokemon.artwork
+      });
+
+      const newFav: FavoritePokemon = {
+        id: pokemon.name,
+        name: pokemon.name,
+        url: pokemon.url || resolvedArtwork,
+        displayId: pokemon.displayId,
+        formId: resolvedFormId,
+        baseId: pokemon.baseId,
+        artwork: resolvedArtwork,
         addedAt: Date.now()
       };
       await idbSet(STORES.FAVORITES, newFav);
@@ -44,7 +69,9 @@ export function useFavorites() {
   };
 
   const isFavorite = (name: string) => {
-    return favorites.some(f => f.id === name);
+    if (!name) return false;
+    const norm = name.toLowerCase().trim();
+    return favorites.some(f => f.name.toLowerCase() === norm || f.id === norm);
   };
 
   return { favorites, toggleFavorite, isFavorite, loadFavorites };

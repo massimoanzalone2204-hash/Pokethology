@@ -18,6 +18,7 @@ import { useBattleSimulation } from './hooks/useBattleSimulation';
 import { Pokemon, EvolutionNode, Move, LogEntry } from './types';
 import { sounds } from './lib/sounds';
 import { cn, abbreviateType, hudButtonClass, playHaptic } from './lib/utils';
+import { getPokemonArtworkUrl, getPokemonSpriteUrl, POKEMON_FORM_IDS } from './lib/pokemonArtwork';
 import { PokethologyCombatMissionWidget, getDailyCombatMission, COMBAT_MISSIONS, getRequiredCount } from './components/PokethologyCombatMissionWidget';
 import { getDailyHubCombatChallenges } from './utils/dailyHubChallenges';
 import { generateCompetitiveMoveset } from './utils/moveset';
@@ -50,6 +51,7 @@ import { TypeWeaknessesSection } from './components/TypeWeaknessesSection';
 import { CombatStatsSection } from './components/CombatStatsSection';
 import { MovesetAnalysisSection } from './components/MovesetAnalysisSection';
 import { FavoritesVaultModal } from './components/FavoritesVaultModal';
+import { TypeChartModal } from './components/TypeChartModal';
 
 const getShowdownName = (name: string, isFemale: boolean = false) => {
   if (!name) return '';
@@ -1151,13 +1153,14 @@ const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny, use2dSpri
   }, [pokemonName, isShiny, use2dSprite]);
 
   const getSrcAtLevel = (lvl: number): string => {
-    const shinyPath = isShiny ? 'shiny/' : '';
     const cleanName = getShowdownName(pokemonName);
-    const displayId = id || pokemonName;
+    const parsedId = id && !isNaN(parseInt(id, 10)) ? parseInt(id, 10) : undefined;
+    const normName = pokemonName?.toLowerCase()?.trim() || '';
+    const formId = POKEMON_FORM_IDS[normName] || (parsedId && parsedId > 1025 ? parsedId : undefined);
 
     if (use2dSprite) {
       if (lvl === 0) {
-        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyPath}${displayId}.png`;
+        return getPokemonSpriteUrl({ name: pokemonName, formId, displayId: parsedId }, { isShiny, use2d: true });
       }
       if (lvl === 1) {
         return `https://play.pokemonshowdown.com/sprites/gen5${isShiny ? '-shiny' : ''}/${cleanName}.png`;
@@ -1165,15 +1168,11 @@ const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny, use2dSpri
       if (lvl === 2) {
         return `https://play.pokemonshowdown.com/sprites/ani${isShiny ? '-shiny' : ''}/${cleanName}.gif`;
       }
-      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shinyPath}${displayId}.png`;
+      return getPokemonArtworkUrl({ name: pokemonName, formId, displayId: parsedId }, { isShiny });
     }
     
     if (lvl === 0) {
-      let artworkId = id;
-      if (isShiny && (id === '10309' || pokemonName?.includes('garchomp-mega-z'))) {
-        artworkId = '10058';
-      }
-      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shinyPath}${artworkId}.png`;
+      return getPokemonArtworkUrl({ name: pokemonName, formId, displayId: parsedId }, { isShiny });
     }
     if (lvl === 1) {
       // Showdown 2D png fallback (good for megas and gmax)
@@ -1184,7 +1183,7 @@ const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny, use2dSpri
       return `https://play.pokemonshowdown.com/sprites/ani${isShiny ? '-shiny' : ''}/${cleanName}.gif`;
     }
     // Final fallback to raw PokeAPI sprite
-    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyPath}${id}.png`;
+    return getPokemonSpriteUrl({ name: pokemonName, formId, displayId: parsedId }, { isShiny });
   };
 
   const currentSrc = getSrcAtLevel(fallbackLvl);
@@ -1389,7 +1388,17 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
           onClick={(e) => {
             e.stopPropagation();
             try { sounds.hover(); } catch (_) {}
-            onToggleFavorite({ name: p.name, url: p.url, displayId: p.displayId || p.baseId || id });
+            const numId = id && !isNaN(parseInt(id, 10)) ? parseInt(id, 10) : undefined;
+            const normName = p.name?.toLowerCase()?.trim() || '';
+            const formId = p.formId || POKEMON_FORM_IDS[normName] || (numId && numId > 1025 ? numId : undefined);
+            onToggleFavorite({
+              name: p.name,
+              url: p.url,
+              displayId: p.displayId || p.baseId || numId,
+              formId,
+              baseId: p.baseId || p.displayId,
+              artwork: p.artwork
+            });
           }}
           title={isFav ? "Remove from Favorites" : "Add to Favorites"}
         >
@@ -2738,6 +2747,12 @@ export default function App() {
   const [showMissionCelebration, setShowMissionCelebration] = useState<boolean>(false);
   const [showMissionUpdateHUD, setShowMissionUpdateHUD] = useState<boolean>(false);
   const [hubChallengeProgressMessage, setHubChallengeProgressMessage] = useState<string | null>(null);
+  const [lastBattleMissionNotice, setLastBattleMissionNotice] = useState<{
+    title: string;
+    description: string;
+    isComplete: boolean;
+  } | null>(null);
+  const hubProgressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [celebratedMission, setCelebratedMission] = useState<any>(null);
 
   const today = new Date().toISOString().split('T')[0];
@@ -3005,7 +3020,7 @@ export default function App() {
   const [isMusicOpen, setIsMusicOpen] = useState(false);
   // Lock body scrolling when any modal is active so main app background stays fixed
   useEffect(() => {
-    const isAnyModalOpen = isDailyHubOpen || isDailyScanOpen || isDailyQuizOpen || isSettingsOpen || isTutorialOpen || isMusicOpen || isComparisonOpen;
+    const isAnyModalOpen = isDailyHubOpen || isDailyScanOpen || isDailyQuizOpen || isSettingsOpen || isTutorialOpen || isMusicOpen || isComparisonOpen || isTypeChartOpen;
     if (isAnyModalOpen) {
       document.body.style.overflow = 'hidden';
       document.body.style.touchAction = 'none';
@@ -3017,7 +3032,7 @@ export default function App() {
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
     };
-  }, [isDailyHubOpen, isDailyScanOpen, isDailyQuizOpen, isSettingsOpen, isTutorialOpen, isMusicOpen]);
+  }, [isDailyHubOpen, isDailyScanOpen, isDailyQuizOpen, isSettingsOpen, isTutorialOpen, isMusicOpen, isComparisonOpen, isTypeChartOpen]);
   const [autoAiEnabled, setAutoAiEnabled] = useState(true);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isChaosMatchSetup, setIsChaosMatchSetup] = useState(false);
@@ -4127,41 +4142,54 @@ export default function App() {
         });
         sounds.victory();
 
-        // Check and update Daily Combat Mission progress on victory
+        // Check and update Daily Combat Mission & Daily Hub Combat Challenges on victory
         if (battleOpponent) {
           try {
+            // Robust extractor for opponent types
+            const oppAny = battleOpponent as any;
+            const opponentTypes: string[] = [];
+            if (Array.isArray(oppAny.types)) {
+              oppAny.types.forEach((t: any) => {
+                if (typeof t === 'string') opponentTypes.push(t.toLowerCase());
+                else if (t?.type?.name) opponentTypes.push(t.type.name.toLowerCase());
+                else if (t?.name) opponentTypes.push(t.name.toLowerCase());
+              });
+            }
+            if (oppAny.type && typeof oppAny.type === 'string') {
+              opponentTypes.push(oppAny.type.toLowerCase());
+            }
+
+            // Robust extractor for opponent defense stat
+            let opponentDefense = 0;
+            if (Array.isArray(oppAny.stats)) {
+              const defStat = oppAny.stats.find((s: any) => s?.stat?.name === 'defense' || s?.name === 'defense');
+              if (defStat) opponentDefense = defStat.base_stat ?? defStat.value ?? 0;
+            } else if (oppAny.defense !== undefined) {
+              opponentDefense = Number(oppAny.defense);
+            }
+
+            const opponentName = (oppAny.name || '').toLowerCase();
+            const legendaries = ['articuno', 'zapdos', 'moltres', 'mewtwo', 'mew', 'raikou', 'entei', 'suicune', 'lugia', 'ho-oh', 'celebi', 'regirock', 'regice', 'registeel', 'latias', 'latios', 'kyogre', 'groudon', 'rayquaza', 'jirachi', 'deoxys', 'uxie', 'mesprit', 'azelf', 'dialga', 'palkia', 'heatran', 'regigigas', 'giratina', 'cresselia', 'phione', 'manaphy', 'darkrai', 'shaymin', 'arceus', 'victini', 'cobalion', 'terrakion', 'virizion', 'tornadus', 'thundurus', 'reshiram', 'zekrom', 'landorus', 'kyurem', 'keldeo', 'meloetta', 'genesect', 'xerneas', 'yveltal', 'zygarde', 'diancie', 'hoopa', 'volcanion', 'tapu koko', 'tapu lele', 'tapu bulu', 'tapu fini', 'cosmog', 'cosmoem', 'solgaleo', 'lunala', 'nihilego', 'buzzwole', 'pheromosa', 'xurkitree', 'celesteela', 'kartana', 'guzzlord', 'necrozma', 'magearna', 'marshadow', 'poipole', 'naganadel', 'stakataka', 'blacephalon', 'zeraora', 'meltan', 'melmetal', 'zacian', 'zamazenta', 'eternatus', 'kubfu', 'urshifu', 'zarude', 'regieleki', 'regidrago', 'glastrier', 'spectrier', 'calyrex', 'enamorus', 'great tusk', 'scream tail', 'brute bonnet', 'flutter mane', 'slither wing', 'sandy shocks', 'iron treads', 'iron bundle', 'iron hands', 'iron jugulis', 'iron moth', 'iron thorns', 'wo-chien', 'chien-pao', 'ting-lu', 'chi-yu', 'roaring moon', 'iron valiant', 'koraidon', 'miraidon', 'walking wake', 'iron leaves', 'gouging fire', 'raging bolt', 'iron boulder', 'iron crown', 'terapagos', 'pecharunt'];
+            const isLegendary = legendaries.some(leg => opponentName.includes(leg));
+
+            let latestMissionNotice: { title: string; description: string; isComplete: boolean } | null = null;
+
+            // 1. Evaluate Main Daily Combat Mission
             const isHardMode = (localStorage.getItem(`pokethology_mission_hard_${today}`) || localStorage.getItem(`poketheology_mission_hard_${today}`)) === 'true';
             const currentMission = getDailyCombatMission(today, isHardMode);
             let matched = false;
 
             if (currentMission.target === 'legendary') {
-                const legendaries = ['articuno', 'zapdos', 'moltres', 'mewtwo', 'mew', 'raikou', 'entei', 'suicune', 'lugia', 'ho-oh', 'celebi', 'regirock', 'regice', 'registeel', 'latias', 'latios', 'kyogre', 'groudon', 'rayquaza', 'jirachi', 'deoxys', 'uxie', 'mesprit', 'azelf', 'dialga', 'palkia', 'heatran', 'regigigas', 'giratina', 'cresselia', 'phione', 'manaphy', 'darkrai', 'shaymin', 'arceus'];
-                const isLegendary = legendaries.some(leg => battleOpponent.name.toLowerCase().includes(leg));
-                const opponentTypes = battleOpponent.types.map((t: any) => t.type.name.toLowerCase());
-                if (isLegendary && opponentTypes.includes(currentMission.type === 'type' ? COMBAT_MISSIONS.find(m => m.id === currentMission.id)?.target : '')) {
-                  matched = true;
-                }
+              if (isLegendary) matched = true;
             } else if (currentMission.target === 'high_defense') {
-                const defenseStat = battleOpponent.stats.find((s: any) => s.stat.name === 'defense')?.base_stat || 0;
-                if (defenseStat >= 150) {
-                  matched = true;
-                }
+              if (opponentDefense >= 150) matched = true;
             } else if (currentMission.target === 'ultra_defense') {
-                const defenseStat = battleOpponent.stats.find((s: any) => s.stat.name === 'defense')?.base_stat || 0;
-                if (defenseStat >= 180) {
-                  matched = true;
-                }
+              if (opponentDefense >= 180) matched = true;
             } else if (currentMission.type === 'type') {
-                const opponentTypes = battleOpponent.types.map((t: any) => t.type.name.toLowerCase());
-                if (opponentTypes.includes(currentMission.target.toLowerCase())) {
-                  matched = true;
-                }
+              if (opponentTypes.includes(currentMission.target.toLowerCase())) matched = true;
             } else if (currentMission.type === 'stat') {
               if (currentMission.target === 'defense') {
-                const defenseStat = battleOpponent.stats.find((s: any) => s.stat.name === 'defense')?.base_stat || 0;
-                if (defenseStat >= 100) {
-                  matched = true;
-                }
+                if (opponentDefense >= 100) matched = true;
               }
             }
 
@@ -4171,10 +4199,7 @@ export default function App() {
               
               const savedCountStr = localStorage.getItem(countKey);
               let prevCount = savedCountStr ? parseInt(savedCountStr, 10) : 0;
-              let nextCount = prevCount + 1;
-              if (nextCount > required) {
-                nextCount = required;
-              }
+              let nextCount = Math.min(required, prevCount + 1);
               
               localStorage.setItem(countKey, String(nextCount));
               setMissionProgressCount(nextCount);
@@ -4184,6 +4209,12 @@ export default function App() {
                 localStorage.setItem(completedKey, 'true');
                 setIsMissionCompleted(true);
                 
+                latestMissionNotice = {
+                  title: "Daily Combat Protocol",
+                  description: `Protocol Fully Cleared (${nextCount}/${required})!`,
+                  isComplete: true
+                };
+
                 // Trigger celebratory animation, award sound and success toast
                 if (prevCount < required) {
                   setCelebratedMission(currentMission);
@@ -4198,19 +4229,23 @@ export default function App() {
                   );
                 }
               } else {
+                latestMissionNotice = {
+                  title: "Daily Combat Protocol",
+                  description: `Progress Updated: ${nextCount}/${required} Defeats Recorded.`,
+                  isComplete: false
+                };
+
                 // Show floating animated HUD element for status update
                 setShowMissionUpdateHUD(true);
                 setTimeout(() => setShowMissionUpdateHUD(false), 4500);
                 
                 if (nextCount === required - 1) {
-                  // Near completion toast alert
                   addToast(
                     "🎯 DAILY MISSION FOCUS", 
                     `Almost there! Progress: ${nextCount}/${required}. Just 1 more win to complete the mission!`, 
                     "combat"
                   );
                 } else {
-                  // Standard progress toast
                   addToast(
                     "⚔️ DAILY MISSION PROGRESS", 
                     `Progress updated: ${nextCount}/${required} defeats recorded. Keep going!`, 
@@ -4218,38 +4253,80 @@ export default function App() {
                   );
                 }
               }
-            } else {
-              // Check Daily Hub Combat Challenges ONLY if main daily mission didn't match
-              const hubChallenges = getDailyHubCombatChallenges(today);
-              let challengeMatched = false;
+            }
+
+            // 2. ALWAYS Evaluate All Daily Hub Combat Challenges (Bronze, Silver, Gold activities)
+            const hubChallenges = getDailyHubCombatChallenges(today);
+            let hubMessageToDisplay: string | null = null;
+
+            for (const challenge of hubChallenges) {
+              const stateKey = `pokethology_hub_combat_${today}_${challenge.id}`;
+              const currentProgress = parseInt(localStorage.getItem(stateKey) || '0', 10);
               
-              for (const challenge of hubChallenges) {
-                const stateKey = `pokethology_hub_combat_${today}_${challenge.id}`;
-                const currentProgress = parseInt(localStorage.getItem(stateKey) || '0', 10);
+              if (currentProgress < challenge.required) {
+                let isMatch = false;
+                if (challenge.type === 'type') {
+                  if (opponentTypes.includes(challenge.target.toLowerCase())) isMatch = true;
+                } else if (challenge.type === 'stat' && challenge.target === 'defense') {
+                  if (opponentDefense >= 150) isMatch = true;
+                }
                 
-                if (currentProgress < challenge.required) {
-                  let isMatch = false;
-                  if (challenge.type === 'type') {
-                     const opponentTypes = battleOpponent.types.map((t: any) => t.type.name.toLowerCase());
-                     if (opponentTypes.includes(challenge.target.toLowerCase())) isMatch = true;
-                  } else if (challenge.type === 'stat' && challenge.target === 'defense') {
-                     const defenseStat = battleOpponent.stats.find((s: any) => s.stat.name === 'defense')?.base_stat || 0;
-                     if (defenseStat >= 150) isMatch = true;
-                  }
+                if (isMatch) {
+                  const newProgress = Math.min(challenge.required, currentProgress + 1);
+                  localStorage.setItem(stateKey, String(newProgress));
+                  const isFinished = newProgress >= challenge.required;
                   
-                  if (isMatch) {
-                    const newProgress = currentProgress + 1;
-                    localStorage.setItem(stateKey, String(newProgress));
-                    
-                    if (!challengeMatched) {
-                      setHubChallengeProgressMessage(`DAILY HUB: ${challenge.title} (${newProgress}/${challenge.required})`);
-                      setTimeout(() => setHubChallengeProgressMessage(null), 8000);
-                      challengeMatched = true; // only show one message
+                  if (isFinished) {
+                    hubMessageToDisplay = `DAILY HUB: ${challenge.title} (${newProgress}/${challenge.required}) - MISSION COMPLETE!`;
+                    latestMissionNotice = {
+                      title: `Daily Hub: ${challenge.title}`,
+                      description: `Challenge Cleared (${newProgress}/${challenge.required})! Daily Progress & Rank upgraded.`,
+                      isComplete: true
+                    };
+                    addToast(
+                      "🎉 DAILY HUB MISSION COMPLETED",
+                      `Activity Complete: ${challenge.title} (${newProgress}/${challenge.required})! Your Daily Hub progress & rank have increased.`,
+                      "success"
+                    );
+                    try { sounds.success?.(); } catch (_) {}
+                  } else {
+                    if (!hubMessageToDisplay) {
+                      hubMessageToDisplay = `DAILY HUB: ${challenge.title} (${newProgress}/${challenge.required})`;
+                      if (!latestMissionNotice) {
+                        latestMissionNotice = {
+                          title: `Daily Hub: ${challenge.title}`,
+                          description: `Goal Advanced: ${newProgress}/${challenge.required} completed.`,
+                          isComplete: false
+                        };
+                      }
                     }
+                    addToast(
+                      "⚔️ DAILY HUB COMBAT PROGRESS",
+                      `Combat Goal Advanced: ${challenge.title} (${newProgress}/${challenge.required})!`,
+                      "combat"
+                    );
                   }
                 }
               }
             }
+
+            if (hubMessageToDisplay) {
+              setHubChallengeProgressMessage(hubMessageToDisplay);
+              if (hubProgressTimeoutRef.current) clearTimeout(hubProgressTimeoutRef.current);
+              hubProgressTimeoutRef.current = setTimeout(() => {
+                setHubChallengeProgressMessage(null);
+              }, 8000);
+            }
+
+            if (latestMissionNotice) {
+              setLastBattleMissionNotice(latestMissionNotice);
+            }
+
+            // Sync state with open widgets immediately
+            try {
+              window.dispatchEvent(new Event('pokethology_hub_update'));
+              window.dispatchEvent(new Event('storage'));
+            } catch (_) {}
           } catch (e) {
             console.error("Error evaluating combat mission progress", e);
           }
@@ -5921,10 +5998,14 @@ export default function App() {
                                     type="button"
                                     onClick={() => {
                                       if (pokemon) {
+                                        const art = pokemon.sprites?.other?.['official-artwork']?.front_default || pokemon.sprites?.front_default || '';
                                         toggleFavorite({
                                           name: pokemon.name,
-                                          url: pokemon.sprites?.front_default || pokemon.sprites?.other?.['official-artwork']?.front_default || '',
-                                          displayId: pokemon.baseId || pokemon.id
+                                          url: art,
+                                          displayId: pokemon.baseId || pokemon.id,
+                                          formId: pokemon.id,
+                                          baseId: pokemon.baseId,
+                                          artwork: art
                                         });
                                         try { sounds.shiny(); } catch (_) {}
                                       }
@@ -7887,10 +7968,20 @@ export default function App() {
                           </div>
 
                           {/* Home Screen Copyright & Legal Disclaimer */}
-                          <p className="text-[9px] sm:text-[10px] text-slate-400 font-mono tracking-wider max-w-2xl mx-auto text-center mt-3 sm:mt-4 md:mt-5 mb-2 leading-relaxed opacity-80 select-none px-2">
-                            Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc. TM, ® and Pokémon character names are trademarks of Nintendo.<br className="hidden sm:inline"/>
-                            No copyright or trademark infringement is intended in using Pokémon content on Pokéthology.
-                          </p>
+                          <div className="text-[9px] sm:text-[10px] text-slate-400 font-mono tracking-wider max-w-2xl mx-auto text-center mt-3 sm:mt-4 md:mt-5 mb-2 leading-relaxed opacity-80 select-none px-2 space-y-0.5">
+                            <p>
+                              Pokéthology is an unofficial, free fan made app and is NOT affiliated, endorsed or supported by Nintendo, GAME FREAK or The Pokémon company in any way.
+                            </p>
+                            <p>
+                              Some images used in this app are copyrighted and are supported under fair use.
+                            </p>
+                            <p>
+                              Pokémon and Pokémon character names are trademarks of Nintendo. No copyright infringement intended.
+                            </p>
+                            <p className="text-slate-300 font-semibold pt-0.5">
+                              Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc.
+                            </p>
+                          </div>
                         </div>
 
                         <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end opacity-40 pointer-events-none">
@@ -8270,108 +8361,17 @@ export default function App() {
         </div>
       </div>
 
-         <AnimatePresence>
-           {isTypeChartOpen && (
-             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90"
-            >
-              <motion.div
-                initial={{ scale: 0.98, y: 6, opacity: 0 }}
-                animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.98, y: 6, opacity: 0 }}
-                transition={{ duration: 0.15, ease: 'easeOut' }}
-                className="bg-slate-900 border-2 border-red-500/50 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(239,68,68,0.3)]"
-              >
-                <div className="p-4 border-b border-red-900/30 flex justify-between items-center bg-slate-950 shrink-0">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(220,38,38,0.4)]">
-                      <Layers className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
-                    </div>
-                    <div>
-                      <h2 className="text-red-500 font-hud text-xs sm:text-lg uppercase tracking-wider sm:tracking-[0.3em] font-black">Type Chart</h2>
-                      <p className="text-[7px] sm:text-[9px] font-bold tracking-wider text-red-900 font-mono uppercase">Battle Arena</p>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => setIsTypeChartOpen(false)}
-                    className="p-1.5 sm:p-3 hover:bg-red-900/20 rounded-full transition-all text-red-500 hover:scale-110 active:scale-90 z-50 shrink-0"
-                  >
-                    <X className="w-5 h-5 sm:w-7 sm:h-7" />
-                  </button>
-                </div>
-
-                <div className="flex-1 overflow-auto p-0 sm:p-4 custom-scrollbar bg-slate-900 relative">
-                  <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-5 bg-[linear-gradient(rgba(18,24,27,0)_50%,rgba(32,32,32,0.5)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]"></div>
-                  <div className="w-max min-w-full relative z-10 pb-8 pr-4 sm:pr-8">
-                    <div className="sticky top-0 z-30 grid grid-cols-[40px_repeat(18,minmax(20px,1fr))] sm:grid-cols-[100px_repeat(18,minmax(40px,1fr))] gap-0.5 sm:gap-1.5 mb-2 sm:mb-4 bg-slate-900/95 pt-2 pb-2 px-1 sm:px-0">
-                      <div className="sticky left-0 z-40 h-10 sm:h-12 flex items-center justify-center bg-slate-950 rounded-lg border border-slate-800 shadow-[4px_0_10px_rgba(0,0,0,0.5)]">
-                        <span className="text-[6px] font-bold tracking-wider sm:text-[8px] font-bold tracking-wider text-slate-300 font-medium font-hud uppercase tracking-tighter text-center leading-none">ATK \ DEF</span>
-                      </div>
-                      {Object.keys(typeColors).map(type => (
-                        <div key={`typehdr-${type}`} className="h-10 sm:h-12 flex items-center justify-center">
-                          <div className={cn(
-                            "w-6 h-16 sm:w-10 sm:h-24 -rotate-45 origin-center flex items-center justify-center text-[5px] sm:text-[8px] font-bold tracking-wider font-black uppercase tracking-tighter rounded shadow-lg transition-transform hover:scale-110",
-                            typeColors[type]
-                          )}>
-                            <span className="rotate-45 drop-shadow-md">{type.slice(0, 3)}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="px-2 sm:px-0">
-                      {Object.keys(typeColors).map(attackerType => (
-                        <div key={`typerow-${attackerType}`} className="grid grid-cols-[50px_repeat(18,minmax(28px,1fr))] sm:grid-cols-[100px_repeat(18,minmax(40px,1fr))] gap-1 sm:gap-1.5 mb-1 sm:mb-1.5 group/row">
-                          <div className={cn(
-                            "sticky left-0 z-20 h-7 sm:h-10 flex items-center justify-center sm:justify-start sm:px-4 rounded sm:rounded-lg text-[6px] font-bold tracking-wider sm:text-[9px] font-bold tracking-wider font-black uppercase tracking-widest sm:tracking-[0.2em] shadow-[4px_0_10px_rgba(0,0,0,0.5)] group-hover/row:scale-105 transition-transform",
-                            typeColors[attackerType]
-                          )}>
-                            <span className="hidden sm:inline">{attackerType}</span>
-                            <span className="sm:hidden">{attackerType.slice(0, 3)}</span>
-                          </div>
-                          {Object.keys(typeColors).map(defenderType => {
-                            const multiplier = TYPE_CHART[attackerType]?.[defenderType] ?? 1;
-                            return (
-                              <div 
-                                key={`typecell-${attackerType}-${defenderType}`} 
-                                className={cn(
-                                  "h-7 sm:h-10 flex items-center justify-center text-[8px] font-bold tracking-wider sm:text-[12px] font-mono font-black rounded sm:rounded-lg border transition-all hover:scale-110 hover:z-20",
-                                  multiplier === 2 ? "bg-green-500/30 border-green-500/60 text-green-400 shadow-[0_0_10px_rgba(34,197,94,0.3)]" :
-                                  multiplier === 0.5 ? "bg-red-500/30 border-red-500/60 text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.3)]" :
-                                  multiplier === 0 ? "bg-slate-800 border-slate-700 text-slate-300 font-medium" :
-                                  "bg-slate-950/40 border-slate-800/40 text-slate-700 hover:border-slate-600"
-                                )}
-                              >
-                                {multiplier === 1 ? '' : multiplier === 0.5 ? '½' : multiplier}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="p-4 sm:p-6 bg-slate-950 border-t border-red-900/30 flex flex-wrap gap-4 sm:gap-8 justify-center">
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 bg-green-500/30 border-2 border-green-500/60 rounded-md shadow-[0_0_10px_rgba(34,197,94,0.4)]"></div>
-                    <span className="text-[10px] font-bold tracking-wider text-green-400 uppercase font-hud font-black tracking-widest">Super Effective (2x)</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 bg-red-500/30 border-2 border-red-500/60 rounded-md shadow-[0_0_10px_rgba(239,68,68,0.4)]"></div>
-                    <span className="text-[10px] font-bold tracking-wider text-red-400 uppercase font-hud font-black tracking-widest">Not Very Effective (0.5x)</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 bg-slate-800 border-2 border-slate-700 rounded-md"></div>
-                    <span className="text-[10px] font-bold tracking-wider text-slate-300 font-medium uppercase font-hud font-black tracking-widest">No Effect (0x)</span>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <TypeChartModal
+          isOpen={isTypeChartOpen}
+          onClose={() => {
+            setIsTypeChartOpen(false);
+            try { sounds.scan(); } catch (_) {}
+          }}
+          typeColors={typeColors}
+          TYPE_CHART={TYPE_CHART}
+          isLightMode={isLightMode}
+          sounds={sounds}
+        />
 
         {/* Move Learning Modal */}
         <AnimatePresence>
@@ -9055,6 +9055,7 @@ export default function App() {
           pokemonStatus={pokemonStatus}
           opponentStatus={opponentStatus}
           isLightMode={isLightMode}
+          missionNotice={lastBattleMissionNotice}
           onRematch={() => {
             sounds.battleStart();
             setIsBattling(false);
@@ -9550,10 +9551,19 @@ export default function App() {
                       </motion.div>
                     )}
                   </div>
-                  <div className="pt-3 border-t border-slate-800/50 text-[9px] font-mono text-slate-500 text-center leading-relaxed">
-                    Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc. TM, ® and Pokémon character names are trademarks of Nintendo.
-                    <br />
-                    No copyright or trademark infringement is intended in using Pokémon content on Pokéthology.
+                  <div className="pt-3 border-t border-slate-800/50 text-[9px] font-mono text-slate-500 text-center leading-relaxed space-y-0.5">
+                    <p>
+                      Pokéthology is an unofficial, free fan made app and is NOT affiliated, endorsed or supported by Nintendo, GAME FREAK or The Pokémon company in any way.
+                    </p>
+                    <p>
+                      Some images used in this app are copyrighted and are supported under fair use.
+                    </p>
+                    <p>
+                      Pokémon and Pokémon character names are trademarks of Nintendo. No copyright infringement intended.
+                    </p>
+                    <p className="text-slate-400 font-semibold pt-0.5">
+                      Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc.
+                    </p>
                   </div>
                 </div>
 
@@ -9740,24 +9750,73 @@ export default function App() {
           </AnimatePresence>
         </div>
 
-        {/* Hub Challenge Progress Message */}
+        {/* Hub Challenge Progress 8-Second Notification HUD */}
         <AnimatePresence>
           {hubChallengeProgressMessage && (
             <motion.div
-              initial={{ opacity: 0, y: -40, scale: 0.95 }}
+              initial={{ opacity: 0, y: -50, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="fixed top-20 left-0 right-0 z-[110] pointer-events-none flex justify-center px-4"
+              transition={{ type: "spring", stiffness: 350, damping: 26 }}
+              className="fixed top-6 sm:top-8 left-0 right-0 z-[700] flex justify-center px-4 pointer-events-auto"
             >
-              <div className="bg-slate-900/90 backdrop-blur-md border border-cyan-500/30 px-5 py-3 rounded-2xl shadow-[0_4px_30px_rgba(6,182,212,0.3)] flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center border border-cyan-400/50">
-                  <Swords className="w-4 h-4 text-cyan-400 animate-pulse" />
+              <div className={cn(
+                "backdrop-blur-xl border px-5 py-3.5 rounded-2xl flex items-center gap-4 relative overflow-hidden max-w-lg w-full",
+                hubChallengeProgressMessage.includes("COMPLETE")
+                  ? "bg-slate-950/95 border-emerald-500/60 shadow-[0_0_35px_rgba(16,185,129,0.35)] text-emerald-400"
+                  : "bg-slate-950/95 border-cyan-500/60 shadow-[0_0_35px_rgba(6,182,212,0.35)] text-cyan-400"
+              )}>
+                {/* 8-Second Animated Depletion Bar */}
+                <motion.div 
+                  initial={{ width: "100%" }}
+                  animate={{ width: "0%" }}
+                  transition={{ duration: 8, ease: "linear" }}
+                  className={cn(
+                    "absolute bottom-0 left-0 h-1",
+                    hubChallengeProgressMessage.includes("COMPLETE")
+                      ? "bg-gradient-to-r from-emerald-500 to-teal-400"
+                      : "bg-gradient-to-r from-cyan-500 to-blue-400"
+                  )}
+                />
+
+                <div className={cn(
+                  "w-10 h-10 rounded-xl flex items-center justify-center border shrink-0",
+                  hubChallengeProgressMessage.includes("COMPLETE")
+                    ? "bg-emerald-500/20 border-emerald-400/60 text-emerald-300"
+                    : "bg-cyan-500/20 border-cyan-400/60 text-cyan-300"
+                )}>
+                  {hubChallengeProgressMessage.includes("COMPLETE") ? (
+                    <Trophy className="w-5 h-5 animate-bounce" />
+                  ) : (
+                    <Swords className="w-5 h-5 animate-pulse" />
+                  )}
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-hud font-bold text-slate-400 uppercase tracking-widest">Progress Updated</span>
-                  <span className="text-xs sm:text-sm font-hud font-black text-white">{hubChallengeProgressMessage}</span>
+
+                <div className="flex flex-col flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-hud font-black uppercase tracking-widest text-slate-400">
+                      {hubChallengeProgressMessage.includes("COMPLETE") ? "🎉 DAILY HUB OBJECTIVE MET" : "⚔️ DAILY HUB COMBAT PROGRESS"}
+                    </span>
+                    <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
+                      8s
+                    </span>
+                  </div>
+                  <span className="text-xs sm:text-sm font-hud font-black text-white truncate mt-0.5">
+                    {hubChallengeProgressMessage}
+                  </span>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (hubProgressTimeoutRef.current) clearTimeout(hubProgressTimeoutRef.current);
+                    setHubChallengeProgressMessage(null);
+                  }}
+                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+                  title="Dismiss notification"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
             </motion.div>
           )}

@@ -5,6 +5,7 @@ import { cn } from '../lib/utils';
 import { GENERATIONS } from '../lib/api';
 import { Pokemon } from '../types';
 import { useFavorites } from '../hooks/useFavorites';
+import { getPokemonArtworkUrl, getPokemonSpriteUrl } from '../lib/pokemonArtwork';
 
 interface PokemonListProps {
   listMode: 'home' | 'pokemon' | 'types' | 'favorites';
@@ -290,7 +291,14 @@ export const PokemonList = memo(({
                       onClick={(e) => {
                         e.stopPropagation();
                         try { sounds.hover(); } catch (_) {}
-                        toggleFavorite({ name: p.name, url: p.url, displayId });
+                        toggleFavorite({
+                          name: p.name,
+                          url: p.url,
+                          displayId,
+                          formId: p.formId || (parseInt(id || '0') > 1025 ? parseInt(id || '0') : undefined),
+                          baseId: p.baseId || displayId,
+                          artwork: p.artwork
+                        });
                       }}
                       title={isFavorite(p.name) ? "Remove from Favorites" : "Add to Favorites"}
                     >
@@ -305,12 +313,9 @@ export const PokemonList = memo(({
                     {/* Official Artwork */}
                     <div className="relative w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center mt-2 z-10 shrink-0">
                       <img
-                        src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${displayId || id}.png`}
+                        src={getPokemonArtworkUrl(p)}
                         onError={(e) => {
-                          const target = e.currentTarget;
-                          if (target.src.includes('official-artwork')) {
-                            target.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${displayId || id}.png`;
-                          }
+                          e.currentTarget.src = getPokemonSpriteUrl(p);
                         }}
                         alt={p.name}
                         referrerPolicy="no-referrer"

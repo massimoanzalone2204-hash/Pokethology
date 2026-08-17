@@ -469,7 +469,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
   // Uncommitted selected choices before submission (matches Theory Exam structure)
   const [selectedChoices, setSelectedChoices] = useState<Record<string, number>>({});
 
-  // Poll local storage for combat progress periodically or when tab changes
+  // Poll local storage for combat progress and listen to custom sync events
   const [combatProgress, setCombatProgress] = useState<Record<string, number>>({});
   
   useEffect(() => {
@@ -482,31 +482,102 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     };
     updateCombatProgress();
     
-    // Listen for storage events (if updated from another window, though mainly for same window we use interval)
-    const interval = setInterval(updateCombatProgress, 2000);
-    return () => clearInterval(interval);
+    window.addEventListener('pokethology_hub_update', updateCombatProgress);
+    window.addEventListener('storage', updateCombatProgress);
+    const interval = setInterval(updateCombatProgress, 1500);
+    return () => {
+      window.removeEventListener('pokethology_hub_update', updateCombatProgress);
+      window.removeEventListener('storage', updateCombatProgress);
+      clearInterval(interval);
+    };
   }, [todayStr, combatChallenges]);
 
-  const bronzeCompleted = easyStatusA === 'correct' && easyStatusB === 'correct' && 
-                          (combatProgress['bronze_3'] || 0) >= combatChallenges[0].required && 
-                          (combatProgress['bronze_4'] || 0) >= combatChallenges[1].required;
-                          
-  const silverCompleted = medStatusA === 'correct' && medStatusB === 'correct' && 
-                          (combatProgress['silver_3'] || 0) >= combatChallenges[2].required && 
-                          (combatProgress['silver_4'] || 0) >= combatChallenges[3].required;
+  const bronzeCombat1Done = (combatProgress['bronze_3'] || 0) >= (combatChallenges[0]?.required || 1);
+  const bronzeCombat2Done = (combatProgress['bronze_4'] || 0) >= (combatChallenges[1]?.required || 1);
+  const silverCombat1Done = (combatProgress['silver_3'] || 0) >= (combatChallenges[2]?.required || 2);
+  const silverCombat2Done = (combatProgress['silver_4'] || 0) >= (combatChallenges[3]?.required || 2);
+  const goldCombat1Done = (combatProgress['gold_3'] || 0) >= (combatChallenges[4]?.required || 3);
+  const goldCombat2Done = (combatProgress['gold_4'] || 0) >= (combatChallenges[5]?.required || 1);
 
-  const goldCompleted = hardStatusA === 'correct' && hardStatusB === 'correct' && 
-                        (combatProgress['gold_3'] || 0) >= combatChallenges[4].required && 
-                        (combatProgress['gold_4'] || 0) >= combatChallenges[5].required;
+  const bronzeCompleted = easyStatusA === 'correct' && easyStatusB === 'correct' && bronzeCombat1Done && bronzeCombat2Done;
+  const silverCompleted = medStatusA === 'correct' && medStatusB === 'correct' && silverCombat1Done && silverCombat2Done;
+  const goldCompleted = hardStatusA === 'correct' && hardStatusB === 'correct' && goldCombat1Done && goldCombat2Done;
 
-  const totalCompletedCount = (bronzeCompleted ? 4 : 0) + (silverCompleted ? 4 : 0) + (goldCompleted ? 4 : 0);
+  const completedActivitiesList = [
+    easyStatusA === 'correct',
+    easyStatusB === 'correct',
+    bronzeCombat1Done,
+    bronzeCombat2Done,
+    medStatusA === 'correct',
+    medStatusB === 'correct',
+    silverCombat1Done,
+    silverCombat2Done,
+    hardStatusA === 'correct',
+    hardStatusB === 'correct',
+    goldCombat1Done,
+    goldCombat2Done
+  ];
+
+  const totalCompletedCount = completedActivitiesList.filter(Boolean).length;
+
+  const RANK_TIERS = useMemo(() => [
+    { title: 'Novice', level: 1, minCount: 0, color: 'text-slate-400 bg-slate-600/10 border-slate-600/40', badge: 'Novice Operator', desc: 'Standard field accreditation initialized.' },
+    { title: 'Cadet', level: 2, minCount: 1, color: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.25)]', badge: 'Active Cadet', desc: 'First daily activities logged. Diagnostic capabilities active.' },
+    { title: 'Beginner', level: 3, minCount: 4, color: 'text-orange-400 bg-orange-500/10 border-orange-500/40 shadow-[0_0_15px_rgba(234,88,12,0.3)]', badge: 'Combat Specialist', desc: 'Bronze Tier completed. Advanced tactical awareness unlocked.' },
+    { title: 'Intermediate', level: 4, minCount: 8, color: 'text-slate-200 bg-slate-300/10 border-slate-400/40 shadow-[0_0_15px_rgba(148,163,184,0.3)]', badge: 'Senior Strategist', desc: 'Silver Tier cleared. Expert-level battle execution certified.' },
+    { title: 'Master', level: 5, minCount: 12, color: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/40 shadow-[0_0_20px_rgba(234,179,8,0.35)]', badge: 'Pokéthology Master', desc: 'Flawless execution of all 12 theory & combat objectives.' }
+  ], []);
 
   const operatorRank = useMemo(() => {
-    if (goldCompleted) return { title: 'Expert', color: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/40 shadow-[0_0_15px_rgba(234,179,8,0.3)]' };
-    if (silverCompleted) return { title: 'Intermediate', color: 'text-slate-200 bg-slate-300/10 border-slate-400/40 shadow-[0_0_15px_rgba(148,163,184,0.3)]' };
-    if (bronzeCompleted) return { title: 'Beginner', color: 'text-orange-400 bg-orange-500/10 border-orange-500/40 shadow-[0_0_15px_rgba(234,88,12,0.3)]' };
-    return { title: 'Novice', color: 'text-slate-400 bg-slate-600/10 border-slate-600/40' };
-  }, [bronzeCompleted, silverCompleted, goldCompleted]);
+    if (goldCompleted || totalCompletedCount === 12) {
+      return RANK_TIERS[4];
+    }
+    if (silverCompleted || totalCompletedCount >= 8) {
+      return RANK_TIERS[3];
+    }
+    if (bronzeCompleted || totalCompletedCount >= 4) {
+      return RANK_TIERS[2];
+    }
+    if (totalCompletedCount >= 1) {
+      return RANK_TIERS[1];
+    }
+    return RANK_TIERS[0];
+  }, [goldCompleted, silverCompleted, bronzeCompleted, totalCompletedCount, RANK_TIERS]);
+
+  // Rank-Up Celebration State
+  const [celebratingRank, setCelebratingRank] = useState<{
+    rank: typeof RANK_TIERS[0];
+    prevRankTitle: string;
+  } | null>(null);
+  const prevRankLevelRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('pokethology_user_rank', operatorRank.title);
+      localStorage.setItem(`pokethology_user_rank_${todayStr}`, operatorRank.title);
+      
+      const celebratedLevelKey = `pokethology_celebrated_rank_level_${todayStr}`;
+      const highestCelebrated = parseInt(localStorage.getItem(celebratedLevelKey) || '1', 10);
+
+      if (prevRankLevelRef.current === null) {
+        prevRankLevelRef.current = operatorRank.level;
+      } else if (operatorRank.level > prevRankLevelRef.current && operatorRank.level > highestCelebrated) {
+        const prevTitle = RANK_TIERS.find(r => r.level === prevRankLevelRef.current)?.title || 'Novice';
+        setCelebratingRank({
+          rank: operatorRank,
+          prevRankTitle: prevTitle
+        });
+        localStorage.setItem(celebratedLevelKey, String(operatorRank.level));
+        try {
+          sounds.victory?.();
+          playHaptic?.();
+        } catch (_) {}
+        prevRankLevelRef.current = operatorRank.level;
+      } else {
+        prevRankLevelRef.current = operatorRank.level;
+      }
+    } catch (_) {}
+  }, [operatorRank, todayStr, RANK_TIERS]);
 
   const handleSelectChoice = (tier: string, questionId: string, idx: number, isLocked: boolean) => {
     if (isLocked) return;
@@ -831,6 +902,130 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
           )}
         </AnimatePresence>
       </div>
+
+      {/* Visual Rank-Up Celebration Modal */}
+      <AnimatePresence>
+        {celebratingRank && (
+          <motion.div
+            key="rank-up-celebration-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+          >
+            <ParticleExplosion active={true} />
+
+            <motion.div
+              initial={{ scale: 0.8, y: 30, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.85, y: 20, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 350, damping: 25 }}
+              className="relative w-full max-w-md bg-slate-950/95 border-2 border-cyan-400/80 rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center shadow-[0_0_60px_rgba(6,182,212,0.4)] overflow-hidden"
+            >
+              {/* Ambient Glowing Background Accents */}
+              <div className="absolute -top-16 -left-16 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-amber-500/20 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Rotating Holographic Aura */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                className="w-32 h-32 rounded-full border border-dashed border-cyan-400/40 absolute top-10 pointer-events-none"
+              />
+
+              {/* Rank Emblem with Animated Scaling and Glow */}
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.15 }}
+                className={cn(
+                  "w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center border-2 mb-4 relative z-10 shadow-2xl",
+                  celebratingRank.rank.title === 'Master' ? 'bg-yellow-500/20 border-yellow-400 shadow-[0_0_35px_rgba(234,179,8,0.5)]' :
+                  celebratingRank.rank.title === 'Intermediate' ? 'bg-slate-300/20 border-slate-300 shadow-[0_0_35px_rgba(148,163,184,0.4)]' :
+                  celebratingRank.rank.title === 'Beginner' ? 'bg-orange-500/20 border-orange-400 shadow-[0_0_35px_rgba(234,88,12,0.5)]' :
+                  'bg-cyan-500/20 border-cyan-400 shadow-[0_0_35px_rgba(6,182,212,0.5)]'
+                )}
+              >
+                {celebratingRank.rank.title === 'Master' ? (
+                  <Crown className="w-14 h-14 text-yellow-400 animate-bounce" />
+                ) : celebratingRank.rank.title === 'Intermediate' ? (
+                  <Trophy className="w-14 h-14 text-slate-200 animate-pulse" />
+                ) : celebratingRank.rank.title === 'Beginner' ? (
+                  <Award className="w-14 h-14 text-orange-400 animate-pulse" />
+                ) : (
+                  <Star className="w-14 h-14 text-cyan-400 animate-spin" style={{ animationDuration: '8s' }} />
+                )}
+              </motion.div>
+
+              {/* Header Titles */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
+                className="space-y-1 z-10"
+              >
+                <div className="flex items-center justify-center gap-1.5 text-xs font-hud font-black text-cyan-400 uppercase tracking-widest">
+                  <Sparkles className="w-4 h-4 text-cyan-300 animate-spin" style={{ animationDuration: '4s' }} />
+                  <span>RANK MILESTONE ATTAINED</span>
+                  <Sparkles className="w-4 h-4 text-cyan-300 animate-spin" style={{ animationDuration: '4s' }} />
+                </div>
+                
+                <h3 className="text-2xl sm:text-3xl font-hud font-black text-white uppercase tracking-wider">
+                  PROMOTED TO <span className={cn(
+                    "drop-shadow-[0_0_12px_currentColor]",
+                    celebratingRank.rank.title === 'Master' ? 'text-yellow-400' :
+                    celebratingRank.rank.title === 'Intermediate' ? 'text-slate-200' :
+                    celebratingRank.rank.title === 'Beginner' ? 'text-orange-400' :
+                    'text-cyan-300'
+                  )}>{celebratingRank.rank.title}</span>
+                </h3>
+
+                <p className="text-xs sm:text-sm font-sans text-slate-300 max-w-xs mx-auto leading-relaxed pt-1">
+                  {celebratingRank.rank.desc}
+                </p>
+              </motion.div>
+
+              {/* Progress Summary Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 }}
+                className="w-full bg-slate-900/90 border border-slate-800 rounded-2xl p-4 my-4 flex items-center justify-around z-10"
+              >
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] font-hud font-bold text-slate-400 uppercase">Previous</span>
+                  <span className="text-xs sm:text-sm font-hud font-black text-slate-300 uppercase">{celebratingRank.prevRankTitle}</span>
+                </div>
+                <div className="text-cyan-400 font-hud text-lg">➜</div>
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] font-hud font-bold text-cyan-400 uppercase">Current Rank</span>
+                  <span className={cn("text-xs sm:text-sm font-hud font-black uppercase", celebratingRank.rank.color.split(' ')[0])}>
+                    {celebratingRank.rank.title} (Level {celebratingRank.rank.level})
+                  </span>
+                </div>
+              </motion.div>
+
+              {/* Confirm / Continue Button */}
+              <motion.button
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.45 }}
+                onClick={() => {
+                  setCelebratingRank(null);
+                  try { sounds.scan(); } catch (_) {}
+                }}
+                className={cn(
+                  hudButtonClass(true, 'cyan'),
+                  "w-full py-3 text-xs sm:text-sm font-hud font-black uppercase tracking-widest !rounded-2xl cursor-pointer shadow-lg shadow-cyan-950/60 z-10 flex items-center justify-center gap-2 hover:scale-102 transition-transform"
+                )}
+              >
+                <CheckCircle2 className="w-4 h-4 text-slate-950" />
+                CLAIM RANK & CONTINUE
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 });

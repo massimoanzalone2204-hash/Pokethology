@@ -4,12 +4,16 @@ import { Star, Search, Trash2, Plus, X, Eye, Swords, Sparkles, Check, Database, 
 import { cn } from '../lib/utils';
 import { Pokemon } from '../types';
 import { searchPokemon } from '../lib/api';
+import { getPokemonArtworkUrl, getPokemonSpriteUrl, POKEMON_FORM_IDS } from '../lib/pokemonArtwork';
 
 interface FavoriteItem {
   id: string; // pokemon name
   name: string;
   url?: string;
   displayId?: number;
+  formId?: number;
+  baseId?: number;
+  artwork?: string;
   addedAt: number;
 }
 
@@ -17,7 +21,7 @@ interface FavoritesVaultModalProps {
   isOpen: boolean;
   onClose: () => void;
   favorites: FavoriteItem[];
-  toggleFavorite: (pokemon: { name: string; url: string; displayId?: number }) => Promise<void>;
+  toggleFavorite: (pokemon: { name: string; url?: string; displayId?: number; formId?: number; baseId?: number; artwork?: string }) => Promise<void>;
   onSelectPokemon: (name: string) => void;
   onStartBattleWithPokemon?: (name: string) => void;
   isLightMode?: boolean;
@@ -159,7 +163,10 @@ export const FavoritesVaultModal: React.FC<FavoritesVaultModalProps> = ({
       await toggleFavorite({
         name: form.name,
         url: form.artwork || form.sprite,
-        displayId: form.baseId || form.id
+        displayId: form.baseId,
+        formId: form.id,
+        baseId: form.baseId,
+        artwork: form.artwork
       });
       const isNowFav = !favorites.some(f => f.name.toLowerCase() === form.name.toLowerCase());
       if (isNowFav) {
@@ -180,10 +187,14 @@ export const FavoritesVaultModal: React.FC<FavoritesVaultModalProps> = ({
   };
 
   const getArtworkUrl = (item: FavoriteItem) => {
-    if (item.displayId) {
-      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${item.displayId}.png`;
-    }
-    return item.url || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png`;
+    return getPokemonArtworkUrl({
+      name: item.name,
+      url: item.url,
+      displayId: item.displayId,
+      formId: item.formId,
+      baseId: item.baseId,
+      artwork: item.artwork
+    });
   };
 
   return (
@@ -497,7 +508,14 @@ export const FavoritesVaultModal: React.FC<FavoritesVaultModalProps> = ({
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                toggleFavorite({ name: fav.name, url: fav.url || '', displayId: fav.displayId });
+                                toggleFavorite({
+                                  name: fav.name,
+                                  url: fav.url || '',
+                                  displayId: fav.displayId,
+                                  formId: fav.formId,
+                                  baseId: fav.baseId,
+                                  artwork: fav.artwork
+                                });
                                 try { sounds?.hover?.(); } catch (_) {}
                               }}
                               className="absolute top-2.5 right-2.5 p-1.5 rounded-lg bg-slate-950/80 hover:bg-rose-950 text-yellow-400 hover:text-rose-400 border border-yellow-500/30 hover:border-rose-500/50 transition-all z-20 cursor-pointer"
@@ -527,7 +545,13 @@ export const FavoritesVaultModal: React.FC<FavoritesVaultModalProps> = ({
                                 className="max-w-full max-h-full object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] z-10"
                                 referrerPolicy="no-referrer"
                                 onError={(e) => {
-                                  e.currentTarget.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${fav.displayId || 25}.png`;
+                                  e.currentTarget.src = getPokemonSpriteUrl({
+                                    name: fav.name,
+                                    url: fav.url,
+                                    displayId: fav.displayId,
+                                    formId: fav.formId,
+                                    baseId: fav.baseId
+                                  });
                                 }}
                               />
                             </div>

@@ -132,10 +132,22 @@ export function AboutModal({ isOpen, onClose, isLightMode = false }: AboutModalP
               </div>
 
               {/* Copyright Footnote */}
-              <div className="text-[10px] font-mono text-slate-500 text-center pt-4 border-t border-slate-800/80 leading-relaxed">
-                Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc. TM, ® and Pokémon character names are trademarks of Nintendo.
-                <br />
-                No copyright or trademark infringement is intended in using Pokémon content on Pokéthology.
+              <div className="text-[9px] sm:text-[10px] font-mono text-slate-500 text-center pt-4 border-t border-slate-800/80 leading-relaxed space-y-1">
+                <p>
+                  Pokéthology is an unofficial, free fan made app and is NOT affiliated, endorsed or supported by Nintendo, GAME FREAK or The Pokémon company in any way.
+                </p>
+                <p>
+                  Some images used in this app are copyrighted and are supported under fair use.
+                </p>
+                <p>
+                  Pokémon and Pokémon character names are trademarks of Nintendo.
+                </p>
+                <p>
+                  No copyright infringement intended.
+                </p>
+                <p className="text-slate-400 font-semibold pt-1">
+                  Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc.
+                </p>
               </div>
             </div>
           </div>

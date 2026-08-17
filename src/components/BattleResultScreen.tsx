@@ -21,6 +21,11 @@ interface BattleResultScreenProps {
   onInspect: () => void;
   onNewBattle: () => void;
   isLightMode?: boolean;
+  missionNotice?: {
+    title: string;
+    description: string;
+    isComplete: boolean;
+  } | null;
 }
 
 export function BattleResultScreen({
@@ -37,7 +42,8 @@ export function BattleResultScreen({
   onRematch,
   onInspect,
   onNewBattle,
-  isLightMode
+  isLightMode,
+  missionNotice
 }: BattleResultScreenProps) {
   if (!isOpen) return null;
 
@@ -240,6 +246,43 @@ export function BattleResultScreen({
                 </span>
               </div>
             </div>
+
+            {/* Mission Objective Milestone Notice */}
+            {missionNotice && (
+              <div className={cn(
+                "p-3 rounded-xl border flex items-center gap-3 relative overflow-hidden",
+                missionNotice.isComplete 
+                  ? "bg-emerald-950/70 border-emerald-500/60 shadow-[0_0_25px_rgba(16,185,129,0.25)]" 
+                  : "bg-cyan-950/70 border-cyan-500/60 shadow-[0_0_25px_rgba(6,182,212,0.25)]"
+              )}>
+                <div className={cn(
+                  "w-9 h-9 rounded-full flex items-center justify-center shrink-0 border",
+                  missionNotice.isComplete 
+                    ? "bg-emerald-500/20 border-emerald-400 text-emerald-300" 
+                    : "bg-cyan-500/20 border-cyan-400 text-cyan-300"
+                )}>
+                  {missionNotice.isComplete ? (
+                    <Trophy className="w-5 h-5 animate-bounce" />
+                  ) : (
+                    <Target className="w-5 h-5 animate-pulse" />
+                  )}
+                </div>
+                <div className="flex flex-col text-left overflow-hidden">
+                  <span className={cn(
+                    "text-[10px] font-hud font-black uppercase tracking-wider flex items-center gap-1",
+                    missionNotice.isComplete ? "text-emerald-400" : "text-cyan-400"
+                  )}>
+                    {missionNotice.isComplete ? "🎉 MISSION OBJECTIVE COMPLETED" : "⚔️ DAILY HUB MISSION PROGRESS"}
+                  </span>
+                  <span className="text-xs font-bold text-white truncate">
+                    {missionNotice.title}
+                  </span>
+                  <span className="text-[10px] text-slate-300 font-sans truncate">
+                    {missionNotice.description}
+                  </span>
+                </div>
+              </div>
+            )}
 
             {/* Minimal Final Combat Logs */}
             {lastLogs.length > 0 && (

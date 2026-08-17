@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Search, Zap, Swords } from 'lucide-react';
 import { Move } from '../types';
-import { cn } from '../lib/utils';
+import { cn, playHaptic } from '../lib/utils';
 import { TypeBadge } from './TypeBadge';
 import { sounds } from '../lib/sounds';
 
@@ -63,6 +63,7 @@ export const MoveModal: React.FC<MoveModalProps> = ({ isOpen, onClose, moves, on
 
             <button
               onClick={() => {
+                playHaptic('light');
                 onClose();
                 try { sounds.scan(); } catch (_) {}
               }}
@@ -88,7 +89,10 @@ export const MoveModal: React.FC<MoveModalProps> = ({ isOpen, onClose, moves, on
                 />
                 {searchTerm && (
                   <button
-                    onClick={() => setSearchTerm('')}
+                    onClick={() => {
+                      playHaptic('light');
+                      setSearchTerm('');
+                    }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -99,7 +103,10 @@ export const MoveModal: React.FC<MoveModalProps> = ({ isOpen, onClose, moves, on
               {/* Type Filter Pills */}
               <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0 no-scrollbar">
                 <button
-                  onClick={() => setSelectedType(null)}
+                  onClick={() => {
+                    playHaptic('selection');
+                    setSelectedType(null);
+                  }}
                   className={cn(
                     "px-2.5 py-1 rounded-lg text-[10px] font-hud font-bold uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer border",
                     !selectedType
@@ -112,7 +119,10 @@ export const MoveModal: React.FC<MoveModalProps> = ({ isOpen, onClose, moves, on
                 {uniqueTypes.map((t) => (
                   <button
                     key={t}
-                    onClick={() => setSelectedType(selectedType === t ? null : t)}
+                    onClick={() => {
+                      playHaptic('selection');
+                      setSelectedType(selectedType === t ? null : t);
+                    }}
                     className={cn(
                       "px-2 py-1 rounded-lg text-[10px] font-hud font-bold uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer border",
                       selectedType === t
@@ -137,8 +147,12 @@ export const MoveModal: React.FC<MoveModalProps> = ({ isOpen, onClose, moves, on
                     No Moves Match Filter
                   </p>
                   <button
-                    onClick={() => { setSearchTerm(''); setSelectedType(null); }}
-                    className="mt-2 px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono"
+                    onClick={() => {
+                      playHaptic('light');
+                      setSearchTerm('');
+                      setSelectedType(null);
+                    }}
+                    className="mt-2 px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono cursor-pointer"
                   >
                     Reset Filters
                   </button>
@@ -149,11 +163,12 @@ export const MoveModal: React.FC<MoveModalProps> = ({ isOpen, onClose, moves, on
                     <button
                       key={`${move.name}-${i}`}
                       onClick={() => {
+                        playHaptic('selection');
                         onMoveClick(move);
                         onClose();
                         try { sounds.scan(); } catch (_) {}
                       }}
-                      className="p-3.5 rounded-xl border border-slate-800 hover:border-cyan-500/60 bg-slate-900/70 hover:bg-slate-900 transition-all text-left group shadow-sm flex flex-col justify-between cursor-pointer"
+                      className="p-3.5 rounded-xl border border-slate-800 hover:border-cyan-500/60 bg-slate-900/70 hover:bg-slate-900 transition-all text-left group shadow-sm flex flex-col justify-between cursor-pointer active:scale-98"
                     >
                       <div className="flex justify-between items-start mb-2">
                         <span className="text-xs sm:text-sm font-hud font-black uppercase tracking-wider text-cyan-300 group-hover:text-cyan-200">
