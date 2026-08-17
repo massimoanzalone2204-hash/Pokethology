@@ -109,7 +109,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
             </motion.div>
             <div>
               <h2 className="text-sm sm:text-lg font-hud font-black text-cyan-300 uppercase tracking-widest leading-none">
-                Pokéthology Tutorial & Guide
+                Pokéthology Tutorial
               </h2>
             </div>
           </div>
