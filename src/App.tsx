@@ -42,6 +42,7 @@ import { PokethologyQuizWidget } from './components/PokethologyQuizWidget';
 import { MoveModal } from './components/MoveModal';
 import { BattleHistory } from './components/BattleHistory';
 import { AboutModal } from './components/AboutModal';
+import { DisclaimerModal, DisclaimerButton } from './components/DisclaimerModal';
 import { PwaInstallModal } from './components/PwaInstallModal';
 import { OfflineManagerModal } from './components/OfflineManagerModal';
 import { PokedexEntrySection } from './components/PokedexEntrySection';
@@ -2652,6 +2653,7 @@ export default function App() {
   const [selectedMoveDetail, setSelectedMoveDetail] = useState<Move | null>(null);
   const [isMoveDetailOpen, setIsMoveDetailOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
   const [isDiagnosticRunning, setIsDiagnosticRunning] = useState(false);
   const [diagnosticProgress, setDiagnosticProgress] = useState(0);
   const [diagnosticLogs, setDiagnosticLogs] = useState<string[]>([]);
@@ -7967,20 +7969,9 @@ export default function App() {
                             </motion.button>
                           </div>
 
-                          {/* Home Screen Copyright & Legal Disclaimer */}
-                          <div className="text-[9px] sm:text-[10px] text-slate-400 font-mono tracking-wider max-w-2xl mx-auto text-center mt-3 sm:mt-4 md:mt-5 mb-2 leading-relaxed opacity-80 select-none px-2 space-y-0.5">
-                            <p>
-                              Pokéthology is an unofficial, free fan made app and is NOT affiliated, endorsed or supported by Nintendo, GAME FREAK or The Pokémon company in any way.
-                            </p>
-                            <p>
-                              Some images used in this app are copyrighted and are supported under fair use.
-                            </p>
-                            <p>
-                              Pokémon and Pokémon character names are trademarks of Nintendo. No copyright infringement intended.
-                            </p>
-                            <p className="text-slate-300 font-semibold pt-0.5">
-                              Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc.
-                            </p>
+                          {/* Home Screen Copyright & Legal Disclaimer Toggle */}
+                          <div className="flex flex-col items-center justify-center mt-6 sm:mt-8 md:mt-10 mb-2 select-none px-2">
+                            <DisclaimerButton onClick={() => setIsDisclaimerOpen(true)} variant="pill" />
                           </div>
                         </div>
 
@@ -9551,19 +9542,8 @@ export default function App() {
                       </motion.div>
                     )}
                   </div>
-                  <div className="pt-3 border-t border-slate-800/50 text-[9px] font-mono text-slate-500 text-center leading-relaxed space-y-0.5">
-                    <p>
-                      Pokéthology is an unofficial, free fan made app and is NOT affiliated, endorsed or supported by Nintendo, GAME FREAK or The Pokémon company in any way.
-                    </p>
-                    <p>
-                      Some images used in this app are copyrighted and are supported under fair use.
-                    </p>
-                    <p>
-                      Pokémon and Pokémon character names are trademarks of Nintendo. No copyright infringement intended.
-                    </p>
-                    <p className="text-slate-400 font-semibold pt-0.5">
-                      Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc.
-                    </p>
+                  <div className="pt-4 mt-2 border-t border-slate-800/50 flex flex-col items-center justify-center">
+                    <DisclaimerButton onClick={() => setIsDisclaimerOpen(true)} variant="pill" />
                   </div>
                 </div>
 
@@ -9956,6 +9936,11 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
+        {/* Full-Screen Disclaimer & Copyright Modal */}
+        <DisclaimerModal
+          isOpen={isDisclaimerOpen}
+          onClose={() => setIsDisclaimerOpen(false)}
+        />
         {/* About & System Info / Bug Report Modal */}
         <AboutModal
           isOpen={isAboutOpen}
