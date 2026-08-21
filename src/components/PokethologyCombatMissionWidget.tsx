@@ -953,7 +953,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 ) : celebratingRank.rank.title === 'Beginner' ? (
                   <Award className="w-14 h-14 text-orange-400 animate-pulse" />
                 ) : (
-                  <Star className="w-14 h-14 text-cyan-400 animate-spin" style={{ animationDuration: '8s' }} />
+                  <Trophy className="w-14 h-14 text-cyan-400 animate-pulse" />
                 )}
               </motion.div>
 

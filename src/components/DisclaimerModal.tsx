@@ -28,33 +28,23 @@ export function DisclaimerModal({ isOpen, onClose }: DisclaimerModalProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 md:p-8 bg-slate-950/95 backdrop-blur-2xl text-slate-100 overflow-y-auto"
+          className="fixed inset-0 z-[9999] flex flex-col bg-slate-950/98 backdrop-blur-2xl text-slate-100 overflow-hidden"
           onClick={onClose}
         >
           {/* Background Cyber Ambient Glows */}
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none" />
           <div className="absolute bottom-10 right-10 w-[200px] sm:w-[400px] h-[200px] sm:h-[400px] bg-indigo-500/10 rounded-full blur-[90px] pointer-events-none" />
 
-          {/* Full Screen Modal Card Container */}
-          <motion.div
-            initial={{ scale: 0.92, opacity: 0, y: 15 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.92, opacity: 0, y: 15 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          {/* Full Screen View Container */}
+          <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-3xl bg-slate-900/95 border-2 border-cyan-500/50 rounded-2xl sm:rounded-3xl shadow-[0_0_60px_rgba(34,211,238,0.25)] overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[85vh] my-auto"
+            className="relative w-full h-full flex flex-col justify-between overflow-hidden"
           >
-            {/* HUD Corner Decorators */}
-            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-cyan-400 pointer-events-none rounded-tl-2xl" />
-            <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-cyan-400 pointer-events-none rounded-tr-2xl" />
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-cyan-400 pointer-events-none rounded-bl-2xl" />
-            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-cyan-400 pointer-events-none rounded-br-2xl" />
-
             {/* Header */}
-            <div className="relative shrink-0 px-5 sm:px-8 py-5 sm:py-6 border-b border-cyan-500/30 bg-slate-950/80 flex items-center justify-between gap-4">
+            <div className="relative shrink-0 px-4 sm:px-8 py-4 sm:py-5 border-b border-cyan-500/30 bg-slate-900/90 flex items-center justify-between gap-4 z-10 shadow-lg">
               <div className="flex items-center gap-3 sm:gap-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/60 flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(34,211,238,0.4)]">
-                  <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7 text-cyan-300" />
+                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-cyan-500/20 border border-cyan-400/60 flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(34,211,238,0.4)]">
+                  <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-300" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
@@ -72,33 +62,45 @@ export function DisclaimerModal({ isOpen, onClose }: DisclaimerModalProps) {
                   try { sounds.scan(); } catch (_) {}
                   onClose();
                 }}
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-800/80 hover:bg-cyan-500/20 border border-slate-700 hover:border-cyan-400 text-slate-400 hover:text-cyan-200 flex items-center justify-center transition-all shrink-0 active:scale-95"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-800/80 hover:bg-cyan-500/20 border border-slate-700 hover:border-cyan-400 text-slate-400 hover:text-cyan-200 flex items-center justify-center transition-all shrink-0 active:scale-95 cursor-pointer"
                 title="Close Disclaimer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Body Content - Exact Original Disclaimer Messages */}
-            <div className="p-6 sm:p-10 space-y-5 overflow-y-auto text-sm sm:text-base font-mono leading-relaxed text-slate-200 text-center custom-scrollbar my-auto">
-              <div className="p-5 sm:p-6 rounded-2xl bg-slate-950/80 border border-cyan-500/30 space-y-4 shadow-inner max-w-xl mx-auto">
-                <p className="text-slate-200">
+            {/* Main Body Content - Centered Full Screen Box */}
+            <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 sm:py-12 overflow-y-auto custom-scrollbar">
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0, y: 10 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 10 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                className="relative w-full max-w-2xl p-6 sm:p-10 rounded-2xl sm:rounded-3xl bg-slate-900/90 border-2 border-cyan-500/40 shadow-[0_0_60px_rgba(34,211,238,0.2)] space-y-5 text-sm sm:text-base font-mono leading-relaxed text-slate-200 text-center my-auto"
+              >
+                {/* HUD Corner Decorators */}
+                <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-cyan-400 pointer-events-none rounded-tl-2xl" />
+                <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-cyan-400 pointer-events-none rounded-tr-2xl" />
+                <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-cyan-400 pointer-events-none rounded-bl-2xl" />
+                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-cyan-400 pointer-events-none rounded-br-2xl" />
+
+                <p className="text-slate-100 text-sm sm:text-lg leading-relaxed font-semibold">
                   Pokéthology is an unofficial, free fan made app and is NOT affiliated, endorsed or supported by Nintendo, GAME FREAK or The Pokémon company in any way.
                 </p>
-                <p className="text-slate-300 text-xs sm:text-sm">
+                <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
                   Some images used in this app are copyrighted and are supported under fair use.
                 </p>
-                <p className="text-slate-300 text-xs sm:text-sm">
+                <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
                   Pokémon and Pokémon character names are trademarks of Nintendo. No copyright infringement intended.
                 </p>
-                <div className="pt-3 border-t border-slate-800 text-cyan-300 font-bold text-xs sm:text-sm">
+                <div className="pt-4 border-t border-slate-800 text-cyan-300 font-bold text-xs sm:text-sm tracking-wide">
                   Pokémon © 2002-2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc.
                 </div>
-              </div>
+              </motion.div>
             </div>
 
-            {/* Modal Bottom Footer Action */}
-            <div className="p-4 sm:p-6 bg-slate-950 border-t border-slate-800 flex items-center justify-between gap-4">
+            {/* Footer Action Bar */}
+            <div className="shrink-0 p-4 sm:px-8 sm:py-5 bg-slate-950/90 border-t border-slate-800 flex items-center justify-between gap-4 z-10">
               <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-500">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>Full-Screen Policy Compliance</span>
@@ -109,13 +111,13 @@ export function DisclaimerModal({ isOpen, onClose }: DisclaimerModalProps) {
                   try { sounds.scan(); } catch (_) {}
                   onClose();
                 }}
-                className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-slate-950 font-hud text-xs sm:text-sm font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(34,211,238,0.4)] active:scale-95 flex items-center justify-center gap-2 ml-auto"
+                className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-slate-950 font-hud text-xs sm:text-sm font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(34,211,238,0.4)] active:scale-95 flex items-center justify-center gap-2 ml-auto cursor-pointer"
               >
                 <Check className="w-4 h-4 stroke-[3]" />
                 <span>I Understand & Close</span>
               </button>
             </div>
-          </motion.div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
