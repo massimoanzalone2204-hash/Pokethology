@@ -480,7 +480,7 @@ export async function preCachePokemonRange(
 
   for (let id = start; id <= end; id++) {
     try {
-      const data = await searchPokemon(id.toString(), 'en');
+      const data = await searchPokemon(id.toString());
       if (data) {
         count++;
         // Pre-cache artwork sprite image blob into IndexedDB if available

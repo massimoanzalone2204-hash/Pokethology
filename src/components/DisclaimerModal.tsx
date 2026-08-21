@@ -78,17 +78,11 @@ export function DisclaimerModal({ isOpen, onClose }: DisclaimerModalProps) {
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                 className="relative w-full max-w-2xl p-6 sm:p-10 rounded-2xl sm:rounded-3xl bg-slate-900/90 border-2 border-cyan-500/40 shadow-[0_0_60px_rgba(34,211,238,0.2)] space-y-5 text-sm sm:text-base font-mono leading-relaxed text-slate-200 text-center my-auto"
               >
-                {/* HUD Corner Decorators */}
-                <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-cyan-400 pointer-events-none rounded-tl-2xl" />
-                <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-cyan-400 pointer-events-none rounded-tr-2xl" />
-                <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-cyan-400 pointer-events-none rounded-bl-2xl" />
-                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-cyan-400 pointer-events-none rounded-br-2xl" />
-
                 <p className="text-slate-100 text-sm sm:text-lg leading-relaxed font-semibold">
                   Pokéthology is an unofficial, free fan made app and is NOT affiliated, endorsed or supported by Nintendo, GAME FREAK or The Pokémon company in any way.
                 </p>
                 <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                  Some images used in this app are copyrighted and are supported under fair use.
+                  Images and sounds used in this app are copyrighted and are supported under fair use.
                 </p>
                 <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
                   Pokémon and Pokémon character names are trademarks of Nintendo. No copyright infringement intended.
@@ -143,10 +137,10 @@ export function DisclaimerButton({ onClick, className = '', variant = 'pill' }: 
       <button
         onClick={handleClick}
         className={`px-4 py-2 bg-slate-900/90 hover:bg-slate-800/90 border border-cyan-500/50 hover:border-cyan-400 text-cyan-300 hover:text-cyan-100 rounded-xl font-hud text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)] hover:shadow-[0_0_25px_rgba(34,211,238,0.4)] flex items-center gap-2 group active:scale-95 ${className}`}
-        title="Open Full Screen Legal Disclaimer"
+        title="Open Full Screen Copyright Notice"
       >
         <ShieldCheck className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform shrink-0" />
-        <span>Disclaimer</span>
+        <span>Copyright</span>
       </button>
     );
   }
@@ -156,10 +150,10 @@ export function DisclaimerButton({ onClick, className = '', variant = 'pill' }: 
       <button
         onClick={handleClick}
         className={`text-[11px] font-mono text-cyan-400 hover:text-cyan-300 underline underline-offset-4 decoration-cyan-500/50 hover:decoration-cyan-400 flex items-center gap-1 transition-colors ${className}`}
-        title="View Full Legal Disclaimer"
+        title="View Full Copyright Notice"
       >
         <ShieldCheck className="w-3.5 h-3.5 inline shrink-0" />
-        <span>Disclaimer</span>
+        <span>Copyright</span>
       </button>
     );
   }
@@ -171,7 +165,7 @@ export function DisclaimerButton({ onClick, className = '', variant = 'pill' }: 
       title="View Legal Disclaimer & Copyright Notice"
     >
       <ShieldCheck className="w-3.5 h-3.5 text-cyan-400 group-hover:scale-110 transition-transform shrink-0" />
-      <span>Disclaimer</span>
+      <span>Copyright</span>
       <span className="w-1.5 h-1.5 rounded-full bg-cyan-400/80 group-hover:bg-cyan-300 animate-pulse ml-0.5" />
     </button>
   );

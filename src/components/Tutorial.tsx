@@ -33,7 +33,7 @@ import {
   GitBranch,
   BarChart3,
   Dna,
-  Mic,
+
   MessageSquare,
   Flame,
   Target,
@@ -185,7 +185,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                   Pokéthology provides a complete index spanning all 9 Generations of Pokémon (from Kanto #001 Bulbasaur to Paldea #1025 Pecharunt), including full support for Alternative Forms: Mega Evolutions, Gigantamax (G-Max) variants, Alolan, Galarian, Hisuian, and Paldean regional forms, as well as Legends Z-A custom additions (such as Mega Zygarde, Mega Garchomp-Z, and Stretchy Tatsugiri).
                 </p>
                 <p className="text-slate-400 font-sans leading-relaxed text-[10.5px] sm:text-[11px] relative z-10 pt-1 border-t border-emerald-500/20">
-                  Filter by 18 Elemental Types with dual-type combinations, jump across Generation selectors (Gen I–IX), and sort instantly by National Dex ID, Base Stat Total (BST), Kinetic Speed, Attack, Defense, or Alphabetical name.
+                  Jump across Generation selectors (Gen I–IX), and sort instantly by National Dex ID, Base Stat Total (BST), Kinetic Speed, Attack, Defense, or Alphabetical name.
                 </p>
               </div>
               
@@ -243,10 +243,10 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                   </div>
                   <div className="space-y-1 w-full min-w-0">
                     <span className="font-hud font-black text-cyan-400 text-xs sm:text-sm uppercase tracking-wider block">
-                      Artwork, Sprites & Shiny Toggle
+                      Artwork & Shiny Toggle
                     </span>
                     <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      Toggle seamlessly between High-Definition Official Pokémon Artwork, classic 2D Gen 5 Showdown pixel sprites, and animated battle models. Click the Sparkles/Shiny button to preview rare Shiny colorations for any species or alternative form.
+                      Toggle seamlessly between High-Definition Official Pokémon Artwork and animated battle models. Click the Sparkles/Shiny button to preview rare Shiny colorations for any species or alternative form.
                     </p>
                   </div>
                 </div>
@@ -299,9 +299,6 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
                   The Pokéthology AI Assistant is a specialized neural assistant powered by Gemini AI, engineered to provide expert analysis across competitive metagame strategies, Smogon tiers, species biology, canonical lore, and matchup calculations.
                 </p>
-                <p className="text-slate-400 font-sans leading-relaxed text-[10.5px] sm:text-[11px] relative z-10 pt-1 border-t border-purple-500/20">
-                  The assistant is context-aware: it automatically synchronizes with the Pokémon currently inspected in your Pokédex, offering custom prompt shortcuts for quick tactical assessments, moveset optimization, and team synergies.
-                </p>
               </div>
 
               {/* HUD Feature Cards */}
@@ -332,36 +329,6 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     </span>
                     <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
                       Discover evolutionary adaptations, anatomical physiology, habitat behaviors, and canonical Pokédex descriptions from Red & Blue to Scarlet & Violet and Legends Z-A.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Voice Input & TTS Playback */}
-                <div className="p-4 rounded-xl border border-purple-500/30 bg-slate-900/60 flex items-start gap-4 group">
-                  <div className="p-3 bg-purple-950 rounded-full border border-purple-500/50 group-hover:scale-110 transition-transform shrink-0">
-                    <Mic className="w-5 h-5 text-purple-400" />
-                  </div>
-                  <div className="space-y-1">
-                    <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider block">
-                      Voice Transcription & Text-to-Speech (TTS)
-                    </span>
-                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      Ask questions hands-free using the built-in microphone speech-to-text input, or listen to the AI assistant read its tactical analysis aloud using integrated Text-to-Speech synthesis.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Contextual Quick Prompts */}
-                <div className="p-4 rounded-xl border border-purple-500/30 bg-slate-900/60 flex items-start gap-4 group">
-                  <div className="p-3 bg-purple-950 rounded-full border border-purple-500/50 group-hover:rotate-12 transition-transform shrink-0">
-                    <MessageSquare className="w-5 h-5 text-purple-400" />
-                  </div>
-                  <div className="space-y-1">
-                    <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider block">
-                      Context-Aware Quick Prompts
-                    </span>
-                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      Tap one-touch prompt chips to instantly generate best counter-picks, Gym Leader / Elite Four battle tactics, type coverage analysis, and complementary team recommendations.
                     </p>
                   </div>
                 </div>
@@ -436,21 +403,6 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                   </div>
                 </div>
 
-                {/* Battle Logs & Post-Match Summary */}
-                <div className="p-4 rounded-xl border border-red-500/30 bg-slate-900/60 flex items-start gap-4 group">
-                  <div className="p-3 bg-red-950 rounded-full border border-red-500/50 group-hover:scale-110 transition-transform shrink-0">
-                    <BarChart3 className="w-5 h-5 text-red-400" />
-                  </div>
-                  <div className="space-y-1">
-                    <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider block">
-                      Turn-by-Turn Combat Log & Victory Summary
-                    </span>
-                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      Review a real-time combat feed detailing each action, move accuracy checks, damage numbers, and effectiveness notes. The post-battle modal calculates the Victor, MVP performer, Total Turns, and Total Damage dealt.
-                    </p>
-                  </div>
-                </div>
-
                 {/* Sound Cries & Audio Pack */}
                 <div className="p-4 rounded-xl border border-cyan-500/30 bg-slate-900/60 flex items-start gap-4 group">
                   <div className="p-3 bg-cyan-950 rounded-full border border-cyan-500/50 group-hover:rotate-12 transition-transform shrink-0">
@@ -485,7 +437,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                   The Daily Hub is Pokéthology's operational command center for daily training routines, knowledge evaluation, progress milestones, and persistent local storage management.
                 </p>
                 <p className="text-slate-400 font-sans leading-relaxed text-[10.5px] sm:text-[11px] relative z-10 pt-1 border-t border-amber-500/20">
-                  Complete daily featured Pokémon scans, test your competitive acumen in the Theory Exam, finish combat missions to advance Operator Rank tiers, and manage your Favorites Vault directly in your browser.
+                  Complete daily featured Pokémon scans, test your competitive acumen in the Theory Exam, and finish combat missions to advance Operator Rank tiers.
                 </p>
               </div>
               
@@ -535,21 +487,6 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                   </div>
                 </div>
 
-                {/* FAVORITES VAULT */}
-                <div className="p-4 rounded-xl border border-yellow-500/40 bg-slate-900/70 flex items-start gap-4 group">
-                  <div className="p-3 bg-yellow-950 rounded-full border border-yellow-500/60 group-hover:rotate-12 transition-transform shrink-0">
-                    <Star className="w-5 h-5 text-yellow-400 fill-yellow-400/40" />
-                  </div>
-                  <div className="space-y-1">
-                    <span className="font-hud font-black text-yellow-300 text-xs sm:text-sm uppercase tracking-wider block">
-                      Favorites Vault (IndexedDB Storage)
-                    </span>
-                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      Locally and privately stored in your browser using IndexedDB. Save any base Pokémon or specific alternate form (Mega, Gigantamax, Regional), filter by type within the vault, and launch any favorited Pokémon directly into combat.
-                    </p>
-                  </div>
-                </div>
-
                 {/* SEARCH BAR */}
                 <div className="p-4 rounded-xl border border-cyan-500/40 bg-slate-900/70 flex items-start gap-4 group">
                   <div className="p-3 bg-cyan-950 rounded-full border border-cyan-500/60 group-hover:scale-110 transition-transform shrink-0">
@@ -575,7 +512,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       System Settings & HUD Customization
                     </span>
                     <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      Toggle between Cyberpunk Dark Mode and Clean Light Mode themes, customize Web Audio Synthesizer BGM / SFX / Pokémon Cry volume sliders, switch interface languages (EN / IT / ES / FR / DE), and manage local application caches.
+                      Toggle between Cyberpunk Dark Mode and Clean Light Mode themes, and customize Web Audio Synthesizer BGM / SFX / Pokémon Cry volume sliders.
                     </p>
                   </div>
                 </div>

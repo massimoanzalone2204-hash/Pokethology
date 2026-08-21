@@ -83,9 +83,6 @@ export const isNonPcDevice = (): boolean => {
 
 export const playHaptic = (pattern: number | number[] | HapticPreset = 'selection') => {
   if (typeof window === 'undefined') return;
-  // Enhanced haptic feedback for devices that aren't PC
-  if (!isNonPcDevice()) return;
-
   const now = Date.now();
   if (now - lastHapticTime < 20) return;
   lastHapticTime = now;

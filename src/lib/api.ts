@@ -165,7 +165,7 @@ export function getZAEntry(pokemonName: string): string | null {
 }
 
 
-export async function searchPokemon(query: string, lang: string = 'en'): Promise<Pokemon> {
+export async function searchPokemon(query: string): Promise<Pokemon> {
   let formattedQuery = query.trim().toLowerCase();
 
   // Normalize Koraidon and Miraidon to base form (removing alternate forms from backend)
@@ -185,7 +185,7 @@ export async function searchPokemon(query: string, lang: string = 'en'): Promise
   }
   if (!formattedQuery) throw new Error("Please enter a Pokemon name or ID.");
 
-  const baseLang = lang.split('-')[0];
+  const baseLang = 'en';
   const cacheKey = `v2-${formattedQuery}-${baseLang}`;
   const cachedPokemon = await getPokemonFromCache(cacheKey);
   if (cachedPokemon) {

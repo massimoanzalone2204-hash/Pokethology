@@ -358,6 +358,16 @@ export function BattleResultScreen({
 
           <div className="w-full sm:w-auto flex items-center justify-stretch sm:justify-end gap-2 sm:gap-3">
             <button
+              onClick={onInspect}
+              className={cn(
+                "flex-1 sm:flex-initial min-w-[95px] sm:min-w-[120px] px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-hud font-black uppercase tracking-wider text-xs sm:text-sm transition-all border flex items-center justify-center gap-1.5 sm:gap-2 hover:bg-black/10 active:scale-95 cursor-pointer font-bold whitespace-nowrap",
+                isLightMode ? "border-slate-400 bg-white text-slate-800 hover:bg-slate-50" : "border-slate-700 bg-slate-900 text-slate-200 hover:bg-slate-800"
+              )}
+            >
+              <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Inspect
+            </button>
+
+            <button
               onClick={onRematch}
               className={cn(
                 "flex-1 sm:flex-initial min-w-[95px] sm:min-w-[120px] px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-hud font-black uppercase tracking-wider text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 sm:gap-2 shadow-lg active:scale-95 cursor-pointer whitespace-nowrap",
@@ -367,16 +377,6 @@ export function BattleResultScreen({
               )}
             >
               <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Rematch
-            </button>
-
-            <button
-              onClick={onInspect}
-              className={cn(
-                "flex-1 sm:flex-initial min-w-[95px] sm:min-w-[120px] px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl font-hud font-black uppercase tracking-wider text-xs sm:text-sm transition-all border flex items-center justify-center gap-1.5 sm:gap-2 hover:bg-black/10 active:scale-95 cursor-pointer font-bold whitespace-nowrap",
-                isLightMode ? "border-slate-400 bg-white text-slate-800 hover:bg-slate-50" : "border-slate-700 bg-slate-900 text-slate-200 hover:bg-slate-800"
-              )}
-            >
-              <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Inspect Data
             </button>
 
             <button

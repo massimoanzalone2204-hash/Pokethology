@@ -2,8 +2,8 @@ import React, { Suspense } from 'react';
 import { idbGet, idbSet, idbGetAll, idbDelete, STORES } from "./lib/indexedDB";
 import { checkQuotaAllowed, recordApiUsage } from "./lib/quotaManager";
 import { useState, useEffect, useRef, useTransition, useMemo, useCallback, memo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Download, Search, Loader2, Database, Sparkles, Volume2, VolumeX, Copy, Check, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork, Github, ArrowLeftRight, Wifi, WifiOff } from 'lucide-react';
+
+import { Download, Search, Loader2, Database, Sparkles, Volume2, VolumeX, Copy, Check, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork, Github, ArrowLeftRight, Wifi, WifiOff, Bookmark } from 'lucide-react';
 import { EvolutionNodeComponent } from './components/EvolutionNodeComponent';
 
 import { PokethologyLogo } from './components/PokethologyLogo';
@@ -53,6 +53,477 @@ import { CombatStatsSection } from './components/CombatStatsSection';
 import { MovesetAnalysisSection } from './components/MovesetAnalysisSection';
 import { FavoritesVaultModal } from './components/FavoritesVaultModal';
 import { TypeChartModal } from './components/TypeChartModal';
+
+const TRAINER_SPRITES = [
+  {
+    "name": "Brock",
+    "id": "brock",
+    "role": "Gym Leader",
+    "lore": "The Rock-Solid Pok\u00e9mon Trainer. As the Pewter City Gym Leader, he acts as a wall of defense for challengers, believing in the unbreakable spirit of Rock-type Pok\u00e9mon and their enduring fortitude against any storm."
+  },
+  {
+    "name": "Misty",
+    "id": "misty",
+    "role": "Gym Leader",
+    "lore": "The Tomboyish Mermaid of Cerulean City. A fierce Water-type specialist whose tactics flow like a raging river. She balances grace and power, demanding absolute respect for the depths of water strategy."
+  },
+  {
+    "name": "Lt. Surge",
+    "id": "ltsurge",
+    "role": "Gym Leader",
+    "lore": "The Lightning American. A veteran of a vague, historic Pok\u00e9mon war, he uses his military discipline to command Electric-type Pok\u00e9mon with shocking precision and explosive speed from his Vermilion City Gym."
+  },
+  {
+    "name": "Erika",
+    "id": "erika",
+    "role": "Gym Leader",
+    "lore": "The Nature-Loving Princess. A practitioner of traditional flower arrangement in Celadon City. She finds true elegance in Grass-type Pok\u00e9mon, preferring battles that bloom with natural beauty and tranquility."
+  },
+  {
+    "name": "Koga",
+    "id": "koga",
+    "role": "Gym Leader",
+    "lore": "The Poisonous Ninja Master. Relying on confusion, toxins, and shadows, this Fuchsia City Gym Leader treats Pok\u00e9mon battling as an extension of the ancient ninja arts, striking when his foes are least prepared."
+  },
+  {
+    "name": "Sabrina",
+    "id": "sabrina",
+    "role": "Gym Leader",
+    "lore": "The Master of Psychic Pok\u00e9mon. A psychic prodigy from Saffron City who communicates telepathically with her Pok\u00e9mon. She foresaw your arrival and believes that true power lies in the untethered mind."
+  },
+  {
+    "name": "Blaine",
+    "id": "blaine",
+    "role": "Gym Leader",
+    "lore": "The Hotheaded Quiz Master. Living on the volcanic Cinnabar Island, this eccentric Fire-type specialist combines his passion for riddles with the searing heat of his beloved fiery companions."
+  },
+  {
+    "name": "Giovanni",
+    "id": "giovanni",
+    "role": "Gym Leader",
+    "lore": "The enigmatic boss of Team Rocket and the former Viridian City Gym Leader. A ruthless mastermind who views Pok\u00e9mon primarily as tools for absolute domination and financial conquest."
+  },
+  {
+    "name": "Lorelei",
+    "id": "lorelei",
+    "role": "Elite Four",
+    "lore": "An elite master of Ice-type Pok\u00e9mon. Hailing from the Sevii Islands, her analytical combat style is as cold and calculating as a glacier, freezing challengers in their tracks at the Indigo Plateau."
+  },
+  {
+    "name": "Bruno",
+    "id": "bruno",
+    "role": "Elite Four",
+    "lore": "A dedicated martial artist who trains his own body alongside his Fighting-type Pok\u00e9mon. He believes that pushing the physical limits is the only path to discovering true inner strength."
+  },
+  {
+    "name": "Agatha",
+    "id": "agatha",
+    "role": "Elite Four",
+    "lore": "An elderly but deeply formidable former rival to Professor Oak. She relies on the terrifying, deceptive nature of Ghost-type Pok\u00e9mon to remind younger generations that age only sharpens one's venom."
+  },
+  {
+    "name": "Lance",
+    "id": "lance",
+    "role": "Champion",
+    "lore": "The venerable Dragon Master of Blackthorn City. As a member of the Elite Four and later a Champion, he unleashes the mythical, untamed fury of Dragon-type Pok\u00e9mon to uphold justice across the regions."
+  },
+  {
+    "name": "Falkner",
+    "id": "falkner",
+    "role": "Gym Leader",
+    "lore": "The Elegant Master of Flying Pok\u00e9mon. Inheriting the Violet City Gym from his father, he commands the skies and fiercely defends the honor of Flying-types against those who underestimate them."
+  },
+  {
+    "name": "Bugsy",
+    "id": "bugsy",
+    "role": "Gym Leader",
+    "lore": "The Walking Bug Pok\u00e9mon Encyclopedia. Despite his youth, this Azalea Town prodigy has dedicated his life to researching the hidden potential and evolutionary wonders of Bug-type Pok\u00e9mon."
+  },
+  {
+    "name": "Whitney",
+    "id": "whitney",
+    "role": "Gym Leader",
+    "lore": "The Incredibly Pretty Girl of Goldenrod City! Don't let her tears fool you\u2014her Normal-type Pok\u00e9mon are notoriously resilient, utilizing relentless tactics like Rollout to crush unsuspecting challengers."
+  },
+  {
+    "name": "Morty",
+    "id": "morty",
+    "role": "Gym Leader",
+    "lore": "The Mystic Seer of the Future. Stationed in Ecruteak City, he has dedicated his life to studying the legends of Ho-Oh, communicating with Ghost-types to pierce the veil between the physical and spiritual realms."
+  },
+  {
+    "name": "Chuck",
+    "id": "chuck",
+    "role": "Gym Leader",
+    "lore": "His Roaring Fists Do the Talking. Training endlessly under the crashing waterfalls of Cianwood City, this Fighting-type Gym Leader channels the raw, unyielding power of nature into his Pok\u00e9mon's strikes."
+  },
+  {
+    "name": "Jasmine",
+    "id": "jasmine",
+    "role": "Gym Leader",
+    "lore": "The Steel-Clad Defense Girl. Initially timid and caring, she hardens her resolve in battle, directing her defensively impenetrable Steel-type Pok\u00e9mon to stand firm as the lighthouse of Olivine City."
+  },
+  {
+    "name": "Pryce",
+    "id": "pryce",
+    "role": "Gym Leader",
+    "lore": "The Teacher of Winter's Harshness. A veteran who has seen many bitter winters, this Mahogany Town Gym Leader uses Ice-types to test the inner warmth and unyielding willpower of the younger generations."
+  },
+  {
+    "name": "Clair",
+    "id": "clair",
+    "role": "Gym Leader",
+    "lore": "The Blessed User of Dragon Pok\u00e9mon. Proud, fiercely competitive, and demanding, she expects perfection from her challengers, reigning over the Blackthorn Gym with the overwhelming might of her dragons."
+  },
+  {
+    "name": "Roxanne",
+    "id": "roxanne",
+    "role": "Gym Leader",
+    "lore": "The Rock-Loving Scholar. A top graduate of the Pok\u00e9mon Trainer's School, she approaches battles with academic rigor, testing her textbook strategies through her sturdy Rock-type Pok\u00e9mon."
+  },
+  {
+    "name": "Brawly",
+    "id": "brawly",
+    "role": "Gym Leader",
+    "lore": "A big wave in motion! Surfing the tides of Dewford Town, he applies the fluidity of the ocean to his martial arts, instructing his Fighting-type Pok\u00e9mon to absorb impact and counterattack."
+  },
+  {
+    "name": "Wattson",
+    "id": "wattson",
+    "role": "Gym Leader",
+    "lore": "The cheerfully electrifying man! A jovial inventor who revolutionized Mauville City, he greets every battle with a hearty laugh, sparking joy and high-voltage tactics with his Electric-type Pok\u00e9mon."
+  },
+  {
+    "name": "Flannery",
+    "id": "flannery",
+    "role": "Gym Leader",
+    "lore": "One with a fiery passion that burns! Recently inheriting the Lavaridge Gym, her inexperience is masked by her explosive enthusiasm and the intense heat radiating from her Fire-type companions."
+  },
+  {
+    "name": "Norman",
+    "id": "norman",
+    "role": "Gym Leader",
+    "lore": "A man in pursuit of ultimate power. The protagonist's strict but loving father, he commands the Petalburg Gym with disciplined Normal-type strategies, offering the ultimate test of his child's growth."
+  },
+  {
+    "name": "Winona",
+    "id": "winona",
+    "role": "Gym Leader",
+    "lore": "The bird user taking flight into the world. Graceful and deeply attuned to the winds of Fortree City, she dances with her Flying-type Pok\u00e9mon, performing aerial acrobatics that dazzle her opponents."
+  },
+  {
+    "name": "Tate & Liza",
+    "id": "tateandliza",
+    "role": "Gym Leader",
+    "lore": "The mystic combination! These Mossdeep City twins share a telepathic bond, coordinating their Psychic-type Pok\u00e9mon in flawless double battles that overwhelm solitary challengers."
+  },
+  {
+    "name": "Wallace",
+    "id": "wallace",
+    "role": "Champion",
+    "lore": "Artist, and lover of water. An elegant coordinator and powerful trainer from Sootopolis City, he intertwines beauty and strength, commanding Water-type Pok\u00e9mon with the grace of a master illusionist."
+  },
+  {
+    "name": "Juan",
+    "id": "juan",
+    "role": "Gym Leader",
+    "lore": "The Gym Leader with the beauty of pure water. Wallace's sophisticated mentor, he delights in creating dazzling, aquatic spectacles, proving that true power can be a breathtaking work of art."
+  },
+  {
+    "name": "Steven",
+    "id": "steven",
+    "role": "Champion",
+    "lore": "The wandering stone collector. An heir to the Devon Corporation and the Champion of Hoenn, he traverses the globe in search of rare minerals, battling with an unshakeable, Steel-clad resolve."
+  },
+  {
+    "name": "Roark",
+    "id": "roark",
+    "role": "Gym Leader",
+    "lore": "Call him Roark the Rock! The dedicated foreman of the Oreburgh Mine, he follows in his father's footsteps, polishing the rugged potential of Rock-type Pok\u00e9mon into shining gems of strength."
+  },
+  {
+    "name": "Gardenia",
+    "id": "gardenia",
+    "role": "Gym Leader",
+    "lore": "Master of Vivid Plant Pok\u00e9mon! A deeply enthusiastic Grass-type specialist in Eterna City, she loves her botanical companions fiercely\u2014though she remains famously terrified of Ghost-types."
+  },
+  {
+    "name": "Maylene",
+    "id": "maylene",
+    "role": "Gym Leader",
+    "lore": "The Barefoot Fighting Genius! A humble prodigy from Veilstone City who sometimes doubts her own strength, yet commands her Fighting-type Pok\u00e9mon with astonishing, instinctual precision."
+  },
+  {
+    "name": "Crasher Wake",
+    "id": "crasherwake",
+    "role": "Gym Leader",
+    "lore": "The Torrential Masked Master! A larger-than-life pro wrestler from Pastoria City who loves entertaining the crowds, washing away the competition with the brute force of his Water-type Pok\u00e9mon."
+  },
+  {
+    "name": "Fantina",
+    "id": "fantina",
+    "role": "Gym Leader",
+    "lore": "The Alluring Soul Dancer! A flamboyant contest coordinator and Hearthome Gym Leader, she speaks with a foreign flair, utilizing Ghost-type Pok\u00e9mon to weave mesmerizing, unpredictable illusions."
+  },
+  {
+    "name": "Byron",
+    "id": "byron",
+    "role": "Gym Leader",
+    "lore": "The Man with the Steel Body! Roark's boisterous father and the Canalave City Gym Leader, he forged his unyielding defensive strategies deep within the Iron Island mines."
+  },
+  {
+    "name": "Candice",
+    "id": "candice",
+    "role": "Gym Leader",
+    "lore": "The Diamond Dust Girl! Despite Snowpoint City's freezing climate, her fierce, passionate spirit burns brightly, inspiring her Ice-type Pok\u00e9mon to strike with the focus of a blizzard."
+  },
+  {
+    "name": "Volkner",
+    "id": "volkner",
+    "role": "Gym Leader",
+    "lore": "The Shining, Shocking Star! Bored by weak challengers, this brilliant but melancholic Sunyshore City Gym Leader revitalizes the local technology to spark the ultimate Electric-type battle."
+  },
+  {
+    "name": "Cynthia",
+    "id": "cynthia",
+    "role": "Champion",
+    "lore": "The beloved Champion of the Sinnoh region. Deeply fascinated by Pok\u00e9mon mythology and the creation of the universe, she battles with an unparalleled, terrifyingly diverse team led by her Garchomp."
+  },
+  {
+    "name": "Cilan",
+    "id": "cilan",
+    "role": "Gym Leader",
+    "lore": "A sophisticated connoisseur of Grass-type Pok\u00e9mon. Alongside his brothers in Striaton City, he carefully analyzes the flavor of a challenger's battling style, aiming for a perfectly balanced encounter."
+  },
+  {
+    "name": "Lenora",
+    "id": "lenora",
+    "role": "Gym Leader",
+    "lore": "The Archeologist with a Backbone! Directing the Nacrene City Museum, she applies her rigorous scientific deduction to battling, using Normal-type Pok\u00e9mon to unearth her opponents' weaknesses."
+  },
+  {
+    "name": "Burgh",
+    "id": "burgh",
+    "role": "Gym Leader",
+    "lore": "The Premiere Insect Artist! A wandering bohemian soul in Castelia City, he finds profound artistic inspiration in the pure, unadulterated nature of Bug-type Pok\u00e9mon."
+  },
+  {
+    "name": "Elesa",
+    "id": "elesa",
+    "role": "Gym Leader",
+    "lore": "The Shining Beauty! A world-famous supermodel in Nimbasa City, she dazzles the runway and the battlefield alike, electrifying her audiences with a flashy, high-voltage combat style."
+  },
+  {
+    "name": "Clay",
+    "id": "clay",
+    "role": "Gym Leader",
+    "lore": "The Underground Boss! A gruff, hard-working magnate who built Driftveil City through sheer willpower, he crushes obstacles using the raw, unrefined power of his Ground-type Pok\u00e9mon."
+  },
+  {
+    "name": "Skyla",
+    "id": "skyla",
+    "role": "Gym Leader",
+    "lore": "The Highflying Girl! A cheerful cargo pilot in Mistralton City, she loves soaring through the open skies and subjects her challengers to dizzying, wind-blown aerial trials."
+  },
+  {
+    "name": "Brycen",
+    "id": "brycen",
+    "role": "Gym Leader",
+    "lore": "The legendary Ice Mask! Once a celebrated movie star, he retreated to Icirrus City to hone his martial arts in the freezing cold, mastering the silent, crystalline precision of Ice-type Pok\u00e9mon."
+  },
+  {
+    "name": "Drayden",
+    "id": "drayden",
+    "role": "Gym Leader",
+    "lore": "The Spartan Mayor! An imposing, physically powerful leader in Opelucid City, he governs with wisdom and battles with the ancient, devastating ferocity of Dragon-type Pok\u00e9mon."
+  },
+  {
+    "name": "Iris",
+    "id": "iris",
+    "role": "Champion",
+    "lore": "The Girl Who Knows the Hearts of Dragons! A wild, energetic prodigy deeply connected to nature, she embraces the untamed spirit of Dragon-types to ascend as the Champion of Unova."
+  },
+  {
+    "name": "Alder",
+    "id": "alder",
+    "role": "Champion",
+    "lore": "The wandering Champion of Unova. Carrying a heavy burden of loss, he travels the region teaching others that the bond between humans and Pok\u00e9mon is far more important than the pursuit of raw power."
+  },
+  {
+    "name": "Red",
+    "id": "red",
+    "role": "Protagonist",
+    "lore": "The legendary silent prodigy from Pallet Town. He conquered the Kanto region and retreated to Mt. Silver to await a challenger worthy of his ultimate team."
+  },
+  {
+    "name": "Blue",
+    "id": "blue",
+    "role": "Rival",
+    "lore": "Red's arrogant but brilliant rival and the former Kanto Champion. Smell ya later!"
+  },
+  {
+    "name": "Ethan",
+    "id": "ethan",
+    "role": "Protagonist",
+    "lore": "The heroic boy from New Bark Town who toppled Team Rocket and conquered two entire regions."
+  },
+  {
+    "name": "Lyra",
+    "id": "lyra",
+    "role": "Protagonist",
+    "lore": "A cheerful and energetic trainer from Johto, always ready for an adventure with her Marill."
+  },
+  {
+    "name": "Brendan",
+    "id": "brendan",
+    "role": "Protagonist",
+    "lore": "The confident son of Professor Birch, constantly exploring the vibrant, tropical Hoenn region."
+  },
+  {
+    "name": "May",
+    "id": "may",
+    "role": "Protagonist",
+    "lore": "Daughter of the Petalburg Gym Leader Norman, balancing her love for battles and Pok\u00e9mon Contests."
+  },
+  {
+    "name": "Lucas",
+    "id": "lucas",
+    "role": "Protagonist",
+    "lore": "A dedicated assistant to Professor Rowan in Sinnoh, eager to uncover the secrets of evolution."
+  },
+  {
+    "name": "Dawn",
+    "id": "dawn",
+    "role": "Protagonist",
+    "lore": "A spirited trainer from Twinleaf Town, aiming to conquer the Sinnoh league and contests alike."
+  },
+  {
+    "name": "Hilbert",
+    "id": "hilbert",
+    "role": "Protagonist",
+    "lore": "The hero of truth or ideals from Nuvema Town, destined to awaken a legendary dragon."
+  },
+  {
+    "name": "Hilda",
+    "id": "hilda",
+    "role": "Protagonist",
+    "lore": "A fierce and determined Unovan trainer, ready to take on Team Plasma and save the region."
+  },
+  {
+    "name": "Nate",
+    "id": "nate",
+    "role": "Protagonist",
+    "lore": "A rising star from Aspertia City, fighting alongside Hugh to liberate Unova from Neo Team Plasma."
+  },
+  {
+    "name": "Rosa",
+    "id": "rosa",
+    "role": "Protagonist",
+    "lore": "An energetic and talented trainer, exploring the evolving landscape of the Unova region."
+  },
+  {
+    "name": "Ace Trainer",
+    "id": "acetrainer",
+    "role": "Trainer",
+    "lore": "Elite, highly skilled trainers who use diverse and fully-evolved teams to crush unprepared opponents."
+  },
+  {
+    "name": "Bug Catcher",
+    "id": "bugcatcher",
+    "role": "Trainer",
+    "lore": "Enthusiastic kids wielding nets, constantly searching the forests for rare and fascinating Bug-type Pok\u00e9mon."
+  },
+  {
+    "name": "Lass",
+    "id": "lass",
+    "role": "Trainer",
+    "lore": "Young girls beginning their journeys, typically preferring cute Normal and Fairy-type companions."
+  },
+  {
+    "name": "Youngster",
+    "id": "youngster",
+    "role": "Trainer",
+    "lore": "Energetic boys obsessed with battling. They really like shorts because they are comfy and easy to wear!"
+  },
+  {
+    "name": "Hiker",
+    "id": "hiker",
+    "role": "Trainer",
+    "lore": "Jovial mountaineers scaling the highest peaks, relying on sturdy Rock and Ground-type Pok\u00e9mon."
+  },
+  {
+    "name": "Scientist",
+    "id": "scientist",
+    "role": "Trainer",
+    "lore": "Analytical minds experimenting with Pok\u00e9mon genetics, artificial items, and strategic battle calculations."
+  },
+  {
+    "name": "Black Belt",
+    "id": "blackbelt",
+    "role": "Trainer",
+    "lore": "Disciplined martial artists who train their bodies in tandem with their powerful Fighting-type Pok\u00e9mon."
+  },
+  {
+    "name": "Beauty",
+    "id": "beauty",
+    "role": "Trainer",
+    "lore": "Elegant trainers who believe true strength lies in a Pok\u00e9mon's grace, charm, and immaculate grooming."
+  },
+  {
+    "name": "Psychic",
+    "id": "psychic",
+    "role": "Trainer",
+    "lore": "Mystics capable of bending spoons and minds, harmonizing their brainwaves with Psychic-type Pok\u00e9mon."
+  },
+  {
+    "name": "Hex Maniac",
+    "id": "hexmaniac",
+    "role": "Trainer",
+    "lore": "Eerie, unsettling individuals who frequent graveyards, communicating with Ghost-types from the beyond."
+  },
+  {
+    "name": "Dragon Tamer",
+    "id": "dragontamer",
+    "role": "Trainer",
+    "lore": "Specialized experts who brave extreme conditions to tame the mythical and devastating Dragon-type Pok\u00e9mon."
+  },
+  {
+    "name": "Veteran",
+    "id": "veteran",
+    "role": "Trainer",
+    "lore": "Seasoned masters with decades of combat experience and profoundly powerful, diverse teams."
+  },
+  {
+    "name": "Rocket Grunt",
+    "id": "rocketgrunt",
+    "role": "Villain",
+    "lore": "Foot soldiers of the notorious Team Rocket, stealing Pok\u00e9mon for profit and absolute domination."
+  },
+  {
+    "name": "Magma Grunt",
+    "id": "magmagrunt",
+    "role": "Villain",
+    "lore": "Fanatical members of Team Magma, seeking to expand the landmass by awakening ancient primal forces."
+  },
+  {
+    "name": "Aqua Grunt",
+    "id": "aquagrunt",
+    "role": "Villain",
+    "lore": "Pirates of Team Aqua, fighting to flood the earth and return it to a prehistoric oceanic state."
+  },
+  {
+    "name": "Galactic Grunt",
+    "id": "galacticgrunt",
+    "role": "Villain",
+    "lore": "Emotionless operatives of Team Galactic, aiming to destroy the universe and rebuild it for their leader."
+  },
+  {
+    "name": "Plasma Grunt",
+    "id": "plasmagrunt",
+    "role": "Villain",
+    "lore": "Knights of Team Plasma, hypocritically \"liberating\" Pok\u00e9mon while seeking total control of the Unova region."
+  }
+];
 
 const getShowdownName = (name: string, isFemale: boolean = false) => {
   if (!name) return '';
@@ -599,8 +1070,7 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
   );
 });
 
-const getOpponentMoveQuote = (pokeName: string, moveName: string, langCode: string) => {
-  const lang = langCode === 'auto' ? navigator.language.slice(0, 2).toLowerCase() : langCode.toLowerCase();
+const getOpponentMoveQuote = (pokeName: string, moveName: string) => {
   const lowerMove = moveName.toLowerCase();
   
   const translations: Record<string, Record<string, string>> = {
@@ -671,7 +1141,7 @@ const getOpponentMoveQuote = (pokeName: string, moveName: string, langCode: stri
     }
   };
 
-  const pool = translations[lang] || translations['en'];
+  const pool = translations['en'];
   
   if (lowerMove.includes('protect') || lowerMove.includes('detect') || lowerMove.includes('substitute')) return pool.protect;
   if (lowerMove.includes('recover') || lowerMove.includes('heal') || lowerMove.includes('roost') || lowerMove.includes('rest')) return pool.healing;
@@ -1277,6 +1747,7 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
   
   return (
     <motion.div
+      layout={enableAnimations}
       role="button"
       tabIndex={0}
       initial={enableAnimations ? { opacity: 0, scale: 0.95 } : undefined}
@@ -1924,7 +2395,7 @@ const getEvolutionLineInfo = (node: any): { names: string[], stagesCount: number
 
 
 export default function App() {
-  const { t } = useTranslation();
+  
   const { state: simState, dispatch: battleDispatch } = useBattleSimulation();
 
   const [query, setQuery] = useState('');
@@ -1933,6 +2404,7 @@ export default function App() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const allPokemonRef = useRef<string[]>([]);
   const arenaRef = useRef<HTMLDivElement>(null);
+  const isProcessingMoveRef = useRef(false);
   useEffect(() => {
     pokeApi.getPokemonList(1302)
       .then(data => {
@@ -1975,11 +2447,23 @@ export default function App() {
   const [currentVariety, setCurrentVariety] = useState<string | null>(null);
   const [listMode, setListMode] = useState<'home' | 'pokemon' | 'types' | 'favorites'>('home');
   const [currentGenId, setCurrentGenId] = useState<number>(1);
+  const [currentAvatar, setCurrentAvatar] = useState(() => {
+    try {
+      const saved = localStorage.getItem('pokethology_user_avatar');
+      if (saved) {
+        const found = TRAINER_SPRITES.find(t => t.id === saved);
+        if (found) return found;
+      }
+    } catch (e) {}
+    return TRAINER_SPRITES[0];
+  });
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [avatarFilter, setAvatarFilter] = useState<'All' | 'Gym Leader' | 'Elite Four' | 'Champion' | 'Protagonist' | 'Trainer' | 'Villain'>('All');
   const [isSelectingOpponent, setIsSelectingOpponent] = useState(false);
   const [filteredList, setFilteredList] = useState<any[]>([]);
   const { favorites, isFavorite, toggleFavorite, loadFavorites } = useFavorites();
   const [isFavoritesModalOpen, setIsFavoritesModalOpen] = useState(false);
-  const [currentType, setCurrentType] = useState<string | null>(null);
+  
   const [loadingList, setLoadingList] = useState<boolean>(false);
   const [isInitializingDb, setIsInitializingDb] = useState<boolean>(false);
   const [debouncedQuery, setDebouncedQuery] = useState<string>('');
@@ -2007,6 +2491,7 @@ export default function App() {
   const [opponentTeam, setOpponentTeam] = useState<Pokemon[]>([]);
   const [activeOpponentIndex, setActiveOpponentIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<'data' | 'chat' | 'battle'>('data');
+  const [isTabTransitioning, setIsTabTransitioning] = useState(false);
   const [showScanHistory, setShowScanHistory] = useState(false);
   const [showClearScanConfirm, setShowClearScanConfirm] = useState(false);
   const [showClearChatConfirm, setShowClearChatConfirm] = useState(false);
@@ -2046,7 +2531,7 @@ export default function App() {
       if (!target) return;
       const button = target.closest('button, [role="button"], input[type="button"], input[type="submit"]');
       if (button && !button.hasAttribute('disabled')) {
-        try { sounds.scan(); } catch (_) {}
+        try { sounds.scan(); playHaptic('light'); } catch (_) {}
         try { playHaptic(20); } catch (_) {}
       }
     };
@@ -2062,60 +2547,69 @@ export default function App() {
       window.speechSynthesis.cancel();
     }
     setChatSpeakingIndex(null);
-    setActiveTab(tab);
-    setShowDetailsScrollTop(false);
-
-    if (tab === 'battle') {
-      setInspectingOpponent(false);
-      setAttackerAnimation('none');
-      setDefenderAnimation('none');
-
-      if (basePlayerPokemonRef.current) {
-        setPokemon(basePlayerPokemonRef.current);
-      }
-
-      const currentPoke = basePlayerPokemonRef.current || pokemon;
-      const pBase = currentPoke?.stats?.find((s: any) => s.stat.name === 'hp')?.base_stat || 50;
-      const oBase = battleOpponent?.stats?.find((s: any) => s.stat.name === 'hp')?.base_stat || 50;
-      const pMax = Math.floor(pBase * 2 + 110);
-      const oMax = Math.floor(oBase * 2 + 110);
-
-      setPokemonMaxHP(pMax);
-      setOpponentMaxHP(oMax);
-      setPokemonHP(pMax);
-      setOpponentHP(oMax);
-
-      setPokemonStatus(null);
-      setOpponentStatus(null);
-      setPokemonFlinched(false);
-      setOpponentFlinched(false);
-      setPlayerSubstitute(0);
-      setOpponentSubstitute(0);
-      setPlayerProtected(false);
-      setOpponentProtected(false);
-      setPlayerStatStages({ attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0, evasion: 0, accuracy: 0 });
-      setOpponentStatStages({ attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0, evasion: 0, accuracy: 0 });
-      setBattleState('setup');
-      setIsBattling(false);
-      setBattleResult(null);
-      setBattleLog([]);
-      setIsBattleHistoryExpanded(false);
-    }
+    setIsTabTransitioning(true);
 
     setTimeout(() => {
-      if (detailsContainerRef.current) {
-        detailsContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      setActiveTab(tab);
+      setShowDetailsScrollTop(false);
+
+      if (tab === 'battle') {
+        setInspectingOpponent(false);
+        setAttackerAnimation('none');
+        setDefenderAnimation('none');
+
+        if (basePlayerPokemonRef.current) {
+          setPokemon(basePlayerPokemonRef.current);
+        }
+
+        const currentPoke = basePlayerPokemonRef.current || pokemon;
+        const pBase = currentPoke?.stats?.find((s: any) => s.stat.name === 'hp')?.base_stat || 50;
+        const oBase = battleOpponent?.stats?.find((s: any) => s.stat.name === 'hp')?.base_stat || 50;
+        const pMax = Math.floor(pBase * 2 + 110);
+        const oMax = Math.floor(oBase * 2 + 110);
+
+        setPokemonMaxHP(pMax);
+        setOpponentMaxHP(oMax);
+        setPokemonHP(pMax);
+        setOpponentHP(oMax);
+
+        setPokemonStatus(null);
+        setOpponentStatus(null);
+        setPokemonFlinched(false);
+        setOpponentFlinched(false);
+        setPlayerSubstitute(0);
+        setOpponentSubstitute(0);
+        setPlayerProtected(false);
+        setOpponentProtected(false);
+        setPlayerStatStages({ attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0, evasion: 0, accuracy: 0 });
+        setOpponentStatStages({ attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0, evasion: 0, accuracy: 0 });
+        setBattleState('setup');
+        setIsBattling(false);
+        setBattleResult(null);
+        setBattleLog([]);
+        setIsBattleHistoryExpanded(false);
       }
-      if (battleScrollRef.current) {
-        battleScrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    }, 50);
-    try { sounds.scan(); } catch (_) {}
+
+      setTimeout(() => {
+        if (detailsContainerRef.current) {
+          detailsContainerRef.current.scrollTo({ top: 0, behavior: 'instant' });
+        }
+        if (battleScrollRef.current) {
+          battleScrollRef.current.scrollTo({ top: 0, behavior: 'instant' });
+        }
+      }, 10);
+    }, 150);
+
+    setTimeout(() => {
+      setIsTabTransitioning(false);
+    }, 300);
+
+    try { sounds.scan(); playHaptic('light'); } catch (_) {}
   }, [pokemon, battleOpponent]);
 
   const slideSection = useCallback((tab: 'data' | 'chat' | 'battle') => {
     if (tab === 'battle') {
-      try { sounds.scan(); } catch (_) {}
+      try { sounds.scan(); playHaptic('light'); } catch (_) {}
       return;
     }
     if (detailsContainerRef.current) {
@@ -2127,7 +2621,7 @@ export default function App() {
         detailsContainerRef.current.scrollTo({ top: targetScroll, behavior: 'smooth' });
       }
     }
-    try { sounds.scan(); } catch (_) {}
+    try { sounds.scan(); playHaptic('light'); } catch (_) {}
   }, []);
 
 
@@ -2140,7 +2634,7 @@ export default function App() {
         gridScrollRef.current.scrollTo({ top: 600, behavior: 'smooth' });
       }
     }
-    try { sounds.scan(); } catch (_) {}
+    try { sounds.scan(); playHaptic('light'); } catch (_) {}
   }, []);
   const [lastSearched, setLastSearched] = useState<string>('');
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
@@ -2156,7 +2650,7 @@ export default function App() {
   
 
   const [lastQuotaError, setLastQuotaError] = useState<string | null>(null);
-  const selectedLang = 'en' as string;
+  
   const suggestTimeoutRef = useRef<any>(null);
   const [opponentDialogue, setOpponentDialogue] = useState<string | null>(null);
   const [playerDialogue, setPlayerDialogue] = useState<string | null>(null);
@@ -2174,34 +2668,14 @@ export default function App() {
     if (opponentStatus && statusStartTurnRef.current.opponent === null) statusStartTurnRef.current.opponent = turnNumber;
     if (!opponentStatus) statusStartTurnRef.current.opponent = null;
   }, [pokemonStatus, opponentStatus, turnNumber]);
-  // Helper function to build standard welcome message for Chatbot
+// Helper function to build standard welcome message for Chatbot
   const getChatWelcomeMessage = useCallback((pokemonName?: string) => {
     const nameUpper = pokemonName ? pokemonName.toUpperCase() : null;
-    if (selectedLang === 'it') {
-      return nameUpper 
-        ? `👋 **Ciao! Sono il Chatbot AI di Pokéthology.**\n\nOra sto analizzando **${nameUpper}**! Puoi chiedermi qualsiasi cosa sul mondo Pokémon, sulle sue statistiche, sulla lore, o su qualunque altro argomento generale!`
-        : `👋 **Ciao! Sono il Chatbot AI di Pokéthology.**\n\nChiedimi qualsiasi cosa sul mondo Pokémon, sulle sue statistiche, sulla lore, o su qualunque altro argomento generale!`;
-    } else if (selectedLang === 'es') {
-      return nameUpper 
-        ? `👋 **¡Hola! Soy el Chatbot AI de Pokéthology.**\n\n¡Ahora estoy analizando a **${nameUpper}**! Puedes preguntarme cualquier cosa sobre el mundo Pokémon, sus estadísticas, el lore, ¡o cualquier otro tema general!`
-        : `👋 **¡Hola! Soy el Chatbot AI de Pokéthology.**\n\n¡Pregúntame cualquier cosa sobre el mundo Pokémon, sus estadísticas, el lore, o cualquier otro tema general!`;
-    } else if (selectedLang === 'fr') {
-      return nameUpper 
-        ? `👋 **Bonjour ! Je suis le Chatbot AI de Pokéthology.**\n\nJ'analyse actuellement **${nameUpper}** ! Vous pouvez me poser toutes vos questions sur l'univers Pokémon, ses statistiques, le lore ou n'importe quel autre sujet général !`
-        : `👋 **Bonjour ! Je suis le Chatbot AI de Pokéthology.**\n\nPosez-moi toutes vos questions sur l'univers Pokémon, ses statistiques, le lore ou n'importe quel autre sujet général !`;
-    } else if (selectedLang === 'de') {
-      return nameUpper 
-        ? `👋 **Hallo! Ich bin der Pokéthology AI Chatbot.**\n\nIch analysiere derzeit **${nameUpper}**! Du kannst mich alles über die Pokémon-Welt, Statuswerte, Lore oder jedes andere allgemeine Thema fragen!`
-        : `👋 **Hallo! Ich bin der Pokéthology AI Chatbot.**\n\nFrage mich alles über die Pokémon-Welt, Statuswerte, Lore oder jedes andere allgemeine Thema!`;
-    } else {
-      return nameUpper 
-        ? `👋 **Hello! I am the Pokéthology AI Chatbot.**\n\nI am currently analyzing **${nameUpper}**! Ask me anything about the Pokémon world, stats, lore, or any general topic you'd like!`
-        : `👋 **Hello! I am the Pokéthology AI Chatbot.**\n\nAsk me anything about the Pokémon world, stats, lore, or any general topic you'd like!`;
-    }
-  }, [selectedLang]);
+    return `Hello! I am Pokéthology AI. I can assist you with Pokémon strategies, biology, stats, and canonical lore. ${nameUpper ? `I see you have selected **${nameUpper}**. ` : ""}How can I assist you today?`;
+  }, []);
 
   const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<{role: 'user' | 'model', text: string, groundingChunks?: any[], groundingMetadata?: any}[]>([]);
+  const [chatMessages, setChatMessages] = useState<{role: 'user' | 'model', text: string, groundingChunks?: any[], groundingMetadata?: any}[]>([{ role: 'model', text: getChatWelcomeMessage() }]);
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [chatSpeakingIndex, setChatSpeakingIndex] = useState<number | null>(null);
   const [chatCopiedIndex, setChatCopiedIndex] = useState<number | null>(null);
@@ -2239,13 +2713,13 @@ export default function App() {
     utterance.onerror = () => setChatSpeakingIndex(null);
 
     window.speechSynthesis.speak(utterance);
-    try { sounds.scan(); } catch (_) {}
+    try { sounds.scan(); playHaptic('light'); } catch (_) {}
   }, [chatSpeakingIndex]);
 
   const handleChatCopy = useCallback((text: string, index: number) => {
     navigator.clipboard.writeText(text);
     setChatCopiedIndex(index);
-    try { sounds.scan(); } catch (_) {}
+    try { sounds.scan(); playHaptic('light'); } catch (_) {}
     setTimeout(() => setChatCopiedIndex(null), 2000);
   }, []);
   const [battleLog, setBattleLog] = useState<(LogEntry & { turn?: number })[]>([]);
@@ -2536,7 +3010,7 @@ export default function App() {
     }
     // If no moves to learn, execute immediately
     if (action === 'rematch') {
-      sounds.battleStart();
+      sounds.battleStart(); playHaptic('heavy');
       setIsBattling(false);
       setBattleState('setup');
       setTimeout(() => runBattle(), 100);
@@ -2548,7 +3022,7 @@ export default function App() {
   const finalizeMoveLearn = () => {
     setIsMoveLearningOpen(false);
     if (actionAfterMoveLearn === 'rematch') {
-      sounds.battleStart();
+      sounds.battleStart(); playHaptic('heavy');
       setIsBattling(false);
       setBattleState('setup');
       setTimeout(() => runBattle(), 100);
@@ -2834,7 +3308,7 @@ export default function App() {
   useEffect(() => {
     const fetchDaily = async () => {
       try {
-        const p = await searchPokemon(dailyId.toString(), selectedLang);
+        const p = await searchPokemon(dailyId.toString());
         setDailyPokemon(p);
         
         let femaleP = null;
@@ -2849,7 +3323,7 @@ export default function App() {
           
           if (femaleVariety && femaleVariety.pokemon?.name !== p.name) {
             try {
-              femaleP = await searchPokemon(femaleVariety.pokemon?.name, selectedLang);
+              femaleP = await searchPokemon(femaleVariety.pokemon?.name);
             } catch (err) {
               console.error("Failed to fetch female variety", err);
             }
@@ -2910,7 +3384,7 @@ export default function App() {
           const names: string[] = stored.teamNames;
           const loaded = await Promise.all(names.slice(0, 6).map(async (name) => {
             try {
-              return await searchPokemon(name, selectedLang);
+              return await searchPokemon(name);
             } catch (err) {
               console.error("Failed to load team member", name, err);
               return null;
@@ -3017,12 +3491,12 @@ export default function App() {
     setIsChaosModeActive(false);
     setBattleState('setup');
     setListMode('pokemon');
-    sounds.scan();
+    sounds.scan(); playHaptic('light');
   }, [setLoadingPokemon, setError, setPokemon, setBattleOpponent, setIsBattling, setIsChaosModeActive, setBattleState, setListMode, sounds]);
   const [isMusicOpen, setIsMusicOpen] = useState(false);
   // Lock body scrolling when any modal is active so main app background stays fixed
   useEffect(() => {
-    const isAnyModalOpen = isDailyHubOpen || isDailyScanOpen || isDailyQuizOpen || isSettingsOpen || isTutorialOpen || isMusicOpen || isComparisonOpen || isTypeChartOpen;
+    const isAnyModalOpen = isDailyHubOpen || isDailyScanOpen || isDailyQuizOpen || isSettingsOpen || isTutorialOpen || isMusicOpen || isComparisonOpen || isTypeChartOpen || isAvatarModalOpen;
     if (isAnyModalOpen) {
       document.body.style.overflow = 'hidden';
       document.body.style.touchAction = 'none';
@@ -3034,7 +3508,7 @@ export default function App() {
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
     };
-  }, [isDailyHubOpen, isDailyScanOpen, isDailyQuizOpen, isSettingsOpen, isTutorialOpen, isMusicOpen, isComparisonOpen, isTypeChartOpen]);
+  }, [isDailyHubOpen, isDailyScanOpen, isDailyQuizOpen, isSettingsOpen, isTutorialOpen, isMusicOpen, isComparisonOpen, isTypeChartOpen, isAvatarModalOpen]);
   const [autoAiEnabled, setAutoAiEnabled] = useState(true);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isChaosMatchSetup, setIsChaosMatchSetup] = useState(false);
@@ -3079,7 +3553,7 @@ export default function App() {
   const chatDragScrollTop = useRef(0);
 
   const handleThemeToggle = () => {
-    sounds.boot();
+    sounds.boot(); playHaptic('medium');
     
     const toggle = () => {
       setIsLightMode(prev => {
@@ -3166,7 +3640,7 @@ export default function App() {
         },
         body: JSON.stringify({ 
           battleData,
-          lang: selectedLang === 'auto' ? navigator.language : selectedLang
+          lang: 'en'
         }),
       });
 
@@ -3189,7 +3663,7 @@ export default function App() {
     } finally {
       setIsAiSuggesting(false);
     }
-  }, [pokemon, battleOpponent, pokemonHP, pokemonMaxHP, selectedMoves, opponentHP, opponentMaxHP, opponentStatus, pokemonStatus, getBestMove, selectedLang]);
+  }, [pokemon, battleOpponent, pokemonHP, pokemonMaxHP, selectedMoves, opponentHP, opponentMaxHP, opponentStatus, pokemonStatus, getBestMove, 'en']);
 
   const getEffectiveStat = useCallback((p: Pokemon | null, statName: string, isPlayer: boolean) => {
     if (!p) return 0;
@@ -3312,7 +3786,7 @@ export default function App() {
 
   const handleSystemRestart = useCallback(() => {
     setIsRebooting(true);
-    sounds.boot();
+    sounds.boot(); playHaptic('medium');
     
     setTimeout(() => {
       // 1. Core State Reset
@@ -3329,7 +3803,7 @@ export default function App() {
       setLastSearched('');
       setListMode('home');
       setCurrentGenId(1);
-      setCurrentType(null);
+      
       setTypeFilter(null);
       setSortBy('id');
       setSortOrder('asc');
@@ -3551,7 +4025,7 @@ export default function App() {
     const doesHit = moveAccuracy === null || (Math.random() * 100) <= moveAccuracy;
 
     // Disabled dialog bubble quotes to prevent overlapping text and clutter
-    const speakQuote = getOpponentMoveQuote(attacker.name, move.name, selectedLang);
+    const speakQuote = getOpponentMoveQuote(attacker.name, move.name);
     /* 
     if (isPlayer) {
       setPlayerDialogue(speakQuote);
@@ -4001,7 +4475,7 @@ export default function App() {
 
   const getAiBattleSuggestion = async () => {
     if (!pokemon || !battleOpponent || isChatLoading) return;
-    sounds.scan();
+    sounds.scan(); playHaptic('light');
     
     // Switch to tactical chat tab
     setActiveTab('chat');
@@ -4031,7 +4505,7 @@ export default function App() {
     // 1. Instantly display matchup VS screen & play high quality matchup buzzer
     setActiveTab('battle');
     setShowVSScreen(true);
-    sounds.battleStart();
+    sounds.battleStart(); playHaptic('heavy');
     playHaptic('heavy');
 
     // 2. Clear previous active animations & timeouts
@@ -4161,13 +4635,28 @@ export default function App() {
               opponentTypes.push(oppAny.type.toLowerCase());
             }
 
-            // Robust extractor for opponent defense stat
+            // Robust extractor for opponent stats
             let opponentDefense = 0;
+            let opponentSpeed = 0;
+            let opponentAttack = 0;
+            let opponentHp = 0;
             if (Array.isArray(oppAny.stats)) {
               const defStat = oppAny.stats.find((s: any) => s?.stat?.name === 'defense' || s?.name === 'defense');
               if (defStat) opponentDefense = defStat.base_stat ?? defStat.value ?? 0;
+              
+              const spdStat = oppAny.stats.find((s: any) => s?.stat?.name === 'speed' || s?.name === 'speed');
+              if (spdStat) opponentSpeed = spdStat.base_stat ?? spdStat.value ?? 0;
+
+              const atkStat = oppAny.stats.find((s: any) => s?.stat?.name === 'attack' || s?.name === 'attack');
+              if (atkStat) opponentAttack = atkStat.base_stat ?? atkStat.value ?? 0;
+              
+              const hpStat = oppAny.stats.find((s: any) => s?.stat?.name === 'hp' || s?.name === 'hp');
+              if (hpStat) opponentHp = hpStat.base_stat ?? hpStat.value ?? 0;
             } else if (oppAny.defense !== undefined) {
               opponentDefense = Number(oppAny.defense);
+              opponentSpeed = Number(oppAny.speed || 0);
+              opponentAttack = Number(oppAny.attack || 0);
+              opponentHp = Number(oppAny.hp || 0);
             }
 
             const opponentName = (oppAny.name || '').toLowerCase();
@@ -4269,8 +4758,13 @@ export default function App() {
                 let isMatch = false;
                 if (challenge.type === 'type') {
                   if (opponentTypes.includes(challenge.target.toLowerCase())) isMatch = true;
-                } else if (challenge.type === 'stat' && challenge.target === 'defense') {
-                  if (opponentDefense >= 150) isMatch = true;
+                } else if (challenge.type === 'stat') {
+                  if (challenge.target === 'defense' && opponentDefense >= 150) isMatch = true;
+                  if (challenge.target === 'speed' && opponentSpeed >= 120) isMatch = true;
+                  if (challenge.target === 'attack' && opponentAttack >= 130) isMatch = true;
+                  if (challenge.target === 'hp' && opponentHp >= 130) isMatch = true;
+                } else if (challenge.type === 'category' && challenge.target === 'legendary') {
+                  if (isLegendary) isMatch = true;
                 }
                 
                 if (isMatch) {
@@ -4350,7 +4844,8 @@ export default function App() {
 
   const handlePlayerMove = async (move: Move) => {
     playHaptic(30);
-    if (turn !== 'player' || !isBattling || isAnimating || !pokemon || !battleOpponent) return;
+    if (turn !== 'player' || !isBattling || isAnimating || !pokemon || !battleOpponent || isProcessingMoveRef.current) return;
+    isProcessingMoveRef.current = true;
     
     // Smoothly scroll the arena into view and keep it centered
     arenaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -4370,6 +4865,7 @@ export default function App() {
       console.error("Error during player move:", err);
     } finally {
       setIsAnimating(false);
+      isProcessingMoveRef.current = false;
     }
   };
 
@@ -4716,7 +5212,7 @@ export default function App() {
 
   useEffect(() => {
     // Play boot sound when app loads
-    sounds.boot();
+    sounds.boot(); playHaptic('medium');
     // Show tutorial every time the app opens
     setIsTutorialOpen(true);
   }, []);
@@ -4749,7 +5245,7 @@ export default function App() {
 
   useEffect(() => {
     if (detailsContainerRef.current) {
-      detailsContainerRef.current.scrollTo({ top: 0, behavior: 'instant' });
+      detailsContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [activeTab]);
 
@@ -4763,11 +5259,7 @@ export default function App() {
 
   useEffect(() => {
     if (listMode === 'home') return;
-    if (currentType) {
-      loadTypePokemon(currentType);
-    } else {
-      loadAllPokemon();
-    }
+    loadAllPokemon();
   }, [currentGenId, viewAllGenerations, listMode]);
 
   useEffect(() => {
@@ -4797,7 +5289,7 @@ export default function App() {
     if (isChatLoading || isAiAnalyzing) return;
     setIsAiAnalyzing(true);
     setIsChatLoading(true);
-    sounds.scan();
+    sounds.scan(); playHaptic('light');
     
     setChatMessages(prev => [...prev, { role: 'user', text: "Requesting tactical analysis..." }]);
 
@@ -4834,7 +5326,7 @@ export default function App() {
         },
         body: JSON.stringify({ 
           battleData,
-          lang: selectedLang === 'auto' ? navigator.language : selectedLang
+          lang: 'en'
         }),
       });
 
@@ -4895,9 +5387,7 @@ export default function App() {
         { role: 'user' as const, text: userMessage },
         { 
           role: 'model' as const, 
-          text: selectedLang === 'it' 
-            ? `🌐 **MODEITÀ OFFLINE ATTIVA**: Il Chatbot AI richiede una connessione internet attiva per interrogare i modelli AI online.\n\n⚡ **TUTTE LE ALTRE FUNZIONALITÀ SONO 100% GIOCABILI OFFLINE**:\n- Consultazione e ricerca Pokédex (dati salvati in IndexedDB)\n- Simulatore di Lotta in tempo reale\n- Incontri giornalieri & Quiz\n- Analisi Tipi e Mosse`
-            : `🌐 **OFFLINE MODE ACTIVE**: The live AI Chatbot requires an active internet connection to query online AI models.\n\n⚡ **ALL OTHER FEATURES ARE 100% PLAYABLE OFFLINE**:\n- Pokédex Browsing & Search (IndexedDB storage)\n- Real-Time Battle Combat Simulator\n- Daily Encounters & Quizzes\n- Type Weaknesses & Move Stats`
+          text: `🌐 **OFFLINE MODE ACTIVE**: The live AI Chatbot requires an active internet connection to query online AI models.\n\n⚡ **ALL OTHER FEATURES ARE 100% PLAYABLE OFFLINE**:\n- Pokédex Browsing & Search (IndexedDB storage)\n- Real-Time Battle Combat Simulator\n- Daily Encounters & Quizzes\n- Type Weaknesses & Move Stats`
         }
       ]);
       sounds.error();
@@ -4906,7 +5396,7 @@ export default function App() {
 
     setChatMessages(prev => [...prev, { role: 'user' as const, text: userMessage }]);
     setIsChatLoading(true);
-    sounds.scan();
+    sounds.scan(); playHaptic('light');
 
     const context = {
       selectedPokemon: pokemon ? {
@@ -4930,7 +5420,7 @@ export default function App() {
         payload: {
           messages: [...chatMessages, { role: 'user', text: userMessage }],
           context,
-          lang: selectedLang === 'auto' ? navigator.language : selectedLang
+          lang: 'en'
         }
       }));
       return;
@@ -4953,7 +5443,7 @@ export default function App() {
         body: JSON.stringify({ 
           messages: [...chatMessages, { role: 'user', text: userMessage }],
           context,
-          lang: selectedLang === 'auto' ? navigator.language : selectedLang
+          lang: 'en'
         }),
       });
 
@@ -5029,9 +5519,9 @@ export default function App() {
   };
 
   const loadAllPokemon = useCallback(async (overrideGenId?: number, overrideViewAll?: boolean) => {
-    sounds.scan();
+    sounds.scan(); playHaptic('light');
     setListMode('pokemon');
-    setCurrentType(null);
+    
     setLoadingList(true);
     try {
       const isAll = overrideViewAll !== undefined ? overrideViewAll : viewAllGenerations;
@@ -5050,9 +5540,9 @@ export default function App() {
   }, [viewAllGenerations, currentGenId]);
 
   const loadTypePokemon = useCallback(async (type: string, overrideGenId?: number, overrideViewAll?: boolean) => {
-    sounds.scan();
+    sounds.scan(); playHaptic('light');
     setListMode('pokemon');
-    setCurrentType(type);
+    
     setLoadingList(true);
     try {
       const isAll = overrideViewAll !== undefined ? overrideViewAll : viewAllGenerations;
@@ -5075,7 +5565,7 @@ export default function App() {
     if (!formatted) return;
 
     setLastSearched(formatted);
-    sounds.scan();
+    sounds.scan(); playHaptic('light');
     setLoadingPokemon(true);
     setError(null);
     // REMOVED: setPokemon(null); to prevent jarring layout teardown
@@ -5085,7 +5575,7 @@ export default function App() {
 
     try {
       // Fetch PokeAPI data
-      const pokeData = await searchPokemon(searchQuery, selectedLang);
+      const pokeData = await searchPokemon(searchQuery);
       setPokemon(pokeData);
       basePlayerPokemonRef.current = pokeData;
       setScanHistory(prev => {
@@ -5101,7 +5591,7 @@ export default function App() {
       
       // Scroll to top of details container and browser
       if (detailsContainerRef.current) {
-        detailsContainerRef.current.scrollTo({ top: 0, behavior: 'auto' });
+        detailsContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -5141,7 +5631,7 @@ export default function App() {
             },
             body: JSON.stringify({ 
               pokemonName: pokeData.name,
-              lang: selectedLang === 'auto' ? navigator.language : selectedLang
+              lang: 'en'
             }),
           })
           .then(async res => {
@@ -5230,9 +5720,9 @@ export default function App() {
 
   const handlePokemonClick = useCallback(async (name: string) => {
     if (isSelectingOpponentRef.current) {
-      sounds.scan();
+      sounds.scan(); playHaptic('light');
       try {
-        const opp = await searchPokemon(name, selectedLang);
+        const opp = await searchPokemon(name);
         setBattleOpponent(opp);
         setOpponentMoves(generateCompetitiveMoveset(opp, [], pokemon));
         setIsOpponentShiny(false);
@@ -5249,10 +5739,10 @@ export default function App() {
       return;
     }
     if (inspectingOpponent) {
-      sounds.scan();
+      sounds.scan(); playHaptic('light');
       try {
         setLoadingPokemon(true);
-        const opp = await searchPokemon(name, selectedLang);
+        const opp = await searchPokemon(name);
         setBattleOpponent(opp);
         setOpponentMoves(generateCompetitiveMoveset(opp, [], pokemon));
         setIsOpponentShiny(false);
@@ -5275,7 +5765,7 @@ export default function App() {
       if (inspectingOpponent) {
         setLoadingPokemon(true);
         try {
-          const opp = await searchPokemon(formatted, selectedLang);
+          const opp = await searchPokemon(formatted);
           setBattleOpponent(opp);
           setIsOpponentShiny(false);
         } catch (err) {
@@ -5342,7 +5832,7 @@ export default function App() {
     setError(null);
     
     if (isSelectingOpponent) {
-      sounds.scan();
+      sounds.scan(); playHaptic('light');
       return;
     }
     
@@ -5354,7 +5844,7 @@ export default function App() {
     setIsFemale(false);
     setIsOpponentShiny(false);
     setIsOpponentFemale(false);
-    sounds.boot();
+    sounds.boot(); playHaptic('medium');
   };
 
   useEffect(() => {
@@ -5420,6 +5910,20 @@ export default function App() {
         )}
       </AnimatePresence>
         
+      {/* Tab Change Black Vision Overlay */}
+      <AnimatePresence>
+        {isTabTransitioning && (
+          <motion.div
+            key="tab-transition-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.2, ease: "easeInOut" } }}
+            transition={{ duration: 0.15, ease: "easeInOut" }}
+            className="fixed inset-0 z-[240] bg-slate-950 pointer-events-none"
+          />
+        )}
+      </AnimatePresence>
+
       {/* VS Screen Matchup Transition Overlay */}
       <AnimatePresence>
         {showVSScreen && pokemon && battleOpponent && (
@@ -5652,7 +6156,7 @@ export default function App() {
               >
                 <Star className={cn("w-4 h-4 filter drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]", isFavoritesModalOpen || listMode === 'favorites' ? "text-yellow-300 animate-pulse fill-yellow-300" : "text-yellow-400 fill-yellow-400")} />
               </motion.div>
-              <span className="hidden sm:inline font-hud tracking-[0.1em] relative z-10 font-black">{t('FAVS') || 'Favs'}</span>
+              <span className="hidden sm:inline font-hud tracking-[0.1em] relative z-10 font-black">{'Favs'}</span>
             </motion.button>
             
             <motion.button
@@ -5680,7 +6184,7 @@ export default function App() {
               >
                 <Trophy className={cn("w-4 h-4 filter drop-shadow-[0_0_6px_rgba(34,211,238,0.8)]", isDailyHubOpen ? "text-cyan-300 animate-pulse" : "text-cyan-400")} />
               </motion.div>
-              <span className="hidden sm:inline font-hud tracking-[0.1em] relative z-10 font-black">{t('DAILY HUB') || 'Daily Hub'}</span>
+              <span className="hidden sm:inline font-hud tracking-[0.1em] relative z-10 font-black">{'Daily Hub'}</span>
             </motion.button>
 
 
@@ -5751,7 +6255,7 @@ export default function App() {
                           if (inspectingOpponent) {
                             setLoadingPokemon(true);
                             try {
-                              const opp = await searchPokemon(name, selectedLang);
+                              const opp = await searchPokemon(name);
                               setBattleOpponent(opp);
                             } catch (e) {
                               console.error(e);
@@ -5814,7 +6318,7 @@ export default function App() {
                                   setListMode('home');
                                   setArenaArtworkMode('home');
                                   try { localStorage.setItem('pokethology_arena_artwork_mode', 'home'); } catch(_) {}
-                                  sounds.scan();
+                                  sounds.scan(); playHaptic('light');
                                 }}
                                 className={cn(hudButtonClass(false, 'cyan'), "!py-1 !px-3 !text-[10px] font-bold tracking-wider flex items-center gap-1 cursor-pointer")}
                               >
@@ -5937,7 +6441,7 @@ export default function App() {
                                   type="button"
                                   onClick={() => {
                                     setInspectingOpponent(false);
-                                    sounds.scan();
+                                    sounds.scan(); playHaptic('light');
                                   }}
                                   className={cn(
                                     "px-3 py-1.5 rounded-lg font-hud text-[8px] sm:text-[9px] font-black tracking-wider uppercase transition-all cursor-pointer relative",
@@ -5952,7 +6456,7 @@ export default function App() {
                                   type="button"
                                   onClick={() => {
                                     setInspectingOpponent(true);
-                                    sounds.scan();
+                                    sounds.scan(); playHaptic('light');
                                   }}
                                   className={cn(
                                     "px-3 py-1.5 rounded-lg font-hud text-[8px] sm:text-[9px] font-black tracking-wider uppercase transition-all cursor-pointer relative",
@@ -6059,7 +6563,7 @@ export default function App() {
                                     type="button"
                                     onClick={() => {
                                       handleOpenComparison(pokemon);
-                                      try { sounds.scan(); } catch (_) {}
+                                      try { sounds.scan(); playHaptic('light'); } catch (_) {}
                                     }}
                                     onMouseEnter={() => sounds.hover()}
                                     className={cn(
@@ -6397,7 +6901,7 @@ export default function App() {
                                                 onClick={() => {
                                                   setChatMessages([{ role: "model", text: getChatWelcomeMessage(pokemon?.name) }]);
                                                   setShowClearChatConfirm(false);
-                                                  try { sounds.scan(); } catch(_) {}
+                                                  try { sounds.scan(); playHaptic('light'); } catch(_) {}
                                                 }}
                                                 className="px-1.5 py-0.5 text-[6.5px] font-hud font-black uppercase rounded bg-rose-950 border border-rose-500/40 text-rose-400 hover:bg-rose-900 transition-all cursor-pointer select-none"
                                               >
@@ -6406,7 +6910,7 @@ export default function App() {
                                               <button
                                                 onClick={() => {
                                                   setShowClearChatConfirm(false);
-                                                  try { sounds.scan(); } catch(_) {}
+                                                  try { sounds.scan(); playHaptic('light'); } catch(_) {}
                                                 }}
                                                 className="px-1.5 py-0.5 text-[6.5px] font-hud font-black uppercase rounded bg-slate-800 border border-slate-700 text-slate-400 hover:bg-slate-750 transition-all cursor-pointer select-none"
                                               >
@@ -6417,7 +6921,7 @@ export default function App() {
                                             <button 
                                               onClick={() => {
                                                 setShowClearChatConfirm(true);
-                                                try { sounds.scan(); } catch(_) {}
+                                                try { sounds.scan(); playHaptic('light'); } catch(_) {}
                                               }}
                                               className="text-[7px] font-bold tracking-wider text-cyan-700 hover:text-cyan-400 transition-colors uppercase font-hud tracking-widest flex items-center gap-1 cursor-pointer"
                                             >
@@ -6702,7 +7206,7 @@ export default function App() {
                                           type="text"
                                           value={chatInput}
                                           onChange={(e) => setChatInput(e.target.value)}
-                                          placeholder={selectedLang === 'it' ? "CHIEDI AL POKÉTHEOLOGY CORE..." : "ASK POKÉTHEOLOGY CORE..."}
+                                          placeholder={"ASK POKÉTHEOLOGY CORE..."}
                                           className={cn(
                                             "flex-1 border rounded px-2.5 py-2 text-[10px] font-bold tracking-wider uppercase tracking-widest focus:outline-none shadow-inner",
                                             isLightMode 
@@ -6814,7 +7318,7 @@ export default function App() {
                                               const nextMode = arenaArtworkMode === 'home' ? '2d' : 'home';
                                               setArenaArtworkMode(nextMode);
                                               try { localStorage.setItem('pokethology_arena_artwork_mode', nextMode); } catch(_) {}
-                                              try { sounds.scan(); } catch(_) {}
+                                              try { sounds.scan(); playHaptic('light'); } catch(_) {}
                                               playHaptic();
                                             }}
                                             title={`Switch Combat Arena Visuals (Current: ${arenaArtworkMode === 'home' ? '3D Home Artwork' : '2D Pixel Sprite'})`}
@@ -6919,10 +7423,10 @@ export default function App() {
                                           enableAnimations={enableAnimations}
                                           isSelectingOpponent={isSelectingOpponent}
                                           onSearchOpponent={async (name) => {
-                                            sounds.scan();
+                                            sounds.scan(); playHaptic('light');
                                             setLoadingPokemon(true);
                                             try {
-                                              const opp = await searchPokemon(name.toLowerCase(), selectedLang);
+                                              const opp = await searchPokemon(name.toLowerCase());
                                               setBattleOpponent(opp);
                                               setIsOpponentShiny(false);
                                               setIsSelectingOpponent(false);
@@ -6938,7 +7442,7 @@ export default function App() {
                                             setListMode('pokemon');
                                             setQuery('');
                                             setInputValue('');
-                                            sounds.scan();
+                                            sounds.scan(); playHaptic('light');
                                           }}
                                           statChange={opponentStatAnimation}
                                         />
@@ -7189,7 +7693,7 @@ export default function App() {
                                                   <button 
                                                     onClick={async () => {
                                                       if (!pokemon || !battleOpponent) return;
-                                                      sounds.scan();
+                                                      sounds.scan(); playHaptic('light');
                                                       
                                                       // Advanced Competitive Moveset Randomization (Offline Optimized)
                                                       setSelectedMoves(generateCompetitiveMoveset(pokemon, selectedMoves));
@@ -7239,7 +7743,7 @@ export default function App() {
                                                         setOpponentMaxHP(oMax);
                                                         setOpponentHP(oMax);
                                                         setTurnNumber(1);
-                                                        sounds.battleStart();
+                                                        sounds.battleStart(); playHaptic('heavy');
                                                         setBattleLog([{ text: 'Starting Chaos Match...', type: 'critical' }]);
                                                         setBattleState('battling');
                                                         setIsBattling(true);
@@ -7296,7 +7800,7 @@ export default function App() {
                                             <div className="flex items-center gap-2">
                                             
                                             <button
-                                               onClick={() => { sounds.scan(); setPendingAction('flee'); setShowExitConfirmation(true); }}
+                                               onClick={() => { sounds.scan(); playHaptic('light'); setPendingAction('flee'); setShowExitConfirmation(true); }}
                                                onMouseEnter={() => sounds.hover()}
                                                className="py-1 px-3 rounded text-[9px] border border-red-900/40 bg-red-950/40 text-red-400 hover:text-red-300 hover:bg-red-900/30 hover:border-red-500/30 active:scale-95 font-hud font-black uppercase tracking-widest flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                                              >
@@ -7439,7 +7943,7 @@ export default function App() {
                                             type="button"
                                             onClick={() => {
                                               setIsBattleHistoryExpanded(!isBattleHistoryExpanded);
-                                              sounds.scan();
+                                              sounds.scan(); playHaptic('light');
                                             }}
                                             className="w-full flex items-center justify-between px-3.5 py-2 sm:py-2.5 bg-slate-900/45 hover:bg-slate-900/75 transition-all font-hud text-[9.5px] tracking-widest text-slate-400 hover:text-cyan-400 font-bold uppercase cursor-pointer"
                                           >
@@ -7480,13 +7984,13 @@ export default function App() {
                                                 try {
                                                   // 1. Random Player Pokemon
                                                   const playerBaseId = Math.floor(Math.random() * 1025) + 1;
-                                                  const basePlayer = await searchPokemon(playerBaseId.toString(), selectedLang);
+                                                  const basePlayer = await searchPokemon(playerBaseId.toString());
                                                   let finalPlayer = basePlayer;
                                                   
                                                   if (basePlayer.varieties && basePlayer.varieties.length > 1 && Math.random() < 0.6) {
                                                     const pool = basePlayer.varieties;
                                                     const varietyIndex = Math.floor(Math.random() * pool.length);
-                                                    finalPlayer = await searchPokemon(pool[varietyIndex].pokemon?.name, selectedLang);
+                                                    finalPlayer = await searchPokemon(pool[varietyIndex].pokemon?.name);
                                                   }
                                                   setPokemon(finalPlayer);
                                                   setIsShiny(Math.random() < 0.1); 
@@ -7495,7 +7999,7 @@ export default function App() {
                                                   
                                                   // 2. Random Opponent Pokemon
                                                   const oppBaseId = Math.floor(Math.random() * 1025) + 1;
-                                                  const baseOpponent = await searchPokemon(oppBaseId.toString(), selectedLang);
+                                                  const baseOpponent = await searchPokemon(oppBaseId.toString());
                                                   let finalOpponent = baseOpponent;
                                                   
                                                   if (baseOpponent.varieties && baseOpponent.varieties.length > 1 && Math.random() < 0.8) {
@@ -7504,7 +8008,7 @@ export default function App() {
                                                     );
                                                     const pool = interestingVarieties.length > 0 ? interestingVarieties : baseOpponent.varieties;
                                                     const varietyIndex = Math.floor(Math.random() * pool.length);
-                                                    finalOpponent = await searchPokemon(pool[varietyIndex].pokemon?.name, selectedLang);
+                                                    finalOpponent = await searchPokemon(pool[varietyIndex].pokemon?.name);
                                                   }
                                                   
                                                   setBattleOpponent(finalOpponent);
@@ -7523,7 +8027,7 @@ export default function App() {
                                                    setIsChaosModeActive(true);
                                                   handleTabChange('battle');
                                                   
-                                                  sounds.scan();
+                                                  sounds.scan(); playHaptic('light');
                                                   setBattleLog([{ text: 'CHAOS SETUP INITIATED. SELECT MOVES.', type: 'critical' }]);
                                                 } catch (err) {
                                                   console.error("Failed to setup chaos match", err);
@@ -7552,13 +8056,13 @@ export default function App() {
                                                 setLoadingPokemon(true);
                                                 try {
                                                   const randomBaseId = Math.floor(Math.random() * 1025) + 1;
-                                                  const baseOpponent = await searchPokemon(randomBaseId.toString(), selectedLang);
+                                                  const baseOpponent = await searchPokemon(randomBaseId.toString());
                                                   
                                                   let finalOpponent = baseOpponent;
                                                   if (baseOpponent.varieties && baseOpponent.varieties.length > 1 && Math.random() < 0.8) {
                                                     const pool = baseOpponent.varieties;
                                                     const varietyIndex = Math.floor(Math.random() * pool.length);
-                                                    finalOpponent = await searchPokemon(pool[varietyIndex].pokemon?.name, selectedLang);
+                                                    finalOpponent = await searchPokemon(pool[varietyIndex].pokemon?.name);
                                                   }
                                                   setBattleOpponent(finalOpponent);
                                                   setIsOpponentShiny(Math.random() < 0.05);
@@ -7569,7 +8073,7 @@ export default function App() {
                                                   setOpponentMoves(generateCompetitiveMoveset(finalOpponent, [], pokemon));
 
                                                   
-                                                  sounds.scan();
+                                                  sounds.scan(); playHaptic('light');
                                                   handleTabChange('battle');
                                                 } catch (err) {
                                                   console.error("Failed to fetch random opponent", err);
@@ -7602,7 +8106,7 @@ export default function App() {
                                                   type="button"
                                                   onClick={(e) => { e.stopPropagation();
                                                     setShowCombatOptionsCompare(!showCombatOptionsCompare);
-                                                    sounds.scan();
+                                                    sounds.scan(); playHaptic('light');
                                                   }}
                                                   className={cn(
                                                     "border rounded px-1.5 py-0.5 flex items-center gap-1 transition-colors active:scale-95 text-[9px] font-bold uppercase tracking-widest cursor-pointer",
@@ -7619,7 +8123,7 @@ export default function App() {
                                                   type="button"
                                                   onClick={(e) => { e.stopPropagation();
                                                     setSelectedMoves(generateCompetitiveMoveset(pokemon, selectedMoves));
-                                                    sounds.scan();
+                                                    sounds.scan(); playHaptic('light');
                                                   }}
                                                   className="bg-cyan-900/40 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 rounded px-1.5 py-0.5 flex items-center gap-1 transition-colors active:scale-95 text-[9px] font-bold uppercase tracking-widest cursor-pointer"
                                                 >
@@ -7783,7 +8287,7 @@ export default function App() {
                                                             } else if (selectedMoves.length < 4) {
                                                               setSelectedMoves(prev => [...prev, move]);
                                                             }
-                                                            sounds.scan();
+                                                            sounds.scan(); playHaptic('light');
                                                           }}
                                                           className={cn(
                                                             "text-[9px] font-bold tracking-wider sm:text-[10px] p-2 border rounded-xl flex flex-col items-start gap-1 transition-all group cursor-pointer text-left w-full",
@@ -7874,7 +8378,7 @@ export default function App() {
                               type="button"
                               onClick={() => {
                                 detailsContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-                                sounds.scan();
+                                sounds.scan(); playHaptic('light');
                               }}
                               className={cn(
                                 "absolute bottom-6 right-6 z-50 p-3 rounded-full bg-slate-950/90 border-2 border-cyan-500/50 hover:border-cyan-400 text-cyan-400 hover:text-cyan-300 hover:shadow-[0_0_15px_rgba(34,211,238,0.4)] transition-all flex items-center justify-center cursor-pointer shadow-lg group duration-150 ease-out",
@@ -7901,7 +8405,7 @@ export default function App() {
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/5 to-transparent pointer-events-none"></div>
                         
                         <motion.div 
-                          className="relative w-32 h-32 xxs:w-40 xxs:h-40 xs:w-48 xs:h-48 sm:w-56 sm:h-56 md:w-60 md:h-60 lg:w-64 lg:h-64 flex items-center justify-center shrink max-h-[24vh] sm:max-h-[30vh] my-1"
+                          className="relative w-48 h-48 xxs:w-56 xxs:h-56 xs:w-64 xs:h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[28rem] lg:h-[28rem] flex items-center justify-center shrink max-h-[35vh] sm:max-h-[45vh] -mt-8 sm:-mt-16 mb-2 sm:mb-6"
                           initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: "easeOut" }}
                         >
                           <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 75%)' }}></div>
@@ -7936,7 +8440,7 @@ export default function App() {
                                 setPokemon(null);
                                 setBattleOpponent(null);
                                 resetSimulation();
-                                sounds.boot();
+                                sounds.boot(); playHaptic('medium');
                                 try {
                                   await loadAllPokemon(1, false);
                                   await new Promise(resolve => setTimeout(resolve, 1400));
@@ -8012,7 +8516,7 @@ export default function App() {
                                 setQuery(type);
                                 setInputValue(type);
                                 setListMode('pokemon');
-                                sounds.scan();
+                                sounds.scan(); playHaptic('light');
                               }}
                               className={cn(
                                 "p-4 rounded-lg transition-all hover:scale-105 hover:shadow-lg flex flex-col items-center gap-2 group",
@@ -8053,11 +8557,21 @@ export default function App() {
                                   </span>
                                 </div>
                               </div>
-                              <div className="flex flex-col items-end text-right font-mono select-none">
-                                <div className="flex items-center gap-1.5 select-none pointer-events-none">
-                                  <span className="text-[8px] sm:text-[10px] text-emerald-500 font-bold uppercase tracking-wider">LIVE</span>
-                                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_6px_rgba(16,185,129,0.6)] ml-0.5"></div>
-                                </div>
+                              <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                <button
+                                  onClick={() => { setIsAvatarModalOpen(true); try { sounds.boot() } catch(e){} }}
+                                  className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 border-cyan-500/50 hover:border-cyan-400 bg-cyan-950/40 hover:bg-cyan-900/60 transition-all flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(34,211,238,0.2)] hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] group"
+                                  title="Change Avatar"
+                                >
+                                  <img 
+                                    src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
+                                    alt={currentAvatar.name}
+                                    className="w-10 h-10 sm:w-14 sm:h-14 object-contain group-hover:scale-110 transition-transform"
+                                  />
+                                  <div className="absolute -bottom-1 sm:-bottom-1.5 -right-1 sm:-right-1.5 w-4 h-4 sm:w-5 sm:h-5 bg-emerald-500 rounded-full border-2 border-[#020617] flex items-center justify-center shadow-[0_0_6px_rgba(16,185,129,0.8)]">
+                                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-pulse"></div>
+                                  </div>
+                                </button>
                               </div>
                             </div>
 
@@ -8070,7 +8584,7 @@ export default function App() {
                                 type="button"
                                 onClick={() => {
                                   setIsDailyScanOpen(true);
-                                  sounds.boot();
+                                  sounds.boot(); playHaptic('medium');
                                 }}
                                 className={cn(
                                   hudButtonClass(isDailyScanOpen, 'amber'),
@@ -8081,7 +8595,7 @@ export default function App() {
                                 <motion.div animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}>
                                   <Sparkles className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 filter drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]", isDailyScanOpen ? "text-slate-950 font-black" : "text-amber-400")} />
                                 </motion.div>
-                                <span className="relative z-10 font-bold whitespace-nowrap">{t('DAILY SCANS') || 'DAILY SCANS'}</span>
+                                <span className="relative z-10 font-bold whitespace-nowrap">{'DAILY SCANS'}</span>
                                 <span className="relative z-10 items-center gap-1 px-1.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/50 text-[6.5px] sm:text-[7px] text-amber-300 font-extrabold tracking-wider uppercase shrink-0 shadow-[0_0_6px_rgba(245,158,11,0.4)] animate-pulse hidden xs:inline-flex">
                                   <span className="w-1 h-1 rounded-full bg-amber-400 animate-ping shrink-0" />
                                   READY
@@ -8095,7 +8609,7 @@ export default function App() {
                                 type="button"
                                 onClick={() => {
                                   setIsDailyQuizOpen(true);
-                                  sounds.boot();
+                                  sounds.boot(); playHaptic('medium');
                                 }}
                                 className={cn(
                                   hudButtonClass(isDailyQuizOpen, 'purple'),
@@ -8106,7 +8620,7 @@ export default function App() {
                                 <motion.div animate={{ rotate: 360, scale: [1, 1.15, 1] }} transition={{ repeat: Infinity, duration: 4, ease: "linear" }}>
                                   <BrainCircuit className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 filter drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]", isDailyQuizOpen ? "text-white font-black" : "text-purple-400")} />
                                 </motion.div>
-                                <span className="relative z-10 font-bold whitespace-nowrap">{t('THEORY EXAM') || 'THEORY EXAM'}</span>
+                                <span className="relative z-10 font-bold whitespace-nowrap">{'THEORY EXAM'}</span>
                                 <span className="relative z-10 items-center gap-1 px-1.5 py-0.5 rounded-full bg-purple-500/20 border border-purple-400/50 text-[6.5px] sm:text-[7px] text-purple-300 font-extrabold tracking-wider uppercase shrink-0 shadow-[0_0_6px_rgba(168,85,247,0.4)] animate-pulse hidden xs:inline-flex">
                                   <span className="w-1 h-1 rounded-full bg-purple-400 animate-ping shrink-0" />
                                   READY
@@ -8124,7 +8638,7 @@ export default function App() {
                                       onClick={() => {
                                         setCurrentGenId(gen.id);
                                         setViewAllGenerations(false);
-                                        sounds.scan();
+                                        sounds.scan(); playHaptic('light');
                                       }}
                                       className={cn(
                                         "whitespace-nowrap px-2.5 sm:px-3 py-1 text-[8px] font-bold tracking-wider sm:text-[9px] font-bold uppercase tracking-[0.1em] transition-all duration-300 relative rounded-lg border shrink-0",
@@ -8144,7 +8658,7 @@ export default function App() {
                                       setInputValue('');
                                       setLastSearched('');
                                       setListMode('pokemon');
-                                      sounds.scan();
+                                      sounds.scan(); playHaptic('light');
                                     }}
                                     className={cn(
                                       "whitespace-nowrap px-2 py-1 text-[7px] sm:text-[8px] font-bold tracking-wider uppercase tracking-[0.1em] transition-all duration-300 relative rounded-lg border font-black group/viewall-bottom shrink-0",
@@ -8164,7 +8678,7 @@ export default function App() {
                                 </div>
                               </div>
                               
-                              <div className="flex items-center justify-between gap-2 px-1 pt-1">
+                              <div className="flex flex-wrap items-center justify-between gap-2 px-1 pt-1 w-full">
                                 {/* Units Found indicator alongside Export PDF & Filters */}
                                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-cyan-500/25 bg-cyan-950/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] shrink-0">
                                   {isSelectingOpponent && (
@@ -8174,7 +8688,7 @@ export default function App() {
                                         setPokemon(pokemon);
                                         setAttackerAnimation('none');
                                         handleTabChange('battle');
-                                        sounds.scan();
+                                        sounds.scan(); playHaptic('light');
                                       }}
                                       className={cn(hudButtonClass(false, 'red'), "!py-1 !px-2.5 !text-[9px] font-bold tracking-wider uppercase tracking-widest mr-1")}
                                     >
@@ -8193,7 +8707,7 @@ export default function App() {
                                       const nextMode = arenaArtworkMode === 'home' ? '2d' : 'home';
                                       setArenaArtworkMode(nextMode);
                                       try { localStorage.setItem('pokethology_arena_artwork_mode', nextMode); } catch(_) {}
-                                      try { sounds.scan(); } catch(_) {}
+                                      try { sounds.scan(); playHaptic('light'); } catch(_) {}
                                       playHaptic();
                                     }}
                                     className={cn(
@@ -8233,7 +8747,7 @@ export default function App() {
                                   <button
                                     onClick={() => {
                                       setSortBy(sortBy === 'id' ? 'name' : 'id');
-                                      sounds.scan();
+                                      sounds.scan(); playHaptic('light');
                                     }}
                                     className={cn(hudButtonClass(false, 'slate'), "!p-1.5 !text-[8px] font-bold tracking-wider")}
                                     title="Toggle Sort"
@@ -8243,7 +8757,7 @@ export default function App() {
                                   <button
                                     onClick={() => {
                                       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-                                      sounds.scan();
+                                      sounds.scan(); playHaptic('light');
                                     }}
                                     className={cn(hudButtonClass(false, 'slate'), "!p-1.5 !text-[8px] font-bold tracking-wider")}
                                   >
@@ -8270,7 +8784,7 @@ export default function App() {
                               onClick={() => {
                                 setLoadingList(false);
                                 setListMode('home');
-                                sounds.scan();
+                                sounds.scan(); playHaptic('light');
                               }}
                               className="mt-8 px-5 py-2 hover:bg-rose-950/10 border border-neutral-800 hover:border-cyan-500/40 rounded-lg text-[9px] font-hud uppercase tracking-[0.2em] text-cyan-400 hover:text-cyan-300 transition-all font-black"
                             >
@@ -8298,7 +8812,7 @@ export default function App() {
                               type="button"
                               onClick={() => {
                                 gridScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-                                sounds.scan();
+                                sounds.scan(); playHaptic('light');
                               }}
                               className={cn(
                                 "fixed bottom-6 right-6 z-50 p-3 rounded-full bg-slate-950/90 border-2 border-cyan-500/50 hover:border-cyan-400 text-cyan-400 hover:text-cyan-300 hover:shadow-[0_0_15px_rgba(34,211,238,0.4)] transition-all flex items-center justify-center cursor-pointer shadow-lg group duration-150 ease-out",
@@ -8356,13 +8870,145 @@ export default function App() {
           isOpen={isTypeChartOpen}
           onClose={() => {
             setIsTypeChartOpen(false);
-            try { sounds.scan(); } catch (_) {}
+            try { sounds.scan(); playHaptic('light'); } catch (_) {}
           }}
           typeColors={typeColors}
           TYPE_CHART={TYPE_CHART}
           isLightMode={isLightMode}
           sounds={sounds}
         />
+
+        {/* Avatar Selection Modal */}
+        <AnimatePresence>
+          {isAvatarModalOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[120] flex bg-black/90 backdrop-blur-md"
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 40 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                className="w-full h-full bg-slate-950 flex flex-col overflow-hidden border-t-2 border-cyan-500/30"
+              >
+                <div className="flex items-center justify-between p-4 sm:p-6 border-b border-cyan-900/50 bg-slate-900/80 shrink-0">
+                  <div className="flex items-center gap-4">
+                    <User className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+                    <h2 className="font-hud text-xl sm:text-2xl lg:text-3xl font-black text-cyan-300 tracking-widest">SELECT AVATAR</h2>
+                  </div>
+                  <button
+                    onClick={() => { setIsAvatarModalOpen(false); try { sounds.scan(); playHaptic('light'); } catch(e){} }}
+                    className="p-3 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-full transition-colors group"
+                  >
+                    <X className="w-6 h-6 sm:w-8 sm:h-8 group-hover:scale-110 transition-transform" />
+                  </button>
+                </div>
+
+                <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
+                  {/* Left Side: Avatar Details & Default Save */}
+                  <div className="w-full lg:w-[400px] xl:w-[450px] max-h-[45vh] lg:max-h-none bg-slate-950/80 p-4 sm:p-6 lg:p-8 flex flex-col border-b lg:border-b-0 lg:border-r border-cyan-900/50 shrink-0 z-10 shadow-2xl relative">
+                    <div className="absolute inset-0 bg-gradient-to-b from-cyan-900/10 to-transparent pointer-events-none" />
+                    
+                    <div className="relative w-24 h-24 sm:w-32 sm:h-32 lg:w-56 lg:h-56 mx-auto mb-3 sm:mb-6 bg-slate-900/50 rounded-full flex items-center justify-center border-4 border-cyan-500/30 shadow-[0_0_30px_rgba(34,211,238,0.15)] group shrink-0">
+                      <div className="absolute inset-0 rounded-full bg-cyan-400/5 animate-pulse" />
+                      <img 
+                        src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
+                        alt={currentAvatar.name}
+                        className="w-20 h-20 sm:w-28 sm:h-28 lg:w-48 lg:h-48 object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    
+                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 sm:pr-4 flex flex-col">
+                      <h3 className="text-xl sm:text-3xl lg:text-5xl font-hud font-black text-center text-cyan-300 uppercase tracking-[0.2em] mb-1.5 sm:mb-2 drop-shadow-lg shrink-0">
+                        {currentAvatar.name}
+                      </h3>
+                      <div className="text-xs sm:text-sm lg:text-lg text-emerald-400 font-bold uppercase tracking-widest text-center mb-3 sm:mb-6 py-0.5 sm:py-1 px-3 sm:px-4 border border-emerald-500/30 bg-emerald-950/30 rounded-full self-center shrink-0">
+                        {currentAvatar.role}
+                      </div>
+
+                      <p className="text-sm sm:text-base lg:text-xl font-serif italic text-slate-300 leading-relaxed opacity-90 text-center lg:text-left mb-4 sm:mb-6">
+                        "{currentAvatar.lore}"
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        try {
+                          localStorage.setItem('pokethology_user_avatar', currentAvatar.id);
+                          sounds.scan(); playHaptic('light');
+                          setIsAvatarModalOpen(false);
+                        } catch(e) {}
+                      }}
+                      className="w-full py-4 sm:py-5 px-6 bg-emerald-600 hover:bg-emerald-500 text-emerald-50 rounded-xl sm:rounded-2xl font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] hover:-translate-y-1 text-sm sm:text-base lg:text-lg"
+                    >
+                      <Bookmark className="w-5 h-5 sm:w-6 sm:h-6" />
+                      Set as Default
+                    </button>
+                  </div>
+
+                  {/* Right Side: Grid Selection */}
+                  <div className="flex-1 flex flex-col h-full min-h-[300px] bg-slate-900/30 relative">
+                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none mix-blend-overlay" />
+                    
+                    <div className="p-4 sm:p-6 border-b border-cyan-900/30 bg-slate-900/80 flex gap-3 sm:gap-4 overflow-x-auto hide-scrollbar shrink-0 z-10 backdrop-blur-md">
+                      {['All', 'Protagonist', 'Gym Leader', 'Elite Four', 'Champion', 'Trainer', 'Villain'].map(role => (
+                        <button 
+                          key={role}
+                          onClick={() => { setAvatarFilter(role as any); try { sounds.scan() } catch(e){} }}
+                          className={cn(
+                            "px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl border-2 whitespace-nowrap transition-all text-sm sm:text-base font-bold tracking-widest uppercase", 
+                            avatarFilter === role 
+                              ? "bg-cyan-950 border-cyan-400 text-cyan-100 shadow-[0_0_20px_rgba(34,211,238,0.3)]" 
+                              : "bg-slate-900/50 border-slate-700/50 text-slate-400 hover:text-slate-200 hover:border-cyan-500/50"
+                          )}
+                        >
+                          {role}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 z-10">
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6 pb-20">
+                        {TRAINER_SPRITES.filter(t => avatarFilter === 'All' || t.role === avatarFilter).map(trainer => (
+                          <button
+                            key={trainer.id}
+                            onClick={() => { setCurrentAvatar(trainer); try { sounds.scan() } catch(e){} }}
+                            className={cn(
+                              "relative aspect-square rounded-2xl border-2 transition-all group overflow-hidden flex flex-col items-center justify-center p-3 sm:p-4 backdrop-blur-sm",
+                              currentAvatar.id === trainer.id 
+                                ? "border-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.5)] bg-cyan-900/60" 
+                                : "border-slate-700/40 hover:border-cyan-500/60 hover:bg-slate-800/80 bg-slate-900/40"
+                            )}
+                          >
+                            <img 
+                              src={`https://play.pokemonshowdown.com/sprites/trainers/${trainer.id}.png`} 
+                              alt={trainer.name}
+                              className={cn(
+                                "w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-contain transition-transform duration-300 drop-shadow-md",
+                                currentAvatar.id === trainer.id ? "scale-110 drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]" : "group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                              )}
+                            />
+                            <div className={cn(
+                              "absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm py-1.5 px-2 transition-opacity duration-200 border-t border-cyan-500/30",
+                              currentAvatar.id === trainer.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                            )}>
+                              <span className="block w-full text-center text-[10px] sm:text-xs font-bold text-cyan-100 truncate tracking-wider uppercase">
+                                {trainer.name}
+                              </span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Move Learning Modal */}
         <AnimatePresence>
@@ -8406,7 +9052,7 @@ export default function App() {
                               } else {
                                 setMoveBeingLearned(move);
                                 setIsReplacingMove(true);
-                                sounds.scan();
+                                sounds.scan(); playHaptic('light');
                               }
                             }}
                             className="w-full bg-slate-900/50 p-4 rounded-xl border border-cyan-900/30 hover:border-cyan-400 transition-all text-left group"
@@ -8433,7 +9079,7 @@ export default function App() {
                       <button
                         onClick={() => {
                           setOfferedMoves([]);
-                          sounds.scan();
+                          sounds.scan(); playHaptic('light');
                           finalizeMoveLearn();
                         }}
                         className="w-full py-3 text-slate-500 hover:text-slate-300 transition-colors uppercase font-hud text-[9px] font-bold tracking-wider tracking-widest mt-2"
@@ -8463,7 +9109,7 @@ export default function App() {
                               setMoveBeingLearned(null);
                               setIsReplacingMove(false);
                               setOfferedMoves([]);
-                              sounds.scan();
+                              sounds.scan(); playHaptic('light');
                               setBattleLog(prev => [...prev, { text: `${pokemon?.name?.toUpperCase()} FORGOT ${move.name.toUpperCase()} AND LEARNED ${moveBeingLearned.name.toUpperCase()}!`, type: 'system' }]);
                             }}
                             className="w-full bg-slate-900/50 p-3 rounded-xl border border-red-900/30 hover:border-red-500/50 transition-all text-left group flex justify-between items-center"
@@ -8483,7 +9129,7 @@ export default function App() {
                         onClick={() => {
                           setIsReplacingMove(false);
                           setMoveBeingLearned(null);
-                          sounds.scan();
+                          sounds.scan(); playHaptic('light');
                         }}
                         className="w-full py-3 text-slate-500 hover:text-slate-300 transition-colors uppercase font-hud text-[9px] font-bold tracking-wider tracking-widest mt-2"
                       >
@@ -8645,7 +9291,7 @@ export default function App() {
           onSelectMainPokemon={(p) => {
             setPokemon(p);
             setIsComparisonOpen(false);
-            if (sounds?.scan) sounds.scan();
+            if (sounds?.scan) sounds.scan(); playHaptic('light');
           }}
           isLightMode={isLightMode}
         />
@@ -8673,7 +9319,7 @@ export default function App() {
                   </div>
                   <div className="flex items-center gap-2">
                     <h2 className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-widest leading-none">
-                      {t('DAILY HUB') || 'DAILY OPERATIONS HUB'}
+                      {'DAILY OPERATIONS HUB'}
                     </h2>
                     <span className="px-2 py-0.5 rounded-full bg-cyan-950/90 border border-cyan-500/40 text-cyan-300 text-[10px] sm:text-xs font-mono font-bold whitespace-nowrap shadow-sm">
                       {today}
@@ -8684,7 +9330,7 @@ export default function App() {
                 <button
                   onClick={() => {
                     setIsDailyHubOpen(false);
-                    try { sounds.scan(); } catch (_) {}
+                    try { sounds.scan(); playHaptic('light'); } catch (_) {}
                   }}
                   className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm shrink-0"
                   title="Close (Esc)"
@@ -8755,13 +9401,13 @@ export default function App() {
                     </div>
                     <div className="flex items-center gap-2">
                       <h2 className="font-hud font-black text-base sm:text-xl text-amber-300 uppercase tracking-widest leading-none">
-                        {t('DAILY SCAN') || 'DAILY SPECIMEN SCAN'}
+                        {'DAILY SPECIMEN SCAN'}
                       </h2>
                     </div>
                   </div>
 
                   <button 
-                    onClick={() => { setIsDailyScanOpen(false); sounds.scan(); }} 
+                    onClick={() => { setIsDailyScanOpen(false); sounds.scan(); playHaptic('light'); }} 
                     className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm shrink-0"
                     title="Close (Esc)"
                   >
@@ -8792,13 +9438,13 @@ export default function App() {
                         {dailyFemalePokemon ? (
                           <div className="flex items-center gap-1 bg-slate-950/90 p-1 rounded-lg border border-slate-800/80 text-[9px] font-black uppercase tracking-wider">
                             <button 
-                              onClick={() => { setDailyGender('male'); sounds.scan(); }}
+                              onClick={() => { setDailyGender('male'); sounds.scan(); playHaptic('light'); }}
                               className={cn("px-2 py-1 rounded transition-colors cursor-pointer", dailyGender === 'male' ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" : "text-slate-400 hover:text-white")}
                             >
                               MALE
                             </button>
                             <button 
-                              onClick={() => { setDailyGender('female'); sounds.scan(); }}
+                              onClick={() => { setDailyGender('female'); sounds.scan(); playHaptic('light'); }}
                               className={cn("px-2 py-1 rounded transition-colors cursor-pointer", dailyGender === 'female' ? "bg-pink-500/20 text-pink-400 border border-pink-500/30" : "text-slate-400 hover:text-white")}
                             >
                               FEMALE
@@ -9014,7 +9660,7 @@ export default function App() {
                 </div>
 
                 <button 
-                  onClick={() => { setIsDailyQuizOpen(false); sounds.scan(); }} 
+                  onClick={() => { setIsDailyQuizOpen(false); sounds.scan(); playHaptic('light'); }} 
                   className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm shrink-0"
                   title="Close (Esc)"
                 >
@@ -9048,7 +9694,7 @@ export default function App() {
           isLightMode={isLightMode}
           missionNotice={lastBattleMissionNotice}
           onRematch={() => {
-            sounds.battleStart();
+            sounds.battleStart(); playHaptic('heavy');
             setIsBattling(false);
             setBattleState('setup');
             setTimeout(() => {
@@ -9072,7 +9718,7 @@ export default function App() {
             setOpponentStatStages({ attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0, evasion: 0, accuracy: 0 });
             setBattleLog([]);
             
-            sounds.scan();
+            sounds.scan(); playHaptic('light');
           }}
           onNewBattle={() => {
             resetSimulation();
@@ -9124,7 +9770,7 @@ export default function App() {
                 </div>
 
                 <button 
-                  onClick={() => { setIsSettingsOpen(false); sounds.scan(); }} 
+                  onClick={() => { setIsSettingsOpen(false); sounds.scan(); playHaptic('light'); }} 
                   className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm shrink-0"
                   title="Close (Esc)"
                 >
@@ -9183,7 +9829,7 @@ export default function App() {
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
                           handleInstallPWA();
-                          sounds.scan();
+                          sounds.scan(); playHaptic('light');
                         }}
                         className="flex items-center justify-between p-3.5 bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/50 hover:border-cyan-400 rounded-xl transition-all group w-full text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.25)] cursor-pointer"
                       >
@@ -9205,7 +9851,7 @@ export default function App() {
                       onClick={() => {
                         setIsSettingsOpen(false);
                         setIsTutorialOpen(true);
-                        sounds.scan();
+                        sounds.scan(); playHaptic('light');
                       }}
                       className="flex items-center justify-between p-3.5 bg-slate-950/60 hover:bg-slate-950/90 border border-cyan-900/40 hover:border-cyan-500/50 rounded-xl transition-all group w-full cursor-pointer"
                     >
@@ -9319,7 +9965,7 @@ export default function App() {
                 <div className="grid grid-cols-2 gap-3 mt-1">
                   <button
                     onClick={() => {
-                      sounds.scan();
+                      sounds.scan(); playHaptic('light');
                       setPendingAction(null);
                       setShowExitConfirmation(false);
                     }}
@@ -9924,7 +10570,7 @@ export default function App() {
                     onClick={() => {
                       setShowMissionCelebration(false);
                       try {
-                        sounds.scan();
+                        sounds.scan(); playHaptic('light');
                       } catch (_) {}
                     }}
                     className="w-full py-3 px-4 rounded-xl font-hud text-[10px] sm:text-[11px] font-black tracking-widest uppercase bg-amber-500 text-slate-950 hover:bg-amber-400 hover:shadow-[0_0_20px_rgba(245,158,11,0.5)] transition-all active:scale-[0.98] cursor-pointer"

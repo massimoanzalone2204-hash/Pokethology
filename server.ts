@@ -108,9 +108,7 @@ function detectLanguage(text: string): 'it' | 'es' | 'fr' | 'de' | 'en' {
   return 'en';
 }
 
-const getRequestLanguage = (req: any, userText?: string): 'it' | 'es' | 'fr' | 'de' | 'en' => {
-  return 'en';
-};
+
 
 
 
@@ -1094,7 +1092,7 @@ app.post("/api/chat", async (req, res) => {
   const { messages, context } = req.body;
   const apiKey = getApiKey();
   const userText = messages[messages.length - 1]?.text || "";
-  const lang = getRequestLanguage(req, userText);
+  const lang = 'en';
   const suggestedPokemon = extractSuggestedPokemonWrapper(userText);
   const navigateWords = ["show", "search", "open", "find", "view", "display", "stats", "load", "see", "bring", "check", "info", "pokedex", "mega", "gmax", "gigantamax", "alolan", "alola", "galarian", "galar", "hisuian", "hisui", "paldean", "paldea", "primal", "origin", "therian", "sky", "dusk", "dawn", "ultra", "look", "tell"];
   const wantsNavigation = (navigateWords.some(w => userText.toLowerCase().includes(w)) && suggestedPokemon) || (suggestedPokemon && userText.split(/\s+/).length <= 5);
@@ -1122,14 +1120,8 @@ app.post("/api/chat", async (req, res) => {
       parts: [{ text: m.text }]
     }));
 
-    const langNameMap: Record<string, string> = {
-      it: "Italian",
-      es: "Spanish",
-      fr: "French",
-      de: "German",
-      en: "English"
-    };
-    const targetLangName = langNameMap[lang] || "English";
+    
+    
 
     const currentViewed = context.selectedPokemon ? context.selectedPokemon.name : "None";
     const activeContextName = suggestedPokemon || currentViewed;
@@ -1182,7 +1174,7 @@ app.post("/api/chat", async (req, res) => {
         Full Interface Context: 
         ${JSON.stringify({ ...context, newlySelected: suggestedPokemon })}
 
-        CRITICAL MULTILINGUAL MANDATE: The user's preferred language is ${targetLangName}. You MUST respond exclusively in ${targetLangName}.`
+        .`
       },
     });
 
@@ -1207,7 +1199,7 @@ app.post("/api/chat", async (req, res) => {
 app.post("/api/analyze", async (req, res) => {
   const { battleData } = req.body;
   const apiKey = getApiKey();
-  const lang = getRequestLanguage(req);
+  const lang = 'en';
 
   if (!apiKey) {
     const analysis = generateOfflineAnalysis(battleData, lang);
@@ -1220,14 +1212,8 @@ app.post("/api/analyze", async (req, res) => {
   }
   
   try {
-    const langNameMap = {
-      it: "Italian",
-      es: "Spanish",
-      fr: "French",
-      de: "German",
-      en: "English"
-    };
-    const targetLangName = langNameMap[lang] || "English";
+    
+    
 
     const response = await generateWithRetry({
       model: DEFAULT_MODEL,
@@ -1236,7 +1222,7 @@ app.post("/api/analyze", async (req, res) => {
         maxOutputTokens: 250,
         systemInstruction: `You are a Battle Frontier Strategist. System Key: Pokédex. Provide concise, high-impact tactical advice under 80 words. Use plenty of expressive emojis (🔮, ⚔️, 🛡️, 💥, ⚡, 🎯, 📊, 🧬) for visual signaling. Focus on 1v1 singles battle formats, type advantages, HP management, and predicted opponent moves where switching is not possible.
         
-        CRITICAL MULTILINGUAL MANDATE: The user's preferred language is ${targetLangName}. You MUST write the entire analysis in ${targetLangName}. Translate all tactical reports, status values, and directions cleanly to ${targetLangName}.`,
+        .`,
       }
     });
 
@@ -1258,7 +1244,7 @@ app.post("/api/analyze", async (req, res) => {
 app.post("/api/suggest", async (req, res) => {
   const { pokemonName } = req.body;
   const apiKey = getApiKey();
-  const lang = getRequestLanguage(req);
+  const lang = 'en';
 
   if (!apiKey) {
     const suggestion = generateOfflineSuggestion(pokemonName, lang);
@@ -1271,21 +1257,15 @@ app.post("/api/suggest", async (req, res) => {
   }
   
   try {
-    const langNameMap = {
-      it: "Italian",
-      es: "Spanish",
-      fr: "French",
-      de: "German",
-      en: "English"
-    };
-    const targetLangName = langNameMap[lang] || "English";
+    
+    
 
     const response = await generateWithRetry({
       model: LITE_MODEL,
-      contents: `Provide a single, incredibly interesting fun fact or pro battle tip about ${pokemonName}. Keep it under 20 words with expressive emojis. Write this fact exclusively in ${targetLangName}.`,
+      contents: `Provide a single, incredibly interesting fun fact or pro battle tip about ${pokemonName}. Keep it under 20 words with expressive emojis. Write this fact exclusively in English.`,
       config: {
         maxOutputTokens: 100,
-        systemInstruction: `You are Pokéthology. System Key: Pokédex. You provide ultra-short, punchy, and fascinating Pokémon insights with expressive emojis (🧬, ✨, 💥, 🌟, 🔮), written exclusively in ${targetLangName}.`,
+        systemInstruction: `You are Pokéthology. System Key: Pokédex. You provide ultra-short, punchy, and fascinating Pokémon insights with expressive emojis (🧬, ✨, 💥, 🌟, 🔮), written exclusively in English.`,
       }
     });
 
@@ -1307,7 +1287,7 @@ app.post("/api/suggest", async (req, res) => {
 app.post("/api/strategy", async (req, res) => {
   const { battleData } = req.body;
   const apiKey = getApiKey();
-  const lang = getRequestLanguage(req);
+  const lang = 'en';
 
   if (!apiKey) {
     const strategy = generateOfflineStrategy(battleData, lang);
@@ -1320,14 +1300,8 @@ app.post("/api/strategy", async (req, res) => {
   }
   
   try {
-    const langNameMap = {
-      it: "Italian",
-      es: "Spanish",
-      fr: "French",
-      de: "German",
-      en: "English"
-    };
-    const targetLangName = langNameMap[lang] || "English";
+    
+    
 
     const response = await generateWithRetry({
       model: DEFAULT_MODEL,
@@ -1343,7 +1317,7 @@ app.post("/api/strategy", async (req, res) => {
         • ⚔️ **COMMAND**: Clear, immediate action/move command.
         Avoid paragraphs, warm intros, or generic background talk. Be crisp, direct, and elite.
         
-        CRITICAL MULTILINGUAL MANDATE: Write the entire response exclusively in ${targetLangName}.`,
+        .`,
       }
     });
 

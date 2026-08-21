@@ -110,7 +110,7 @@ export const FavoritesVaultModal: React.FC<FavoritesVaultModalProps> = ({
     setSearchedPokemonName(term);
 
     try {
-      const data = await searchPokemon(term, 'en');
+      const data = await searchPokemon(term);
       if (data && data.name) {
         const baseId = data.baseId || data.id;
         const formsList: DiscoveredForm[] = [];
