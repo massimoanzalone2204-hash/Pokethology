@@ -1155,7 +1155,7 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
             scaleX: { type: "spring", stiffness: 300, damping: 15 }
           }}
           className={cn(
-            "absolute object-contain pointer-events-none select-none transition-all duration-500",
+            "absolute object-contain pointer-events-none select-none transition-transform duration-500",
             "max-w-[85vw] sm:max-w-[90%] max-h-[90%]"
           )}
           style={{
@@ -1605,7 +1605,7 @@ const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: string;
   if (!effectType) return null;
 
   return (
-    <div className="absolute inset-0 z-[1] overflow-hidden pointer-events-none select-none rounded-xl sm:rounded-2xl transform-gpu">
+    <div className="absolute inset-0 z-[1] overflow-hidden pointer-events-none select-none rounded-xl sm:rounded-2xl ">
       {/* Electric ambient overlay */}
       {effectType === 'electric-ambient' && (
         <div className="absolute inset-0 bg-yellow-950/15">
@@ -1615,7 +1615,7 @@ const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: string;
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="absolute bg-yellow-400/45 rounded-full transform-gpu"
+                className="absolute bg-yellow-400/45 rounded-full "
                 style={{
                   width: '2px',
                   height: `${12 + (i % 3) * 15}px`,
@@ -1639,7 +1639,7 @@ const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: string;
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="absolute bg-orange-500/50 rounded-full transform-gpu"
+                className="absolute bg-orange-500/50 rounded-full "
                 style={{
                   width: `${3 + (i % 3) * 2}px`,
                   height: `${3 + (i % 3) * 2}px`,
@@ -1663,7 +1663,7 @@ const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: string;
             {[...Array(10)].map((_, i) => (
               <div
                 key={i}
-                className="absolute bg-blue-400/25 rounded transform-gpu"
+                className="absolute bg-blue-400/25 rounded "
                 style={{
                   width: '1px',
                   height: `${20 + (i % 4) * 15}px`,
@@ -1687,7 +1687,7 @@ const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: string;
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="absolute bg-white/40 rounded-full transform-gpu"
+                className="absolute bg-white/40 rounded-full "
                 style={{
                   width: `${4 + (i % 3) * 2}px`,
                   height: `${4 + (i % 3) * 2}px`,
@@ -1877,7 +1877,7 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
   };
   
   const spriteClasses = cn(
-    "transition-all duration-500 will-change-transform select-none max-w-[150%] max-h-[150%]",
+    "transition-transform duration-500  select-none max-w-[150%] max-h-[150%]",
     (isSelected || isOpponentSelected) 
       ? "!scale-[1.6]" 
       : "opacity-90 group-hover:opacity-100"
@@ -1914,7 +1914,7 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
         sounds.hover();
       }}
       className={cn(
-        "border rounded-xl p-3 flex flex-col items-center transition-all group cursor-pointer relative overflow-hidden h-32 sm:h-36 justify-center will-change-transform shadow-lg",
+        "border rounded-xl p-3 flex flex-col items-center transition-all group cursor-pointer relative overflow-hidden h-32 sm:h-36 justify-center  shadow-lg",
         isLightMode
           ? "bg-white border-slate-200 hover:bg-cyan-50/20 hover:border-cyan-400"
           : "bg-slate-950/40 border-slate-800/50 hover:bg-cyan-950/20 hover:border-cyan-500/40",
@@ -1939,7 +1939,7 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
           transition={{ duration: 0.5, ease: "easeOut" }}
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      <div className="absolute inset-0 bg-gradient-to-b  r from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
       {/* Type-based Particle Aura */}
       <AnimatePresence>
@@ -2163,7 +2163,7 @@ const BattleLog = memo(({ log, enableAnimations, turn, isBattling }: { log: (Log
       exit={{ opacity: 0, y: 10, scale: 0.98 }}
       transition={{ duration: 0.3 }}
       ref={logRef} 
-      className="bg-slate-900/30 backdrop-blur-md rounded-xl p-3 sm:p-4 h-32 sm:h-40 md:h-48 overflow-y-auto custom-scrollbar font-mono text-[10px] sm:text-[11px] sm:leading-relaxed font-bold tracking-wider space-y-1 sm:space-y-1.5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_32px_rgba(0,0,0,0.5)] shrink-0 pointer-events-auto scroll-smooth" 
+      className="bg-slate-900/30 backdrop-blur-md rounded-xl p-3 sm:p-4 h-32 sm:h-40 md:h-48 overflow-y-auto custom-scrollbar optimize-scrolling font-mono text-[10px] sm:text-[11px] sm:leading-relaxed font-bold tracking-wider space-y-1 sm:space-y-1.5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_32px_rgba(0,0,0,0.5)] shrink-0 pointer-events-auto scroll-smooth" 
       style={{ overflowAnchor: 'none' }}
     >
       {log.slice(-50).map((entry, i) => {
@@ -2254,7 +2254,7 @@ const StatusOverlay = memo(({ status }: { status: string | null }) => {
   if (!status) return null;
 
   return (
-    <div className="absolute inset-0 pointer-events-none touch-none select-none z-20 flex items-center justify-center overflow-visible transform-gpu">
+    <div className="absolute inset-0 pointer-events-none touch-none select-none z-20 flex items-center justify-center overflow-visible ">
       {/* BRN - Burn */}
       {(status === 'BRN' || status === 'BUR') && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none touch-none">
@@ -2468,7 +2468,7 @@ const HPBar = memo(({ current, max, enableAnimations }: { current: number; max: 
           backgroundColor: color
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-black/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-b   from-white/30 via-transparent to-black/20"></div>
         <div className="absolute top-0 bottom-0 right-0 w-[2px] bg-white/70 shadow-[0_0_6px_#fff]"></div>
       </motion.div>
     </motion.div>
@@ -6006,7 +6006,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center gap-6"
+            className="fixed inset-0  z-[200] bg-black flex flex-col items-center justify-center gap-6"
           >
             <div className="relative">
               <motion.div 
@@ -6057,7 +6057,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.2, ease: "easeInOut" } }}
             transition={{ duration: 0.15, ease: "easeInOut" }}
-            className="fixed inset-0 z-[240] bg-slate-950 pointer-events-none"
+            className="fixed inset-0  z-[240] bg-slate-950 pointer-events-none"
           />
         )}
       </AnimatePresence>
@@ -6070,7 +6070,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 1.04, filter: "blur(10px)", transition: { duration: 0.4, ease: "easeInOut" } }}
-            className="fixed inset-0 z-[250] flex flex-col items-center justify-center overflow-hidden bg-slate-950/95 backdrop-blur-md select-none p-2 xs:p-4 sm:p-8 cursor-default pointer-events-auto"
+            className="fixed inset-0  z-[250] flex flex-col items-center justify-center overflow-hidden bg-slate-950/95 backdrop-blur-md select-none p-2 xs:p-4 sm:p-8 cursor-default pointer-events-auto"
           >
             {/* Background Ambient Glows & Slashed Effect */}
             <div className="absolute inset-0 z-0 select-none pointer-events-none overflow-hidden">
@@ -6610,7 +6610,7 @@ export default function App() {
                           )}
 
                           <div className={cn(
-                            "flex-1 flex flex-col lg:flex-row lg:gap-6 min-h-0 h-full custom-scrollbar",
+                            "flex-1 flex flex-col lg:flex-row lg:gap-6 min-h-0 h-full custom-scrollbar optimize-scrolling",
                             activeTab === 'chat' ? "overflow-hidden items-stretch pb-0 lg:pb-0" : "overflow-y-auto lg:items-start pb-8 sm:pb-12"
                           )} 
                           ref={detailsContainerRef}
@@ -6631,7 +6631,7 @@ export default function App() {
                                     isShiny={isShiny}
                                     isFemale={isFemale}
                                     use2dSprite={false}
-                                    className="w-full h-full object-contain transition-all duration-500 select-none will-change-transform filter drop-shadow-[0_0_15px_rgba(34,211,238,0.4)] group-hover:scale-105 group-hover:drop-shadow-[0_0_25px_rgba(34,211,238,0.65)]"
+                                    className="w-full h-full object-contain transition-transform duration-500 select-none  filter drop-shadow-[0_0_15px_rgba(34,211,238,0.4)] group-hover:scale-105 group-hover:drop-shadow-[0_0_25px_rgba(34,211,238,0.65)]"
                                     onClick={() => sounds.playCry(pokemon?.name, pokemon.cries?.latest, pokemon?.name?.includes('-gmax'))}
                                   />
                                 </div>
@@ -6935,7 +6935,7 @@ export default function App() {
                                      {/* Evolution Line & Methods Section (Only for standard 1025 Pokémon) */}
                                      {isStandard1025Pokemon(pokemon) && pokemon.evolutionChain && pokemon.evolutionChain.evolves_to && pokemon.evolutionChain.evolves_to.length > 0 && (
                                        <div className={cn(
-                                         "rounded-xl p-4 sm:p-5 border-2 shadow-[0_4px_22px_rgba(0,0,0,0.03)] overflow-x-auto custom-scrollbar relative mb-4 touch-pan-x touch-pan-y [touch-action:pan-x_pan-y]",
+                                         "rounded-xl p-4 sm:p-5 border-2 shadow-[0_4px_22px_rgba(0,0,0,0.03)] overflow-x-auto custom-scrollbar optimize-scrolling relative mb-4 touch-pan-x touch-pan-y [touch-action:pan-x_pan-y]",
                                          isLightMode ? "bg-white border-slate-200" : "bg-slate-950/60 border-cyan-900/40 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
                                        )}>
                                          <h3 className={cn(
@@ -7078,7 +7078,7 @@ export default function App() {
                                           savedChatScrollTopRef.current = e.currentTarget.scrollTop;
                                         }}
                                         className={cn(
-                                          "chat-messages-area flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 custom-scrollbar relative min-h-0 transition-colors",
+                                          "chat-messages-area flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 custom-scrollbar optimize-scrolling relative min-h-0 transition-colors",
                                           isLightMode ? "bg-[#efeae2]" : "bg-[#0b141a]"
                                         )}
                                       >
@@ -7298,7 +7298,7 @@ export default function App() {
                                         <div ref={chatEndRef} />
                                       </div>
                                       <div className={cn(
-                                        "px-2.5 py-1.5 flex gap-1.5 overflow-x-auto custom-scrollbar whitespace-nowrap border-t relative z-10 shrink-0",
+                                        "px-2.5 py-1.5 flex gap-1.5 overflow-x-auto custom-scrollbar optimize-scrolling whitespace-nowrap border-t relative z-10 shrink-0",
                                         isLightMode ? "bg-slate-50 border-slate-200" : "bg-slate-900/90 border-cyan-900/40 backdrop-blur-md"
                                       )}>
                                         {quotaLimitReached && (
@@ -7366,7 +7366,7 @@ export default function App() {
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                     exit={{ opacity: 0, y: -12, scale: 0.99 }}
                                     transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-                                    className="w-full flex-1 min-h-0 overflow-y-auto custom-scrollbar max-w-full"
+                                    className="w-full flex-1 min-h-0 overflow-y-auto custom-scrollbar optimize-scrolling max-w-full"
                                   >
                                     {/* ─── DUAL MODEL MATCHUP PREVIEW REMOVED (THE ARENA ONLY IS SUFFICIENT) ─── */}
 
@@ -7522,7 +7522,7 @@ export default function App() {
                                         ref={arenaCallbackRef}
                                         transition={{ duration: 0.25, ease: "easeOut" }}
                                         id="battle-arena-container"
-                                        className="relative flex-1 flex flex-col justify-center min-h-[220px] xs:min-h-[260px] sm:min-h-[300px] md:min-h-[320px] lg:min-h-[340px] h-[300px] sm:h-[340px] lg:h-[380px] max-h-[40vh] z-10 p-[clamp(0.5rem,2vw,1.5rem)] font-bold overflow-hidden w-full max-w-full transform-gpu will-change-transform"
+                                        className="relative flex-1 flex flex-col justify-center min-h-[220px] xs:min-h-[260px] sm:min-h-[300px] md:min-h-[320px] lg:min-h-[340px] h-[300px] sm:h-[340px] lg:h-[380px] max-h-[40vh] z-10 p-[clamp(0.5rem,2vw,1.5rem)] font-bold overflow-hidden w-full max-w-full  "
                                         style={{ touchAction: 'pan-y', boxSizing: 'border-box' }}
                                       >
                                         {/* Battle Flash Overlay */}
@@ -7534,7 +7534,7 @@ export default function App() {
                                               animate={{ opacity: 0 }}
                                               exit={{ opacity: 0 }}
                                               transition={{ type: "spring", damping: 25, stiffness: 250 }}
-                                              className="absolute inset-0 bg-white/30 pointer-events-none z-50 transform-gpu"
+                                              className="absolute inset-0 bg-white/30 pointer-events-none z-50 "
                                             />
                                           )}
                                           {(attackerAnimation === 'hit_critical' || defenderAnimation === 'hit_critical') && (
@@ -7544,7 +7544,7 @@ export default function App() {
                                               animate={{ opacity: 0 }}
                                               exit={{ opacity: 0 }}
                                               transition={{ duration: 0.3 }}
-                                              className="absolute inset-0 bg-red-500/25 pointer-events-none z-50 transform-gpu"
+                                              className="absolute inset-0 bg-red-500/25 pointer-events-none z-50 "
                                             />
                                           )}
                                         </AnimatePresence>
@@ -7594,7 +7594,7 @@ export default function App() {
                                               animate={getBattleSpriteAnimation(defenderAnimation, opponentStatus)}
                                               transition={getBattleSpriteTransition(defenderAnimation)}
 
-                                              className="relative flex flex-col items-center justify-end will-change-transform transform-gpu group"
+                                              className="relative flex flex-col items-center justify-end   group"
                                             >
                                               <div className="relative h-28 w-28 xs:h-32 xs:w-32 sm:h-40 sm:w-40 md:h-48 md:w-48 lg:h-52 lg:w-52 xl:h-56 xl:w-56 flex items-center justify-center max-h-[40vh]">
                                               {opponentDialogue && (
@@ -7672,7 +7672,7 @@ export default function App() {
                                             animate={getBattleSpriteAnimation(attackerAnimation, pokemonStatus)}
                                             transition={getBattleSpriteTransition(attackerAnimation)}
 
-                                            className="relative flex flex-col items-center justify-end will-change-transform transform-gpu group"
+                                            className="relative flex flex-col items-center justify-end   group"
                                           >
                                             <div className="relative h-32 w-32 xs:h-36 xs:w-36 sm:h-48 sm:w-48 md:h-56 md:w-56 lg:h-64 lg:w-64 xl:h-72 xl:w-72 flex items-center justify-center max-h-[40vh]">
                                               {playerDialogue && (
@@ -8411,7 +8411,7 @@ export default function App() {
                                                 </div>
 
                                                 {/* Scrollable Windowed Grid */}
-                                                <div className="max-h-56 sm:max-h-64 overflow-y-auto custom-scrollbar p-1.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 border border-cyan-900/30 bg-slate-950/80 rounded-xl w-full">
+                                                <div className="max-h-56 sm:max-h-64 overflow-y-auto custom-scrollbar optimize-scrolling p-1.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 border border-cyan-900/30 bg-slate-950/80 rounded-xl w-full">
                                                   {pokemon.moves
                                                     .map((move, idx) => {
                                                       const isSelected = selectedMoves.some(m => m.name === move.name);
@@ -8538,7 +8538,7 @@ export default function App() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98, y: -12 }}
                         transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-                        className="flex-1 flex flex-col items-center justify-center gap-3 sm:gap-4 md:gap-5 py-3 sm:py-5 px-3 sm:px-4 text-center relative overflow-y-auto custom-scrollbar select-none w-full h-full my-auto max-w-5xl mx-auto min-h-0"
+                        className="flex-1 flex flex-col items-center justify-center gap-3 sm:gap-4 md:gap-5 py-3 sm:py-5 px-3 sm:px-4 text-center relative overflow-y-auto custom-scrollbar optimize-scrolling select-none w-full h-full my-auto max-w-5xl mx-auto min-h-0"
                       >
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/5 to-transparent pointer-events-none"></div>
                         
@@ -8698,17 +8698,14 @@ export default function App() {
                               <div className="flex flex-col items-end gap-1.5 shrink-0">
                                 <button
                                   onClick={() => { setIsAvatarModalOpen(true); try { sounds.boot() } catch(e){} }}
-                                  className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 border-cyan-500/50 hover:border-cyan-400 bg-cyan-950/40 hover:bg-cyan-900/60 transition-all flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(34,211,238,0.2)] hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] group"
+                                  className="relative flex items-center justify-center shrink-0 group hover:scale-105 active:scale-95 transition-transform"
                                   title="Change Avatar"
                                 >
                                   <img 
                                     src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                                     alt={currentAvatar.name}
-                                    className="w-10 h-10 sm:w-14 sm:h-14 object-contain group-hover:scale-110 transition-transform [image-rendering:pixelated]"
+                                    className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-[0_5px_15px_rgba(34,211,238,0.5)] [image-rendering:pixelated]"
                                   />
-                                  <div className="absolute -bottom-1 sm:-bottom-1.5 -right-1 sm:-right-1.5 w-4 h-4 sm:w-5 sm:h-5 bg-emerald-500 rounded-full border-2 border-[#020617] flex items-center justify-center shadow-[0_0_6px_rgba(16,185,129,0.8)]">
-                                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-pulse"></div>
-                                  </div>
                                 </button>
                               </div>
                             </div>
@@ -8768,7 +8765,7 @@ export default function App() {
 
                             <div className="flex flex-col gap-1 w-full mt-1.5 sm:mt-2">
                               <div className="flex items-center justify-between gap-3 px-2 w-full">
-                                <div className="flex overflow-x-auto custom-scrollbar sm:flex-wrap gap-2 sm:gap-2.5 pb-2 shrink-0 max-w-full w-full">
+                                <div className="flex overflow-x-auto custom-scrollbar optimize-scrolling sm:flex-wrap gap-2 sm:gap-2.5 pb-2 shrink-0 max-w-full w-full">
                                   {GENERATIONS.map((gen) => (
                                     <button
                                       key={gen.id}
@@ -8943,7 +8940,7 @@ export default function App() {
                                 setShowScrollTop(false);
                               }
                             }}
-                            className="flex-1 overflow-y-auto py-1 custom-scrollbar relative" 
+                            className="flex-1 overflow-y-auto py-1 custom-scrollbar optimize-scrolling relative" 
                             style={{ overflowAnchor: 'none' }}
                           >
                             <button
@@ -9023,14 +9020,14 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex bg-black/90 backdrop-blur-md"
+              className="fixed inset-0  z-[120] flex bg-black/90 backdrop-blur-md"
             >
               <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 40 }}
                 transition={{ type: "spring", damping: 25, stiffness: 250 }}
-                className="w-full h-full bg-slate-950 flex flex-col overflow-hidden border-t-2 border-cyan-500/30"
+                className="w-full h-full bg-slate-950  flex flex-col overflow-hidden border-t-2 border-cyan-500/30"
               >
                 <div className="flex items-center justify-between p-3 sm:p-5 lg:p-6 border-b border-cyan-900/50 bg-slate-900/80 shrink-0">
                   <div className="flex items-center gap-2 sm:gap-4">
@@ -9048,11 +9045,11 @@ export default function App() {
                 <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
                   {/* Left Side: Avatar Details & Default Save */}
                   <div className="w-full lg:w-[400px] xl:w-[450px] bg-slate-950/80 p-3 sm:p-5 lg:p-8 flex flex-col border-b lg:border-b-0 lg:border-r border-cyan-900/50 shrink-0 z-10 shadow-2xl relative">
-                    <div className="absolute inset-0 bg-gradient-to-b from-cyan-900/10 to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-b   from-cyan-900/10 to-transparent pointer-events-none" />
                     
                     <div className="flex flex-row lg:flex-col items-center lg:items-stretch gap-3 lg:gap-0 h-full mb-3 lg:mb-0">
                       {/* Avatar Image */}
-                      <div className="relative w-20 h-20 sm:w-28 sm:h-28 lg:w-56 lg:h-56 mx-auto mb-0 lg:mb-6 bg-slate-900/50 rounded-full flex items-center justify-center border-4 border-cyan-500/30 shadow-[0_0_30px_rgba(34,211,238,0.15)] group shrink-0">
+                      <div className="relative w-20 h-20  sm:w-28 sm:h-28 lg:w-56 lg:h-56 mx-auto mb-0 lg:mb-6 bg-slate-900/50 rounded-full flex items-center justify-center border-4 border-cyan-500/30 shadow-[0_0_30px_rgba(34,211,238,0.15)] group shrink-0">
                         <div className="absolute inset-0 rounded-full bg-cyan-400/5 animate-pulse" />
                         <img 
                           src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
@@ -9062,7 +9059,7 @@ export default function App() {
                       </div>
                       
                       {/* Avatar Details */}
-                      <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 sm:pr-2 lg:pr-4 flex flex-col max-h-[22vh] lg:max-h-none">
+                      <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling pr-1 sm:pr-2 lg:pr-4 flex flex-col max-h-[22vh] lg:max-h-none">
                         <h3 className="text-base sm:text-2xl lg:text-5xl font-hud font-black text-left lg:text-center text-cyan-300 uppercase tracking-[0.2em] mb-1 sm:mb-2 drop-shadow-lg shrink-0">
                           {currentAvatar.name}
                         </h3>
@@ -9112,14 +9109,15 @@ export default function App() {
                       ))}
                     </div>
 
-                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 z-10">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-4 sm:p-6 lg:p-8 z-10">
                       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6 pb-20">
                         {TRAINER_SPRITES.filter(t => avatarFilter === 'All' || t.role === avatarFilter).map(trainer => (
                           <button
                             key={trainer.id}
                             onClick={() => { setCurrentAvatar(trainer); try { sounds.scan() } catch(e){} }}
                             className={cn(
-                              "relative aspect-square rounded-2xl border-2 transition-all group overflow-hidden flex flex-col items-center justify-center p-3 sm:p-4 backdrop-blur-sm",
+                              "relative aspect-square rounded-2xl border-2 transition-colors group overflow-hidden flex flex-col items-center justify-center p-3 sm:p-4",
+                              "[content-visibility:auto] contain-intrinsic-size-[100px]",
                               currentAvatar.id === trainer.id 
                                 ? "border-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.5)] bg-cyan-900/60" 
                                 : "border-slate-700/40 hover:border-cyan-500/60 hover:bg-slate-800/80 bg-slate-900/40"
@@ -9134,7 +9132,7 @@ export default function App() {
                               )}
                             />
                             <div className={cn(
-                              "absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm py-1.5 px-2 transition-opacity duration-200 border-t border-cyan-500/30",
+                              "absolute bottom-0 inset-x-0 bg-black/80 py-1.5 px-2 transition-opacity duration-200 border-t border-cyan-500/30",
                               currentAvatar.id === trainer.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                             )}>
                               <span className="block w-full text-center text-[10px] sm:text-xs font-bold text-cyan-100 truncate tracking-wider uppercase">
@@ -9159,7 +9157,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/90"
+              className="fixed inset-0  z-[120] flex items-center justify-center p-4 bg-black/90"
             >
               <motion.div
                 initial={{ scale: 0.98, y: 6, opacity: 0 }}
@@ -9292,7 +9290,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80"
+              className="fixed inset-0  z-[110] flex items-center justify-center p-4 bg-black/80"
             >
               <motion.div
                 initial={{ scale: 0.98, y: 6, opacity: 0 }}
@@ -9305,7 +9303,7 @@ export default function App() {
                   "p-4 sm:p-6 flex justify-between items-start relative overflow-hidden w-full border-b border-cyan-500/30",
                   typeHeaderGradients[(selectedMoveDetail.type || '').toLowerCase()] || "bg-gradient-to-r from-cyan-900 via-slate-900 to-slate-950"
                 )}>
-                  <div className="absolute inset-0 bg-gradient-to-br from-black/40 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-b  r from-black/40 to-transparent"></div>
                   <div className="relative z-10">
                     <h2 className="text-white font-hud text-2xl uppercase tracking-widest drop-shadow-lg">
                       {selectedMoveDetail.name.replace('-', ' ')}
@@ -9447,7 +9445,7 @@ export default function App() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 250 }}
-              className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
+              className="fixed inset-0  z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
             >
               {/* Ambient Glows */}
               <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -9482,7 +9480,7 @@ export default function App() {
                 </button>
               </div>
               
-              <div className="flex-1 overflow-y-auto custom-scrollbar p-3.5 sm:p-6 md:p-8 max-w-5xl mx-auto w-full flex flex-col">
+              <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-3.5 sm:p-6 md:p-8 max-w-5xl mx-auto w-full flex flex-col">
                 <PokethologyCombatMissionWidget 
                   todayStr={today} 
                   isCompleted={isMissionCompleted} 
@@ -9529,7 +9527,7 @@ export default function App() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ type: "spring", damping: 25, stiffness: 250 }}
-                className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
+                className="fixed inset-0  z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
               >
                 {/* Ambient Glows */}
                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -9559,7 +9557,7 @@ export default function App() {
                 </div>
 
                 {/* Scrollable Content Body Container */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full">
+                <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                     {/* Left Column - Holographic Specimen Container & Metrics */}
                     <div className="w-full shrink-0 bg-slate-900/95 border-2 border-amber-500/30 rounded-2xl p-4 sm:p-6 flex flex-col items-center gap-4 relative shadow-xl text-center">
@@ -9782,7 +9780,7 @@ export default function App() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 250 }}
-              className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
+              className="fixed inset-0  z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
             >
               {/* Ambient Glows */}
               <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -9811,7 +9809,7 @@ export default function App() {
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto custom-scrollbar p-3.5 sm:p-6 md:p-8 max-w-4xl mx-auto w-full flex flex-col">
+              <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-3.5 sm:p-6 md:p-8 max-w-4xl mx-auto w-full flex flex-col">
                 <PokethologyQuizWidget />
               </div>
             </motion.div>
@@ -9892,7 +9890,7 @@ export default function App() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 250 }}
-              className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
+              className="fixed inset-0  z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
             >
               {/* Ambient Glows */}
               <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -9922,7 +9920,7 @@ export default function App() {
               </div>
 
               {/* Scrollable Content Body */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-8 max-w-2xl mx-auto w-full flex flex-col gap-5">
+              <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-4 sm:p-6 md:p-8 max-w-2xl mx-auto w-full flex flex-col gap-5">
                 {/* Audio & Visuals Settings */}
                 <div className="flex flex-col gap-3 bg-slate-900/90 p-4 sm:p-6 rounded-2xl border border-cyan-500/30 shadow-xl w-full">
                   <HUDCorners />
@@ -10077,7 +10075,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[140] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto custom-scrollbar"
+              className="fixed inset-0  z-[140] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto custom-scrollbar optimize-scrolling"
             >
               <motion.div
                 initial={{ scale: 0.92, y: 15 }}
@@ -10142,7 +10140,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[130] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto custom-scrollbar"
+              className="fixed inset-0  z-[130] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto custom-scrollbar optimize-scrolling"
             >
               <motion.div
                 initial={{ scale: 0.98, y: 6, opacity: 0 }}
@@ -10155,7 +10153,7 @@ export default function App() {
                    <h2 className="text-base sm:text-xl font-hud text-red-400 uppercase tracking-widest text-center">How to Battle</h2>
                    <button onClick={() => setIsBattleHelpOpen(false)} className="text-slate-500 hover:text-white p-2"><X className="w-5 h-5"/></button>
                 </div>
-                <div className="p-4 sm:p-6 overflow-y-auto max-h-[70vh] custom-scrollbar space-y-4">
+                <div className="p-4 sm:p-6 overflow-y-auto max-h-[70vh] custom-scrollbar optimize-scrolling space-y-4">
                   <div className="space-y-3">
                     <h3 className="text-cyan-400 font-bold uppercase text-[10px] tracking-widest border-l-2 border-cyan-500 pl-2">The Battle Screen</h3>
                     <p className="text-slate-400 text-xs leading-relaxed">Your Pokemon is on the left and the enemy is on the right. Keep an eye on the health bars! If a Pokemon gets a status like Burn or Poison, it will show up next to their name.</p>
@@ -10193,7 +10191,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-slate-950/90 backdrop-blur-md overflow-y-auto custom-scrollbar"
+              className="fixed inset-0  z-[120] flex items-center justify-center p-2 sm:p-4 bg-slate-950/90 backdrop-blur-md overflow-y-auto custom-scrollbar optimize-scrolling"
             >
               <motion.div
                 initial={{ scale: 0.95, y: 15 }}
@@ -10211,7 +10209,7 @@ export default function App() {
                   <span className="text-[9px] font-mono text-cyan-600 uppercase tracking-[0.3em] mt-2 block relative z-10">Core System Specifications & Modalities</span>
                 </div>
                 
-                <div className="p-5 sm:p-7 overflow-y-auto space-y-6 text-slate-300 text-xs text-left flex flex-col custom-scrollbar">
+                <div className="p-5 sm:p-7 overflow-y-auto space-y-6 text-slate-300 text-xs text-left flex flex-col custom-scrollbar optimize-scrolling">
                   <div className="space-y-3 w-full">
                     <h3 className="text-cyan-400 font-black uppercase tracking-[0.2em] text-[10px] font-hud flex items-center gap-2">
                       <div className="w-1 h-3 bg-cyan-500 rounded-md"></div>
@@ -10355,7 +10353,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto custom-scrollbar"
+              className="fixed inset-0  z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto custom-scrollbar optimize-scrolling"
             >
               <motion.div
                 initial={{ scale: 0.98, y: 6, opacity: 0 }}
@@ -10430,7 +10428,7 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
-              className="fixed inset-0 z-[130] flex items-center justify-center pointer-events-none"
+              className="fixed inset-0  z-[130] flex items-center justify-center pointer-events-none"
             >
               <div className={cn(
                 "px-8 py-4 rounded-full font-hud text-2xl uppercase tracking-widest shadow-2xl border-4",
@@ -10624,7 +10622,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[550] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md"
+              className="fixed inset-0  z-[550] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md"
               id="combat-mission-celebration-overlay"
             >
               {/* Spinning cyber background layer */}

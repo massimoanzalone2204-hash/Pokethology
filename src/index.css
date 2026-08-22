@@ -1,6 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=VT323&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
+/* Hardware Acceleration & Smoothness Optimizations */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.hardware-accelerated, .transform-gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.smooth-render {
+  contain: content;
+}
+
+
 @variant light (&:where(.light, .light *));
 
 @theme {
@@ -1248,4 +1266,21 @@ body {
   .ios-safe-bottom {
     padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
   }
+}
+
+/* Safe High-Performance Enhancements */
+.hardware-accelerated-layer {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.optimize-scrolling {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* Force hardware rendering for images */
+img {
+  transform: translateZ(0);
 }
