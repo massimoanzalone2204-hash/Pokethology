@@ -57,6 +57,64 @@ export function sendDiscoveryNotifications() {
         body: 'Universal combat sync and daily battle notifications enabled!',
         icon: '/icon.svg'
       });
+      
+      // Schedule more notifications during the day
+      const dailyNotifications = [
+        {
+          title: '🤖 Universal AI Chatbot Discovery',
+          body: 'Ask the AI Chatbot anything! Explore Pokémon lore, battle tactics, game mechanics, anime, or any topic you like!',
+          delay: 5000,
+        },
+        {
+          title: '⚔️ Combat Simulator Discovery',
+          body: 'Test your Pokémon team in real-time turn-based tactical combat with damage calculations!',
+          delay: 20000,
+        },
+        {
+          title: '🌟 Pokéthology World Exploration',
+          body: 'Explore over 1,000+ Pokémon, evolutions, abilities & competitive movesets offline!',
+          delay: 45000,
+        },
+        {
+          title: '🏆 Daily Challenge',
+          body: 'Have you scanned your daily Pokémon? Complete your Pokédex and claim your rewards!',
+          delay: 3600000, // 1 hour
+        },
+        {
+          title: '🧠 Theological Exam Reminder',
+          body: 'Sharpen your knowledge! Take the Pokéthology Exam to test your mastery.',
+          delay: 7200000, // 2 hours
+        },
+        {
+          title: '⚔️ Arena Awaits',
+          body: 'Your rivals are waiting in the Arena. Jump in and battle now!',
+          delay: 14400000, // 4 hours
+        },
+        {
+          title: '📚 Lore Master',
+          body: 'Discover the deep lore of legendary Pokémon and mythical regions in the Pokédex.',
+          delay: 28800000, // 8 hours
+        }
+      ];
+
+      dailyNotifications.forEach(({ title, body, delay }) => {
+        setTimeout(() => {
+          if (Notification.permission === 'granted') {
+            new Notification(title, { body, icon: '/icon.svg' });
+          }
+        }, delay);
+      });
+      
+      // Set an interval for generic hourly reminders
+      setInterval(() => {
+        if (Notification.permission === 'granted') {
+           new Notification('Pokéthology Hourly Sync', {
+             body: 'Trainers are waiting! Check the Arena and your daily Pokémon scans.',
+             icon: '/icon.svg'
+           });
+        }
+      }, 3600000); // every 1 hour
+
     } catch (_) {}
   }
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
+  User,
   X, 
   BookOpen, 
   Sparkles, 
@@ -137,7 +138,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               pokedex: 'POKÉDEX',
               pokethology: 'POKÉTHOLOGY',
               combat: 'COMBAT',
-              daily: 'DAILY & UTILITIES',
+              daily: 'DAILY',
               social: 'SOCIAL',
               news: 'NEWS'
             };
@@ -191,51 +192,20 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               
               {/* Feature Cards */}
               <div className="grid grid-cols-1 gap-3 text-left">
-                {/* Stats & Radar Charts */}
-                <div className="p-4 rounded-xl border border-emerald-500/30 bg-slate-900/60 flex items-start gap-4 group">
-                  <div className="p-3 bg-emerald-950 rounded-full border border-emerald-500/50 shrink-0 group-hover:rotate-12 transition-transform">
-                    <Radar className="w-5 h-5 text-emerald-400" />
-                  </div>
-                  <div className="space-y-1 w-full min-w-0">
-                    <span className="font-hud font-black text-emerald-400 text-xs sm:text-sm uppercase tracking-wider block">
-                      Base Stats & Radar Diagnostics
-                    </span>
-                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      Inspect complete Base Stat Totals (BST) with an interactive hexagonal radar diagram mapping HP, Attack, Defense, Special Attack, Special Defense, and Kinetic Speed. Compare individual stat bars against benchmark maximums (up to 255).
-                    </p>
-                  </div>
-                </div>
-
-                {/* Type Weaknesses & Resistances */}
+                {/* Avatar Personalization */}
                 <div className="p-4 rounded-xl border border-emerald-500/30 bg-slate-900/60 flex items-start gap-4 group">
                   <div className="p-3 bg-emerald-950 rounded-full border border-emerald-500/50 shrink-0 group-hover:scale-110 transition-transform">
-                    <Shield className="w-5 h-5 text-emerald-400" />
+                    <User className="w-5 h-5 text-emerald-400" />
                   </div>
                   <div className="space-y-1 w-full min-w-0">
                     <span className="font-hud font-black text-emerald-400 text-xs sm:text-sm uppercase tracking-wider block">
-                      Type Matchup Matrix (18 Types)
+                      Avatar Personalization
                     </span>
                     <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      View real-time defensive matchup multipliers for the selected Pokémon: 4x critical weaknesses, 2x super effective vulnerabilities, 0.5x & 0.25x resistances, and 0x total type immunities calculated accurately from dual typing.
+                      Choose your favorite trainer avatar from Pokémon regions and customize your HUD persona. Tap the avatar icon in the top navigation to select from Gym Leaders, Champions, Rivals, and Protagonists.
                     </p>
                   </div>
                 </div>
-
-                {/* Evolution Trees & Moveset Engine */}
-                <div className="p-4 rounded-xl border border-emerald-500/30 bg-slate-900/60 flex items-start gap-4 group">
-                  <div className="p-3 bg-emerald-950 rounded-full border border-emerald-500/50 shrink-0 group-hover:rotate-12 transition-transform">
-                    <GitBranch className="w-5 h-5 text-emerald-400" />
-                  </div>
-                  <div className="space-y-1 w-full min-w-0">
-                    <span className="font-hud font-black text-emerald-400 text-xs sm:text-sm uppercase tracking-wider block">
-                      Evolution Nodes & Moveset Pool
-                    </span>
-                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      Explore multi-branch evolution chains with explicit trigger conditions (level thresholds, evolution stones, friendship, trade requirements). Browse categorized movesets (Level-up, TM/HM, Egg Moves, Move Tutor) with Power, Accuracy, PP, and damage classes (Physical, Special, Status).
-                    </p>
-                  </div>
-                </div>
-
                 {/* Artwork & Sprite Presentation Modes */}
                 <div className="p-4 rounded-xl border border-cyan-500/30 bg-slate-900/60 flex items-start gap-4 group">
                   <div className="p-3 bg-cyan-950 rounded-full border border-cyan-500/50 shrink-0 group-hover:scale-110 transition-transform">
@@ -294,48 +264,62 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               {/* Banner Incipit */}
               <div className="p-4 bg-purple-950/25 border-l-4 border-purple-500 rounded-r-xl space-y-2 text-left relative overflow-hidden">
                 <h3 className="font-hud font-black text-purple-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
-                  <Brain className="w-4 h-4 text-purple-400 animate-pulse" /> Pokéthology AI Assistant & Tactical Cognition
+                  <Brain className="w-4 h-4 text-purple-400 animate-pulse" /> Pokéthology AI Assistant
                 </h3>
                 <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
-                  The Pokéthology AI Assistant is a specialized neural assistant powered by Gemini AI, engineered to provide expert analysis across competitive metagame strategies, Smogon tiers, species biology, canonical lore, and matchup calculations.
+                  The Pokéthology AI Assistant is a specialized, open-domain neural assistant powered by Gemini AI. While deeply knowledgeable about competitive formats, it is fully equipped to answer any query spanning the entire Pokémon universe.
                 </p>
               </div>
 
-              {/* HUD Feature Cards */}
+              {/* HUD Feature Cards */}              
               <div className="grid grid-cols-1 gap-3 text-left">
-                {/* Tactics & Metagame Strategy */}
+                {/* Omniscient Conversational Engine */}
                 <div className="p-4 rounded-xl border border-purple-500/30 bg-slate-900/60 flex items-start gap-4 group">
                   <div className="p-3 bg-purple-950 rounded-full border border-purple-500/50 group-hover:rotate-12 transition-transform shrink-0">
-                    <Crosshair className="w-5 h-5 text-purple-400" />
+                    <Globe className="w-5 h-5 text-purple-400" />
                   </div>
                   <div className="space-y-1">
                     <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider block">
-                      Competitive Metagame & Smogon Builds
+                      Universal Pokémon Knowledge Base
                     </span>
                     <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      Get complete competitive setups including 4-move synergies, optimal Held Items (Choice Specs, Choice Band, Focus Sash, Heavy-Duty Boots, Life Orb, Leftovers), EV/IV spreads, optimal Natures, and hazard/pivot strategies.
+                      Ask anything. From identifying obscure anime episodes and detailing manga arcs, to explaining core game mechanics and breeding algorithms, the assistant handles unrestricted franchise queries.
                     </p>
                   </div>
                 </div>
 
-                {/* Lore, Ecology & Morphology */}
+                {/* Tactical & Competitive */}
+                <div className="p-4 rounded-xl border border-purple-500/30 bg-slate-900/60 flex items-start gap-4 group">
+                  <div className="p-3 bg-purple-950 rounded-full border border-purple-500/50 group-hover:scale-110 transition-transform shrink-0">
+                    <Crosshair className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div className="space-y-1">
+                    <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider block">
+                      Dynamic Team Structuring & Synergy
+                    </span>
+                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
+                      Request bespoke team compositions, theoretical strategy breakdowns, optimal EV/IV spreads, counter-picks against specific metagame threats, or full VGC rule analysis.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Lore, Ecology & Mythology */}
                 <div className="p-4 rounded-xl border border-purple-500/30 bg-slate-900/60 flex items-start gap-4 group">
                   <div className="p-3 bg-purple-950 rounded-full border border-purple-500/50 group-hover:-rotate-12 transition-transform shrink-0">
                     <BookOpen className="w-5 h-5 text-purple-400" />
                   </div>
                   <div className="space-y-1">
                     <span className="font-hud font-black text-purple-400 text-xs sm:text-sm uppercase tracking-wider block">
-                      Species Biology, Ecology & Lore
+                      Deep Lore, Mythology & Ecology
                     </span>
                     <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      Discover evolutionary adaptations, anatomical physiology, habitat behaviors, and canonical Pokédex descriptions from Red & Blue to Scarlet & Violet and Legends Z-A.
+                      Explore the rich narrative of the Pokémon world. Discover detailed physiological adaptations, historical mythologies surrounding Legendary Pokémon, and canonical regional phenomena.
                     </p>
                   </div>
                 </div>
               </div>
             </motion.div>
           )}
-
           {/* TAB: COMBAT */}
           {activeTab === 'combat' && (
             <motion.div 
@@ -358,6 +342,22 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 
               {/* HUD Feature Cards */}
               <div className="grid grid-cols-1 gap-3 text-left">
+{/* Type Weaknesses & Resistances */}
+                <div className="p-4 rounded-xl border border-red-500/30 bg-slate-900/60 flex items-start gap-4 group">
+                  <div className="p-3 bg-red-950 rounded-full border border-red-500/50 shrink-0 group-hover:scale-110 transition-transform">
+                    <Shield className="w-5 h-5 text-red-400" />
+                  </div>
+                  <div className="space-y-1 w-full min-w-0">
+                    <span className="font-hud font-black text-red-400 text-xs sm:text-sm uppercase tracking-wider block">
+                      Type Matchup Matrix (18 Types)
+                    </span>
+                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
+                      View real-time defensive matchup multipliers for the selected Pokémon: 4x critical weaknesses, 2x super effective vulnerabilities, 0.5x & 0.25x resistances, and 0x total type immunities calculated accurately from dual typing.
+                    </p>
+                  </div>
+                </div>
+
+                
                 {/* Select Target Opponent */}
                 <div className="p-4 rounded-xl border border-red-500/30 bg-slate-900/60 flex items-start gap-4 group">
                   <div className="p-3 bg-red-950 rounded-full border border-red-500/50 group-hover:rotate-12 transition-transform shrink-0">
@@ -421,7 +421,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
             </motion.div>
           )}
 
-          {/* TAB: DAILY ACTIVITIES & UTILITIES */}
+          {/* TAB: DAILY */}
           {activeTab === 'daily' && (
             <motion.div 
               initial={{ opacity: 0, x: 20 }} 
@@ -431,7 +431,7 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               {/* Banner Incipit */}
               <div className="p-4 bg-amber-950/25 border-l-4 border-amber-500 rounded-r-xl space-y-2 text-left relative overflow-hidden">
                 <h3 className="font-hud font-black text-amber-400 uppercase text-xs sm:text-sm tracking-wider flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-amber-400 animate-bounce" /> Daily Hub, Quests & Utilities
+                  <Calendar className="w-4 h-4 text-amber-400 animate-bounce" /> Daily
                 </h3>
                 <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
                   The Daily Hub is Pokéthology's operational command center for daily training routines, knowledge evaluation, progress milestones, and persistent local storage management.
@@ -468,51 +468,6 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     </span>
                     <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
                       Daily multiple-choice knowledge evaluation challenging you on type matchups, passive ability mechanics, base stat distributions, and battle trivia to earn Operator XP and accreditation certification.
-                    </p>
-                  </div>
-                </div>
-
-                {/* COMBAT MISSIONS & OPERATOR RANKS */}
-                <div className="p-4 rounded-xl border border-amber-500/40 bg-slate-900/70 flex items-start gap-4 group">
-                  <div className="p-3 bg-amber-950 rounded-full border border-amber-500/60 group-hover:scale-110 transition-transform shrink-0">
-                    <Award className="w-5 h-5 text-amber-400" />
-                  </div>
-                  <div className="space-y-1">
-                    <span className="font-hud font-black text-amber-300 text-xs sm:text-sm uppercase tracking-wider block">
-                      Daily Combat Missions & Trainer Rank Progression
-                    </span>
-                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      Complete daily combat challenges (such as winning with specific elemental types, executing Super Effective strikes, or winning within 5 turns) to unlock achievement badges and level up your Trainer Rank from Rookie to Champion / Master.
-                    </p>
-                  </div>
-                </div>
-
-                {/* SEARCH BAR */}
-                <div className="p-4 rounded-xl border border-cyan-500/40 bg-slate-900/70 flex items-start gap-4 group">
-                  <div className="p-3 bg-cyan-950 rounded-full border border-cyan-500/60 group-hover:scale-110 transition-transform shrink-0">
-                    <Search className="w-5 h-5 text-cyan-400" />
-                  </div>
-                  <div className="space-y-1">
-                    <span className="font-hud font-black text-cyan-300 text-xs sm:text-sm uppercase tracking-wider block">
-                      Real-Time Search & Alias Filtering
-                    </span>
-                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      Rapid debounced search query engine supporting species names (e.g. "Charizard"), National Pokédex numbers (e.g. <span className="font-mono text-cyan-400">#006</span>), or alternate form aliases (e.g. "Mega Mewtwo", "Alolan Raichu").
-                    </p>
-                  </div>
-                </div>
-
-                {/* SETTINGS SECTION */}
-                <div className="p-4 rounded-xl border border-purple-500/40 bg-slate-900/70 flex items-start gap-4 group">
-                  <div className="p-3 bg-purple-950 rounded-full border border-purple-500/60 group-hover:rotate-45 transition-transform shrink-0">
-                    <SettingsIcon className="w-5 h-5 text-purple-400" />
-                  </div>
-                  <div className="space-y-1">
-                    <span className="font-hud font-black text-purple-300 text-xs sm:text-sm uppercase tracking-wider block">
-                      System Settings & HUD Customization
-                    </span>
-                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
-                      Toggle between Cyberpunk Dark Mode and Clean Light Mode themes, and customize Web Audio Synthesizer BGM / SFX / Pokémon Cry volume sliders.
                     </p>
                   </div>
                 </div>

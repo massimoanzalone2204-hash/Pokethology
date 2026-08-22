@@ -2597,6 +2597,9 @@ export default function App() {
   });
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const [avatarFilter, setAvatarFilter] = useState<'All' | 'Protagonist' | 'Rival' | 'Gym Leader' | 'Champion' | 'Trainer' | 'Villain'>('All');
+  const [opponentAvatar, setOpponentAvatar] = useState(() => {
+    return TRAINER_SPRITES.find(t => t.id === 'blue') || TRAINER_SPRITES.find(t => t.role === 'Rival') || TRAINER_SPRITES[1] || TRAINER_SPRITES[0];
+  });
   const [isSelectingOpponent, setIsSelectingOpponent] = useState(false);
   const [filteredList, setFilteredList] = useState<any[]>([]);
   const { favorites, isFavorite, toggleFavorite, loadFavorites } = useFavorites();
@@ -2614,6 +2617,17 @@ export default function App() {
   }, [inputValue]);
   const [battleOpponent, setBattleOpponent] = useState<Pokemon | null>(null);
   const [battleResult, setBattleResult] = useState<'victory' | 'defeat' | null>(null);
+
+  useEffect(() => {
+    if (battleOpponent) {
+      const rivals = TRAINER_SPRITES.filter(t => t.id !== currentAvatar.id);
+      if (rivals.length > 0) {
+        const hash = (battleOpponent.id || battleOpponent.name.length * 7);
+        const chosen = rivals[hash % rivals.length];
+        setOpponentAvatar(chosen);
+      }
+    }
+  }, [battleOpponent?.id, battleOpponent?.name, currentAvatar.id]);
 
 
   const [sessionWins, setSessionWins] = useState<number>(() => {
@@ -6442,12 +6456,33 @@ export default function App() {
                         
                         <div className="relative z-10 flex-1 flex flex-col overflow-hidden">
                           {/* Top Bar */}
-                          <div className="flex justify-between items-center mb-4 mt-4 sm:mt-6 border-b border-white/5 pb-3 px-1 shrink-0 z-10 relative">
-                            <div className="flex items-center gap-3">
-                              <div className="w-2.5 h-2.5 rounded bg-emerald-500 animate-pulse shadow-[0_0_12px_rgba(16,185,129,0.8)]"></div>
-                              <span className="font-hud text-[10px] font-black sm:text-xs text-slate-300 uppercase tracking-[0.3em]">Analysis Mode</span>
+                          <div className="flex justify-between items-center mb-4 mt-4 sm:mt-6 border-b border-white/5 pb-2 px-1 shrink-0 z-10 relative">
+                            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setIsAvatarModalOpen(true);
+                                  try { sounds.boot(); } catch(e) {}
+                                }}
+                                className="relative flex items-center justify-center shrink-0 group hover:scale-105 active:scale-95 transition-transform cursor-pointer"
+                                title="Change Trainer Avatar"
+                              >
+                                <img 
+                                  src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
+                                  alt={currentAvatar.name}
+                                  className="w-10 h-10 xs:w-12 xs:h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-contain [image-rendering:pixelated] drop-shadow-[0_3px_10px_rgba(34,211,238,0.35)] shrink-0 -my-1"
+                                />
+                              </button>
+                              <div className="flex flex-col min-w-0">
+                                <span className="font-hud font-black text-sm xs:text-base sm:text-lg text-cyan-300 uppercase tracking-widest truncate leading-tight drop-shadow">
+                                  {currentAvatar.name}
+                                </span>
+                                <span className="text-[9px] xs:text-[10px] sm:text-xs font-mono text-cyan-400/80 tracking-wider uppercase leading-none mt-0.5">
+                                  {currentAvatar.role}
+                                </span>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 shrink-0">
                               <button 
                                 onClick={() => {
                                   setPokemon(null);
@@ -7560,6 +7595,7 @@ export default function App() {
                                           turn={turn}
                                           enableAnimations={enableAnimations}
                                           isSelectingOpponent={isSelectingOpponent}
+                                          opponentAvatar={opponentAvatar}
                                           onSearchOpponent={async (name) => {
                                             sounds.scan(); playHaptic('light');
                                             setLoadingPokemon(true);
@@ -7659,10 +7695,13 @@ export default function App() {
                                           statChange={playerStatAnimation}
                                           opponent={battleOpponent}
                                           showComparison={showStatComparison}
+                                          playerAvatar={currentAvatar}
                                         />
                                         
                                         {/* Opponent Status Bar (implied) */}
                                         {/* OpponentStatusBar is likely already in the file... let me check*/}
+
+
 
                                         {/* Player Sprite (Bottom Left Area) */}
                                         <div className="absolute bottom-1 left-2 xs:bottom-2 xs:left-4 sm:bottom-6 sm:left-12 md:bottom-8 md:left-16 lg:bottom-10 lg:left-24 pointer-events-auto z-10">
@@ -8540,6 +8579,34 @@ export default function App() {
                         transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                         className="flex-1 flex flex-col items-center justify-center gap-3 sm:gap-4 md:gap-5 py-3 sm:py-5 px-3 sm:px-4 text-center relative overflow-y-auto custom-scrollbar optimize-scrolling select-none w-full h-full my-auto max-w-5xl mx-auto min-h-0"
                       >
+                        {/* Top-Right Corner Avatar with Interactive Selector */}
+                        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20 flex flex-col items-end gap-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsAvatarModalOpen(true);
+                              try { sounds.boot(); } catch(e) {}
+                            }}
+                            className="relative flex items-center justify-center shrink-0 group hover:scale-105 active:scale-95 transition-transform cursor-pointer"
+                            title="Change Trainer Avatar"
+                          >
+                            <div className="absolute inset-0 rounded-2xl bg-cyan-500/15 filter blur-md group-hover:bg-cyan-500/30 transition-all"></div>
+                            <img 
+                              src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
+                              alt={currentAvatar.name}
+                              className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 object-contain drop-shadow-[0_4px_16px_rgba(34,211,238,0.5)] [image-rendering:pixelated] relative z-10"
+                            />
+                          </button>
+                          <div className="text-right hidden xs:flex flex-col items-end -mt-1">
+                            <span className="font-hud font-bold text-[10px] sm:text-xs text-cyan-300 uppercase tracking-widest leading-none drop-shadow">
+                              {currentAvatar.name}
+                            </span>
+                            <span className="text-[8px] sm:text-[9px] font-mono text-cyan-400/75 tracking-wider uppercase leading-none mt-0.5">
+                              {currentAvatar.role}
+                            </span>
+                          </div>
+                        </div>
+
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/5 to-transparent pointer-events-none"></div>
                         
                         <motion.div 
@@ -8695,18 +8762,27 @@ export default function App() {
                                   </span>
                                 </div>
                               </div>
-                              <div className="flex flex-col items-end gap-1.5 shrink-0">
+                              <div className="flex flex-col items-end gap-1 shrink-0">
                                 <button
-                                  onClick={() => { setIsAvatarModalOpen(true); try { sounds.boot() } catch(e){} }}
-                                  className="relative flex items-center justify-center shrink-0 group hover:scale-105 active:scale-95 transition-transform"
-                                  title="Change Avatar"
+                                  onClick={() => { setIsAvatarModalOpen(true); try { sounds.boot(); } catch(e){} }}
+                                  className="relative flex items-center justify-center shrink-0 group hover:scale-105 active:scale-95 transition-transform cursor-pointer"
+                                  title="Change Trainer Avatar"
                                 >
+                                  <div className="absolute inset-0 rounded-2xl bg-cyan-500/10 filter blur-md group-hover:bg-cyan-500/25 transition-all"></div>
                                   <img 
                                     src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                                     alt={currentAvatar.name}
-                                    className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-[0_5px_15px_rgba(34,211,238,0.5)] [image-rendering:pixelated]"
+                                    className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 lg:w-20 lg:h-20 object-contain drop-shadow-[0_4px_14px_rgba(34,211,238,0.45)] [image-rendering:pixelated] relative z-10"
                                   />
                                 </button>
+                                <div className="text-right hidden sm:flex flex-col items-end -mt-1">
+                                  <span className="font-hud font-bold text-[10px] sm:text-xs text-cyan-300 uppercase tracking-widest leading-none drop-shadow">
+                                    {currentAvatar.name}
+                                  </span>
+                                  <span className="text-[8px] sm:text-[9px] font-mono text-cyan-400/75 tracking-wider uppercase leading-none mt-0.5">
+                                    {currentAvatar.role}
+                                  </span>
+                                </div>
                               </div>
                             </div>
 

@@ -95,6 +95,30 @@ export const sendDiscoveryNotifications = () => {
       tag: 'app-discovery',
       delay: 45000,
     },
+    {
+      title: '🏆 Daily Challenge',
+      body: 'Have you scanned your daily Pokémon? Complete your Pokédex and claim your rewards!',
+      tag: 'daily-challenge',
+      delay: 3600000, // 1 hour
+    },
+    {
+      title: '🧠 Theological Exam Reminder',
+      body: 'Sharpen your knowledge! Take the Pokéthology Exam to test your mastery.',
+      tag: 'exam-discovery',
+      delay: 7200000, // 2 hours
+    },
+    {
+      title: '⚔️ Arena Awaits',
+      body: 'Your rivals are waiting in the Arena. Jump in and battle now!',
+      tag: 'arena-reminder',
+      delay: 14400000, // 4 hours
+    },
+    {
+      title: '📚 Lore Master',
+      body: 'Discover the deep lore of legendary Pokémon and mythical regions in the Pokédex.',
+      tag: 'lore-reminder',
+      delay: 28800000, // 8 hours
+    }
   ];
 
   notifications.forEach(({ title, body, tag, delay }) => {
@@ -102,4 +126,13 @@ export const sendDiscoveryNotifications = () => {
       sendPokethologyNotification({ title, body, tag });
     }, delay);
   });
+  
+  // Generic Hourly Reminders
+  setInterval(() => {
+    sendPokethologyNotification({
+      title: 'Pokéthology Hourly Sync',
+      body: 'Trainers are waiting! Check the Arena and your daily Pokémon scans.',
+      tag: 'hourly-sync'
+    });
+  }, 3600000);
 };
