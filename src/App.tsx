@@ -104,24 +104,6 @@ const TRAINER_SPRITES = [
     "lore": "The enigmatic boss of Team Rocket and the former Viridian City Gym Leader. A ruthless mastermind who views Pok\u00e9mon primarily as tools for absolute domination and financial conquest."
   },
   {
-    "name": "Lorelei",
-    "id": "lorelei",
-    "role": "Elite Four",
-    "lore": "An elite master of Ice-type Pok\u00e9mon. Hailing from the Sevii Islands, her analytical combat style is as cold and calculating as a glacier, freezing challengers in their tracks at the Indigo Plateau."
-  },
-  {
-    "name": "Bruno",
-    "id": "bruno",
-    "role": "Elite Four",
-    "lore": "A dedicated martial artist who trains his own body alongside his Fighting-type Pok\u00e9mon. He believes that pushing the physical limits is the only path to discovering true inner strength."
-  },
-  {
-    "name": "Agatha",
-    "id": "agatha",
-    "role": "Elite Four",
-    "lore": "An elderly but deeply formidable former rival to Professor Oak. She relies on the terrifying, deceptive nature of Ghost-type Pok\u00e9mon to remind younger generations that age only sharpens one's venom."
-  },
-  {
     "name": "Lance",
     "id": "lance",
     "role": "Champion",
@@ -210,12 +192,6 @@ const TRAINER_SPRITES = [
     "id": "winona",
     "role": "Gym Leader",
     "lore": "The bird user taking flight into the world. Graceful and deeply attuned to the winds of Fortree City, she dances with her Flying-type Pok\u00e9mon, performing aerial acrobatics that dazzle her opponents."
-  },
-  {
-    "name": "Tate & Liza",
-    "id": "tateandliza",
-    "role": "Gym Leader",
-    "lore": "The mystic combination! These Mossdeep City twins share a telepathic bond, coordinating their Psychic-type Pok\u00e9mon in flawless double battles that overwhelm solitary challengers."
   },
   {
     "name": "Wallace",
@@ -476,12 +452,6 @@ const TRAINER_SPRITES = [
     "lore": "Mystics capable of bending spoons and minds, harmonizing their brainwaves with Psychic-type Pok\u00e9mon."
   },
   {
-    "name": "Hex Maniac",
-    "id": "hexmaniac",
-    "role": "Trainer",
-    "lore": "Eerie, unsettling individuals who frequent graveyards, communicating with Ghost-types from the beyond."
-  },
-  {
     "name": "Dragon Tamer",
     "id": "dragontamer",
     "role": "Trainer",
@@ -522,8 +492,176 @@ const TRAINER_SPRITES = [
     "id": "plasmagrunt",
     "role": "Villain",
     "lore": "Knights of Team Plasma, hypocritically \"liberating\" Pok\u00e9mon while seeking total control of the Unova region."
+  },
+  {
+    "name": "Maxie",
+    "id": "maxie-gen6",
+    "role": "Villain",
+    "lore": "The analytical leader of Team Magma, who wishes to expand the landmass to create more space for human progress and development."
+  },
+  {
+    "name": "Archie",
+    "id": "archie-gen6",
+    "role": "Villain",
+    "lore": "The boisterous leader of Team Aqua, who seeks to expand the sea to return the world to its primordial, natural state for Pok\u00e9mon."
+  },
+  {
+    "name": "Cyrus",
+    "id": "cyrus",
+    "role": "Villain",
+    "lore": "The emotionless boss of Team Galactic. He despises the human spirit and aims to destroy the universe to rebuild a perfect one without emotion."
+  },
+  {
+    "name": "Ghetsis",
+    "id": "ghetsis",
+    "role": "Villain",
+    "lore": "The true mastermind behind Team Plasma. A manipulative and cruel dictator who uses the ideal of Pok\u00e9mon liberation as a front for world domination."
+  },
+  {
+    "name": "N",
+    "id": "n",
+    "role": "Villain",
+    "lore": "The enigmatic King of Team Plasma. Raised alongside Pok\u00e9mon, he can hear their inner voices and seeks to separate their world from humans."
+  },
+  {
+    "name": "Lysandre",
+    "id": "lysandre",
+    "role": "Villain",
+    "lore": "The charismatic leader of Team Flare. Obsessed with preserving the world's beauty, he plans to activate the ultimate weapon to wipe out the \"ugly\" elements of society."
+  },
+  {
+    "name": "Guzma",
+    "id": "guzma",
+    "role": "Villain",
+    "lore": "The destructive boss of Team Skull. A misunderstood outcast who relies on Bug-type Pok\u00e9mon and overwhelming force to beat down his opponents."
+  },
+  {
+    "name": "Lusamine",
+    "id": "lusamine",
+    "role": "Villain",
+    "lore": "The elegant president of the Aether Foundation. Her obsessive love for Ultra Beasts drives her to terrifying extremes, disregarding the safety of everyone around her."
+  },
+  {
+    "name": "Calem",
+    "id": "calem",
+    "role": "Protagonist",
+    "lore": "The stylish hero of the Kalos region, striving to uncover the mysteries of Mega Evolution."
+  },
+  {
+    "name": "Serena",
+    "id": "serena",
+    "role": "Protagonist",
+    "lore": "A passionate and determined trainer from Kalos, seeking to become the very best."
+  },
+  {
+    "name": "Elio",
+    "id": "elio",
+    "role": "Protagonist",
+    "lore": "The bright-eyed champion of Alola, who brought the Island Challenge to new heights."
+  },
+  {
+    "name": "Selene",
+    "id": "selene",
+    "role": "Protagonist",
+    "lore": "A cheerful Alolan trainer, always ready for an adventure beneath the tropical sun."
+  },
+  {
+    "name": "Victor",
+    "id": "victor",
+    "role": "Protagonist",
+    "lore": "The determined hero of Galar, ready to conquer the Gym Challenge in packed stadiums."
+  },
+  {
+    "name": "Gloria",
+    "id": "gloria",
+    "role": "Protagonist",
+    "lore": "A spirited Galarian trainer with an unstoppable drive to become the Champion."
+  },
+  {
+    "name": "Florian",
+    "id": "florian-s",
+    "role": "Protagonist",
+    "lore": "A student of Naranja Academy in Paldea, exploring the vast region on a treasure hunt."
+  },
+  {
+    "name": "Juliana",
+    "id": "juliana-s",
+    "role": "Protagonist",
+    "lore": "A student of Uva Academy in Paldea, seeking her own unique treasure across the region."
+  },
+  {
+    "name": "Leon",
+    "id": "leon",
+    "role": "Champion",
+    "lore": "The undefeated Champion of the Galar region. Known for his incredible battle sense and terrible sense of direction."
+  },
+  {
+    "name": "Geeta",
+    "id": "geeta",
+    "role": "Champion",
+    "lore": "The Top Champion of the Paldea region. She oversees the Pokemon League with unmatched grace and authority."
+  },
+  {
+    "name": "Diantha",
+    "id": "diantha",
+    "role": "Champion",
+    "lore": "The glamorous Champion of the Kalos region and a world-renowned movie star."
+  },
+  {
+    "name": "Kukui",
+    "id": "kukui",
+    "role": "Champion",
+    "lore": "The passionate Pokemon Professor of Alola, and the founder of its first-ever Pokemon League."
+  },
+  {
+    "name": "Hop",
+    "id": "hop",
+    "role": "Rival",
+    "lore": "Leon's younger brother and a fiercely determined rival aiming to step out of his brother's shadow."
+  },
+  {
+    "name": "Nemona",
+    "id": "nemona-s",
+    "role": "Rival",
+    "lore": "A battle-obsessed Champion-ranked trainer from Paldea who loves testing new strategies."
+  },
+  {
+    "name": "Kieran",
+    "id": "kieran",
+    "role": "Rival",
+    "lore": "A quiet trainer from Kitakami whose intense determination pushed him to become the BB League Champion."
+  },
+  {
+    "name": "Carmine",
+    "id": "carmine",
+    "role": "Rival",
+    "lore": "A strong-willed student from Blueberry Academy who fiercely protects her younger brother Kieran."
+  },
+  {
+    "name": "Marnie",
+    "id": "marnie",
+    "role": "Rival",
+    "lore": "A composed trainer from Spikemuth. Her quiet strength earned her the fanatic devotion of Team Yell."
+  },
+  {
+    "name": "Bede",
+    "id": "bede",
+    "role": "Rival",
+    "lore": "A proud and arrogant trainer who eventually found his true calling as the Ballonlea Gym Leader."
+  },
+  {
+    "name": "Penny",
+    "id": "penny",
+    "role": "Trainer",
+    "lore": "A shy tech genius from Paldea who secretly led Team Star to protect her friends."
+  },
+  {
+    "name": "Arven",
+    "id": "arven-s",
+    "role": "Trainer",
+    "lore": "A culinary expert from Paldea on a quest to find the mythical Herba Mystica to heal his partner Pokemon."
   }
-];
+];;
 
 const getShowdownName = (name: string, isFemale: boolean = false) => {
   if (!name) return '';
@@ -2458,7 +2596,7 @@ export default function App() {
     return TRAINER_SPRITES[0];
   });
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
-  const [avatarFilter, setAvatarFilter] = useState<'All' | 'Gym Leader' | 'Elite Four' | 'Champion' | 'Protagonist' | 'Trainer' | 'Villain'>('All');
+  const [avatarFilter, setAvatarFilter] = useState<'All' | 'Protagonist' | 'Rival' | 'Gym Leader' | 'Champion' | 'Trainer' | 'Villain'>('All');
   const [isSelectingOpponent, setIsSelectingOpponent] = useState(false);
   const [filteredList, setFilteredList] = useState<any[]>([]);
   const { favorites, isFavorite, toggleFavorite, loadFavorites } = useFavorites();
@@ -6289,7 +6427,7 @@ export default function App() {
                             initial={{ opacity: 0, y: 4 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -4 }}
-                            transition={{ duration: 0.15, ease: 'easeOut' }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
                             className="flex-1 bg-transparent relative overflow-hidden flex flex-col p-1 sm:p-2 w-full max-w-[1920px] mx-auto lg:px-4 xl:px-6"
                           >
                         {loadingPokemon && (
@@ -6773,7 +6911,7 @@ export default function App() {
                                     initial={{ opacity: 0, y: 4 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -4 }}
-                                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
                                     className="w-full space-y-4"
                                   >
                                     {/* Enhanced Pokedex Entry Section */}
@@ -6856,7 +6994,7 @@ export default function App() {
                                     initial={{ opacity: 0, y: 4 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -4 }}
-                                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
                                     className="w-full flex-1 flex flex-col gap-2 min-h-0 h-full overflow-hidden"
                                   >
                                     <div className={cn(
@@ -7395,7 +7533,7 @@ export default function App() {
                                               initial={{ opacity: 0.15 }}
                                               animate={{ opacity: 0 }}
                                               exit={{ opacity: 0 }}
-                                              transition={{ duration: 0.2 }}
+                                              transition={{ type: "spring", damping: 25, stiffness: 250 }}
                                               className="absolute inset-0 bg-white/30 pointer-events-none z-50 transform-gpu"
                                             />
                                           )}
@@ -8566,7 +8704,7 @@ export default function App() {
                                   <img 
                                     src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                                     alt={currentAvatar.name}
-                                    className="w-10 h-10 sm:w-14 sm:h-14 object-contain group-hover:scale-110 transition-transform"
+                                    className="w-10 h-10 sm:w-14 sm:h-14 object-contain group-hover:scale-110 transition-transform [image-rendering:pixelated]"
                                   />
                                   <div className="absolute -bottom-1 sm:-bottom-1.5 -right-1 sm:-right-1.5 w-4 h-4 sm:w-5 sm:h-5 bg-emerald-500 rounded-full border-2 border-[#020617] flex items-center justify-center shadow-[0_0_6px_rgba(16,185,129,0.8)]">
                                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-pulse"></div>
@@ -8891,47 +9029,51 @@ export default function App() {
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 40 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
+                transition={{ type: "spring", damping: 25, stiffness: 250 }}
                 className="w-full h-full bg-slate-950 flex flex-col overflow-hidden border-t-2 border-cyan-500/30"
               >
-                <div className="flex items-center justify-between p-4 sm:p-6 border-b border-cyan-900/50 bg-slate-900/80 shrink-0">
-                  <div className="flex items-center gap-4">
-                    <User className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
-                    <h2 className="font-hud text-xl sm:text-2xl lg:text-3xl font-black text-cyan-300 tracking-widest">SELECT AVATAR</h2>
+                <div className="flex items-center justify-between p-3 sm:p-5 lg:p-6 border-b border-cyan-900/50 bg-slate-900/80 shrink-0">
+                  <div className="flex items-center gap-2 sm:gap-4">
+                    <User className="w-5 h-5 sm:w-8 sm:h-8 text-cyan-400" />
+                    <h2 className="font-hud text-lg sm:text-2xl lg:text-3xl font-black text-cyan-300 tracking-widest">SELECT AVATAR</h2>
                   </div>
                   <button
                     onClick={() => { setIsAvatarModalOpen(false); try { sounds.scan(); playHaptic('light'); } catch(e){} }}
-                    className="p-3 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-full transition-colors group"
+                    className="p-2 sm:p-3 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-full transition-colors group"
                   >
-                    <X className="w-6 h-6 sm:w-8 sm:h-8 group-hover:scale-110 transition-transform" />
+                    <X className="w-5 h-5 sm:w-8 sm:h-8 group-hover:scale-110 transition-transform" />
                   </button>
                 </div>
 
                 <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
                   {/* Left Side: Avatar Details & Default Save */}
-                  <div className="w-full lg:w-[400px] xl:w-[450px] max-h-[45vh] lg:max-h-none bg-slate-950/80 p-4 sm:p-6 lg:p-8 flex flex-col border-b lg:border-b-0 lg:border-r border-cyan-900/50 shrink-0 z-10 shadow-2xl relative">
+                  <div className="w-full lg:w-[400px] xl:w-[450px] bg-slate-950/80 p-3 sm:p-5 lg:p-8 flex flex-col border-b lg:border-b-0 lg:border-r border-cyan-900/50 shrink-0 z-10 shadow-2xl relative">
                     <div className="absolute inset-0 bg-gradient-to-b from-cyan-900/10 to-transparent pointer-events-none" />
                     
-                    <div className="relative w-24 h-24 sm:w-32 sm:h-32 lg:w-56 lg:h-56 mx-auto mb-3 sm:mb-6 bg-slate-900/50 rounded-full flex items-center justify-center border-4 border-cyan-500/30 shadow-[0_0_30px_rgba(34,211,238,0.15)] group shrink-0">
-                      <div className="absolute inset-0 rounded-full bg-cyan-400/5 animate-pulse" />
-                      <img 
-                        src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
-                        alt={currentAvatar.name}
-                        className="w-20 h-20 sm:w-28 sm:h-28 lg:w-48 lg:h-48 object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    
-                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 sm:pr-4 flex flex-col">
-                      <h3 className="text-xl sm:text-3xl lg:text-5xl font-hud font-black text-center text-cyan-300 uppercase tracking-[0.2em] mb-1.5 sm:mb-2 drop-shadow-lg shrink-0">
-                        {currentAvatar.name}
-                      </h3>
-                      <div className="text-xs sm:text-sm lg:text-lg text-emerald-400 font-bold uppercase tracking-widest text-center mb-3 sm:mb-6 py-0.5 sm:py-1 px-3 sm:px-4 border border-emerald-500/30 bg-emerald-950/30 rounded-full self-center shrink-0">
-                        {currentAvatar.role}
+                    <div className="flex flex-row lg:flex-col items-center lg:items-stretch gap-3 lg:gap-0 h-full mb-3 lg:mb-0">
+                      {/* Avatar Image */}
+                      <div className="relative w-20 h-20 sm:w-28 sm:h-28 lg:w-56 lg:h-56 mx-auto mb-0 lg:mb-6 bg-slate-900/50 rounded-full flex items-center justify-center border-4 border-cyan-500/30 shadow-[0_0_30px_rgba(34,211,238,0.15)] group shrink-0">
+                        <div className="absolute inset-0 rounded-full bg-cyan-400/5 animate-pulse" />
+                        <img 
+                          src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
+                          alt={currentAvatar.name}
+                          className="w-16 h-16 sm:w-24 sm:h-24 lg:w-48 lg:h-48 object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform duration-300 [image-rendering:pixelated]"
+                        />
                       </div>
+                      
+                      {/* Avatar Details */}
+                      <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 sm:pr-2 lg:pr-4 flex flex-col max-h-[22vh] lg:max-h-none">
+                        <h3 className="text-base sm:text-2xl lg:text-5xl font-hud font-black text-left lg:text-center text-cyan-300 uppercase tracking-[0.2em] mb-1 sm:mb-2 drop-shadow-lg shrink-0">
+                          {currentAvatar.name}
+                        </h3>
+                        <div className="text-[9px] sm:text-xs lg:text-lg text-emerald-400 font-bold uppercase tracking-widest text-center mb-1.5 sm:mb-6 py-0.5 sm:py-1 px-2 sm:px-4 border border-emerald-500/30 bg-emerald-950/30 rounded-full self-start lg:self-center shrink-0">
+                          {currentAvatar.role}
+                        </div>
 
-                      <p className="text-sm sm:text-base lg:text-xl font-serif italic text-slate-300 leading-relaxed opacity-90 text-center lg:text-left mb-4 sm:mb-6">
-                        "{currentAvatar.lore}"
-                      </p>
+                        <p className="text-[11px] sm:text-sm lg:text-xl font-serif italic text-slate-300 leading-relaxed opacity-90 text-left lg:text-center lg:text-left mb-1 sm:mb-6">
+                          "{currentAvatar.lore}"
+                        </p>
+                      </div>
                     </div>
 
                     <button
@@ -8942,9 +9084,9 @@ export default function App() {
                           setIsAvatarModalOpen(false);
                         } catch(e) {}
                       }}
-                      className="w-full py-4 sm:py-5 px-6 bg-emerald-600 hover:bg-emerald-500 text-emerald-50 rounded-xl sm:rounded-2xl font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] hover:-translate-y-1 text-sm sm:text-base lg:text-lg"
+                      className="w-full mt-1 lg:mt-auto py-2.5 sm:py-4 lg:py-5 px-4 sm:px-6 bg-emerald-600 hover:bg-emerald-500 text-emerald-50 rounded-lg sm:rounded-xl lg:rounded-2xl font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 sm:gap-3 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:-translate-y-0.5 lg:hover:-translate-y-1 text-xs sm:text-sm lg:text-lg shrink-0"
                     >
-                      <Bookmark className="w-5 h-5 sm:w-6 sm:h-6" />
+                      <Bookmark className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
                       Set as Default
                     </button>
                   </div>
@@ -8954,7 +9096,7 @@ export default function App() {
                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none mix-blend-overlay" />
                     
                     <div className="p-4 sm:p-6 border-b border-cyan-900/30 bg-slate-900/80 flex gap-3 sm:gap-4 overflow-x-auto hide-scrollbar shrink-0 z-10 backdrop-blur-md">
-                      {['All', 'Protagonist', 'Gym Leader', 'Elite Four', 'Champion', 'Trainer', 'Villain'].map(role => (
+                      {['All', 'Protagonist', 'Rival', 'Gym Leader', 'Champion', 'Trainer', 'Villain'].map(role => (
                         <button 
                           key={role}
                           onClick={() => { setAvatarFilter(role as any); try { sounds.scan() } catch(e){} }}
@@ -8987,7 +9129,7 @@ export default function App() {
                               src={`https://play.pokemonshowdown.com/sprites/trainers/${trainer.id}.png`} 
                               alt={trainer.name}
                               className={cn(
-                                "w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-contain transition-transform duration-300 drop-shadow-md",
+                                "w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-contain transition-transform duration-300 drop-shadow-md [image-rendering:pixelated]",
                                 currentAvatar.id === trainer.id ? "scale-110 drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]" : "group-hover:scale-110 opacity-70 group-hover:opacity-100"
                               )}
                             />
@@ -9023,7 +9165,7 @@ export default function App() {
                 initial={{ scale: 0.98, y: 6, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
                 exit={{ scale: 0.98, y: 6, opacity: 0 }}
-                transition={{ duration: 0.15, ease: 'easeOut' }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
                 className="bg-slate-950 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.3)]"
               >
                 <div className="p-4 sm:p-6 border-b border-cyan-900/30 bg-cyan-950/20">
@@ -9156,7 +9298,7 @@ export default function App() {
                 initial={{ scale: 0.98, y: 6, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
                 exit={{ scale: 0.98, y: 6, opacity: 0 }}
-                transition={{ duration: 0.15, ease: 'easeOut' }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
                 className="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.2)]"
               >
                 <div className={cn(
@@ -9304,7 +9446,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ type: "spring", damping: 25, stiffness: 250 }}
               className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
             >
               {/* Ambient Glows */}
@@ -9319,7 +9461,7 @@ export default function App() {
                   </div>
                   <div className="flex items-center gap-2">
                     <h2 className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-widest leading-none">
-                      {'DAILY OPERATIONS HUB'}
+                      {'DAILY HUB'}
                     </h2>
                     <span className="px-2 py-0.5 rounded-full bg-cyan-950/90 border border-cyan-500/40 text-cyan-300 text-[10px] sm:text-xs font-mono font-bold whitespace-nowrap shadow-sm">
                       {today}
@@ -9386,7 +9528,7 @@ export default function App() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ type: "spring", damping: 25, stiffness: 250 }}
                 className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
               >
                 {/* Ambient Glows */}
@@ -9401,7 +9543,7 @@ export default function App() {
                     </div>
                     <div className="flex items-center gap-2">
                       <h2 className="font-hud font-black text-base sm:text-xl text-amber-300 uppercase tracking-widest leading-none">
-                        {'DAILY SPECIMEN SCAN'}
+                        {'DAILY SCAN'}
                       </h2>
                     </div>
                   </div>
@@ -9456,7 +9598,7 @@ export default function App() {
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            transition={{ duration: 0.2 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 250 }}
                             type="button"
                             onClick={() => sounds.playCry(activePokemonData.name, activePokemonData.cries?.latest, activePokemonData.name.includes('-gmax'))}
                             className="p-1.5 sm:p-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-cyan-500/40 text-slate-300 hover:text-cyan-300 hover:bg-cyan-950/40 transition-colors font-mono text-[9px] font-bold tracking-widest flex items-center gap-1.5 cursor-pointer shrink-0 ml-auto group"
@@ -9639,7 +9781,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ type: "spring", damping: 25, stiffness: 250 }}
               className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
             >
               {/* Ambient Glows */}
@@ -9749,7 +9891,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ type: "spring", damping: 25, stiffness: 250 }}
               className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
             >
               {/* Ambient Glows */}
@@ -10006,7 +10148,7 @@ export default function App() {
                 initial={{ scale: 0.98, y: 6, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
                 exit={{ scale: 0.98, y: 6, opacity: 0 }}
-                transition={{ duration: 0.15, ease: 'easeOut' }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
                 className="bg-slate-900 border-2 border-red-500/50 rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_0_50px_rgba(239,68,68,0.2)] my-auto mx-auto"
               >
                 <div className="p-4 border-b border-red-900/30 flex justify-between items-center bg-slate-950">
@@ -10164,7 +10306,7 @@ export default function App() {
                           <motion.div 
                             className="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full"
                             style={{ width: `${diagnosticProgress}%` }}
-                            transition={{ duration: 0.2 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 250 }}
                           />
                         </div>
 
@@ -10219,7 +10361,7 @@ export default function App() {
                 initial={{ scale: 0.98, y: 6, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
                 exit={{ scale: 0.98, y: 6, opacity: 0 }}
-                transition={{ duration: 0.15, ease: 'easeOut' }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
                 className="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.2)] p-4 sm:p-6 my-auto mx-auto"
               >
                 <div className="flex justify-between items-center mb-6">
