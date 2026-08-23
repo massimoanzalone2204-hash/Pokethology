@@ -137,7 +137,7 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
           transition={{ duration: 0.3 }}
           className={cn(
             "z-20 flex flex-col items-start gap-1 pointer-events-auto",
-            isCompact ? "relative w-full max-w-xs mx-auto" : "absolute top-2 left-2 xs:top-3 xs:left-3 sm:top-4 sm:left-4"
+            isCompact ? "relative w-full max-w-xs mx-auto" : "absolute top-2 right-2 xs:top-3 xs:right-3 sm:top-4 sm:right-4"
           )}
         >
           <div className="pointer-events-auto">
@@ -163,9 +163,19 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
           transition={{ duration: 0.3 }}
           className={cn(
             "OpponentStatusBar z-20 pointer-events-auto flex items-center gap-1.5 sm:gap-2 transform-gpu",
-            isCompact ? "relative w-full max-w-xs mx-auto" : "absolute top-2 left-2 xs:top-3 xs:left-3 sm:top-4 sm:left-4"
+            isCompact ? "relative w-full max-w-xs mx-auto" : "absolute bottom-2 right-2 xs:bottom-3 xs:right-3 sm:bottom-4 sm:right-4"
           )}
         >
+      {/* Opponent Avatar on the left of HP bar (small/little) */}
+      {opponentAvatar && (
+        <div className="shrink-0 flex items-center justify-center pointer-events-none drop-shadow-md">
+          <img 
+            src={`https://play.pokemonshowdown.com/sprites/trainers/${opponentAvatar.id}.png`}
+            alt={opponentAvatar.name}
+            className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 object-contain [image-rendering:pixelated] drop-shadow-[0_2px_8px_rgba(239,68,68,0.45)]"
+          />
+        </div>
+      )}
       <div className={cn(
         "w-[110px] xs:w-[125px] sm:w-[170px] lg:w-[200px] bg-slate-950/92 border border-red-500/30 rounded-2xl p-1.5 sm:p-2 sm:px-2.5 shadow-md relative group overflow-hidden transition-all duration-200 transform-gpu",
         turn === 'opponent' && "ring-1 ring-red-500/70 border-red-500/80 scale-[1.01]"
@@ -242,16 +252,7 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
         )}
       </div>
 
-      {/* Opponent Avatar on the right of HP bar (small/little) */}
-      {opponentAvatar && (
-        <div className="shrink-0 flex items-center justify-center pointer-events-none drop-shadow-md">
-          <img 
-            src={`https://play.pokemonshowdown.com/sprites/trainers/${opponentAvatar.id}.png`}
-            alt={opponentAvatar.name}
-            className="w-14 h-14 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 object-contain [image-rendering:pixelated] drop-shadow-[0_4px_14px_rgba(239,68,68,0.45)]"
-          />
-        </div>
-      )}
+
       
       {turn === 'opponent' && (
         <motion.div 
@@ -318,20 +319,9 @@ export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = memo(({
           transition={{ duration: 0.4 }}
           className={cn(
             "PlayerStatusBar z-20 pointer-events-auto flex items-center gap-1.5 sm:gap-2.5 transform-gpu",
-            isCompact ? "relative w-full max-w-xs mx-auto" : "absolute bottom-2 right-2 xs:bottom-3 xs:right-3 sm:bottom-4 sm:right-4"
+            isCompact ? "relative w-full max-w-xs mx-auto" : "absolute bottom-2 left-2 xs:bottom-3 xs:left-3 sm:bottom-4 sm:left-4"
           )}
         >
-      {/* Player Character Avatar on the left of HP bar (bigger) */}
-      {playerAvatar && (
-        <div className="shrink-0 flex items-center justify-center pointer-events-none drop-shadow-lg">
-          <img 
-            src={`https://play.pokemonshowdown.com/sprites/trainers/${playerAvatar.id}.png`}
-            alt={playerAvatar.name}
-            className="w-14 h-14 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 object-contain [image-rendering:pixelated] drop-shadow-[0_4px_14px_rgba(34,211,238,0.45)]"
-          />
-        </div>
-      )}
-
       <div className={cn(
         "w-[110px] xs:w-[125px] sm:w-[170px] lg:w-[200px] bg-slate-950/92 border border-cyan-500/30 rounded-2xl p-1.5 sm:p-2 sm:px-2.5 shadow-md relative group overflow-hidden transition-all duration-200 transform-gpu",
         turn === 'player' && "ring-1 ring-cyan-500/70 border-cyan-500/80 scale-[1.01]"
@@ -407,7 +397,18 @@ export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = memo(({
           </div>
         )}
       </div>
-      
+
+      {/* Player Character Avatar on the right of HP bar (bigger) */}
+      {playerAvatar && (
+        <div className="shrink-0 flex items-center justify-center pointer-events-none drop-shadow-lg">
+          <img 
+            src={`https://play.pokemonshowdown.com/sprites/trainers/${playerAvatar.id}.png`}
+            alt={playerAvatar.name}
+            className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 object-contain [image-rendering:pixelated] drop-shadow-[0_4px_14px_rgba(34,211,238,0.45)] -scale-x-100"
+          />
+        </div>
+      )}
+
       {turn === 'player' && (
         <motion.div 
           initial={{ x: 6, opacity: 0 }}

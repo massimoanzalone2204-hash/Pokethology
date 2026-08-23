@@ -36,17 +36,13 @@ export const WelcomeModal = ({ isOpen, onClose, onOpenTutorial }: WelcomeModalPr
               <X className="w-5 h-5" />
             </button>
 
-            <div className="relative w-32 h-32 mb-6 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
+            <div className="relative w-40 h-40 sm:w-48 sm:h-48 mb-6 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
                <PokethologyLogo className="w-full h-full object-contain" />
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-hud font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 mb-4 uppercase tracking-wider">
+            <h2 className="text-2xl sm:text-3xl font-hud font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 mb-8 uppercase tracking-wider">
               Welcome to Pokéthology
             </h2>
-            
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-8 max-w-[280px] sm:max-w-xs mx-auto">
-              Your ultimate Pokémon database and battle simulator. Dive deep into stats, moves, and chaotic battles!
-            </p>
 
             <div className="flex flex-col w-full gap-3 relative z-10">
               <button

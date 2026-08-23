@@ -5368,8 +5368,12 @@ export default function App() {
     // Play boot sound when app loads
     sounds.boot(); playHaptic('medium');
     
-    // Show welcome message every time the app opens
-    setIsWelcomeOpen(true);
+    // Check if it's the first time opening the app
+    const hasSeenWelcome = localStorage.getItem('hasSeenWelcomeMessage');
+    if (!hasSeenWelcome) {
+      setIsWelcomeOpen(true);
+      localStorage.setItem('hasSeenWelcomeMessage', 'true');
+    }
   }, []);
 
   useEffect(() => {
@@ -6473,7 +6477,7 @@ export default function App() {
                                 <img 
                                   src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                                   alt={currentAvatar.name}
-                                  className="w-10 h-10 xs:w-12 xs:h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-contain [image-rendering:pixelated] drop-shadow-[0_3px_10px_rgba(34,211,238,0.35)] shrink-0 -my-1"
+                                  className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain [image-rendering:pixelated] drop-shadow-[0_3px_10px_rgba(34,211,238,0.35)] shrink-0 -my-1"
                                 />
                               </button>
                               <div className="flex flex-col min-w-0">
@@ -7625,7 +7629,7 @@ export default function App() {
                                         />
 
                                         {/* Opponent Sprite (Top Right Area) */}
-                                        <div className="absolute top-8 right-2 xs:top-10 xs:right-4 sm:top-10 sm:right-12 md:top-12 md:right-16 lg:top-14 lg:right-24 pointer-events-auto z-10">
+                                        <div className="absolute top-[12%] right-2 xs:top-[15%] xs:right-4 sm:top-[20%] sm:right-12 md:top-[25%] md:right-16 lg:top-[25%] lg:right-24 pointer-events-auto z-10">
                                           {battleOpponent && (
                                             <motion.div
                                               key={battleOpponent?.name + '-' + isBattling}
@@ -7635,7 +7639,7 @@ export default function App() {
 
                                               className="relative flex flex-col items-center justify-end   group"
                                             >
-                                              <div className="relative h-28 w-28 xs:h-32 xs:w-32 sm:h-40 sm:w-40 md:h-48 md:w-48 lg:h-52 lg:w-52 xl:h-56 xl:w-56 flex items-center justify-center max-h-[40vh]">
+                                              <div className="relative h-28 w-28 xs:h-32 xs:w-32 sm:h-40 sm:w-40 md:h-48 md:w-48 lg:h-52 lg:w-52 xl:h-56 xl:w-56 flex items-center justify-center max-h-[35vh]">
                                               {opponentDialogue && (
                                                 <div 
                                                   className="absolute -top-12 sm:-top-16 left-1/2 -translate-x-1/2 bg-slate-950/95 border border-red-500 rounded-xl px-2.5 py-1.5 sm:px-4 sm:py-2 text-[8px] sm:text-[11px] font-bold text-red-200 shadow-lg select-none z-50 flex items-center gap-1.5 min-w-[max-content]"
@@ -7707,7 +7711,7 @@ export default function App() {
 
 
                                         {/* Player Sprite (Bottom Left Area) */}
-                                        <div className="absolute bottom-1 left-2 xs:bottom-2 xs:left-4 sm:bottom-6 sm:left-12 md:bottom-8 md:left-16 lg:bottom-10 lg:left-24 pointer-events-auto z-10">
+                                        <div className="absolute bottom-20 left-2 xs:bottom-24 xs:left-4 sm:bottom-28 sm:left-12 md:bottom-32 md:left-16 lg:bottom-40 lg:left-24 pointer-events-auto z-10">
                                           <motion.div
                                             key={pokemon?.name + '-' + isBattling}
                                             initial={{ opacity: 1, scale: 0.8 }}
@@ -7716,7 +7720,7 @@ export default function App() {
 
                                             className="relative flex flex-col items-center justify-end   group"
                                           >
-                                            <div className="relative h-32 w-32 xs:h-36 xs:w-36 sm:h-48 sm:w-48 md:h-56 md:w-56 lg:h-64 lg:w-64 xl:h-72 xl:w-72 flex items-center justify-center max-h-[40vh]">
+                                            <div className="relative h-28 w-28 xs:h-32 xs:w-32 sm:h-44 sm:w-44 md:h-52 md:w-52 lg:h-60 lg:w-60 xl:h-64 xl:w-64 flex items-center justify-center max-h-[35vh]">
                                               {playerDialogue && (
                                                 <div 
                                                   className="absolute -top-12 sm:-top-16 left-1/2 -translate-x-1/2 bg-slate-950/95 border border-cyan-500 rounded-xl px-2.5 py-1.5 sm:px-4 sm:py-2 text-[8px] sm:text-[11px] font-bold text-cyan-200 shadow-lg select-none z-50 flex items-center gap-1.5 min-w-[max-content]"
@@ -8597,7 +8601,7 @@ export default function App() {
                             <img 
                               src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                               alt={currentAvatar.name}
-                              className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 lg:w-20 lg:h-20 object-contain drop-shadow-[0_4px_14px_rgba(34,211,238,0.45)] [image-rendering:pixelated] relative z-10"
+                              className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-[0_4px_14px_rgba(34,211,238,0.45)] [image-rendering:pixelated] relative z-10"
                             />
                           </button>
                           <div className="text-right hidden xs:flex flex-col items-end -mt-1">
@@ -8775,7 +8779,7 @@ export default function App() {
                                   <img 
                                     src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                                     alt={currentAvatar.name}
-                                    className="w-14 h-14 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 lg:w-24 lg:h-24 object-contain drop-shadow-[0_5px_16px_rgba(34,211,238,0.5)] [image-rendering:pixelated] relative z-10"
+                                    className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-[0_5px_16px_rgba(34,211,238,0.5)] [image-rendering:pixelated] relative z-10"
                                   />
                                 </button>
                                 <div className="text-right hidden sm:flex flex-col items-end -mt-1">
