@@ -248,7 +248,7 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
           <img 
             src={`https://play.pokemonshowdown.com/sprites/trainers/${opponentAvatar.id}.png`}
             alt={opponentAvatar.name}
-            className="w-8 h-8 xs:w-10 xs:h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 object-contain [image-rendering:pixelated] drop-shadow-[0_2px_8px_rgba(239,68,68,0.45)]"
+            className="w-14 h-14 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 object-contain [image-rendering:pixelated] drop-shadow-[0_4px_14px_rgba(239,68,68,0.45)]"
           />
         </div>
       )}

@@ -38,6 +38,7 @@ import { pokeApi, isApiError } from './lib/pokeApiService';
 // Directly imported UI and modal components for instant rendering
 import { BattleResultScreen } from './components/BattleResultScreen';
 import { Tutorial } from './components/Tutorial';
+import { WelcomeModal } from './components/WelcomeModal';
 import { PokethologyQuizWidget } from './components/PokethologyQuizWidget';
 import { MoveModal } from './components/MoveModal';
 import { BattleHistory } from './components/BattleHistory';
@@ -3631,7 +3632,8 @@ export default function App() {
       document.body.classList.remove('light');
     }
   }, [isLightMode]);
-  const [isTutorialOpen, setIsTutorialOpen] = useState(true);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
   const [displayLimit, setDisplayLimit] = useState(50);
 
   const handleAbort = useCallback(() => {
@@ -3648,7 +3650,7 @@ export default function App() {
   const [isMusicOpen, setIsMusicOpen] = useState(false);
   // Lock body scrolling when any modal is active so main app background stays fixed
   useEffect(() => {
-    const isAnyModalOpen = isDailyHubOpen || isDailyScanOpen || isDailyQuizOpen || isSettingsOpen || isTutorialOpen || isMusicOpen || isComparisonOpen || isTypeChartOpen || isAvatarModalOpen;
+    const isAnyModalOpen = isDailyHubOpen || isDailyScanOpen || isDailyQuizOpen || isSettingsOpen || isTutorialOpen || isWelcomeOpen || isMusicOpen || isComparisonOpen || isTypeChartOpen || isAvatarModalOpen;
     if (isAnyModalOpen) {
       document.body.style.overflow = 'hidden';
       document.body.style.touchAction = 'none';
@@ -3660,7 +3662,7 @@ export default function App() {
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
     };
-  }, [isDailyHubOpen, isDailyScanOpen, isDailyQuizOpen, isSettingsOpen, isTutorialOpen, isMusicOpen, isComparisonOpen, isTypeChartOpen, isAvatarModalOpen]);
+  }, [isDailyHubOpen, isDailyScanOpen, isDailyQuizOpen, isSettingsOpen, isTutorialOpen, isWelcomeOpen, isMusicOpen, isComparisonOpen, isTypeChartOpen, isAvatarModalOpen]);
   const [autoAiEnabled, setAutoAiEnabled] = useState(true);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isChaosMatchSetup, setIsChaosMatchSetup] = useState(false);
@@ -5365,8 +5367,9 @@ export default function App() {
   useEffect(() => {
     // Play boot sound when app loads
     sounds.boot(); playHaptic('medium');
-    // Show tutorial every time the app opens
-    setIsTutorialOpen(true);
+    
+    // Show welcome message every time the app opens
+    setIsWelcomeOpen(true);
   }, []);
 
   useEffect(() => {
@@ -6071,7 +6074,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.2, ease: "easeInOut" } }}
             transition={{ duration: 0.15, ease: "easeInOut" }}
-            className="fixed inset-0  z-[240] bg-slate-950 pointer-events-none"
+            className="fixed inset-0  z-[240] bg-slate-950/40 backdrop-blur-sm pointer-events-none"
           />
         )}
       </AnimatePresence>
@@ -8594,7 +8597,7 @@ export default function App() {
                             <img 
                               src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                               alt={currentAvatar.name}
-                              className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 object-contain drop-shadow-[0_4px_16px_rgba(34,211,238,0.5)] [image-rendering:pixelated] relative z-10"
+                              className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 lg:w-20 lg:h-20 object-contain drop-shadow-[0_4px_14px_rgba(34,211,238,0.45)] [image-rendering:pixelated] relative z-10"
                             />
                           </button>
                           <div className="text-right hidden xs:flex flex-col items-end -mt-1">
@@ -8610,7 +8613,7 @@ export default function App() {
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/5 to-transparent pointer-events-none"></div>
                         
                         <motion.div 
-                          className="relative w-48 h-48 xxs:w-56 xxs:h-56 xs:w-64 xs:h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[28rem] lg:h-[28rem] flex items-center justify-center shrink max-h-[35vh] sm:max-h-[45vh] -mt-8 sm:-mt-16 mb-2 sm:mb-6"
+                          className="relative w-52 h-52 xxs:w-60 xxs:h-60 xs:w-72 xs:h-72 sm:w-80 sm:h-80 md:w-[28rem] md:h-[28rem] lg:w-[32rem] lg:h-[32rem] flex items-center justify-center shrink max-h-[35vh] sm:max-h-[45vh] -mt-8 sm:-mt-16 mb-2 sm:mb-6"
                           initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: "easeOut" }}
                         >
                           <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 75%)' }}></div>
@@ -8772,7 +8775,7 @@ export default function App() {
                                   <img 
                                     src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                                     alt={currentAvatar.name}
-                                    className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 lg:w-20 lg:h-20 object-contain drop-shadow-[0_4px_14px_rgba(34,211,238,0.45)] [image-rendering:pixelated] relative z-10"
+                                    className="w-14 h-14 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 lg:w-24 lg:h-24 object-contain drop-shadow-[0_5px_16px_rgba(34,211,238,0.5)] [image-rendering:pixelated] relative z-10"
                                   />
                                 </button>
                                 <div className="text-right hidden sm:flex flex-col items-end -mt-1">
@@ -9498,6 +9501,11 @@ export default function App() {
           )}
         </AnimatePresence>
 
+        <WelcomeModal 
+          isOpen={isWelcomeOpen} 
+          onClose={() => setIsWelcomeOpen(false)} 
+          onOpenTutorial={() => setIsTutorialOpen(true)} 
+        />
         <Tutorial isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
 
         <PokemonComparisonSidebar
