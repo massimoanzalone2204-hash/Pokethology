@@ -164,7 +164,7 @@ export const MoveModal: React.FC<MoveModalProps> = ({ isOpen, onClose, moves, on
                         </span>
                       </div>
                       <div className="flex items-center justify-between mt-auto pt-2 border-t border-slate-800/60">
-                        <TypeBadge type={move.type} size="sm" />
+                        <div className="flex items-center gap-1.5"><TypeBadge type={move.type} size="sm" />{move.damage_class && <img src={`https://play.pokemonshowdown.com/sprites/categories/${move.damage_class.charAt(0).toUpperCase() + move.damage_class.slice(1)}.png`} alt={move.damage_class} className="h-4 rendering-pixelated" title={move.damage_class} />}</div>
                         <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400">
                           {move.power ? (
                             <span className="text-amber-400 font-bold">PWR: {move.power}</span>

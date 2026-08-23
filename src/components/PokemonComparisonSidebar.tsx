@@ -181,11 +181,8 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
               </div>
               <div>
                 <h2 className="text-sm sm:text-base font-hud font-black uppercase tracking-wider text-cyan-400 flex items-center gap-2">
-                  Pokémon Stat Comparator
+                  Comparing Pokémon
                 </h2>
-                <p className="text-[10px] sm:text-[11px] text-slate-400 font-sans">
-                  Pin stats, choose specific forms, and analyze head-to-head combat metrics
-                </p>
               </div>
             </div>
 
@@ -218,7 +215,7 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                     : "bg-slate-900/80 border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
                 )}>
                   <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-widest bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
-                    P1 (Pinned)
+                    P1
                   </span>
 
                   {pokemon1 ? (
@@ -268,7 +265,7 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                     : "bg-slate-900/80 border-purple-500/40 shadow-[0_0_15px_rgba(168,85,247,0.1)]"
                 )}>
                   <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-widest bg-purple-500/20 text-purple-400 border border-purple-500/30">
-                    P2 (Compare)
+                    P2
                   </span>
 
                   {secondPokemon ? (

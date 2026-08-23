@@ -8691,16 +8691,7 @@ export default function App() {
                           </div>
                         </div>
 
-                        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end opacity-40 pointer-events-none">
-                          <div className="flex flex-col gap-1">
-                            <div className="w-24 h-1 bg-cyan-900/60"></div>
-                            <div className="w-16 h-1 bg-cyan-900/60"></div>
-                          </div>
-                          <div className="text-[8px] font-bold tracking-wider font-mono text-cyan-600 uppercase tracking-widest text-right leading-relaxed select-none">
-                            System Status: Operational<br />
-                            Connection: Secure <span className="text-emerald-500 animate-pulse">●</span>
-                          </div>
-                        </div>
+                        {/* Removed decorative bottom status elements */}
                       </motion.div>
                     ) : listMode === 'types' ? (
                       <motion.div

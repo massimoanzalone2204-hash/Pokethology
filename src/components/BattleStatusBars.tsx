@@ -76,7 +76,9 @@ const HPBar = memo(({ current, max, enableAnimations = true }: { current: number
 
 HPBar.displayName = 'HPBar';
 
-interface OpponentStatusBarProps {
+const REVERSE_FACING_AVATARS = ['alder', 'ghetsis', 'cilan', 'peony'];
+
+export interface OpponentStatusBarProps {
   battleOpponent: Pokemon | null;
   opponentHP: number;
   opponentMaxHP: number;
@@ -172,7 +174,10 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
           <img 
             src={`https://play.pokemonshowdown.com/sprites/trainers/${opponentAvatar.id}.png`}
             alt={opponentAvatar.name}
-            className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 object-contain [image-rendering:pixelated] drop-shadow-[0_2px_8px_rgba(239,68,68,0.45)]"
+            className={cn(
+              "w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain [image-rendering:pixelated] drop-shadow-[0_2px_8px_rgba(239,68,68,0.45)]",
+              REVERSE_FACING_AVATARS.includes(opponentAvatar.id) && "-scale-x-100"
+            )}
           />
         </div>
       )}
@@ -404,7 +409,10 @@ export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = memo(({
           <img 
             src={`https://play.pokemonshowdown.com/sprites/trainers/${playerAvatar.id}.png`}
             alt={playerAvatar.name}
-            className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 object-contain [image-rendering:pixelated] drop-shadow-[0_4px_14px_rgba(34,211,238,0.45)] -scale-x-100"
+            className={cn(
+              "w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain [image-rendering:pixelated] drop-shadow-[0_4px_14px_rgba(34,211,238,0.45)]",
+              !REVERSE_FACING_AVATARS.includes(playerAvatar.id) && "-scale-x-100"
+            )}
           />
         </div>
       )}

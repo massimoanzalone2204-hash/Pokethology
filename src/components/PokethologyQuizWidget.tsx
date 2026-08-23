@@ -909,7 +909,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
           <span className="text-[10px] font-mono font-bold text-cyan-300 tracking-wider uppercase">
-            {formattedToday.toUpperCase()} - THEORY EXAM
+            {formattedToday.toUpperCase()}
           </span>
         </div>
         <button
@@ -956,11 +956,8 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
           <h3 className="text-xs xs:text-sm sm:text-base font-hud font-black text-amber-300 uppercase tracking-wider flex items-center gap-2 min-w-0 break-words">
             {React.createElement(REGION_ICONS[currentRegionData.region] || BookOpen, { className: "w-4 h-4 text-amber-400 shrink-0" })}
-            <span className="truncate">{currentRegionData.region}: {currentRegionData.themeTitle}</span>
+            <span className="truncate">{currentRegionData.region} Exam</span>
           </h3>
-        </div>
-        <div className="text-xs text-slate-300 font-sans leading-relaxed">
-          {stripHtmlTags(currentRegionData.themeDescription)}
         </div>
       </div>
 

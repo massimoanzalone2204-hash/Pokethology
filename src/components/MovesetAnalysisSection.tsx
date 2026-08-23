@@ -182,6 +182,7 @@ export const MovesetAnalysisSection: React.FC<MovesetAnalysisSectionProps> = ({
                               )}>
                                 {move.type}
                               </span>
+                              {move.damage_class && <img src={`https://play.pokemonshowdown.com/sprites/categories/${move.damage_class.charAt(0).toUpperCase() + move.damage_class.slice(1)}.png`} alt={move.damage_class} className="h-3 rendering-pixelated inline-block" title={move.damage_class} />}
                               {move.power ? (
                                 <span className={cn("text-[8px] font-mono font-bold", isLightMode ? "text-slate-600" : "text-amber-300")}>
                                   PWR: {move.power}
