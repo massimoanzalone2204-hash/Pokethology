@@ -897,6 +897,18 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
     const isCorrect = selected === question.answerIndex;
     if (isCorrect) {
       try { sounds.success(); } catch (_) {}
+      try {
+        let stats = JSON.parse(localStorage.getItem('Pokethology_MissionStats') || '{"pokemonWins":{}, "typeWins":{}, "hubCompletions":0, "examCompletions":0}');
+                        const currentMonth = new Date().toISOString().slice(0, 7);
+                        if (stats.lastResetMonth !== currentMonth) {
+                          stats = { pokemonWins: {}, typeWins: {}, hubCompletions: 0, examCompletions: 0, lastResetMonth: currentMonth };
+                        }
+        stats.examCompletions = (stats.examCompletions || 0) + 1;
+        localStorage.setItem('Pokethology_MissionStats', JSON.stringify(stats));
+        window.dispatchEvent(new Event('storage'));
+      } catch (e) {
+        console.error("Error updating exam stats", e);
+      }
     } else {
       try { sounds.error(); } catch (_) {}
     }

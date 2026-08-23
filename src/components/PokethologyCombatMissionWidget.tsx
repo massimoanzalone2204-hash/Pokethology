@@ -405,6 +405,7 @@ interface PokethologyCombatMissionWidgetProps {
   isCompleted: boolean;
   missionProgressCount?: number;
   missionRequiredCount?: number;
+  dailyStreak?: number;
 }
 
 
@@ -431,7 +432,7 @@ function usePersistentState<T>(key: string, initialValue: T): [T, React.Dispatch
   return [state, setState];
 }
 
-export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWidgetProps> = memo(({ todayStr, isCompleted, missionProgressCount, missionRequiredCount }) => {
+export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWidgetProps> = memo(({ todayStr, isCompleted, missionProgressCount, missionRequiredCount, dailyStreak }) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<'bronze' | 'silver' | 'gold'>('bronze');
 
   const hash = useMemo(() => todayStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0), [todayStr]);
@@ -812,12 +813,20 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
   return (
     <div id="combat-mission-dashboard" className="relative w-full flex flex-col gap-4 text-center">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-950/70 p-4.5 rounded-2xl border border-cyan-500/10 text-left shadow-lg">
-        <div className="space-y-1.5 border-b sm:border-b-0 sm:border-r border-slate-900 pb-3 sm:pb-0 sm:pr-4">
-          <div className="flex items-center gap-1.5 md:gap-2">
-            <Award className="w-5 h-5 text-cyan-400" />
-            <span className="text-[10px] sm:text-xs font-hud font-black text-cyan-400 uppercase tracking-widest">Rank</span>
+        <div className="space-y-1.5 border-b sm:border-b-0 sm:border-r border-slate-900 pb-3 sm:pb-0 sm:pr-4 flex flex-col justify-center">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <Award className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
+              <span className="text-[10px] sm:text-xs font-hud font-black text-cyan-400 uppercase tracking-widest">Rank</span>
+            </div>
+            {dailyStreak !== undefined && (
+              <div className="px-2 py-0.5 rounded-full bg-orange-950/80 border border-orange-500/40 text-orange-400 text-[8.5px] sm:text-[9.5px] font-hud font-bold whitespace-nowrap shadow-[0_0_10px_rgba(249,115,22,0.3)] flex items-center gap-1">
+                <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-orange-500 text-orange-400" />
+                <span>{dailyStreak} DAY{dailyStreak !== 1 ? "S" : ""}</span>
+              </div>
+            )}
           </div>
-          <div className="mt-1.5">
+          <div className="mt-1">
             <span className={cn("inline-flex items-center px-2.5 py-1 rounded-md border text-xs sm:text-sm font-hud uppercase font-black tracking-widest drop-shadow-md", operatorRank.color)}>
               {operatorRank.title}
             </span>

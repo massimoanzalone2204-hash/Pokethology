@@ -1,7 +1,7 @@
 import React, { memo, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
-import { ChevronLeft, ChevronRight, Flame, Skull, Zap, Snowflake, Moon, RefreshCw, Crosshair } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Flame, Skull, Zap, Snowflake, Moon, RefreshCw, Crosshair, Sparkles } from 'lucide-react';
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
   'BRN': <Flame className="w-3 h-3 text-orange-400" />,
@@ -96,6 +96,7 @@ export interface OpponentStatusBarProps {
   showComparison?: boolean;
   isCompact?: boolean;
   opponentAvatar?: { id: string; name: string; role?: string } | null;
+  isShiny?: boolean;
 }
 
 export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
@@ -114,7 +115,8 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
   player,
   showComparison,
   isCompact,
-  opponentAvatar
+  opponentAvatar,
+  isShiny
 }) => {
   const hpPercent = battleOpponent ? Math.ceil((opponentHP / opponentMaxHP) * 100) : 0;
   
@@ -164,18 +166,18 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
           exit={{ opacity: 0, x: -20, scale: 0.95 }}
           transition={{ duration: 0.3 }}
           className={cn(
-            "OpponentStatusBar z-20 pointer-events-auto flex items-center gap-1.5 sm:gap-2 transform-gpu",
+            "OpponentStatusBar z-20 pointer-events-auto flex items-center gap-0.5 sm:gap-1 transform-gpu",
             isCompact ? "relative w-full max-w-xs mx-auto" : "absolute bottom-2 right-2 xs:bottom-3 xs:right-3 sm:bottom-4 sm:right-4"
           )}
         >
       {/* Opponent Avatar on the left of HP bar (small/little) */}
       {opponentAvatar && (
-        <div className="shrink-0 flex items-center justify-center pointer-events-none drop-shadow-md">
+        <div className="shrink-0 flex items-center justify-center pointer-events-none drop-shadow-md -mr-0.5 sm:-mr-1">
           <img 
             src={`https://play.pokemonshowdown.com/sprites/trainers/${opponentAvatar.id}.png`}
             alt={opponentAvatar.name}
             className={cn(
-              "w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain [image-rendering:pixelated] drop-shadow-[0_2px_8px_rgba(239,68,68,0.45)]",
+              "w-13 h-13 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-26 lg:h-26 object-contain [image-rendering:pixelated] drop-shadow-[0_2px_8px_rgba(239,68,68,0.45)]",
               REVERSE_FACING_AVATARS.includes(opponentAvatar.id) && "-scale-x-100"
             )}
           />
@@ -185,6 +187,13 @@ export const OpponentStatusBar: React.FC<OpponentStatusBarProps> = memo(({
         "w-[110px] xs:w-[125px] sm:w-[170px] lg:w-[200px] bg-slate-950/92 border border-red-500/30 rounded-2xl p-1.5 sm:p-2 sm:px-2.5 shadow-md relative group overflow-hidden transition-all duration-200 transform-gpu",
         turn === 'opponent' && "ring-1 ring-red-500/70 border-red-500/80 scale-[1.01]"
       )}>
+        {isShiny && (
+          <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden flex items-center justify-around opacity-40 mix-blend-screen">
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 animate-[pulse_1.5s_ease-in-out_infinite]" />
+            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400 animate-[pulse_2s_ease-in-out_infinite_0.5s] -translate-y-2" />
+            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-200 animate-[pulse_1.2s_ease-in-out_infinite_1s] translate-y-1" />
+          </div>
+        )}
         {/* Sleek digital accent line */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-red-500/40 to-transparent"></div>
         
@@ -291,6 +300,7 @@ interface PlayerStatusBarProps {
   showComparison?: boolean;
   isCompact?: boolean;
   playerAvatar?: { id: string; name: string; role?: string } | null;
+  isShiny?: boolean;
 }
 
 export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = memo(({
@@ -307,7 +317,8 @@ export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = memo(({
   opponent,
   showComparison,
   isCompact,
-  playerAvatar
+  playerAvatar,
+  isShiny
 }) => {
   const getStatsMap = (poke: Pokemon) => poke.stats.reduce((acc, s) => ({ ...acc, [s.stat.name]: s.base_stat }), {} as Record<string, number>);
   const pStats = pokemon ? getStatsMap(pokemon) : null;
@@ -323,7 +334,7 @@ export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = memo(({
           exit={{ opacity: 0, x: 20, scale: 0.95 }}
           transition={{ duration: 0.4 }}
           className={cn(
-            "PlayerStatusBar z-20 pointer-events-auto flex items-center gap-1.5 sm:gap-2.5 transform-gpu",
+            "PlayerStatusBar z-20 pointer-events-auto flex items-center gap-0.5 sm:gap-1 transform-gpu",
             isCompact ? "relative w-full max-w-xs mx-auto" : "absolute bottom-2 left-2 xs:bottom-3 xs:left-3 sm:bottom-4 sm:left-4"
           )}
         >
@@ -331,6 +342,13 @@ export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = memo(({
         "w-[110px] xs:w-[125px] sm:w-[170px] lg:w-[200px] bg-slate-950/92 border border-cyan-500/30 rounded-2xl p-1.5 sm:p-2 sm:px-2.5 shadow-md relative group overflow-hidden transition-all duration-200 transform-gpu",
         turn === 'player' && "ring-1 ring-cyan-500/70 border-cyan-500/80 scale-[1.01]"
       )}>
+        {isShiny && (
+          <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden flex items-center justify-around opacity-40 mix-blend-screen">
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 animate-[pulse_1.5s_ease-in-out_infinite]" />
+            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400 animate-[pulse_2s_ease-in-out_infinite_0.5s] -translate-y-2" />
+            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-200 animate-[pulse_1.2s_ease-in-out_infinite_1s] translate-y-1" />
+          </div>
+        )}
         {/* Sleek digital accent line */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent"></div>
         
@@ -405,12 +423,12 @@ export const PlayerStatusBar: React.FC<PlayerStatusBarProps> = memo(({
 
       {/* Player Character Avatar on the right of HP bar (bigger) */}
       {playerAvatar && (
-        <div className="shrink-0 flex items-center justify-center pointer-events-none drop-shadow-lg">
+        <div className="shrink-0 flex items-center justify-center pointer-events-none drop-shadow-lg -ml-0.5 sm:-ml-1">
           <img 
             src={`https://play.pokemonshowdown.com/sprites/trainers/${playerAvatar.id}.png`}
             alt={playerAvatar.name}
             className={cn(
-              "w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain [image-rendering:pixelated] drop-shadow-[0_4px_14px_rgba(34,211,238,0.45)]",
+              "w-13 h-13 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-26 lg:h-26 object-contain [image-rendering:pixelated] drop-shadow-[0_4px_14px_rgba(34,211,238,0.45)]",
               !REVERSE_FACING_AVATARS.includes(playerAvatar.id) && "-scale-x-100"
             )}
           />

@@ -42,6 +42,8 @@ import { WelcomeModal } from './components/WelcomeModal';
 import { PokethologyQuizWidget } from './components/PokethologyQuizWidget';
 import { MoveModal } from './components/MoveModal';
 import { BattleHistory } from './components/BattleHistory';
+import { PokethologyMissionModal } from './components/PokethologyMissionModal';
+import { PokethologyMissionBadge } from './components/PokethologyMissionBadge';
 import { AboutModal } from './components/AboutModal';
 import { DisclaimerModal, DisclaimerButton } from './components/DisclaimerModal';
 import { PwaInstallModal } from './components/PwaInstallModal';
@@ -3084,6 +3086,23 @@ export default function App() {
             date: new Date().toISOString(),
             usedSuperEffective: usedSuperEffectiveCurrentBattle,
         };
+        if (battleResult === 'victory') {
+          try {
+            let stats = JSON.parse(localStorage.getItem('Pokethology_MissionStats') || '{"pokemonWins":{}, "typeWins":{}}');
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            if (stats.lastResetMonth !== currentMonth) {
+              stats = { pokemonWins: {}, typeWins: {}, lastResetMonth: currentMonth };
+            }
+            stats.pokemonWins[pokemon.name] = (stats.pokemonWins[pokemon.name] || 0) + 1;
+            pokemon.types.forEach((t: any) => {
+              const typeName = t.type.name.toLowerCase();
+              stats.typeWins[typeName] = (stats.typeWins[typeName] || 0) + 1;
+            });
+            localStorage.setItem('Pokethology_MissionStats', JSON.stringify(stats));
+          } catch (e) {
+            console.error("Error updating mission stats", e);
+          }
+        }
         idbSet(STORES.BATTLE_HISTORY, newRecord).then(() => {
            idbGetAll(STORES.BATTLE_HISTORY).then(all => {
              const sorted = all.sort((a, b) => b.timestamp - a.timestamp);
@@ -3281,6 +3300,7 @@ export default function App() {
   const [isMoveDetailOpen, setIsMoveDetailOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
+  const [isMissionModalOpen, setIsMissionModalOpen] = useState(false);
   const [isDiagnosticRunning, setIsDiagnosticRunning] = useState(false);
   const [diagnosticProgress, setDiagnosticProgress] = useState(0);
   const [diagnosticLogs, setDiagnosticLogs] = useState<string[]>([]);
@@ -4925,8 +4945,23 @@ export default function App() {
                   const newProgress = Math.min(challenge.required, currentProgress + 1);
                   localStorage.setItem(stateKey, String(newProgress));
                   const isFinished = newProgress >= challenge.required;
+                  const wasFinished = currentProgress >= challenge.required;
                   
                   if (isFinished) {
+                    if (!wasFinished) {
+                      try {
+                        let stats = JSON.parse(localStorage.getItem('Pokethology_MissionStats') || '{"pokemonWins":{}, "typeWins":{}, "hubCompletions":0, "examCompletions":0}');
+                        const currentMonth = new Date().toISOString().slice(0, 7);
+                        if (stats.lastResetMonth !== currentMonth) {
+                          stats = { pokemonWins: {}, typeWins: {}, hubCompletions: 0, examCompletions: 0, lastResetMonth: currentMonth };
+                        }
+                        stats.hubCompletions = (stats.hubCompletions || 0) + 1;
+                        localStorage.setItem('Pokethology_MissionStats', JSON.stringify(stats));
+                        window.dispatchEvent(new Event('storage'));
+                      } catch (e) {
+                        console.error("Error updating hub stats", e);
+                      }
+                    }
                     hubMessageToDisplay = `DAILY HUB: ${challenge.title} (${newProgress}/${challenge.required}) - MISSION COMPLETE!`;
                     latestMissionNotice = {
                       title: `Daily Hub: ${challenge.title}`,
@@ -6463,7 +6498,7 @@ export default function App() {
                         
                         <div className="relative z-10 flex-1 flex flex-col overflow-hidden">
                           {/* Top Bar */}
-                          <div className="flex justify-between items-center mb-4 mt-4 sm:mt-6 border-b border-white/5 pb-2 px-1 shrink-0 z-10 relative">
+                          <div className="flex justify-between items-center mb-3 mt-3 sm:mt-4 px-1 shrink-0 z-10 relative">
                             <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                               <button
                                 type="button"
@@ -6477,7 +6512,7 @@ export default function App() {
                                 <img 
                                   src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                                   alt={currentAvatar.name}
-                                  className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain [image-rendering:pixelated] drop-shadow-[0_3px_10px_rgba(34,211,238,0.35)] shrink-0 -my-1"
+                                  className="w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 object-contain [image-rendering:pixelated] drop-shadow-[0_3px_10px_rgba(34,211,238,0.35)] shrink-0"
                                 />
                               </button>
                               <div className="flex flex-col min-w-0">
@@ -7603,6 +7638,7 @@ export default function App() {
                                           enableAnimations={enableAnimations}
                                           isSelectingOpponent={isSelectingOpponent}
                                           opponentAvatar={opponentAvatar}
+                                          isShiny={isOpponentShiny}
                                           onSearchOpponent={async (name) => {
                                             sounds.scan(); playHaptic('light');
                                             setLoadingPokemon(true);
@@ -7703,6 +7739,7 @@ export default function App() {
                                           opponent={battleOpponent}
                                           showComparison={showStatComparison}
                                           playerAvatar={currentAvatar}
+                                          isShiny={isShiny}
                                         />
                                         
                                         {/* Opponent Status Bar (implied) */}
@@ -8586,6 +8623,7 @@ export default function App() {
                         transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                         className="flex-1 flex flex-col items-center justify-center gap-3 sm:gap-4 md:gap-5 py-3 sm:py-5 px-3 sm:px-4 text-center relative overflow-y-auto custom-scrollbar optimize-scrolling select-none w-full h-full my-auto max-w-5xl mx-auto min-h-0"
                       >
+                        <PokethologyMissionBadge />
                         {/* Top-Right Corner Avatar with Interactive Selector */}
                         <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20 flex flex-col items-end gap-1">
                           <button
@@ -8597,11 +8635,11 @@ export default function App() {
                             className="relative flex items-center justify-center shrink-0 group hover:scale-105 active:scale-95 transition-transform cursor-pointer"
                             title="Change Trainer Avatar"
                           >
-                            <div className="absolute inset-0 rounded-2xl bg-cyan-500/15 filter blur-md group-hover:bg-cyan-500/30 transition-all"></div>
+                            <div className="absolute inset-0 rounded-2xl bg-cyan-400/10 filter blur-sm group-hover:bg-cyan-400/20 transition-all pointer-events-none"></div>
                             <img 
                               src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                               alt={currentAvatar.name}
-                              className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-[0_4px_14px_rgba(34,211,238,0.45)] [image-rendering:pixelated] relative z-10"
+                              className="w-14 h-14 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 object-contain drop-shadow-[0_2px_10px_rgba(34,211,238,0.3)] [image-rendering:pixelated] relative z-10"
                             />
                           </button>
                           <div className="text-right hidden xs:flex flex-col items-end -mt-1">
@@ -8686,7 +8724,7 @@ export default function App() {
                           </div>
 
                           {/* Home Screen Copyright & Legal Disclaimer Toggle */}
-                          <div className="flex flex-col items-center justify-center mt-6 sm:mt-8 md:mt-10 mb-2 select-none px-2">
+                          <div className="flex flex-col items-center justify-center mt-12 sm:mt-16 md:mt-24 mb-2 select-none px-2">
                             <DisclaimerButton onClick={() => setIsDisclaimerOpen(true)} variant="pill" />
                           </div>
                         </div>
@@ -9536,9 +9574,9 @@ export default function App() {
                   <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)] shrink-0">
                     <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 filter drop-shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-widest leading-none">
-                      {'DAILY HUB'}
+                  <div className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
+                    <h2 className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-widest leading-none whitespace-nowrap">
+                      DAILY HUB
                     </h2>
                     <span className="px-2 py-0.5 rounded-full bg-cyan-950/90 border border-cyan-500/40 text-cyan-300 text-[10px] sm:text-xs font-mono font-bold whitespace-nowrap shadow-sm">
                       {today}
@@ -9565,6 +9603,7 @@ export default function App() {
                   isCompleted={isMissionCompleted} 
                   missionProgressCount={missionProgressCount}
                   missionRequiredCount={missionRequiredCount}
+                  dailyStreak={dailyStreak}
                 />
               </div>
             </motion.div>
@@ -10481,6 +10520,27 @@ export default function App() {
                     </div>
                     <AudioSettings mode="simple" />
 
+                    <div className="pt-4 border-t border-cyan-500/20">
+                      <div className="flex items-center justify-between">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-amber-400 font-hud uppercase text-[10px] font-bold tracking-widest flex items-center gap-1.5">
+                            <Trophy className="w-3.5 h-3.5" />
+                            Pokéthology Mission
+                          </span>
+                          <span className="text-slate-400 text-[9px] max-w-[200px]">Track your overall combat mastery progress.</span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setIsMusicOpen(false);
+                            setIsMissionModalOpen(true);
+                          }}
+                          className="px-4 py-2 rounded-xl font-hud uppercase text-[10px] font-bold tracking-widest transition-all bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 hover:border-amber-400 hover:shadow-[0_0_15px_rgba(245,158,11,0.3)]"
+                        >
+                          Personalize
+                        </button>
+                      </div>
+                    </div>
+
 
                     
                   
@@ -10805,6 +10865,11 @@ export default function App() {
         <DisclaimerModal
           isOpen={isDisclaimerOpen}
           onClose={() => setIsDisclaimerOpen(false)}
+        />
+        
+        <PokethologyMissionModal
+          isOpen={isMissionModalOpen}
+          onClose={() => setIsMissionModalOpen(false)}
         />
         {/* About & System Info / Bug Report Modal */}
         <AboutModal
