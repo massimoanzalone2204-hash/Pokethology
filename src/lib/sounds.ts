@@ -56,6 +56,26 @@ function playTone(freq: number, type: OscillatorType, duration: number, vol: num
 
 let lastScanSoundTime = 0;
 
+export const POKE_CHILL_TRACKS = [
+  { id: 'fullalbum', name: 'Poké & Chill (Full Album)', videoId: '2DVpys50LVE' },
+  { id: 'gym', name: 'Pokémon Gym', videoId: 'O6MDKkRfPZE' },
+  { id: 'route3', name: 'Route 3', videoId: 'bGcP2z0E_g4' },
+  { id: 'azalea', name: 'Azalea Town', videoId: 'xYm0bS4ctRQ' },
+  { id: 'hauoli', name: 'Hau\'oli City', videoId: 'P6VYifDDIrE' },
+  { id: 'ecruteak', name: 'Ecruteak City', videoId: 'dCUFw2Hfs7Q' },
+  { id: 'route30', name: 'Route 30', videoId: 'LxpeC46ncaA' },
+  { id: 'nationalpark', name: 'National Park', videoId: '0eu7URQWWvc' },
+  { id: 'league', name: 'Pokémon League', videoId: 'xQZbODfDiag' },
+  { id: 'anistar', name: 'Anistar City', videoId: 'H-d1hwRT4hk' },
+  { id: 'relic', name: 'Relic Song', videoId: 'vwmimhxk42A' },
+  { id: 'sacred', name: 'Sacred Beasts', videoId: 'CW93k6Ak8iw' },
+  { id: 'route113', name: 'Route 113', videoId: 'IilvTS0ARlI' },
+  { id: 'trainer', name: 'Trainer Battle', videoId: 'WU1K0Iq0Ijs' },
+  { id: 'lavender', name: 'Lavender Town', videoId: 'FfwROoThRGA' },
+  { id: 'ending', name: 'Ending Theme', videoId: 'xlSdJgk4oOg' },
+  { id: 'title', name: 'Title Screen', videoId: 'zxDFu0C7IWQ' }
+];
+
 export const sounds = {
   setTempoMultiplier: (mult: number) => {
     tempoMultiplier = mult;
@@ -822,89 +842,121 @@ export const sounds = {
   },
   playBGM: (theme: string) => {
     try {
-      sounds.stopBGM();
       currentTheme = theme;
-      // Procedural BGM playback disabled per configuration; BGM volume bar preserved on settings
-      return;
+      const w = window as any;
+      const track = POKE_CHILL_TRACKS.find(t => t.id === theme) || POKE_CHILL_TRACKS[0];
+      if (w.soundsYTPlayer && typeof w.soundsYTPlayer.loadVideoById === 'function') {
+        if (w.soundsYTCurrentVid !== track.videoId) {
+          w.soundsYTCurrentVid = track.videoId;
+          w.soundsYTPlayer.loadVideoById({
+            videoId: track.videoId
+          });
+        } else {
+          w.soundsYTPlayer.playVideo();
+        }
+        w.soundsYTPlayer.setVolume(bgmVolume * 100);
+      } else {
+        w.soundsYTQueued = theme;
+      }
     } catch (e) {
       console.warn("BGM initialization failed:", e);
     }
   },
-  fadeOutBGM: (onComplete?: () => void, duration: number = 2000) => {
-    if (fadeIntervalId !== null) {
-      window.clearInterval(fadeIntervalId);
-      fadeIntervalId = null;
-    }
-    
-    // If not playing BGM, complete immediately
-    if (bgmInterval === null) {
-      if (onComplete) onComplete();
+  toggleShuffle: () => {
+    const w = window as any;
+    w.soundsYTShuffle = !w.soundsYTShuffle;
+    return w.soundsYTShuffle;
+  },
+  toggleLoop: () => {
+    const w = window as any;
+    w.soundsYTLoop = !w.soundsYTLoop;
+    return w.soundsYTLoop;
+  },
+  isShuffleEnabled: () => {
+    const w = window as any;
+    return !!w.soundsYTShuffle;
+  },
+  isLoopEnabled: () => {
+    const w = window as any;
+    return !!w.soundsYTLoop;
+  },
+  playNextBGM: () => {
+    const w = window as any;
+    if (!currentTheme) return;
+    if (w.soundsYTShuffle) {
+      const randomIndex = Math.floor(Math.random() * POKE_CHILL_TRACKS.length);
+      sounds.playBGM(POKE_CHILL_TRACKS[randomIndex].id);
       return;
     }
-
-    const startVal = bgmFadeMultiplier;
-    const stepTime = 50; // ms
-    let elapsed = 0;
-    
-    fadeIntervalId = window.setInterval(() => {
-      elapsed += stepTime;
-      const progress = elapsed / duration;
-      if (progress >= 1) {
-        bgmFadeMultiplier = 0.0;
-        sounds.stopBGM();
-        if (onComplete) onComplete();
-      } else {
-        bgmFadeMultiplier = startVal * (1.0 - progress);
-      }
-    }, stepTime);
+    const currentIndex = POKE_CHILL_TRACKS.findIndex(t => t.id === currentTheme);
+    const nextIndex = (currentIndex + 1) % POKE_CHILL_TRACKS.length;
+    sounds.playBGM(POKE_CHILL_TRACKS[nextIndex].id);
+  },
+  playPrevBGM: () => {
+    if (!currentTheme) return;
+    const currentIndex = POKE_CHILL_TRACKS.findIndex(t => t.id === currentTheme);
+    const prevIndex = currentIndex === 0 ? POKE_CHILL_TRACKS.length - 1 : currentIndex - 1;
+    sounds.playBGM(POKE_CHILL_TRACKS[prevIndex].id);
+  },
+  getBGMState: () => {
+    const w = window as any;
+    if (w.soundsYTPlayer && typeof w.soundsYTPlayer.getCurrentTime === 'function' && typeof w.soundsYTPlayer.getDuration === 'function') {
+      const track = POKE_CHILL_TRACKS.find(t => t.id === currentTheme) || POKE_CHILL_TRACKS[0];
+      return {
+         trackId: track.id,
+         trackName: track.name,
+         currentTime: w.soundsYTPlayer.getCurrentTime() || 0,
+         duration: w.soundsYTPlayer.getDuration() || 1,
+         isPlaying: w.soundsYTPlayer.getPlayerState() === 1,
+         isShuffle: !!w.soundsYTShuffle,
+         isLoop: !!w.soundsYTLoop
+      };
+    }
+    return null;
+  },
+  fadeOutBGM: (onComplete?: () => void, duration: number = 2000) => {
+    sounds.stopBGM();
+    if (onComplete) onComplete();
   },
   fadeInBGM: (theme: string, duration: number = 1500) => {
-    if (fadeIntervalId !== null) {
-      window.clearInterval(fadeIntervalId);
-      fadeIntervalId = null;
-    }
-    
-    bgmFadeMultiplier = 0.0;
     sounds.playBGM(theme);
-    
-    // playBGM clears BGM and resets multiplier, so override to start at 0
-    bgmFadeMultiplier = 0.0;
-    
-    const stepTime = 50; // ms
-    let elapsed = 0;
-    
-    fadeIntervalId = window.setInterval(() => {
-      elapsed += stepTime;
-      const progress = elapsed / duration;
-      if (progress >= 1) {
-        bgmFadeMultiplier = 1.0;
-        if (fadeIntervalId !== null) {
-          window.clearInterval(fadeIntervalId);
-          fadeIntervalId = null;
-        }
-      } else {
-        bgmFadeMultiplier = progress;
-      }
-    }, stepTime);
   },
   fadeOutAndTransition: (nextTheme: string | 'None', fadeOutDuration: number = 2000, fadeInDuration: number = 1500) => {
-    sounds.fadeOutBGM(() => {
-      if (nextTheme && nextTheme !== 'None') {
-        sounds.fadeInBGM(nextTheme, fadeInDuration);
-      }
-    }, fadeOutDuration);
+    if (nextTheme && nextTheme !== 'None') {
+      sounds.playBGM(nextTheme);
+    } else {
+      sounds.stopBGM();
+    }
+  },
+  pauseBGM: () => {
+    const w = window as any;
+    if (w.soundsYTPlayer && typeof w.soundsYTPlayer.pauseVideo === 'function') {
+      w.soundsYTPlayer.pauseVideo();
+    }
   },
   stopBGM: () => {
-    if (fadeIntervalId !== null) {
-      window.clearInterval(fadeIntervalId);
-      fadeIntervalId = null;
-    }
-    bgmFadeMultiplier = 1.0;
-    if (bgmInterval !== null) {
-      clearInterval(bgmInterval);
-      bgmInterval = null;
-    }
+    const w = window as any;
+    w.soundsYTQueued = null;
     currentTheme = null;
+    if (w.soundsYTPlayer && typeof w.soundsYTPlayer.pauseVideo === 'function') {
+      w.soundsYTPlayer.pauseVideo();
+    }
+  },
+  isBGMPlaying: () => {
+    const w = window as any;
+    if (w.soundsYTPlayer && typeof w.soundsYTPlayer.getPlayerState === 'function') {
+      return w.soundsYTPlayer.getPlayerState() === 1;
+    }
+    return !!w.soundsYTQueued;
+  },
+  toggleBGM: () => {
+    if (sounds.isBGMPlaying()) {
+      sounds.pauseBGM();
+      return false;
+    } else {
+      sounds.playBGM(currentTheme || 'fullalbum');
+      return true;
+    }
   },
   playMoveSound: (type: string, isSpecial: boolean) => {
     const ctx = getAudioContext();
@@ -982,3 +1034,73 @@ export const sounds = {
     }
   }
 };
+
+// --- YouTube Iframe API Integration for Mikel's Poke & Chill ---
+if (typeof window !== 'undefined') {
+  const w = window as any;
+  
+  if (!w.YT) {
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    if (firstScriptTag && firstScriptTag.parentNode) {
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    } else {
+      document.head.appendChild(tag);
+    }
+    
+    w.onYouTubeIframeAPIReady = () => {
+      const div = document.createElement('div');
+      div.id = 'yt-bgm-player-container';
+      div.style.position = 'absolute';
+      div.style.top = '-9999px';
+      div.style.left = '-9999px';
+      div.style.width = '1px';
+      div.style.height = '1px';
+      div.style.opacity = '0.01';
+      div.style.pointerEvents = 'none';
+      document.body.appendChild(div);
+      
+      w.soundsYTPlayer = new w.YT.Player('yt-bgm-player-container', {
+        height: '1',
+        width: '1',
+        videoId: POKE_CHILL_TRACKS[0].videoId,
+        playerVars: {
+          'autoplay': 0,
+          'controls': 0,
+          'playsinline': 1
+        },
+        events: {
+          'onReady': () => {
+            if (w.soundsYTQueued) {
+              sounds.playBGM(w.soundsYTQueued);
+            }
+          },
+          'onStateChange': (event: any) => {
+            if (event.data === 0) { // ENDED
+              const w = window as any;
+              if (w.soundsYTLoop) {
+                w.soundsYTPlayer.seekTo(0);
+                w.soundsYTPlayer.playVideo();
+              } else {
+                sounds.playNextBGM();
+              }
+            }
+          }
+        }
+      });
+    };
+  }
+
+  // Autoplay on first interaction
+  const startAutoplay = () => {
+    if (!sounds.isBGMPlaying() && bgmVolume > 0) {
+      sounds.playBGM('fullalbum');
+    }
+    document.removeEventListener('click', startAutoplay);
+    document.removeEventListener('keydown', startAutoplay);
+  };
+  document.addEventListener('click', startAutoplay, { once: true });
+  document.addEventListener('keydown', startAutoplay, { once: true });
+}
+

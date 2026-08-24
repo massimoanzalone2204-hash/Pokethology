@@ -133,6 +133,76 @@ export const REGION_LORE_DATABASE: RegionLoreData[] = [
         options: ["Water Stone", "Thunder Stone", "Fire Stone", "Moon Stone"],
         answerIndex: 0,
         explanation: "Exposure to the radiation of a Water Stone triggers Eevee's cellular composition to restructure into the aquatic Vaporeon."
+      },
+      {
+        id: "kanto_11",
+        question: "What item developed by Silph Co. allows trainers to identify and interact with cloaked ghost apparitions?",
+        options: ["Silph Scope", "Devon Scope", "Itemfinder", "Town Map"],
+        answerIndex: 0,
+        explanation: "The Silph Scope is an optical visor designed by Silph Co. that pierces ghost cloaking to reveal true identities."
+      },
+      {
+        id: "kanto_12",
+        question: "Which deep cave in northwestern Kanto contains the highest concentration of high-level feral Pokémon and Mewtwo?",
+        options: ["Cerulean Cave", "Rock Tunnel", "Diglett's Cave", "Seafoam Islands"],
+        answerIndex: 0,
+        explanation: "Cerulean Cave (Unknown Dungeon) houses formidable, untamed Pokémon and served as Mewtwo's refuge."
+      },
+      {
+        id: "kanto_13",
+        question: "What rare extraterrestrial stone found on Mt. Moon causes Clefairy to evolve into Clefable?",
+        options: ["Moon Stone", "Sun Stone", "Dusk Stone", "Shiny Stone"],
+        answerIndex: 0,
+        explanation: "Moon Stones fell with ancient meteorites onto Mt. Moon, triggering Clefairy's lunar evolution."
+      },
+      {
+        id: "kanto_14",
+        question: "Who was the enigmatic leader of Team Rocket who simultaneously served as the Viridian City Gym Leader?",
+        options: ["Giovanni", "Blaine", "Koga", "Lt. Surge"],
+        answerIndex: 0,
+        explanation: "Giovanni commanded the Viridian Gym while orchestrating Team Rocket's syndicate across Kanto."
+      },
+      {
+        id: "kanto_15",
+        question: "Which Kanto fossil is revived into the predatory, scythe-armed ancient rock arthropod Kabutops?",
+        options: ["Dome Fossil", "Helix Fossil", "Old Amber", "Claw Fossil"],
+        answerIndex: 0,
+        explanation: "The Dome Fossil contains the ancient genetic imprint of Kabuto, which evolves into the deadly Kabutops."
+      },
+      {
+        id: "kanto_16",
+        question: "What legendary amber relic contains genetic material sufficient to regenerate the prehistoric dragon Aerodactyl?",
+        options: ["Old Amber", "Helix Fossil", "Armor Fossil", "Dragon Fang"],
+        answerIndex: 0,
+        explanation: "Old Amber preserves primeval tree resin carrying Aerodactyl DNA from millions of years ago."
+      },
+      {
+        id: "kanto_17",
+        question: "Which eccentric researcher and inventor created the Pokémon Storage System used across all regions?",
+        options: ["Bill", "Professor Oak", "Celio", "Mr. Fuji"],
+        answerIndex: 0,
+        explanation: "Bill invented the computer PC Pokémon Storage System at his Sea Cottage on Route 25 in Cerulean Cape."
+      },
+      {
+        id: "kanto_18",
+        question: "Which frigid cavern located on Route 20 serves as the glacial nesting ground of the legendary bird Articuno?",
+        options: ["Seafoam Islands", "Cerulean Cave", "Ice Path", "Rock Tunnel"],
+        answerIndex: 0,
+        explanation: "The icy subterranean waterfalls of the Seafoam Islands shelter the legendary Ice-bird Articuno."
+      },
+      {
+        id: "kanto_19",
+        question: "What martial arts dojo in Saffron City was stripped of official Gym status by Sabrina's Psychic gym?",
+        options: ["Fighting Dojo", "Indigo Dojo", "Blackthorn Gym", "Cianwood Dojo"],
+        answerIndex: 0,
+        explanation: "The Fighting Dojo in Saffron City lost its League sanction after losing an elemental Gym challenge to Sabrina."
+      },
+      {
+        id: "kanto_20",
+        question: "Which psychic prodigy and Gym Leader of Saffron City communicated telepathically from early childhood?",
+        options: ["Sabrina", "Erika", "Misty", "Lorelei"],
+        answerIndex: 0,
+        explanation: "Sabrina mastered telekinesis and telepathy at a young age, commanding psychic bends of spoon and mind."
       }
     ]
   },
@@ -200,590 +270,1150 @@ export const REGION_LORE_DATABASE: RegionLoreData[] = [
       },
       {
         id: "johto_9",
-        question: "Which steel-clad mantis Pokémon evolves from Scyther when traded while holding a heavy Metal Coat?",
-        options: ["Scizor", "Steelix", "Skarmory", "Forretress"],
+        question: "Which sacred cavern in Blackthorn City is reserved exclusively for the Clan of Dragon Masters to test pure spirit?",
+        options: ["Dragon's Den", "Whirl Islands Cave", "Mt. Mortar", "Dark Cave"],
         answerIndex: 0,
-        explanation: "Trading Scyther with a Metal Coat fuses metallic strength into its exoskeleton, evolving it into Scizor."
+        explanation: "The Dragon's Den houses the Dragon Shrine, where the Dragon Clan elder tests the heart and character of aspiring Dragon Masters."
       },
       {
         id: "johto_10",
-        question: "Which legendary beast embodies the lightning bolt that struck the Brass Tower during its tragic burning?",
+        question: "What traditional artisan in Azalea Town crafts specialized Poké Balls directly from organic Apricorn shells?",
+        options: ["Kurt", "Professor Elm", "Mr. Pokémon", "Eusine"],
+        answerIndex: 0,
+        explanation: "Kurt handcrafts specialized Apricorn Balls (Heavy, Moon, Fast, Level, Lure, Love, Friend) in Azalea Town."
+      },
+      {
+        id: "johto_11",
+        question: "Which legendary beast embodies the raging thunder that struck the Brass Tower during the great fire?",
         options: ["Raikou", "Entei", "Suicune", "Zapdos"],
         answerIndex: 0,
-        explanation: "Raikou embodies the lightning bolt that struck the tower, roaring like thunder as it runs across the land."
+        explanation: "Raikou embodies the lightning strike that ignited the Brass Tower in ancient Ecruteak lore."
+      },
+      {
+        id: "johto_12",
+        question: "Which legendary beast is said to be born whenever a new volcano erupts onto the earth?",
+        options: ["Entei", "Raikou", "Heatran", "Moltres"],
+        answerIndex: 0,
+        explanation: "Entei is said to race across land, with new ones bursting into life with the eruption of fresh volcanoes."
+      },
+      {
+        id: "johto_13",
+        question: "What central pillar inside Sprout Tower in Violet City sways perpetually to absorb seismic shockwaves?",
+        options: ["A massive petrified Bellsprout stalk", "A bronze spire", "A solidified steel gyro", "An ancient dragon spine"],
+        answerIndex: 0,
+        explanation: "Sprout Tower's central swaying timber is modeled after Bellsprout's flexible stem, protecting the structure from earthquakes."
+      },
+      {
+        id: "johto_14",
+        question: "What traditional five performers in Ecruteak City test trainers with Eevee evolutions before granting the Tidal/Rainbow bell?",
+        options: ["The Kimono Girls", "The Battle Maidens", "The Shrine Maidens", "The Indigo Sisters"],
+        answerIndex: 0,
+        explanation: "The five Kimono Girls (Tamao, Zuki, Naoko, Sayo, Kuni) guard sacred dance traditions and test trainers before summoning legendary birds."
+      },
+      {
+        id: "johto_15",
+        question: "What legendary item is blown to summon Ho-Oh to the apex of the Bell Tower?",
+        options: ["Rainbow Wing & Clear Bell", "Silver Wing & Tidal Bell", "Poké Flute", "Azure Flute"],
+        answerIndex: 0,
+        explanation: "The Rainbow Wing together with the resonant chiming of the Clear Bell summons Ho-Oh."
+      },
+      {
+        id: "johto_16",
+        question: "What species had its tails ruthlessly harvested by Team Rocket in Azalea Town's subterranean well?",
+        options: ["Slowpoke", "Mareep", "Wooper", "Aipom"],
+        answerIndex: 0,
+        explanation: "Team Rocket occupied Slowpoke Well to sever and sell delicious, nutritious SlowpokeTails at exorbitant prices."
+      },
+      {
+        id: "johto_17",
+        question: "What tranquil, snowbound mountain peak at the border of Johto and Kanto serves as the sanctuary of Pokémon Master Red?",
+        options: ["Mt. Silver", "Mt. Coronet", "Mt. Pyre", "Mt. Moon"],
+        answerIndex: 0,
+        explanation: "Mt. Silver (Silver Cave) is a perilous, restricted nature reserve where Champion Red trains in absolute solitude."
+      },
+      {
+        id: "johto_18",
+        question: "What sacred feather allows a trainer to access the underwater chambers of the Whirl Islands to encounter Lugia?",
+        options: ["Silver Wing", "Rainbow Wing", "Lunar Wing", "Dragon Scale"],
+        answerIndex: 0,
+        explanation: "The Silver Wing resonates with Lugia's psychic aura, calming the surrounding whirlpools."
+      },
+      {
+        id: "johto_19",
+        question: "What item is required to cure the sick Ampharos (Amphy) guiding ships from the Olivine City Lighthouse?",
+        options: ["Secret Medicine from Cianwood City", "Lava Cookie", "Moomoo Milk", "Sacred Ash"],
+        answerIndex: 0,
+        explanation: "Jasmine requires the ancient Secret Medicine brewed in Cianwood Pharmacy to restore Amphy's radiant beacon."
+      },
+      {
+        id: "johto_20",
+        question: "What type specialty does Gym Leader Whitney of Goldenrod City employ, famous for her unstoppable Rollout tactic?",
+        options: ["Normal-type", "Fairy-type", "Grass-type", "Ground-type"],
+        answerIndex: 0,
+        explanation: "Whitney commands cute but notoriously resilient Normal-type Pokémon, headlined by her devastating Miltank."
       }
     ]
   },
   {
     region: "Hoenn",
-    themeTitle: "Primal Weather Trio & Continental Expansion",
-    themeDescription: "Hoenn mythology revolves around super-ancient primal forces shaping landmasses, abyssal oceans, and ozone equilibrium.",
+    themeTitle: "Tectonic Genesis & Primordial Clashes",
+    themeDescription: "Hoenn mythos revolves around the primordial shaping of oceans and continents, celestial ozone dragons, and sealed titans.",
     badgeColor: "border-emerald-500/40 text-emerald-400 bg-emerald-950/30",
     questions: [
       {
         id: "hoenn_1",
-        question: "Which super-ancient deity expanded the landmasses during its primordial clash with Kyogre?",
-        options: ["Regigigas", "Groudon", "Rayquaza", "Heatran"],
-        answerIndex: 1,
-        explanation: "Groudon evaporated oceans with intense sunlight to expand the continents during the ancient primal era."
+        question: "Which celestial sky dragon descended from the ozone layer to pacify the apocalyptic battle between Groudon and Kyogre?",
+        options: ["Rayquaza", "Latios", "Salamence", "Flygon"],
+        answerIndex: 0,
+        explanation: "Rayquaza descended from the stratosphere, neutralizing extreme droughts and deluges with its Air Lock ability."
       },
       {
         id: "hoenn_2",
-        question: "According to Hoenn legend, which sky dragon descended from the ozone layer to quell Groudon and Kyogre?",
-        options: ["Rayquaza", "Deoxys", "Latios", "Giratina"],
+        question: "What ancient process allows Groudon and Kyogre to reclaim the limitless primordial energy of ancient Earth?",
+        options: ["Primal Reversion", "Mega Evolution", "Terastallization", "Dynamax"],
         answerIndex: 0,
-        explanation: "Rayquaza ended the destructive primal battle between Groudon and Kyogre, returning peace to the Hoenn atmosphere."
+        explanation: "Primal Reversion allows Groudon and Kyogre to absorb nature's raw energy via the Red and Blue Orbs, transforming into their primordial forms."
       },
       {
         id: "hoenn_3",
-        question: "What divine energy process allows Kyogre and Groudon to reclaim their original ancient power?",
-        options: ["Primal Reversion", "Mega Evolution", "Dynamax", "Terastallization"],
+        question: "Which extraterrestrial psychic virus mutated upon entering earth's atmosphere via a crystalline laser meteor?",
+        options: ["Deoxys", "Jirachi", "Beheeyem", "Starmie"],
         answerIndex: 0,
-        explanation: "Primal Reversion allows Groudon and Kyogre to absorb natural energy and reclaim their ancient primal forms."
+        explanation: "Deoxys originated as an alien virus on a laser-irradiated meteorite, reconstituting into Normal, Attack, Defense, and Speed forms."
       },
       {
         id: "hoenn_4",
-        question: "Which alien DNA virus mutated in the ozone layer after exposed to laser rays, creating an alien mythical titan?",
-        options: ["Deoxys", "Rayquaza", "Eternatus", "Necrozma"],
+        question: "According to ancient Braille glyphs in the Sealed Chamber, what titanic species created the Regi trio in its own image?",
+        options: ["Regigigas", "Arceus", "Groudon", "Rayquaza"],
         answerIndex: 0,
-        explanation: "Deoxys mutated from an extraterrestrial virus aboard a meteor that entered Earth's upper atmosphere."
+        explanation: "Regigigas forged Regirock from clay/magma, Regice from glacial ice, and Registeel from hardened magma before sealing them across Hoenn."
       },
       {
         id: "hoenn_5",
-        question: "Which wish-granting Pokémon awakens from a thousand-year slumber when the Millennium Comet shines?",
-        options: ["Jirachi", "Celebi", "Victini", "Shaymin"],
+        question: "Which wishing star Pokémon awakens for only seven days every thousand years when the Millennium Comet passes?",
+        options: ["Jirachi", "Celebi", "Manaphy", "Victini"],
         answerIndex: 0,
-        explanation: "Jirachi awakens for seven days every millennium to grant heartfelt wishes written on its paper tags."
+        explanation: "Jirachi awakens for one week every 1,000 years in the presence of a pure-hearted companion during the Millennium Comet."
       },
       {
         id: "hoenn_6",
-        question: "According to Mt. Chimney research, which lava-dwelling legendary causes volcanic eruptions when its magma blood boils?",
-        options: ["Heatran", "Magcargo", "Camerupt", "Groudon"],
+        question: "What massive meteor impact crater houses the aquatic, soot-sheltered city of Sootopolis?",
+        options: ["An extinct volcano caldera crater submerged by the sea", "A trench blasted by Rayquaza", "A sunken crater formed by Regirock", "An ancient flooded meteorite site"],
         answerIndex: 0,
-        explanation: "Heatran's body is composed of molten magma; when its core heat surges, volcanic peaks erupt."
+        explanation: "Sootopolis City was founded inside a giant collapsed oceanic volcanic crater formed during primeval clashes."
       },
       {
         id: "hoenn_7",
-        question: "What trio of ancient element titans were sealed away in Hoenn's Desert, Island, and Ancient Tomb chambers?",
-        options: ["Regirock, Regice, and Registeel", "Raikou, Entei, and Suicune", "Cobalion, Terrakion, and Virizion", "Uknown Trio"],
+        question: "Which ancient clan passed down the history of Mega Evolution and the dragon meteor invocation to Zinnia?",
+        options: ["The Draconid Tribe", "The Meteor Clan", "The Ancient Solaceon Clan", "The Celestic Tribe"],
         answerIndex: 0,
-        explanation: "Ancient humans sealed Regirock, Regice, and Registeel in locked stone chambers out of fear of their power."
+        explanation: "The Draconid people inhabited Meteor Falls and preserved Rayquaza's lore for millennia."
       },
       {
         id: "hoenn_8",
-        question: "Which dragon species can bend light around its downy feathers to become completely invisible to human eyes?",
-        options: ["Latios & Latias", "Flygon & Altaria", "Rayquaza & Salamence", "Dragonite & Druddigon"],
+        question: "What crystalline soul relic contains the essence and life-force of the Eon Pokémon Latios and Latias?",
+        options: ["Soul Dew", "Adamant Orb", "Griseous Core", "Lustrous Globe"],
         answerIndex: 0,
-        explanation: "Latios and Latias refract light using glass-like feathers to cloak themselves or project human illusions."
+        explanation: "Soul Dew is a crystallized relic containing the spirits of departed guardian Latios or Latias."
       },
       {
         id: "hoenn_9",
-        question: "Which intense weather state is summoned when Kyogre undergoes Primal Reversion in battle?",
-        options: ["Primordial Sea (Torrential Rain)", "Desolate Land (Harsh Sunlight)", "Delta Stream (Mystic Wind)", "Sandstorm"],
+        question: "What company headquartered in Rustboro City developed the Devon Scope and Infinity Energy technology?",
+        options: ["Devon Corporation", "Silph Co.", "Macro Cosmos", "Aether Foundation"],
         answerIndex: 0,
-        explanation: "Primal Kyogre triggers Primordial Sea, causing downpours that completely evaporate Fire-type attacks."
+        explanation: "President Mr. Stone's Devon Corporation revolutionized Hoenn with advanced navigational scopes and Infinity Energy."
       },
       {
         id: "hoenn_10",
-        question: "Which intense weather state is summoned when Groudon undergoes Primal Reversion in battle?",
-        options: ["Desolate Land (Harsh Sunlight)", "Primordial Sea (Torrential Rain)", "Delta Stream (Mystic Wind)", "Hailstorm"],
+        question: "What volcanic mountain in central Hoenn produces fine mineral ash collected by trainers to blow glass flutes?",
+        options: ["Mt. Chimney", "Mt. Pyre", "Mt. Moon", "Cinnabar Volcano"],
         answerIndex: 0,
-        explanation: "Primal Groudon triggers Desolate Land, emitting extreme heat that instantly evaporates Water-type attacks."
+        explanation: "Mt. Chimney showers Route 113 with thick volcanic ash used by the Glass Workshop in Fallarbor Town."
+      },
+      {
+        id: "hoenn_11",
+        question: "What sacred burial mountain in eastern Hoenn houses spirits and holds the Red and Blue Orbs on its summit?",
+        options: ["Mt. Pyre", "Mt. Chimney", "Meteor Falls", "Sky Pillar"],
+        answerIndex: 0,
+        explanation: "Mt. Pyre serves as a resting ground for Pokémon spirits and the historic sanctuary for the primordial Orbs."
+      },
+      {
+        id: "hoenn_12",
+        question: "What soaring ancient tower off Route 131 leads directly up into the sky where Rayquaza roosts?",
+        options: ["Sky Pillar", "Tin Tower", "Dragonspiral Tower", "Prism Tower"],
+        answerIndex: 0,
+        explanation: "Sky Pillar was constructed by the Draconid people as a direct ladder to the ozone realm of Lord Rayquaza."
+      },
+      {
+        id: "hoenn_13",
+        question: "What weather-sensing synthetic Pokémon was created by the scientists at the Hoenn Weather Institute?",
+        options: ["Castform", "Porygon2", "Rotom", "Baltoy"],
+        answerIndex: 0,
+        explanation: "Castform was engineered by Weather Institute researchers to shift between Sun, Rain, and Snow forms dynamically."
+      },
+      {
+        id: "hoenn_14",
+        question: "Which Hoenn Champion is a wandering mineral collector and heir to the Devon Corporation?",
+        options: ["Steven Stone", "Wallace", "Drake", "Sidney"],
+        answerIndex: 0,
+        explanation: "Steven Stone travels the world prospecting rare stones and masterfully commanding Steel-type titans like Metagross."
+      },
+      {
+        id: "hoenn_15",
+        question: "What legendary Hoenn Pokémon represents the landmass and expanding tectonic plates of the world?",
+        options: ["Groudon", "Kyogre", "Regigigas", "Torterra"],
+        answerIndex: 0,
+        explanation: "Groudon is revered in mythology as the creator and expander of the continents with blazing volcanic heat."
+      },
+      {
+        id: "hoenn_16",
+        question: "What legendary Hoenn Pokémon represents the oceans and expanded world waters through torrential downpours?",
+        options: ["Kyogre", "Groudon", "Manaphy", "Lugia"],
+        answerIndex: 0,
+        explanation: "Kyogre is heralded as the master of the oceans, raising sea levels with endless rainstorms."
+      },
+      {
+        id: "hoenn_17",
+        question: "What tree-top settlement in northern Hoenn consists entirely of interconnected canopy treehouses?",
+        options: ["Fortree City", "Fallarbor Town", "Lavaridge Town", "Pacifidlog Town"],
+        answerIndex: 0,
+        explanation: "Fortree City's residents live in aerial canopy homes to exist in harmony with wild Flying Pokémon."
+      },
+      {
+        id: "hoenn_18",
+        question: "What floating village in southern Hoenn is built atop wooden rafts anchored over coral reefs?",
+        options: ["Pacifidlog Town", "Dewford Town", "Slateport City", "Mossdeep City"],
+        answerIndex: 0,
+        explanation: "Pacifidlog Town floats entirely on wooden rafts anchored in deep ocean currents."
+      },
+      {
+        id: "hoenn_19",
+        question: "What island city in Hoenn is home to the regional Space Center and twin psychic Gym Leaders Tate and Liza?",
+        options: ["Mossdeep City", "Sootopolis City", "Ever Grande City", "Dewford Town"],
+        answerIndex: 0,
+        explanation: "Mossdeep City houses the Mossdeep Space Center, launching rockets into orbit."
+      },
+      {
+        id: "hoenn_20",
+        question: "What mystical elusive island in Hoenn appears only when a Pokémon's personality values align with random coordinates?",
+        options: ["Mirage Island", "Southern Island", "Faraway Island", "Birth Island"],
+        answerIndex: 0,
+        explanation: "Mirage Island only appears on Route 130 when a party Pokémon matches its daily generated bit-flags, growing Liechi Berries."
       }
     ]
   },
   {
     region: "Sinnoh",
-    themeTitle: "Cosmological Creation & Void Dimensions",
-    themeDescription: "Sinnoh theology explores universal origin, time, space, emotion, and the primordial void egg.",
-    badgeColor: "border-cyan-500/40 text-cyan-400 bg-cyan-950/30",
+    themeTitle: "Cosmic Creation & Dimensional Geometry",
+    themeDescription: "Sinnoh lore delves into universal genesis, the creation of time, space, antimatter, and human consciousness.",
+    badgeColor: "border-blue-500/40 text-blue-400 bg-blue-950/30",
     questions: [
       {
         id: "sinnoh_1",
-        question: "Which supreme deity emerged from an egg in the void of chaos to shape the universe and creation trio?",
-        options: ["Arceus", "Dialga", "Palkia", "Giratina"],
+        question: "In Sinnoh mythology, which deity emerged from a single egg in the cosmic void to shape the entire Pokémon universe?",
+        options: ["Arceus", "Giratina", "Dialga", "Palkia"],
         answerIndex: 0,
-        explanation: "Arceus is known in Sinnoh lore as the Original One, born from an egg in the void before the universe existed."
+        explanation: "Arceus (The Original One) was born from an egg in the void of chaos, spinning reality into existence."
       },
       {
         id: "sinnoh_2",
-        question: "In Sinnoh creation theology, Dialga and Palkia govern which fundamental dimensions of reality?",
-        options: ["Time and Space", "Light and Darkness", "Life and Death", "Past and Future"],
+        question: "Which legendary dragon controls the flow of time and accelerates or halts temporal sequences?",
+        options: ["Dialga", "Palkia", "Giratina", "Celebi"],
         answerIndex: 0,
-        explanation: "Dialga's heartbeat maintains the flow of Time, while Palkia's breath stabilizes the structure of Space."
+        explanation: "Dialga was created by Arceus to govern the dimension of Time, keeping seconds flowing in harmony."
       },
       {
         id: "sinnoh_3",
-        question: "Which deity was banished to the Distortion World due to its volatile nature, balancing reality from the reverse side?",
-        options: ["Giratina", "Darkrai", "Regigigas", "Necrozma"],
+        question: "Which deity presides over spatial geometry, planar dimensions, and the curvature of the cosmos?",
+        options: ["Palkia", "Dialga", "Giratina", "Deoxys"],
         answerIndex: 0,
-        explanation: "Giratina inhabits the Distortion World where time does not flow and space is unstable, holding the world in equilibrium."
+        explanation: "Palkia commands spatial dimensions, enabling instantaneous transit across the universe."
       },
       {
         id: "sinnoh_4",
-        question: "The Lake Guardians (Uxie, Mesprit, Azelf) bestowed which three divine attributes upon human minds?",
-        options: ["Knowledge, Emotion, Willpower", "Strength, Speed, Wisdom", "Faith, Hope, Charity", "Time, Space, Void"],
+        question: "Why was Giratina banished to the Distortion World by Arceus following the creation of the universe?",
+        options: ["For its destructive, violent nature and antimatter physics", "It attempted to absorb the Sun", "It destroyed the Lake Trio", "It created dark void portals in Jubilife"],
         answerIndex: 0,
-        explanation: "Uxie gave knowledge, Mesprit taught emotion, and Azelf birthed willpower in humanity."
+        explanation: "Giratina's violent antimatter instability threatened cosmic physics, leading Arceus to seal it in the Distortion World."
       },
       {
         id: "sinnoh_5",
-        question: "According to Sinnoh temple lore, which colossus pulled continents across oceans using massive ropes?",
-        options: ["Regigigas", "Groudon", "Palkia", "Heatran"],
+        question: "Which three Lake Guardians embody Knowledge, Emotion, and Willpower in Sinnoh folklore?",
+        options: ["Uxie, Mesprit, Azelf", "Articuno, Zapdos, Moltres", "Cobalion, Terrakion, Virizion", "Tornadus, Thundurus, Landorus"],
         answerIndex: 0,
-        explanation: "Regigigas created the golem trio from clay, ice, and magma and towed continents into position."
+        explanation: "Uxie represents Knowledge (Acuity), Mesprit represents Emotion (Verity), and Azelf represents Willpower (Valor)."
       },
       {
         id: "sinnoh_6",
-        question: "At Spear Pillar, which mythical items allow Arceus to alter its body color and elemental typing at will?",
-        options: ["Elemental Plates", "Z-Crystals", "Terastal Shards", "Mega Stones"],
+        question: "What ancient sacred summit on Mt. Coronet contains the ruins where Dialga and Palkia can be summoned?",
+        options: ["Spear Pillar", "Dragonspiral Tower", "Sky Pillar", "Hall of Origin"],
         answerIndex: 0,
-        explanation: "Arceus carries 18 elemental Plates crafted during universe creation, changing its type when holding any Plate."
+        explanation: "The Spear Pillar sits atop Mt. Coronet, where ancient people constructed a temple to the creation deities."
       },
       {
         id: "sinnoh_7",
-        question: "Which dark entity causes inescapable nightmare slumbers to anyone near Newmoon Island or Canalave City?",
-        options: ["Darkrai", "Giratina", "Spiritomb", "Yveltal"],
+        question: "What pitch-black mythical Pokémon causes endless nightmares unless countered by Cresselia's Lunar Feather?",
+        options: ["Darkrai", "Spiritomb", "Gengar", "Yveltal"],
         answerIndex: 0,
-        explanation: "Darkrai induces terrifying nightmares as a defense mechanism, keeping people away from its isolated domain."
+        explanation: "Darkrai inhabits Newmoon Island, unintentionally inducing deep nightmares in nearby inhabitants."
       },
       {
         id: "sinnoh_8",
-        question: "Which gentle lunar deity creates Lunar Feathers that dispel Darkrai's nightmare slumbers?",
-        options: ["Cresselia", "Lunala", "Jirachi", "Meloetta"],
+        question: "What colossal continent-pulling titan sleeps deep within the subterranean temple beneath Snowpoint City?",
+        options: ["Regigigas", "Groudon", "Heatran", "Avalugg"],
         answerIndex: 0,
-        explanation: "Cresselia resides on Fullmoon Island, shedding glowing feathers that bring serene dreams and cure Darkrai nightmares."
+        explanation: "Regigigas rests in Snowpoint Temple, awakenable only by presenting Regirock, Regice, and Registeel."
       },
       {
         id: "sinnoh_9",
-        question: "What is the name of the alternate dimension governed by Giratina where matter and gravity behave erratically?",
-        options: ["Distortion World", "Ultra Space", "Underdepths", "Null Zone"],
+        question: "Which magma-dwelling legendary titan dwells inside the volcanic chambers of Stark Mountain?",
+        options: ["Heatran", "Volcanion", "Groudon", "Magmortar"],
         answerIndex: 0,
-        explanation: "The Distortion World (or Reverse World) is a realm where Giratina maintains the physical balance of the real world."
+        explanation: "Heatran was formed from magma bubbling deep beneath Stark Mountain during Sinnoh's creation."
       },
       {
         id: "sinnoh_10",
-        question: "Which gratitude Pokémon absorbs airborne pollutants in its Gratitude Form and purifies blighted landscapes?",
-        options: ["Shaymin", "Celebi", "Phione", "Manaphy"],
+        question: "What mythical hedgehog-like Pokémon purifies toxic atmospheric pollution and blooms into Sky Forme with a Gracidea flower?",
+        options: ["Shaymin", "Celebi", "Meloetta", "Jirachi"],
         answerIndex: 0,
-        explanation: "Shaymin uses Seed Flare to dissolve toxic atmospheric gases, converting wasteland deserts into blooming flower gardens."
+        explanation: "Shaymin absorbs environmental toxins using Seed Flare and blooms into Sky Forme when exposed to Gracidea flowers."
+      },
+      {
+        id: "sinnoh_11",
+        question: "What ancient town in Sinnoh is the oldest settlement, preserving ancient shrine murals of the creation trio?",
+        options: ["Celestic Town", "Solaceon Town", "Pastoria City", "Canalave City"],
+        answerIndex: 0,
+        explanation: "Celestic Town preserves ancestral Sinnoh heritage, overseen by Champion Cynthia's grandmother."
+      },
+      {
+        id: "sinnoh_12",
+        question: "What item forged by Cyrus from the Lake Guardians was designed to shackle Dialga and Palkia without a Poké Ball?",
+        options: ["The Red Chain", "The Lunar Wing", "The Adamant Orb", "The Griseous Orb"],
+        answerIndex: 0,
+        explanation: "The Red Chain bound the minds and cosmic powers of the creation dragons to prevent their power from diminishing."
+      },
+      {
+        id: "sinnoh_13",
+        question: "What spectral Pokémon was sealed inside the Hallowed Tower on Route 209 due to committing 108 misdeeds?",
+        options: ["Spiritomb", "Rotom", "Dusknoir", "Froslass"],
+        answerIndex: 0,
+        explanation: "Spiritomb is formed of 108 spirits bound to an Odd Keystone 500 years ago as punishment for wicked deeds."
+      },
+      {
+        id: "sinnoh_14",
+        question: "What legendary sea prince Pokémon hatches only in warm ocean currents and can bond with all aquatic Pokémon via Heart Swap?",
+        options: ["Manaphy", "Phione", "Kyogre", "Lugia"],
+        answerIndex: 0,
+        explanation: "Manaphy is the Prince of the Sea Temple (Samiya), capable of calming aquatic minds."
+      },
+      {
+        id: "sinnoh_15",
+        question: "Which Sinnoh Champion is a brilliant archaeologist who conducts field studies at Solaceon and Celestic ruins?",
+        options: ["Cynthia", "Steven", "Lance", "Alder"],
+        answerIndex: 0,
+        explanation: "Cynthia studies ancient mythology and archeology, guarding the balance between Pokémon and humanity."
+      },
+      {
+        id: "sinnoh_16",
+        question: "What vast subterranean maze spreads under the entire Sinnoh region, filled with mining spheres and fossils?",
+        options: ["The Underground / Grand Underground", "Cerulean Cave", "Wayward Cave", "Iron Island"],
+        answerIndex: 0,
+        explanation: "The Underground is an expansive tunnel network beneath Sinnoh where trainers unearth ancient fossils and plates."
+      },
+      {
+        id: "sinnoh_17",
+        question: "How many elemental Plates did Arceus drop across creation that alter its typing with the Multitype ability?",
+        options: ["18 Plates (including Pixie Plate)", "16 Plates", "17 Plates", "12 Plates"],
+        answerIndex: 0,
+        explanation: "Arceus carries 18 elemental plates representing every type in existence."
+      },
+      {
+        id: "sinnoh_18",
+        question: "What haunted manor inside Eterna Forest contains paintings whose eyes follow visitors and electric spirits like Rotom?",
+        options: ["Old Chateau", "Lost Tower", "Hallowed Tower", "Turnback Cave"],
+        answerIndex: 0,
+        explanation: "The Old Chateau is an abandoned mansion in Eterna Forest home to ghosts, rare desserts (Old Gateau), and Rotom."
+      },
+      {
+        id: "sinnoh_19",
+        question: "What mysterious island contains a portal to the Distortion World if Giratina is not caught at Spear Pillar?",
+        options: ["Sendoff Spring & Turnback Cave", "Fullmoon Island", "Iron Island", "Stark Mountain"],
+        answerIndex: 0,
+        explanation: "Sendoff Spring is known as the Fourth Lake of Sinnoh, concealing Turnback Cave's link to the Distortion World."
+      },
+      {
+        id: "sinnoh_20",
+        question: "What library city in western Sinnoh contains ancient myth books detailing Pokémon-human marriage and primordial genesis?",
+        options: ["Canalave City", "Jubilife City", "Sunyshore City", "Oreburgh City"],
+        answerIndex: 0,
+        explanation: "The Canalave Library holds ancient myth folktales describing primeval history and Sinnoh customs."
       }
     ]
   },
   {
     region: "Unova",
-    themeTitle: "Dragons of Truth, Ideals & Harmony",
-    themeDescription: "Unova mythology addresses philosophical duality: the split of the Original Dragon into Truth and Ideals.",
+    themeTitle: "Truth vs Ideals & The Tao Dragon Split",
+    themeDescription: "Unova mythos focuses on moral duality, the division of the Original Dragon into Reshiram, Zekrom, and Kyurem, and the Swords of Justice.",
     badgeColor: "border-purple-500/40 text-purple-400 bg-purple-950/30",
     questions: [
       {
         id: "unova_1",
-        question: "Unova legend speaks of a single Original Dragon that split into two deities representing which dual philosophy?",
-        options: ["Truth and Ideals", "Creation and Destruction", "Light and Darkness", "Order and Chaos"],
+        question: "What was the singular ancient entity that split into Reshiram and Zekrom when twin hero princes clashed?",
+        options: ["The Original Dragon", "Kyurem", "Arceus", "Victini"],
         answerIndex: 0,
-        explanation: "The Original Dragon split into Reshiram (Truth) and Zekrom (Ideals) when twin hero brothers disagreed on how to rule Unova."
+        explanation: "The Original Dragon split into Reshiram (Truth) and Zekrom (Ideals) due to ideological warfare between twin princes."
       },
       {
         id: "unova_2",
-        question: "Which vast white dragon deity in Unova mythos aids those who pursue absolute Truth?",
-        options: ["Reshiram", "Zekrom", "Kyurem", "Victini"],
+        question: "Which white dragon seeks the absolute Truth and burns the world with blazing turbo-flare jet engines?",
+        options: ["Reshiram", "Zekrom", "Kyurem", "Palkia"],
         answerIndex: 0,
-        explanation: "Reshiram scorches the world with fire to support those seeking a world of pure Truth."
+        explanation: "Reshiram guides heroes seeking the pursuit of absolute Truth with scorch-tail turbine engines."
       },
       {
         id: "unova_3",
-        question: "Kyurem represents the frozen empty shell left behind after the split. What is its elemental type pairing?",
-        options: ["Dragon & Ice", "Dragon & Fire", "Dragon & Electric", "Dragon & Dark"],
+        question: "Which black dragon embodies Ideals and channels furious lightning through its generator tail?",
+        options: ["Zekrom", "Reshiram", "Kyurem", "Thundurus"],
         answerIndex: 0,
-        explanation: "Kyurem is a Dragon/Ice type that awaits a hero to fuse with Reshiram or Zekrom and restore its power."
+        explanation: "Zekrom assists heroes seeking noble Ideals with high-voltage lightning storms."
       },
       {
         id: "unova_4",
-        question: "Which quadrupedal knight trio (Cobalion, Terrakion, Virizion) fought humans to protect wild Pokémon habitats?",
-        options: ["Swords of Justice", "Ruinous Four", "Forces of Nature", "Lake Guardians"],
+        question: "What frozen hollow shell was left behind when the Original Dragon split into two?",
+        options: ["Kyurem", "Genesect", "Necrozma", "Regice"],
         answerIndex: 0,
-        explanation: "The Swords of Justice defended wild Pokémon during ancient fires ignited by human conflict."
+        explanation: "Kyurem is the frozen husk remaining after the split, longing to be filled with truth or ideals."
       },
       {
         id: "unova_5",
-        question: "Which victory-bringing deity generates infinite energy inside its body, ensuring victory to its trainer?",
-        options: ["Victini", "Meloetta", "Genesect", "Keldeo"],
+        question: "Which item allows Kyurem to recombine with Reshiram or Zekrom into White or Black Kyurem?",
+        options: ["DNA Splicers", "Adamant Crystal", "Prison Bottle", "Dragon Core"],
         answerIndex: 0,
-        explanation: "Victini shares unlimited energy with anyone who bonds with it, guaranteeing absolute triumph."
+        explanation: "The DNA Splicers fuse Kyurem with Reshiram or Zekrom to reabsorb their dragon genetic energy."
       },
       {
         id: "unova_6",
-        question: "What ancient relic artifact enables Kyurem to absorb Reshiram or Zekrom into White or Black Kyurem?",
-        options: ["DNA Splicers", "Dragon Skull", "Light Stone", "Dark Stone"],
+        question: "Which quadrupedal quartet of legendary Pokémon protected wild Pokémon from devastating human wars in Unova?",
+        options: ["The Swords of Justice (Cobalion, Terrakion, Virizion, Keldeo)", "The Forces of Nature", "The Tao Dragons", "The Lake Guardians"],
         answerIndex: 0,
-        explanation: "The DNA Splicers allow Kyurem to re-absorb Reshiram or Zekrom, merging their dragon cores into a single entity."
+        explanation: "The Swords of Justice defended forest Pokémon during the Moor of Icirrus fire caused by human conflicts."
       },
       {
         id: "unova_7",
-        question: "Which brutal three-headed dragon species rules the highest peaks of Unova's Victory Road?",
-        options: ["Hydreigon", "Druddigon", "Haxorus", "Flygon"],
+        question: "Which mythical Pokémon represents infinite victory and produces limitless radiant energy from its core?",
+        options: ["Victini", "Meloetta", "Keldeo", "Genesect"],
         answerIndex: 0,
-        explanation: "Hydreigon is notoriously aggressive, using its three heads to attack anything that moves in its territory."
+        explanation: "Victini is said to bring absolute victory to any trainer who befriends it, generating infinite stamina."
       },
       {
         id: "unova_8",
-        question: "Where in Unova was the giant spiral tower constructed as a sacred resting sanctuary for the Original Dragon?",
-        options: ["Icirrus City (Dragonspiral Tower)", "Castelia City", "Nimbasa City", "Opelucid City"],
+        question: "Which ancient Paleozoic bug predator was excavated and mechanically modified by Team Plasma with a cannon?",
+        options: ["Genesect", "Kabutops", "Durant", "Scolipede"],
         answerIndex: 0,
-        explanation: "Dragonspiral Tower near Icirrus City is said to be the oldest structure in Unova, built for the Original Dragon."
+        explanation: "Genesect was an ancient apex hunter 300 million years ago, resurrected and cybernetically upgraded by Team Plasma."
       },
       {
         id: "unova_9",
-        question: "Which elemental genie trio (Tornadus, Thundurus, Landorus) governs climate weather forces across Unova?",
-        options: ["Forces of Nature", "Swords of Justice", "Creation Trio", "Kami Trio"],
+        question: "Which trio of deities governs the violent weather forces of wind, lightning, and fertile earth in Unova?",
+        options: ["Tornadus, Thundurus, Landorus", "Articuno, Zapdos, Moltres", "Raikou, Entei, Suicune", "Kyurem, Reshiram, Zekrom"],
         answerIndex: 0,
-        explanation: "Tornadus (wind), Thundurus (lightning), and Landorus (fertile land) represent the Forces of Nature."
+        explanation: "The Forces of Nature (Kami trio) control storms, with Landorus reigning in the destructive tempests of Tornadus and Thundurus."
       },
       {
         id: "unova_10",
-        question: "Which equine apprentice trained rigorously under the Swords of Justice to master its Secret Sword technique?",
-        options: ["Keldeo", "Cobalion", "Zebstrika", "Rapidash"],
+        question: "What desert ruins in central Unova contain ancient sun deity Volcarona and crumbling golden sarcophagi?",
+        options: ["Relic Castle", "Dragonspiral Tower", "Giant Chasm", "Abyssal Ruins"],
         answerIndex: 0,
-        explanation: "Keldeo traveled across Unova to learn courage and master the Secret Sword technique from Cobalion, Terrakion, and Virizion."
+        explanation: "Relic Castle lies buried in the Desert Resort sands, preserving a lost civilization that worshipped Volcarona as a replacement sun."
+      },
+      {
+        id: "unova_11",
+        question: "What ancient tower in northern Unova is the oldest standing architectural structure where legendary dragons roost?",
+        options: ["Dragonspiral Tower", "Celestial Tower", "Bell Tower", "Prism Tower"],
+        answerIndex: 0,
+        explanation: "Dragonspiral Tower was built in ancient times as a resting platform for the legendary dragons."
+      },
+      {
+        id: "unova_12",
+        question: "What deep crater impact site near Lacunosa Town was believed to have brought Kyurem down from the stars?",
+        options: ["Giant Chasm", "Meteor Falls", "Wellspring Cave", "Pinwheel Forest"],
+        answerIndex: 0,
+        explanation: "Lacunosa Town residents built high walls to protect themselves from the monster residing in the Giant Chasm."
+      },
+      {
+        id: "unova_13",
+        question: "What musical mythical Pokémon sings the ancient Relic Song to transform between Aria and Pirouette forms?",
+        options: ["Meloetta", "Jirachi", "Chatot", "Chimecho"],
+        answerIndex: 0,
+        explanation: "Meloetta can switch from Normal/Psychic (Aria) to Normal/Fighting (Pirouette) upon singing the sacred Relic Song."
+      },
+      {
+        id: "unova_14",
+        question: "What ancient sunken palace in Undella Bay is covered in cryptic cipher runes describing a benevolent ancient king?",
+        options: ["Abyssal Ruins", "Sea Shrine", "Submerged Grotto", "Relic Castle"],
+        answerIndex: 0,
+        explanation: "The Abyssal Ruins contain 4 floors of ancient cipher-coded tiles praising an ancient king who united the people."
+      },
+      {
+        id: "unova_15",
+        question: "Who was crowned king of Team Plasma by Ghetsis under the false premise of liberating Pokémon from humans?",
+        options: ["N (Natural Harmonia Gropius)", "Colress", "Alder", "Cheren"],
+        answerIndex: 0,
+        explanation: "N was raised among orphaned Pokémon and chosen by Reshiram/Zekrom to build a world where Pokémon roam free."
+      },
+      {
+        id: "unova_16",
+        question: "Which scientific leader of Team Plasma sought to unlock the full latent potential of Pokémon through scientific manipulation?",
+        options: ["Colress", "Ghetsis", "Charon", "Dr. Fuji"],
+        answerIndex: 0,
+        explanation: "Colress pursued the ultimate expression of Pokémon power, eventually discovering that human bonds surpass mechanical force."
+      },
+      {
+        id: "unova_17",
+        question: "What item in Unova turns into Reshiram or Zekrom when awoken by a pure-hearted hero?",
+        options: ["Light Stone & Dark Stone", "Sun Stone & Moon Stone", "Adamant Orb & Lustrous Orb", "Red & Blue Orbs"],
+        answerIndex: 0,
+        explanation: "Reshiram and Zekrom slumber as dormant crystalline Light and Dark Stones until their prospective heroes call them."
+      },
+      {
+        id: "unova_18",
+        question: "What tranquil bell tower on Route 7 rings in memory of deceased Pokémon across Unova?",
+        options: ["Celestial Tower", "Sprout Tower", "Pokémon Tower", "Lost Tower"],
+        answerIndex: 0,
+        explanation: "Celestial Tower is a memorial tower where trainers ring the topmost bell to comfort resting spirits."
+      },
+      {
+        id: "unova_19",
+        question: "What wandering Champion of Unova lost his first partner Volcarona to illness and traveled the region connecting with youth?",
+        options: ["Alder", "Iris", "Steven", "Leon"],
+        answerIndex: 0,
+        explanation: "Alder served as a compassionate roaming Champion, passing the torch to Iris in later years."
+      },
+      {
+        id: "unova_20",
+        question: "What bustling modern bridge in Unova is the longest suspension bridge in the Pokémon world?",
+        options: ["Skyarrow Bridge", "Driftveil Drawbridge", "Tubeline Bridge", "Village Bridge"],
+        answerIndex: 0,
+        explanation: "Skyarrow Bridge connects Pinwheel Forest to Castelia City, showcasing Unova's grand metropolitan engineering."
       }
     ]
   },
   {
     region: "Kalos",
-    themeTitle: "Order of Mortality, Life & Ultimate Weapon",
-    themeDescription: "Kalos history grapples with eternal life, annihilation, ecosystem order, and ancient king energy weapons.",
+    themeTitle: "Life, Death & The Ultimate Weapon",
+    themeDescription: "Kalos mythology explores immortality, entropic destruction, the 3,000-year-old Ultimate Weapon, and Mega Evolution.",
     badgeColor: "border-pink-500/40 text-pink-400 bg-pink-950/30",
     questions: [
       {
         id: "kalos_1",
-        question: "Which Kalos deity radiates life energy and sleeps in the form of a tree to bestow immortality?",
-        options: ["Xerneas", "Yveltal", "Zygarde", "Diancie"],
+        question: "Which legendary stag Pokémon radiates eternal life energy and transforms into a shining tree when resting?",
+        options: ["Xerneas", "Yveltal", "Zygarde", "Sawsbuck"],
         answerIndex: 0,
-        explanation: "Xerneas shares eternal life when its horns glow with seven colors, entering a thousand-year slumber as a tree."
+        explanation: "Xerneas shares eternal life through its horns and slumbers for a millennium in the form of a radiant tree."
       },
       {
         id: "kalos_2",
-        question: "Which entity absorbs life energy from all living creatures when its life cycle terminates?",
-        options: ["Yveltal", "Darkrai", "Giratina", "Necrozma"],
+        question: "Which avian harbinger of destruction absorbs the life force of all living creatures upon entering cocoon dormancy?",
+        options: ["Yveltal", "Xerneas", "Zygarde", "Darkrai"],
         answerIndex: 0,
-        explanation: "Yveltal spreads its crimson wings to absorb the vitality of all living things before transforming into a cocoon."
+        explanation: "Yveltal absorbs biological life energy with its Oblivion Wing, sealing itself in an ominous dark cocoon."
       },
       {
         id: "kalos_3",
-        question: "Zygarde monitors ecological order. In what percentage forms does its cell assembly manifest?",
-        options: ["10%, 50%, and Complete (100%)", "25% and 75%", "33% and 66%", "20% and 80%"],
+        question: "Which ecological deity monitors environmental equilibrium using dispersed Cores and Cells across the globe?",
+        options: ["Zygarde", "Arceus", "Rayquaza", "Volcanion"],
         answerIndex: 0,
-        explanation: "Zygarde gathers its dispersed Cells into 10% Hound, 50% Snake, and 100% Complete Titan forms when the ecosystem is threatened."
+        explanation: "Zygarde synthesizes its 10%, 50%, and 100% Complete Formes from microscopic cells scattered throughout nature."
       },
       {
         id: "kalos_4",
-        question: "What weapon built by King AZ 3,000 years ago utilized Pokémon life energy to grant immortality and end the war?",
-        options: ["The Ultimate Weapon", "The Terastal Orb", "The Darkest Day Core", "The Soul-Heart Cannon"],
+        question: "What ancient machine built by King AZ 3,000 years ago utilized Pokémon life energy to end the ancient Kalos war?",
+        options: ["The Ultimate Weapon", "The Infinity Core", "The Prism Generator", "The DNA Splicer"],
         answerIndex: 0,
-        explanation: "The Ultimate Weapon was constructed by King AZ to revive his beloved Floette, sacrificing countless Pokémon lives."
+        explanation: "King AZ constructed the Ultimate Weapon in Geosenge Town to resurrect his beloved Floette, destroying both armies."
       },
       {
         id: "kalos_5",
-        question: "Which mythical diamond princess Pokémon transformed from Carbink to compress compressed carbon into gems?",
-        options: ["Diancie", "Magearna", "Hoopa", "Volcanion"],
+        question: "What celestial phenomenon is believed to have created Mega Stones from regular evolutionary stones 3,000 years ago?",
+        options: ["The blast radiation of the Ultimate Weapon and Rayquaza's meteor", "A Solar Flare from Solgaleo", "The explosion of Meteor Falls", "The birth of Arceus"],
         answerIndex: 0,
-        explanation: "Diancie can instantly compress carbon in the air to create sparkling diamonds."
+        explanation: "The beam of the Ultimate Weapon radiated into evolutionary stones, transforming them into Mega Stones."
       },
       {
         id: "kalos_6",
-        question: "What unique emotional resonance form occurs when Greninja achieves perfect sync with its trainer in battle?",
-        options: ["Ash-Greninja (Battle Bond)", "Mega Greninja", "Terastal Greninja", "Primal Greninja"],
+        question: "Which mythical jewel Pokémon was created through high-pressure subterranean mutation of a Carbink?",
+        options: ["Diancie", "Sableye", "Starmie", "Minior"],
         answerIndex: 0,
-        explanation: "When Greninja and its trainer's hearts align, it transforms into Ash-Greninja, greatly boosting its stats and Water Shuriken."
+        explanation: "Diancie is a sudden mutation of Carbink that can compress carbon in its hands to form shimmering diamonds."
       },
       {
         id: "kalos_7",
-        question: "What was the name of the ancient king who wandered Kalos for 3,000 years seeking his eternal Floette?",
-        options: ["King AZ", "King N", "King Alder", "King Peony"],
+        question: "Which mythical djinn Pokémon possesses dimensional golden rings capable of transporting islands and legendary beasts?",
+        options: ["Hoopa (Unbound)", "Volcanion", "Magearna", "Marshadow"],
         answerIndex: 0,
-        explanation: "King AZ was granted eternal life by his Ultimate Weapon and spent 3,000 years wandering Kalos searching for his Floette."
+        explanation: "Hoopa uses its interdimensional rings to teleport objects and entire legendary Pokémon across time and space."
       },
       {
         id: "kalos_8",
-        question: "Which mythical genie species uses its dimensional rings to warp islands, buildings, and legendary dragons across space?",
-        options: ["Hoopa (Hoopa Unbound)", "Volcanion", "Magearna", "Diancie"],
+        question: "What unique steam-engine Pokémon generates boiling steam inside its arms by combining water and fire internal reservoirs?",
+        options: ["Volcanion", "Heatran", "Castform", "Magmortar"],
         answerIndex: 0,
-        explanation: "Hoopa Unbound possesses six massive arms and dimensional rings capable of summoning anything across distant dimensions."
+        explanation: "Volcanion expels internal steam with enough force to blow away mountains, standing as the only Fire/Water dual type."
       },
       {
         id: "kalos_9",
-        question: "Where in Kalos does Zygarde's core slumber deep underground to keep watch over ecological destruction?",
-        options: ["Terminus Cave", "Reflection Cave", "Frost Cavern", "Lost Hotel"],
+        question: "What massive crystalline monument in Anistar City acts as an ancient sundial linked to Mega Evolution?",
+        options: ["The Anistar Sundial", "The Prism Tower", "The Geosenge Pillars", "The Shalour Tower"],
         answerIndex: 0,
-        explanation: "Deep within Terminus Cave, Zygarde monitors environmental degradation and intervenes if the ecosystem is disrupted."
+        explanation: "The Anistar Sundial absorbs sunlight and channels cosmic energy, upgrading the Mega Ring between 8 PM and 9 PM."
       },
       {
         id: "kalos_10",
-        question: "What temporary evolutionary phenomenon discovered in Kalos requires a Key Stone and Mega Stone to unleash?",
-        options: ["Mega Evolution", "Z-Moves", "Dynamax", "Terastallization"],
+        question: "What coastal tower in Shalour City is the historic sanctuary where trainers learn the mastery of Mega Evolution from Korrina?",
+        options: ["Tower of Mastery", "Prism Tower", "Dragonspiral Tower", "Sky Pillar"],
         answerIndex: 0,
-        explanation: "Mega Evolution temporarily releases a Pokémon's hidden potential, altering its appearance, stats, and abilities in battle."
+        explanation: "The Tower of Mastery houses the Lucario statue and tests trainers worthy of wielding Key Stones."
+      },
+      {
+        id: "kalos_11",
+        question: "What ancient, deeply saddened nine-foot-tall king wandered Kalos for 3,000 years searching for his Eternal Floette?",
+        options: ["AZ", "Lysandre", "Professor Sycamore", "Wulfric"],
+        answerIndex: 0,
+        explanation: "AZ was cursed with immortality after firing the Ultimate Weapon, wandering the earth until reuniting with Floette."
+      },
+      {
+        id: "kalos_12",
+        question: "What magnificent golden palace on Route 6 was built by an ancient Kalos king to celebrate victory with statues of Reshiram?",
+        options: ["Parfum Palace", "Shalour Castle", "Lumiose Palace", "Camberley Manor"],
+        answerIndex: 0,
+        explanation: "Parfum Palace features sprawling hedge mazes and grand historic artifacts showcasing Kalos royalty."
+      },
+      {
+        id: "kalos_13",
+        question: "What central architectural monument in Lumiose City serves as the regional Gym run by Clemont?",
+        options: ["Prism Tower", "Eiffel Spire", "Lumiose Spire", "Anistar Sundial"],
+        answerIndex: 0,
+        explanation: "Prism Tower is the electrical heart of Lumiose City and its official Electric-type League Gym."
+      },
+      {
+        id: "kalos_14",
+        question: "What organization led by Lysandre sought to purify the world by wiping out human life using the Ultimate Weapon?",
+        options: ["Team Flare", "Team Plasma", "Team Galactic", "Team Rocket"],
+        answerIndex: 0,
+        explanation: "Team Flare believed human greed ruined the planet's beauty, attempting to eliminate all but their chosen members."
+      },
+      {
+        id: "kalos_15",
+        question: "Which artificial clockwork Pokémon was created 500 years ago by an ancient kingdom scientist using human soul energy (Soul-Heart)?",
+        options: ["Magearna", "Golurk", "Genesect", "Porygon"],
+        answerIndex: 0,
+        explanation: "Magearna was crafted by Nikola 500 years ago as a gift for a princess, driven by its conscious Soul-Heart core."
+      },
+      {
+        id: "kalos_16",
+        question: "What Champion of Kalos is a famous movie star and connoisseur of Mega Evolution with her Mega Gardevoir?",
+        options: ["Diantha", "Cynthia", "Iris", "Malva"],
+        answerIndex: 0,
+        explanation: "Diantha balances her international film career with her responsibilities as Kalos League Champion."
+      },
+      {
+        id: "kalos_17",
+        question: "What deep mining cavern on Route 18 was closed down after miners disturbed the resting chamber of Zygarde 50%?",
+        options: ["Terminus Cave", "Glittering Cave", "Connecting Cave", "Seafoam Islands"],
+        answerIndex: 0,
+        explanation: "Terminus Cave leads down into dark abandoned shafts where Zygarde 50% monitors planetary health."
+      },
+      {
+        id: "kalos_18",
+        question: "What mysterious facility in the northern Lumiose Badlands harnesses geothermal electricity and was hijacked by Team Flare?",
+        options: ["Kalos Power Plant", "Devon Labs", "Silph Co.", "Weather Institute"],
+        answerIndex: 0,
+        explanation: "The Kalos Power Plant produces clean sun and wind energy in the desolate Lumiose Badlands."
+      },
+      {
+        id: "kalos_19",
+        question: "What unique genetic phenomenon occurs between Ash and his Greninja, transforming it into Ash-Greninja?",
+        options: ["Battle Bond", "Mega Evolution", "Primal Reversion", "Z-Power Resonance"],
+        answerIndex: 0,
+        explanation: "The Battle Bond ability occurs once every few centuries when trainer and Pokémon sync their willpower perfectly."
+      },
+      {
+        id: "kalos_20",
+        question: "What ancient town filled with standing dolmen megaliths was the site where the Ultimate Weapon was buried?",
+        options: ["Geosenge Town", "Dendemille Town", "Laverre City", "Coumarine City"],
+        answerIndex: 0,
+        explanation: "Geosenge Town is ringed by ancient megalith standing stones, concealing the buried Ultimate Weapon underneath."
       }
     ]
   },
   {
     region: "Alola",
-    themeTitle: "Guardian Tapus, Light & Ultra Space",
-    themeDescription: "Alola lore emphasizes island guardian spirits, ultra wormholes, cosmic solar/lunar deities, and light energy stolen by Necrozma.",
-    badgeColor: "border-yellow-500/40 text-yellow-400 bg-yellow-950/30",
+    themeTitle: "Ultra Space & The Solar/Lunar Emissaries",
+    themeDescription: "Alolan mythos centers on island guardians, solar/lunar deities, interdimensional Ultra Beasts, and Necrozma's light theft.",
+    badgeColor: "border-orange-500/40 text-orange-400 bg-orange-950/30",
     questions: [
       {
         id: "alola_1",
-        question: "What are the divine guardian deities protecting the four islands of Alola called?",
-        options: ["The Tapus", "The Lake Guardians", "The Swords of Justice", "The Ruinous Four"],
+        question: "Which four elemental guardian deities protect the natural islands of Melemele, Akala, Ula'ula, and Poni?",
+        options: ["Tapu Koko, Tapu Lele, Tapu Bulu, Tapu Fini", "Articuno, Zapdos, Moltres, Lugia", "Uxie, Mesprit, Azelf, Arceus", "Cobalion, Terrakion, Virizion, Keldeo"],
         answerIndex: 0,
-        explanation: "Tapu Koko, Tapu Lele, Tapu Bulu, and Tapu Fini serve as the revered divine guardians of Alola's islands."
+        explanation: "The four Tapu deities guard their respective islands, electing Island Kahunas and maintaining natural harmony."
       },
       {
         id: "alola_2",
-        question: "Solgaleo and Lunala are heralded in Alola mythology as the emissaries of which cosmic bodies?",
-        options: ["Sun and Moon", "Stars and Comets", "Eclipse and Nebula", "Void and Cosmos"],
+        question: "Which solar emissary Pokémon is hailed as 'the beast that devours the sun' in ancient Alolan texts?",
+        options: ["Solgaleo", "Lunala", "Necrozma", "Volcarona"],
         answerIndex: 0,
-        explanation: "Solgaleo is known as the Beast that Devours the Sun, while Lunala is the Beast that Calls the Moon."
+        explanation: "Solgaleo is the Radiant Sun emissary, channeling solar brilliance through its Radiant Sun phase."
       },
       {
         id: "alola_3",
-        question: "Which ancient crystal dragon lost its light in Ultra Megalopolis, becoming a shadow prism entity?",
-        options: ["Necrozma", "Eternatus", "Kyurem", "Rayquaza"],
+        question: "Which lunar emissary Pokémon is revered as 'the beast that calls the moon' in Alolan myth?",
+        options: ["Lunala", "Solgaleo", "Cresselia", "Darkrai"],
         answerIndex: 0,
-        explanation: "Necrozma was once a radiant light source before losing its energy, seeking to absorb Solgaleo or Lunala to regain its true Ultra form."
+        explanation: "Lunala shines as the Full Moon emissary, flying across the night skies in its Full Moon phase."
       },
       {
         id: "alola_4",
-        question: "What synthetic artificial Beast Killer Pokémon was engineered by Aether Foundation using genetic cells from all types?",
-        options: ["Type: Null", "Mewtwo", "Genesect", "Silvally"],
+        question: "Which light-devouring prism dragon stole all light from Ultra Megalopolis before invading Alola?",
+        options: ["Necrozma", "Giratina", "Kyurem", "Guzzlord"],
         answerIndex: 0,
-        explanation: "Type: Null was constructed as Code: Beast Killer to combat invading Ultra Beasts."
+        explanation: "Necrozma lost its true form and light in ancient times, absorbing Solgaleo or Lunala to become Ultra Necrozma."
       },
       {
         id: "alola_5",
-        question: "Which 500-year-old artificial mechanical Pokémon houses an artificial soul-heart constructed by a brilliant scientist?",
-        options: ["Magearna", "Melmetal", "Genesect", "Poipole"],
+        question: "What mysterious interdimensional gateways open throughout Alola, allowing Ultra Beasts to spill into our world?",
+        options: ["Ultra Wormholes", "Distortion Portals", "Hoopa Rings", "Space Rifts"],
         answerIndex: 0,
-        explanation: "Magearna was constructed 500 years ago with a Soul-Heart created by gathering life force."
+        explanation: "Ultra Wormholes connect our world to alien dimensions such as Ultra Deep Sea and Ultra Plant."
       },
       {
         id: "alola_6",
-        question: "What interdimensional gateways open across Alola's sky, allowing alien Ultra Beasts to breach Earth's dimension?",
-        options: ["Ultra Wormholes", "Space Distortion Rifts", "Hoopa Rings", "Terastal Fissures"],
+        question: "What synthetic beast killer was engineered by the Aether Foundation using DNA of all types to combat Ultra Beasts?",
+        options: ["Type: Null & Silvally", "Mewtwo", "Genesect", "Porygon-Z"],
         answerIndex: 0,
-        explanation: "Ultra Wormholes are cosmic rifts connecting Earth to foreign Ultra Space dimensions populated by Ultra Beasts."
+        explanation: "The Aether Foundation created Type: Null (formerly 'Beast Killer') which evolves into Silvally through true friendship."
       },
       {
         id: "alola_7",
-        question: "Which dormant cocoon stage do both Solgaleo and Lunala pass through after evolving from Cosmog?",
-        options: ["Cosmoem", "Solgaleo Core", "Lunala Core", "Necrozma Shell"],
+        question: "What crystalline artifacts channel the natural Z-Power of Alola into devastating ultimate battle techniques?",
+        options: ["Z-Crystals & Z-Rings", "Mega Stones", "Tera Orbs", "Dynamax Bands"],
         answerIndex: 0,
-        explanation: "Cosmog evolves into Cosmoem, an extraordinarily dense star cocoon weighing 2,204 lbs before evolving into Solgaleo or Lunala."
+        explanation: "Z-Crystals (derived from the radiant body parts of Necrozma) unleash devastating Z-Moves."
       },
       {
         id: "alola_8",
-        question: "Which purple Ultra Beast is known as the Poison Pin Pokémon and partner of the Ultra Recon Squad?",
-        options: ["Poipole", "Naganadel", "Nihilego", "Blacephalon"],
+        question: "What tiny gaseous nebula Pokémon evolves into the massive dense star Cosmoem and eventually Solgaleo or Lunala?",
+        options: ["Cosmog", "Poipole", "Minior", "Solosis"],
         answerIndex: 0,
-        explanation: "Poipole displays playful emotions and is used as a partner Pokémon by the Ultra Recon Squad in Ultra Megalopolis."
+        explanation: "Cosmog ('Nebby') is a celestial being that condenses into the 2,200 lb Cosmoem before becoming a legendary emissary."
       },
       {
         id: "alola_9",
-        question: "Which ghost/fairy species wears a ragged Pikachu costume to seek friendship and protect itself from sunlight?",
-        options: ["Mimikyu", "Banette", "Sableye", "Dhelmise"],
+        question: "What artificial floating conservation sanctuary was constructed by President Lusamine in the sea between islands?",
+        options: ["Aether Paradise", "Po Town", "Brooklet Hill", "Mount Lanakila"],
         answerIndex: 0,
-        explanation: "Mimikyu wears a homemade Pikachu rag disguise because Pikachu's popularity makes it easier to approach humans."
+        explanation: "Aether Paradise is a colossal man-made island serving as a wildlife refuge and secret research facility."
       },
       {
         id: "alola_10",
-        question: "What crystalline item, when equipped alongside a Z-Ring, allows a Pokémon to release an ultimate Z-Move?",
-        options: ["Z-Crystal", "Mega Stone", "Tera Shard", "Wishing Star"],
+        question: "Which black shadow-stalker mythical Pokémon conceals itself within shadows to mimic and enhance human martial arts?",
+        options: ["Marshadow", "Zeraora", "Magearna", "Darkrai"],
         answerIndex: 0,
-        explanation: "Z-Crystals channel a trainer's Z-Power through the Z-Ring, unleashing a devastating elemental Z-Move once per battle."
+        explanation: "Marshadow can slip into any entity's shadow, deciphering their thoughts and duplicating their physical power."
+      },
+      {
+        id: "alola_11",
+        question: "Which high-speed electric mythical Pokémon generates powerful magnetic fields from its electrified paws without an internal organ?",
+        options: ["Zeraora", "Raikou", "Tapu Koko", "Electivire"],
+        answerIndex: 0,
+        explanation: "Zeraora runs at lightning speeds by emitting high-voltage electricity through its paw pads."
+      },
+      {
+        id: "alola_12",
+        question: "Which massive Ultra Beast resembles a voracious black chasm with dual arm-like mouths, consuming entire landscapes?",
+        options: ["Guzzlord (UB-05 Glutton)", "Nihilego", "Buzzwole", "Kartana"],
+        answerIndex: 0,
+        explanation: "Guzzlord devours mountains, buildings, and toxic waste, leaving no waste behind due to its extreme metabolism."
+      },
+      {
+        id: "alola_13",
+        question: "Which parasitic glass-like jellyfish Ultra Beast injects neurotoxins that stimulate extreme aggression and obsession in humans?",
+        options: ["Nihilego (UB-01 Symbiont)", "Pheromosa", "Celesteela", "Poipole"],
+        answerIndex: 0,
+        explanation: "Nihilego acts as a parasitic neural symbiote, merging with hosts like Lusamine to unlock violent uninhibited behavior."
+      },
+      {
+        id: "alola_14",
+        question: "What origami-thin Ultra Beast can slice through steel towers with its razor-sharp paper-thin blades?",
+        options: ["Kartana (UB-04 Blade)", "Buzzwole", "Xurkitree", "Blacephalon"],
+        answerIndex: 0,
+        explanation: "Kartana is lightweight and flat like paper, yet its edges can effortlessly slice giant iron structures in half."
+      },
+      {
+        id: "alola_15",
+        question: "What traditional rite of passage takes the place of standard Gym challenges across the Alola region?",
+        options: ["The Island Challenge (Grand Trials & Totem Trials)", "The Battle Frontier", "The Indigo League", "The Gym Challenge"],
+        answerIndex: 0,
+        explanation: "Young trainers undertake the Island Challenge, defeating Totem Pokémon and the four Kahunas."
+      },
+      {
+        id: "alola_16",
+        question: "What lonely Ghost/Fairy Pokémon crafts a crude Pikachu costume to be loved by humans because its true form is terrifying?",
+        options: ["Mimikyu", "Banette", "Gengar", "Sableye"],
+        answerIndex: 0,
+        explanation: "Mimikyu wears a disguise modeled after popular Pikachu merchandise so people will not faint from viewing its real body."
+      },
+      {
+        id: "alola_17",
+        question: "What snowy peak on Ula'ula Island was chosen as the site for Alola's newly founded Pokémon League by Professor Kukui?",
+        options: ["Mount Lanakila", "Mount Hokulani", "Wela Volcano", "Haina Desert"],
+        answerIndex: 0,
+        explanation: "Mount Lanakila is the highest mountain in Alola, housing the newly inaugurated Pokémon League summit."
+      },
+      {
+        id: "alola_18",
+        question: "What walled, rain-soaked town in northern Ula'ula Island was occupied and covered in graffiti by Team Skull?",
+        options: ["Po Town", "Malie City", "Konikoni City", "Hau'oli City"],
+        answerIndex: 0,
+        explanation: "Po Town was seized by Guzma and Team Skull as their barricaded hangout."
+      },
+      {
+        id: "alola_19",
+        question: "Which Poison-type baby Ultra Beast is affectionately kept as a starter partner by the Ultra Recon Squad?",
+        options: ["Poipole (UB Adhesive)", "Naganadel", "Cosmog", "Stakataka"],
+        answerIndex: 0,
+        explanation: "Poipole is an expressive, friendly Ultra Beast that evolves into Naganadel upon learning Dragon Pulse."
+      },
+      {
+        id: "alola_20",
+        question: "What stone fortress Ultra Beast is made of hundreds of living quadrangular rock eye-bricks stacked into a tower?",
+        options: ["Stakataka (UB Assembly)", "Blacephalon", "Regirock", "Guzzlord"],
+        answerIndex: 0,
+        explanation: "Stakataka appears as a stone building, with each individual stone being a distinct lifeform."
       }
     ]
   },
   {
     region: "Galar",
-    themeTitle: "The Darkest Day & Heroic Relics",
-    themeDescription: "Galar lore focuses on 3,000-year-old catastrophic Dynamax storms, Eternatus energy, and the Heroic Sword & Shield.",
-    badgeColor: "border-blue-500/40 text-blue-400 bg-blue-950/30",
+    themeTitle: "The Darkest Day & The Rusted Legends",
+    themeDescription: "Galar lore focuses on the Darkest Day 3,000 years ago, Eternatus's dynamax storm, Zacian & Zamazenta, and Calyrex's steeds.",
+    badgeColor: "border-cyan-500/40 text-cyan-400 bg-cyan-950/30",
     questions: [
       {
         id: "galar_1",
-        question: "Which ancient catastrophic storm event brought Dynamax energy to Galar 3,000 years ago?",
-        options: ["The Darkest Day", "The Ultimate Weapon", "The Primal Surge", "The Great Cataclysm"],
+        question: "What cataclysmic event occurred 3,000 years ago when Eternatus nearly destroyed the Galar region with a dynamax storm?",
+        options: ["The Darkest Day", "The Ultimate War", "The Primal Drought", "The Lightless Eclipse"],
         answerIndex: 0,
-        explanation: "The Darkest Day was caused when Eternatus attempted to absorb Galar's energy, making Pokémon gigantean and wild."
+        explanation: "The Darkest Day saw Eternatus leak massive gigantamax energy across Galar, plunging the region into chaotic red storms."
       },
       {
         id: "galar_2",
-        question: "Zacian and Zamazenta saved Galar during the Darkest Day using which iconic relics?",
-        options: ["Rusted Sword and Rusted Shield", "Crown and Lance", "Bow and Arrow", "Orb and Scepter"],
+        question: "Which twin wolf kings wielded ancient weapons to vanquish the Darkest Day before falling into slumber in Slumbering Weald?",
+        options: ["Zacian & Zamazenta", "Solgaleo & Lunala", "Reshiram & Zekrom", "Latios & Latias"],
         answerIndex: 0,
-        explanation: "Equipped with the Rusted Sword and Rusted Shield, Zacian and Zamazenta sealed Eternatus away."
+        explanation: "Zacian (The Crowned Sword) and Zamazenta (The Crowned Shield) united with human kings to defeat Eternatus."
       },
       {
         id: "galar_3",
-        question: "Which alien dragon core is the true source of all Wishing Stars and Dynamax energy in Galar?",
-        options: ["Eternatus", "Rayquaza", "Regidrago", "Urshifu"],
+        question: "What colossal poison/dragon core brought Dynamax energy to Galar via falling Wishing Stars 20,000 years ago?",
+        options: ["Eternatus", "Rayquaza", "Necrozma", "Giratina"],
         answerIndex: 0,
-        explanation: "Eternatus arrived in a meteor 20,000 years ago; its leaking energy powers Galar's Dynamax Power Spots."
+        explanation: "Eternatus arrived on a meteorite, emitting Galar Particles and Wishing Stars that fuel the Dynamax phenomenon."
       },
       {
         id: "galar_4",
-        question: "Which ancient King of Bountiful Harvests rode Glastrier or Spectrier to heal Galar's blighted crops?",
-        options: ["Calyrex", "Zarude", "Urshifu", "Regieleki"],
+        question: "Which mythical sovereign Pokémon is revered as the King of Bountiful Harvests in the Crown Tundra?",
+        options: ["Calyrex", "Zarude", "Kubfu", "Urshifu"],
         answerIndex: 0,
-        explanation: "Calyrex ruled Galar in ancient times, bringing prosperity and healing frozen lands."
+        explanation: "Calyrex ruled ancient Galar with supreme intelligence, causing crops to bloom instantly and healing wounded land."
       },
       {
         id: "galar_5",
-        question: "Regieleki and Regidrago were created by Regigigas using which concentrated elemental materials?",
-        options: ["Pure Electrical Energy & Dragon Crystal Energy", "Solar Ray & Void Energy", "Magma & Ice", "Steel & Rock"],
+        question: "Which two legendary steeds can Calyrex tame using the Reins of Unity to ride into battle?",
+        options: ["Glastrier (Ice) & Spectrier (Ghost)", "Rapidash & Mudsdale", "Raikou & Entei", "Cobalion & Terrakion"],
         answerIndex: 0,
-        explanation: "Regieleki was constructed from electrical energy, while Regidrago was formed from crystallized dragon energy."
+        explanation: "Calyrex mounts Glastrier (Ice Rider) or Spectrier (Shadow Rider) using the sacred Reins of Unity."
       },
       {
         id: "galar_6",
-        question: "Which martial arts bear Pokémon evolves into either Single Strike or Rapid Strike Style Urshifu?",
-        options: ["Kubfu", "Pangoro", "Stufful", "Bewear"],
+        question: "Which fighting bear apprentice trains in either the Tower of Darkness or Tower of Waters to master Single or Rapid Strike styles?",
+        options: ["Kubfu & Urshifu", "Pangoro", "Bewear", "Ursaring"],
         answerIndex: 0,
-        explanation: "Kubfu trains at the Towers of Two Fists in the Isle of Armor, evolving into Fighting/Dark or Fighting/Water Urshifu."
+        explanation: "Kubfu trains on the Isle of Armor, evolving into Urshifu Single Strike (Fighting/Dark) or Rapid Strike (Fighting/Water)."
       },
       {
         id: "galar_7",
-        question: "Which legendary ice steed can Calyrex tame using the Reins of Unity to become Ice Rider Calyrex?",
-        options: ["Glastrier", "Spectrier", "Mudsdale", "Rapidash"],
+        question: "Which two ancient giants represent the sealed dragon and electric titan expansions in the Crown Tundra temples?",
+        options: ["Regidrago & Regieleki", "Regirock & Regice", "Dialga & Palkia", "Zekrom & Reshiram"],
         answerIndex: 0,
-        explanation: "Calyrex binds with Glastrier using the Reins of Unity, gaining powerful Ice/Psychic combat prowess."
+        explanation: "Regieleki (pure electricity) and Regidrago (pure dragon energy) were constructed by Regigigas and sealed in Crown Tundra."
       },
       {
         id: "galar_8",
-        question: "Which punk-rock electric lizard species absorbs voltage to generate electric bass sounds in Galar stadium matches?",
-        options: ["Toxtricity", "Eternatus", "Morpeko", "Boltund"],
+        question: "What mysterious fog-shrouded ancient forest at the edge of Postwick conceals the Rusted Sword and Rusted Shield?",
+        options: ["Slumbering Weald", "Glimwood Tangle", "Ballonlea Forest", "Dappled Grove"],
         answerIndex: 0,
-        explanation: "Toxtricity (Amped or Low Key) generates rhythm by strumming the guitar-like protrusions on its chest."
+        explanation: "Slumbering Weald is a mystical forest home to the resting shrine of Zacian and Zamazenta."
       },
       {
         id: "galar_9",
-        question: "What battle phenomenon occurs at Galar Power Spots when Wishing Star energy causes Pokémon to grow to colossal proportions?",
-        options: ["Dynamax / Gigantamax", "Mega Evolution", "Terastallization", "Z-Power"],
+        question: "What luminescent fairy settlement deep in the glowing mushroom forests of Galar is overseen by Gym Leader Opal?",
+        options: ["Ballonlea", "Circhester", "Hammerlocke", "Motostoke"],
         answerIndex: 0,
-        explanation: "Dynamaxing distorts space around a Pokémon, turning it into a giant projection with Max Moves for three turns."
+        explanation: "Ballonlea is tucked within the Glimwood Tangle, illuminated by vibrant glowing mushrooms."
       },
       {
         id: "galar_10",
-        question: "Which strange fossil combinations were constructed by combining mismatched ancient halves in Galar's Route 6 lab?",
-        options: ["Dracozolt, Arctozolt, Dracovish & Arctovish", "Tyrunt & Amaura", "Cranidos & Shieldon", "Omanyte & Kabuto"],
+        question: "What industrial powerhouse city in central Galar features an ancient medieval castle housing the energy plant?",
+        options: ["Hammerlocke", "Motostoke", "Wyndon", "Circhester"],
         answerIndex: 0,
-        explanation: "Galar's fossil researcher mistakenly fused different fossil upper and lower bodies together to create unique chimera Pokémon."
+        explanation: "Hammerlocke Castle was reinforced with modern technology by Chairman Rose to harbor the Energy Plant under the stadium."
+      },
+      {
+        id: "galar_11",
+        question: "What rogue warrior mythical Pokémon inhabits the dense canopy of the Forest of Okoya, swinging with vines?",
+        options: ["Zarude", "Rillaboom", "Passimian", "Marshadow"],
+        answerIndex: 0,
+        explanation: "Zarude grows vines from its wrists, living in hierarchical packs and using Jungle Healing."
+      },
+      {
+        id: "galar_12",
+        question: "What mineralized pieces of Eternatus's ancient shell are collected by trainers to craft Dynamax Bands?",
+        options: ["Wishing Stars", "Z-Crystals", "Mega Stones", "Tera Shards"],
+        answerIndex: 0,
+        explanation: "Wishing Stars fall from the sky and emit red particles that enable Pokémon to Dynamax at Power Spots."
+      },
+      {
+        id: "galar_13",
+        question: "What mismatched fossil abominations did researcher Cara Liss create by combining incompatible halves on Route 6?",
+        options: ["Dracovish, Dracozolt, Arctovish, Arctozolt", "Omanyte & Kabuto", "Tyrunt & Amaura", "Cranidos & Shieldon"],
+        answerIndex: 0,
+        explanation: "Cara Liss famously combined mismatched fossil halves to produce the bizarre chimeric species like Dracovish."
+      },
+      {
+        id: "galar_14",
+        question: "What undefeated Champion of Galar commanded Charizard and was known for having zero sense of direction?",
+        options: ["Leon", "Hop", "Raihan", "Peony"],
+        answerIndex: 0,
+        explanation: "Leon was Galar's superstar Champion, renowned for his sportsmanship, Charizard, and getting comically lost."
+      },
+      {
+        id: "galar_15",
+        question: "What dragon specialist Gym Leader of Hammerlocke is Leon's fiercest rival and commands sandstorm weather tactics?",
+        options: ["Raihan", "Kabu", "Gordie", "Piers"],
+        answerIndex: 0,
+        explanation: "Raihan takes selfies mid-battle and harnesses severe weather dynamics with his signature Duraludon."
+      },
+      {
+        id: "galar_16",
+        question: "What rock-and-roll Dark-type Gym Leader in Spikemuth refused to Dynamax his Pokémon during battles?",
+        options: ["Piers", "Marnie", "Bede", "Allister"],
+        answerIndex: 0,
+        explanation: "Piers and Spikemuth Gym operate without Power Spots, battling purely with raw tactics and musical passion."
+      },
+      {
+        id: "galar_17",
+        question: "What vast open wilderness area in central Galar features dynamically shifting biomes and roaming wild Pokémon?",
+        options: ["The Wild Area", "Isle of Armor", "Crown Tundra", "Slumbering Weald"],
+        answerIndex: 0,
+        explanation: "The Wild Area spans massive expanses of wilderness with Pokémon Dens connected to the Dynamax network."
+      },
+      {
+        id: "galar_18",
+        question: "What ancient tea master Pokémon species possesses a stamp of authenticity on its bottom rim to prove it is not counterfeit?",
+        options: ["Sinistea & Polteageist (Antique Form)", "Poltchageist", "Applin", "Alcremie"],
+        answerIndex: 0,
+        explanation: "Antique Sinistea and Polteageist feature a genuine forgery-proof seal on the underside of their porcelain."
+      },
+      {
+        id: "galar_19",
+        question: "What supreme battle master and former Champion runs the Master Dojo on the Isle of Armor?",
+        options: ["Mustard", "Peony", "Leon", "Kabu"],
+        answerIndex: 0,
+        explanation: "Master Mustard held the Galar Championship for 18 consecutive years before training Leon and the protagonist."
+      },
+      {
+        id: "galar_20",
+        question: "What hot-headed expedition leader guides players through legendary Dynamax Adventures in the Crown Tundra?",
+        options: ["Peony (Chairman Rose's brother)", "Peonia", "Professor Magnolia", "Sonia"],
+        answerIndex: 0,
+        explanation: "Peony (former Steel Gym Leader and Champion) leads expeditions into the subterranean Max Lair."
       }
     ]
   },
   {
     region: "Paldea",
-    themeTitle: "Area Zero Terastal Matrix & Ruin Treasures",
-    themeDescription: "Paldea lore centers on the Great Crater crystal anomaly, Terapagos matrix energy, and cursed treasures born from ancient greed.",
-    badgeColor: "border-orange-500/40 text-orange-400 bg-orange-950/30",
+    themeTitle: "The Great Crater, Paradox Beings & The Terastal Matrix",
+    themeDescription: "Paldea lore explores Area Zero, the Terastal crystal core, ancient and future Paradox creatures, and the cursed Treasures of Ruin.",
+    badgeColor: "border-violet-500/40 text-violet-400 bg-violet-950/30",
     questions: [
       {
         id: "paldea_1",
-        question: "What mysterious crystalline phenomenon in Paldea alters a Pokémon's typing and bestows a glowing gem crown?",
-        options: ["Terastallization", "Mega Evolution", "Z-Power", "Gigantamax"],
+        question: "What giant crystal turtle deity resting in the Underdepths of Area Zero is the origin of the Terastal phenomenon?",
+        options: ["Terapagos", "Koraidon", "Miraidon", "Pecharunt"],
         answerIndex: 0,
-        explanation: "Terastallization crystallizes a Pokémon, altering its offensive/defensive type matching based on its Tera Type."
+        explanation: "Terapagos embodies the Terastal energy, crystallizing surrounding matter into Stellar and elemental types."
       },
       {
         id: "paldea_2",
-        question: "The Treasures of Ruin (Wo-Chien, Chien-Pao, Ting-Lu, Chi-Yu) were born from ancient artifacts corrupted by what emotion?",
-        options: ["Human Greed & Hatred", "Envy & Jealousy", "Fear & Despair", "Arrogance"],
+        question: "What mysterious geological depression in the center of Paldea has been sealed off due to extreme danger for centuries?",
+        options: ["The Great Crater of Paldea (Area Zero)", "Asado Desert", "Casseroya Lake", "Dalizapa Passage"],
         answerIndex: 0,
-        explanation: "Ancient vessels, tablets, beads, and swords bought by a Paldean king were corrupted by malice and greed, coming to life as destructive ruins."
+        explanation: "The Great Crater of Paldea (Area Zero) descends into a crystalline abyss harboring Paradox Pokémon."
       },
       {
         id: "paldea_3",
-        question: "Which legendary indigo turtle sleeping at the bottom of the Underdepths is the origin of Terastal energy?",
-        options: ["Terapagos", "Koraidon", "Miraidon", "Ogerpon"],
+        question: "Which ancient Paradox Pokémon known as the 'Winged King' serves as the scarlet companion in Paldea?",
+        options: ["Koraidon (Ancient Cyclizar)", "Roaring Moon", "Great Tusk", "Walking Wake"],
         answerIndex: 0,
-        explanation: "Terapagos produces the Terastal energy matrix that fuels the crystal ecosystem throughout Paldea and Area Zero."
+        explanation: "Koraidon is the prehistoric ancestor of Cyclizar, possessing raw solar power and apex fighting instincts."
       },
       {
         id: "paldea_4",
-        question: "Which ancient/future paradox entities were brought to Area Zero using Professor Sada/Turo's Time Machine?",
-        options: ["Koraidon/Miraidon & Paradox Species", "Ultra Beasts", "Ruin Treasures", "Genesect Squad"],
+        question: "Which futuristic cybernetic Paradox Pokémon known as the 'Iron Serpent' glides with twin hover drives?",
+        options: ["Miraidon (Future Cyclizar)", "Iron Valiant", "Iron Leaves", "Iron Hands"],
         answerIndex: 0,
-        explanation: "Paradox Pokémon like Great Tusk and Iron Treads were pulled from ancient past or distant future timelines."
+        explanation: "Miraidon is the futuristic descendant of Cyclizar, channeling Hadron Engine electric propulsion."
       },
       {
         id: "paldea_5",
-        question: "Which lone ogre Pokémon in Kitakami wears four distinct elemental masks carved by an ancient craftsman?",
-        options: ["Ogerpon", "Pecharunt", "Okidogi", "Terapagos"],
+        question: "What four cursed entities brought ruin to an ancient Paldean king when infused with negative human emotions?",
+        options: ["The Treasures of Ruin (Wo-Chien, Chien-Pao, Ting-Lu, Chi-Yu)", "The Loyal Three", "The Tapu Guardians", "The Swords of Justice"],
         answerIndex: 0,
-        explanation: "Ogerpon changes its Tera type and form when holding the Teal, Wellspring, Hearthflame, or Cornerstone Masks."
+        explanation: "The Treasures of Ruin were cursed artifacts (wooden tablets, sword, ritual vessel, beads) that awoke as destructive beasts."
       },
       {
         id: "paldea_6",
-        question: "Which ancient apex paradox bike Pokémon embodies primeval prehistoric power in Paldea's scarlet lore?",
-        options: ["Koraidon", "Miraidon", "Cyclizar", "Great Tusk"],
+        question: "Which ogre Pokémon of Kitakami wears four distinct elemental masks to shift typing and Terastal capabilities?",
+        options: ["Ogerpon", "Pecharunt", "Okidogi", "Fezandipiti"],
         answerIndex: 0,
-        explanation: "Koraidon is the Winged King, an ancient ancestor of Cyclizar that runs across land, swims, and glides through skies."
+        explanation: "Ogerpon changes between Teal, Wellspring, Hearthflame, and Cornerstone forms when equipping her masks."
       },
       {
         id: "paldea_7",
-        question: "Which cybernetic future paradox bike Pokémon embodies high-tech plasma drive in Paldea's violet lore?",
-        options: ["Miraidon", "Koraidon", "Cyclizar", "Iron Treads"],
+        question: "Which mythical mochi Pokémon manipulated the Loyal Three (Okidogi, Munkidori, Fezandipiti) with toxic binding chains?",
+        options: ["Pecharunt", "Ogerpon", "Hoopa", "Marshadow"],
         answerIndex: 0,
-        explanation: "Miraidon is the Iron Serpent, a futuristic descendant of Cyclizar powered by internal plasma engines."
+        explanation: "Pecharunt feeds Binding Mochi to Pokémon and humans, controlling their minds through toxic greed."
       },
       {
         id: "paldea_8",
-        question: "Which mischievous peach-shaped mythical Pokémon controls minds and bodies using toxic binding mochi in Kitakami?",
-        options: ["Pecharunt", "Ogerpon", "Okidogi", "Dipplin"],
+        question: "What ancient expedition journal written by author Heath documented Paradox Pokémon in Area Zero 200 years ago?",
+        options: ["The Scarlet / Violet Book", "The Occulture Magazine", "The Sinnoh Myth Book", "The Silph Reports"],
         answerIndex: 0,
-        explanation: "Pecharunt uses its toxic binding mochi to command minds, as told in the story of the Loyal Three."
+        explanation: "Heath's expedition journal illustrated mysterious sketches of Great Tusk, Iron Treads, and the Disk Pokémon."
       },
       {
         id: "paldea_9",
-        question: "Which three hero Pokémon of Kitakami folklore were granted strength by Pecharunt's toxic mochi to attack Ogerpon?",
-        options: ["Okidogi, Munkidori & Fezandipiti", "Wo-Chien, Chien-Pao & Ting-Lu", "Suicune, Raikou & Entei", "The Tapus"],
+        question: "What high-tech overseas academy in the Unova ocean contains the massive four-biome Terarium?",
+        options: ["Blueberry Academy", "Naranja Academy", "Uva Academy", "Indigo Academy"],
         answerIndex: 0,
-        explanation: "Okidogi, Munkidori, and Fezandipiti were revered as the Loyal Three in Kitakami village legends."
+        explanation: "Blueberry Academy features a massive undersea Terarium with Savannah, Coastal, Canyon, and Polar biomes."
       },
       {
         id: "paldea_10",
-        question: "Which ruin treasure was born from a cursed ancient sword that slaughtered thousands before being sealed in ice?",
-        options: ["Chien-Pao", "Wo-Chien", "Ting-Lu", "Chi-Yu"],
+        question: "What 19th Terastal type combines the strengths of all 18 elemental types, retaining base defensive profiles?",
+        options: ["Stellar Type", "Cosmic Type", "Infinity Type", "Origin Type"],
         answerIndex: 0,
-        explanation: "Chien-Pao was born from the hatred of those who perished by an ancient sword, controlling snow and ice."
+        explanation: "The Stellar Tera type supercharges every elemental move once while preserving the user's natural resistances."
+      },
+      {
+        id: "paldea_11",
+        question: "Which ancient Paradox Pokémon is a ferocious prehistoric relative of the dragon Salamence?",
+        options: ["Roaring Moon", "Flutter Mane", "Scream Tail", "Brute Bonnet"],
+        answerIndex: 0,
+        explanation: "Roaring Moon resembles ancient illustrations of Mega Salamence with jagged blood-red wings."
+      },
+      {
+        id: "paldea_12",
+        question: "Which future Paradox Pokémon is a robotic synthetic fusion of Gardevoir and Gallade wielding light-blades?",
+        options: ["Iron Valiant", "Iron Bundle", "Iron Thorns", "Iron Jugulis"],
+        answerIndex: 0,
+        explanation: "Iron Valiant was engineered by a mad scientist attempting to forge the ultimate psychic-fairy swordsman."
+      },
+      {
+        id: "paldea_13",
+        question: "What culinary Titan herb was discovered in Area Zero and used by Arven to heal his injured Mabosstiff?",
+        options: ["Herba Mystica (Sweet, Salty, Bitter, Sour, Spicy)", "Gracidea Flower", "Revival Herb", "Big Root"],
+        answerIndex: 0,
+        explanation: "The five Herba Mystica possess profound regenerative properties, guarded by gargantuan Titan Pokémon."
+      },
+      {
+        id: "paldea_14",
+        question: "What group of truant academy students founded five operational bases across Paldea under Big Boss Penny?",
+        options: ["Team Star", "Team Skull", "Team Yell", "Team Plasma"],
+        answerIndex: 0,
+        explanation: "Team Star formed Operation Starfall to defend bullied students against academy intimidation."
+      },
+      {
+        id: "paldea_15",
+        question: "Which eccentric streamer and Levincia Gym Leader quizzes challengers on her viral web broadcast?",
+        options: ["Iono", "Rika", "Grusha", "Tulip"],
+        answerIndex: 0,
+        explanation: "Iono streams her battles live to millions, commanding her signature Bellibolt with electric traps."
+      },
+      {
+        id: "paldea_16",
+        question: "What tired, overworked Normal-type Gym Leader and Elite Four member secretly works for the Pokémon League office?",
+        options: ["Larry", "Geeta", "Hassel", "Poppy"],
+        answerIndex: 0,
+        explanation: "Larry is a quintessential salaryman who battles pragmatically at the Medali eatery and the League."
+      },
+      {
+        id: "paldea_17",
+        question: "What top Champion and chairwoman of the Paldea League oversees the talent accreditation of the region?",
+        options: ["Geeta (La Primera)", "Cynthia", "Diantha", "Nemona"],
+        answerIndex: 0,
+        explanation: "Geeta evaluates prospective Champion-rank trainers across Paldea, leading the Elite Four."
+      },
+      {
+        id: "paldea_18",
+        question: "What battle-obsessed Champion-rank student council president is your enthusiastic rival in Paldea?",
+        options: ["Nemona", "Penny", "Arven", "Carmine"],
+        answerIndex: 0,
+        explanation: "Nemona achieved Champion rank at a young age and enthusiastically mentors new trainers to battle at full strength."
+      },
+      {
+        id: "paldea_19",
+        question: "What legendary paradox trio represents the ancient prehistoric incarnations of the Johto legendary beasts?",
+        options: ["Walking Wake, Gouging Fire, Raging Bolt", "Raikou, Entei, Suicune", "Great Tusk, Scream Tail, Brute Bonnet", "Iron Crown, Iron Boulder, Iron Leaves"],
+        answerIndex: 0,
+        explanation: "Walking Wake (Suicune), Gouging Fire (Entei), and Raging Bolt (Raikou) resemble primeval dinosaur beasts."
+      },
+      {
+        id: "paldea_20",
+        question: "What legendary paradox trio represents the mechanized futuristic incarnations of the Swords of Justice?",
+        options: ["Iron Leaves, Iron Boulder, Iron Crown", "Cobalion, Terrakion, Virizion", "Iron Valiant, Iron Bundle, Iron Hands", "Walking Wake, Gouging Fire, Raging Bolt"],
+        answerIndex: 0,
+        explanation: "Iron Leaves (Virizion), Iron Boulder (Terrakion), and Iron Crown (Cobalion) are futuristic cybernetic titans."
       }
     ]
   }
 ];
 
-const stripHtmlTags = (str: string) => {
-  if (!str) return '';
-  return str.replace(/<\/?p[^>]*>/gi, '').replace(/<[^>]+>/g, '').trim();
-};
-
-function seededRandom(seed: number) {
-  const x = Math.sin(seed++) * 10000;
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed) * 10000;
   return x - Math.floor(x);
 }
 
 function hashCode(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash |= 0;
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
   }
   return Math.abs(hash);
 }
 
-let examCacheKey = '';
-let cachedExams: any = null;
+function stripHtmlTags(str: string): string {
+  if (!str) return '';
+  return str.replace(/<[^>]*>?/gm, '');
+}
 
+let examCacheKey = '';
+let cachedExams: RegionLoreData[] | null = null;
 
 function usePersistentState<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [state, setState] = useState<T>(() => {
@@ -825,7 +1455,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
 
   // Dynamically calculate today's selected 3 theory exam questions per region with fast cache
   const allExams = useMemo(() => {
-    const key = `${todayStr}_v2_seed_${customSeed}`;
+    const key = `${todayStr}_v3_seed_${customSeed}`;
     if (examCacheKey === key && cachedExams) {
       return cachedExams;
     }
@@ -837,7 +1467,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
       const picked: RegionQuestion[] = [];
       
       for (let i = 0; i < count && pool.length > 0; i++) {
-        const rand = seededRandom(baseHash + rIdx * 100 + i);
+        const rand = seededRandom(baseHash + rIdx * 100 + i * 37);
         const idx = Math.floor(rand * pool.length);
         const item = pool.splice(idx, 1)[0];
         
@@ -845,7 +1475,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
         const correctAnswerText = item.options[item.answerIndex];
         const shuffledOpts = [...item.options];
         for (let j = shuffledOpts.length - 1; j > 0; j--) {
-          const r2 = seededRandom(baseHash + rIdx * 50 + j * 7 + i);
+          const r2 = seededRandom(baseHash + rIdx * 50 + j * 7 + i * 13);
           const swapIdx = Math.floor(r2 * (j + 1));
           [shuffledOpts[j], shuffledOpts[swapIdx]] = [shuffledOpts[swapIdx], shuffledOpts[j]];
         }
@@ -899,10 +1529,10 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
       try { sounds.success(); } catch (_) {}
       try {
         let stats = JSON.parse(localStorage.getItem('Pokethology_MissionStats') || '{"pokemonWins":{}, "typeWins":{}, "hubCompletions":0, "examCompletions":0}');
-                        const currentMonth = new Date().toISOString().slice(0, 7);
-                        if (stats.lastResetMonth !== currentMonth) {
-                          stats = { pokemonWins: {}, typeWins: {}, hubCompletions: 0, examCompletions: 0, lastResetMonth: currentMonth };
-                        }
+        const currentMonth = new Date().toISOString().slice(0, 7);
+        if (stats.lastResetMonth !== currentMonth) {
+          stats = { pokemonWins: {}, typeWins: {}, hubCompletions: 0, examCompletions: 0, lastResetMonth: currentMonth };
+        }
         stats.examCompletions = (stats.examCompletions || 0) + 1;
         localStorage.setItem('Pokethology_MissionStats', JSON.stringify(stats));
         window.dispatchEvent(new Event('storage'));
@@ -963,14 +1593,15 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
       </div>
 
       {/* ACTIVE REGION HEADER BANNER */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1.5 text-left relative overflow-hidden">
+      <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-3 sm:p-3.5 flex items-center justify-between gap-2 text-left relative overflow-hidden shadow-sm">
         <HUDCorners />
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
-          <h3 className="text-xs xs:text-sm sm:text-base font-hud font-black text-amber-300 uppercase tracking-wider flex items-center gap-2 min-w-0 break-words">
-            {React.createElement(REGION_ICONS[currentRegionData.region] || BookOpen, { className: "w-4 h-4 text-amber-400 shrink-0" })}
-            <span className="truncate">{currentRegionData.region} Exam</span>
-          </h3>
-        </div>
+        <h3 className="text-xs xs:text-sm sm:text-base font-hud font-black text-amber-300 uppercase tracking-wider flex items-center gap-2 min-w-0 break-words">
+          {React.createElement(REGION_ICONS[currentRegionData.region] || BookOpen, { className: "w-4 h-4 text-amber-400 shrink-0" })}
+          <span className="truncate">{currentRegionData.region} Exam</span>
+        </h3>
+        <span className="text-[9.5px] font-mono text-cyan-400/80 uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-cyan-950/40 border border-cyan-500/20">
+          Theory & Lore Certification
+        </span>
       </div>
 
       {/* REGION QUESTIONS LIST */}
@@ -985,7 +1616,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
                   </div>
                   <h3 className="text-xl font-hud font-black text-emerald-400 tracking-widest uppercase text-center">{currentRegionData.region} Cleared</h3>
                   <p className="text-xs text-slate-400 font-mono text-center max-w-sm px-4">
-                    All theory questions for this region have been successfully completed. Check back tomorrow for new challenges!
+                    All theory questions for this region have been successfully completed. Check back tomorrow for new challenges or generate a new set!
                   </p>
                 </div>
              );

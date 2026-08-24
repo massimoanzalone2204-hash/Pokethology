@@ -40,7 +40,8 @@ import {
   Target,
   CheckCircle2,
   TrendingUp,
-  Compass
+  Compass,
+  Music
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -536,8 +537,8 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 <p className="text-slate-300 font-sans leading-relaxed text-[11px] sm:text-xs relative z-10">
                   Pokéthology is an active open-source project and competitive Pokémon platform. Connect with the developer channels to explore source code, review version release notes, contribute suggestions, or follow competitive content showcases.
                 </p>
-                <p className="text-slate-400 font-sans leading-relaxed text-[10.5px] sm:text-[11px] relative z-10 pt-1 border-t border-pink-500/20">
-                  Direct access to our verified GitHub repository and official Instagram channel:
+                <p className="text-slate-400 font-sans leading-relaxed text-[10.5px] sm:text-[11px] relative z-10 pt-1 border-t border-pink-500/20 mt-2">
+                  Direct access to our verified GitHub repository and official channels:
                 </p>
               </div>
 
@@ -580,6 +581,31 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     </div>
                   </div>
                   <ExternalLink className="w-4 h-4 text-pink-400 group-hover:text-pink-300 transition-colors shrink-0" />
+                </a>
+
+                {/* Mikel Credit Section As Button Card */}
+                <a
+                  href="https://www.youtube.com/@MikelTBE"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-4 rounded-xl border border-emerald-500/30 bg-slate-900/60 flex items-center justify-between gap-4 group hover:border-emerald-400 transition-all shadow-md cursor-pointer"
+                >
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="p-3 bg-emerald-950 rounded-full border border-emerald-500/50 group-hover:scale-110 transition-transform shrink-0">
+                      <Music className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div className="flex flex-col text-left min-w-0">
+                      <span className="font-hud font-black text-emerald-400 text-xs sm:text-sm uppercase tracking-wider flex items-center gap-2">
+                        Official Audio Partner
+                        <span className="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 text-[9px] rounded font-mono">BGM</span>
+                      </span>
+                      <span className="text-[9px] sm:text-[10px] font-mono text-emerald-300/80 truncate">@MikelTBE (Poké & Chill)</span>
+                      <span className="text-[9.5px] text-slate-400 font-sans mt-0.5 leading-relaxed">
+                        Enjoy incredible lo-fi Pokémon remixes while exploring. <strong className="text-emerald-400 font-bold ml-1">Songs can be managed in Settings.</strong>
+                      </span>
+                    </div>
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-emerald-400 group-hover:text-emerald-300 transition-colors shrink-0" />
                 </a>
               </div>
             </motion.div>

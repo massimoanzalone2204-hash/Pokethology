@@ -42,7 +42,7 @@ import {
 
 export interface CombatMission {
   id: string;
-  type: 'type' | 'stat' | 'defeat';
+  type: 'type' | 'stat' | 'category' | 'defeat';
   target: string;
   description: string;
   rewardPoints: number;
@@ -60,12 +60,32 @@ export const COMBAT_MISSIONS: CombatMission[] = [
   { id: 'steel', type: 'type', target: 'steel', description: 'Defeat Steel-type Pokémon in battle to complete the mission.', rewardPoints: 250 },
   { id: 'ghost', type: 'type', target: 'ghost', description: 'Defeat Ghost-type Pokémon in battle to complete the mission.', rewardPoints: 250 },
   { id: 'flying', type: 'type', target: 'flying', description: 'Defeat Flying-type Pokémon in battle to complete the mission.', rewardPoints: 180 },
-  { id: 'heavy', type: 'stat', target: 'defense', description: 'Defeat a Pokémon with a very high Defense stat (150+ Base Defense) in battle.', rewardPoints: 220 },
+  { id: 'psychic', type: 'type', target: 'psychic', description: 'Defeat Psychic-type Pokémon in battle to complete the mission.', rewardPoints: 220 },
+  { id: 'dark', type: 'type', target: 'dark', description: 'Defeat Dark-type Pokémon in battle to complete the mission.', rewardPoints: 220 },
+  { id: 'fairy', type: 'type', target: 'fairy', description: 'Defeat Fairy-type Pokémon in battle to complete the mission.', rewardPoints: 250 },
+  { id: 'ice', type: 'type', target: 'ice', description: 'Defeat Ice-type Pokémon in battle to complete the mission.', rewardPoints: 220 },
+  { id: 'fighting', type: 'type', target: 'fighting', description: 'Defeat Fighting-type Pokémon in battle to complete the mission.', rewardPoints: 200 },
+  { id: 'ground', type: 'type', target: 'ground', description: 'Defeat Ground-type Pokémon in battle to complete the mission.', rewardPoints: 200 },
+  { id: 'rock', type: 'type', target: 'rock', description: 'Defeat Rock-type Pokémon in battle to complete the mission.', rewardPoints: 200 },
+  { id: 'bug', type: 'type', target: 'bug', description: 'Defeat Bug-type Pokémon in battle to complete the mission.', rewardPoints: 180 },
+  { id: 'poison', type: 'type', target: 'poison', description: 'Defeat Poison-type Pokémon in battle to complete the mission.', rewardPoints: 180 },
+  { id: 'normal', type: 'type', target: 'normal', description: 'Defeat Normal-type Pokémon in battle to complete the mission.', rewardPoints: 180 },
+  { id: 'heavy', type: 'stat', target: 'high_defense', description: 'Defeat a Pokémon with a very high Defense stat (150+ Base Defense) in battle.', rewardPoints: 250 },
+  { id: 'ultra_def', type: 'stat', target: 'ultra_defense', description: 'Defeat a Fortress Pokémon with extreme Defense (180+ Base Defense).', rewardPoints: 320 },
+  { id: 'speed_demon', type: 'stat', target: 'speed', description: 'Defeat high-speed speedsters with Base Speed of 120 or higher.', rewardPoints: 220 },
+  { id: 'physical_power', type: 'stat', target: 'attack', description: 'Defeat physical powerhouses with Base Attack of 130 or higher.', rewardPoints: 240 },
+  { id: 'special_sweeper', type: 'stat', target: 'special-attack', description: 'Defeat Special Attack powerhouses with Base Sp.Atk of 130 or higher.', rewardPoints: 240 },
+  { id: 'special_wall', type: 'stat', target: 'special-defense', description: 'Defeat Special Defense fortresses with Base Sp.Def of 130 or higher.', rewardPoints: 240 },
+  { id: 'colossal_hp', type: 'stat', target: 'hp', description: 'Defeat massive stamina champions with Base HP of 130 or higher.', rewardPoints: 240 },
+  { id: 'huge_bst', type: 'stat', target: 'huge_bst', description: 'Defeat Pokémon with Huge Total Base Stats (540+ Base Stats).', rewardPoints: 280 },
+  { id: 'legendary', type: 'category', target: 'legendary', description: 'Defeat Legendary or Mythical Pokémon in combat.', rewardPoints: 350 },
+  { id: 'mega', type: 'category', target: 'mega', description: 'Defeat Mega-Evolved or Primal Pokémon forms in battle.', rewardPoints: 320 },
+  { id: 'gmax', type: 'category', target: 'gmax', description: 'Defeat Gigantamax & Dynamax Powerhouses in battle.', rewardPoints: 320 }
 ];
 
 export const getDailyCombatMission = (todayStr: string, isHardMode: boolean = false): CombatMission => {
-  const hash = todayStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const index = hash % COMBAT_MISSIONS.length;
+  const hash = todayStr.split('').reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0);
+  const index = Math.abs(hash) % COMBAT_MISSIONS.length;
   return COMBAT_MISSIONS[index];
 };
 
@@ -74,7 +94,7 @@ export const getRequiredCount = (mission: CombatMission, isHardMode: boolean = f
     return 3; // Hard mode is always 3
   }
   // Standard mode: Rare/difficult types require 2 defeats, other types require 3
-  if (['dragon', 'steel', 'ghost', 'heavy'].includes(mission.id)) {
+  if (['dragon', 'steel', 'ghost', 'heavy', 'ultra_def', 'legendary', 'mega', 'gmax', 'huge_bst'].includes(mission.id)) {
     return 2;
   }
   return 3;
@@ -135,6 +155,83 @@ const EASY_TRIVIA_QUESTIONS: TriviaQuestion[] = [
     options: ["STEALTH ROCK", "SPIKES", "TOXIC SPIKES", "STICKY WEB"],
     answerIndex: 0,
     explanation: "Stealth Rock! It inflicts up to 50% of maximum health on switch-in to Fire/Flying types like Charizard, while doing negligible damage to Rock/Ground types."
+  },
+  {
+    question: "What is the primary effect of the held item 'Leftovers' during active combat?",
+    options: ["RESTORES 1/16TH MAX HP AT END OF EVERY TURN", "PREVENTS CRITICAL HITS", "DOUBLES BASE DEFENSE", "CURES ALL STATUS AILMENTS AT TURN END"],
+    answerIndex: 0,
+    explanation: "Leftovers steadily restores 1/16th (6.25%) of the holder's maximum HP at the end of each turn, standard on defensive tanks."
+  },
+  {
+    question: "Which type is completely immune to Poison status, including regular Poison and Toxic badly-poisoned states?",
+    options: ["STEEL & POISON", "FIRE & ROCK", "GHOST & DARK", "WATER & ICE"],
+    answerIndex: 0,
+    explanation: "Steel-type and Poison-type Pokémon cannot normally be poisoned by damaging moves or Toxic (unless facing Corrosion)."
+  },
+  {
+    question: "How much damage does a move deal if it is used by a Pokémon sharing the exact same type as the move (STAB)?",
+    options: ["1.5X (50% MORE DAMAGE)", "2.0X (100% MORE DAMAGE)", "1.25X (25% MORE DAMAGE)", "1.75X (75% MORE DAMAGE)"],
+    answerIndex: 0,
+    explanation: "Same Type Attack Bonus (STAB) grants an automatic 1.5x damage multiplier to any move matching the user's typing."
+  },
+  {
+    question: "Which of the following Pokémon is the quintessential Electric-type mascot discovered in the Kanto region (Pokédex #025)?",
+    options: ["PIKACHU", "RAICHU", "VOLTORB", "ELECTABUZZ"],
+    answerIndex: 0,
+    explanation: "Pikachu is Pokédex entry #025 and the global electric icon of the Pokémon franchise."
+  },
+  {
+    question: "Which item prevents a Pokémon with full HP from fainting in a single hit, leaving it with 1 HP?",
+    options: ["FOCUS SASH", "FOCUS BAND", "ASSAULT VEST", "SAFETY GOGGLES"],
+    answerIndex: 0,
+    explanation: "Focus Sash guarantees the holder survives any single lethal attack with 1 HP remaining if at 100% HP when hit."
+  },
+  {
+    question: "Which weather condition boosts the Special Defense of all Rock-type Pokémon by 50%?",
+    options: ["SANDSTORM", "SUNNY DAY", "RAIN DANCE", "SNOWSCAPE"],
+    answerIndex: 0,
+    explanation: "In a Sandstorm, Rock-type Pokémon gain a 50% increase to their Special Defense stat in addition to taking no sand damage."
+  },
+  {
+    question: "What does the move 'Taunt' do to an opposing Pokémon in competitive battles?",
+    options: [
+      "FORCES OPPONENT TO USE ONLY DAMAGING ATTACKS FOR 3 TURNS",
+      "HALVES OPPONENT'S DEFENSE STAT",
+      "PREVENTS OPPONENT FROM SWITCHING OUT",
+      "CAUSES OPPONENT TO BECOME CONFUSED"
+    ],
+    answerIndex: 0,
+    explanation: "Taunt prevents the target from using non-damaging status moves for 3 turns, shutting down setup, recovery, and hazard setters."
+  },
+  {
+    question: "What happens when an Electric-type attack targets a Ground-type Pokémon under normal conditions?",
+    options: ["IT HAS NO EFFECT (0X DAMAGE)", "IT DEALS HALF DAMAGE", "IT DEALS REGULAR DAMAGE", "IT PARALYZES THE TARGET"],
+    answerIndex: 0,
+    explanation: "Ground-type Pokémon are completely immune to Electric-type moves, resulting in 0x damage."
+  },
+  {
+    question: "Which generation introduced the Fairy typing to rebalance the dominance of Dragon-type Pokémon?",
+    options: ["GENERATION 6 (X & Y)", "GENERATION 5 (BLACK & WHITE)", "GENERATION 7 (SUN & MOON)", "GENERATION 4 (DIAMOND & PEARL)"],
+    answerIndex: 0,
+    explanation: "Fairy type was introduced in Gen 6 to balance Dragon, Fighting, and Dark types while giving Poison and Steel offensive utility."
+  },
+  {
+    question: "Which berry immediately cures Confusion when the holder is afflicted?",
+    options: ["PERSIM BERRY", "LUM BERRY (ALSO CURES ALL OTHER AILMENTS)", "CHERI BERRY", "CHESTO BERRY"],
+    answerIndex: 1,
+    explanation: "Lum Berry cures confusion as well as all major status ailments. Persim Berry cures confusion specifically."
+  },
+  {
+    question: "What is the priority value of the staple speed move 'Quick Attack'?",
+    options: ["+1 PRIORITY", "+2 PRIORITY", "+3 PRIORITY", "0 PRIORITY WITH HIGH SPEED"],
+    answerIndex: 0,
+    explanation: "Quick Attack operates at +1 priority, allowing it to strike before standard non-priority moves."
+  },
+  {
+    question: "What is the maximum number of moves a single Pokémon can know simultaneously in battle?",
+    options: ["4 MOVES", "6 MOVES", "5 MOVES", "8 MOVES"],
+    answerIndex: 0,
+    explanation: "Standard Pokémon battle mechanics limit each Pokémon's moveset to 4 distinct moves."
   }
 ];
 
@@ -213,10 +310,15 @@ const MEDIUM_TRIVIA_QUESTIONS: TriviaQuestion[] = [
     explanation: "Misty Terrain! Grounded units standing on Misty Terrain cannot be statused or confused, protecting them from classic status plays."
   },
   {
-    question: "Which battle item doubles the effective Speed stat of the holder in combat, but restricts them to executing only the first move selected?",
-    options: ["CHOICE SCARF", "CHOICE BAND", "CHOICE SPECS", "LIFE ORB"],
+    question: "What beneficial stat multiplier is bestowed by the held item 'Eviolite' when equipped on a Pokémon species that is NOT fully evolved?",
+    options: [
+      "BOOSTS BOTH DEFENSE AND SPECIAL DEFENSE BY 50%",
+      "BOOSTS MAXIMUM HP BY 50%",
+      "BOOSTS ATTACK AND SPEED BY 30%",
+      "DOUBLES SPECIAL ATTACK"
+    ],
     answerIndex: 0,
-    explanation: "Choice Scarf boosts Speed by 50% (1.5x) but locks the user into the selected move until switched out!"
+    explanation: "Eviolite increases the Defense and Special Defense of unevolved species by 1.5x (50%), making Pokémon like Chansey and Dusclops exceptionally bulky!"
   },
   {
     question: "What occurs when Shedinja (ability Wonder Guard) is struck by a direct move that is NOT super-effective against Bug/Ghost?",
@@ -230,23 +332,6 @@ const MEDIUM_TRIVIA_QUESTIONS: TriviaQuestion[] = [
     explanation: "Wonder Guard blocks all direct attack damage except moves that deal super-effective damage!"
   },
   {
-    question: "What beneficial stat multiplier is bestowed by the held item 'Eviolite' when equipped on a Pokémon species that is NOT fully evolved?",
-    options: [
-      "BOOSTS BOTH DEFENSE AND SPECIAL DEFENSE BY 50%",
-      "BOOSTS MAXIMUM HP BY 50%",
-      "BOOSTS ATTACK AND SPEED BY 30%",
-      "DOUBLES SPECIAL ATTACK"
-    ],
-    answerIndex: 0,
-    explanation: "Eviolite increases the Defense and Special Defense of unevolved species by 1.5x (50%), making Pokémon like Chansey and Dusclops exceptionally bulky!"
-  },
-  {
-    question: "Which entry hazard inflicts direct percentage damage on switch-in to Flying-type or Levitate Pokémon that are immune to Spikes?",
-    options: ["STEALTH ROCK", "TOXIC SPIKES", "STICKY WEB", "SHADOW TRAP"],
-    answerIndex: 0,
-    explanation: "Stealth Rock deals Rock-type hazard damage on switch-in regardless of whether the target is grounded or airborne!"
-  },
-  {
     question: "What is the primary effect of Psychic Terrain on grounded Pokémon when active on the field?",
     options: [
       "BLOCKS INCREASED PRIORITY MOVES TARGETING GROUNDED ALLIES AND BOOSTS PSYCHIC POWER BY 30%",
@@ -256,6 +341,73 @@ const MEDIUM_TRIVIA_QUESTIONS: TriviaQuestion[] = [
     ],
     answerIndex: 0,
     explanation: "Psychic Terrain prevents targeted priority moves (like Extreme Speed or Aqua Jet) from striking grounded Pokémon and increases Psychic move power!"
+  },
+  {
+    question: "Which ability lowers the opponent's physical Attack stat by one stage immediately upon entering the battle field?",
+    options: ["INTIMIDATE", "MOXIE", "UNNERVE", "PRESSURE"],
+    answerIndex: 0,
+    explanation: "Intimidate drops the Attack stat of opposing Pokémon by 1 stage upon switch-in, making it a cornerstone of competitive doubles and singles."
+  },
+  {
+    question: "How does the ability 'Magic Guard' protect a Pokémon from passive residual damage?",
+    options: [
+      "PREVENTS ALL NON-ATTACK DAMAGE INCLUDING HAZARDS, BURN, POISON, WEATHER, AND LIFE ORB RECOIL",
+      "IMMUNE TO SPECIAL ATTACKS",
+      "REFLECTS STATUS MOVES BACK TO ATTACKER",
+      "RECOVERS 25% HP WHEN HIT BY STATUS MOVES"
+    ],
+    answerIndex: 0,
+    explanation: "Magic Guard renders the Pokémon immune to all indirect damage (Stealth Rock, Spikes, Life Orb recoil, Poison/Burn damage, Hail/Sand)."
+  },
+  {
+    question: "What damage increase and self-damage recoil does the held item 'Life Orb' provide?",
+    options: [
+      "BOOSTS ALL MOVE DAMAGE BY 30% AT COST OF 10% MAX HP PER SUCCESSFUL HIT",
+      "BOOSTS ATTACK ONLY BY 50% AT COST OF 20% HP",
+      "BOOSTS CRITICAL HIT CHANCE BY 50% WITH NO RECOIL",
+      "DOUBLES SPECIAL ATTACK AT COST OF 25% HP"
+    ],
+    answerIndex: 0,
+    explanation: "Life Orb amplifies the damage of all physical and special attacks by 30% (1.3x) while inflicting 10% maximum HP recoil per strike."
+  },
+  {
+    question: "How does the move 'Trick Room' alter turn order for 5 turns?",
+    options: [
+      "SLOWER POKÉMON MOVE FIRST WITHIN THEIR PRIORITY BRACKET",
+      "FASTER POKÉMON MOVE FIRST REGARDLESS OF PRIORITY",
+      "REVERSES ALL DAMAGE CALCULATIONS",
+      "EXCHANGES HELD ITEMS BETWEEN COMBATANTS"
+    ],
+    answerIndex: 0,
+    explanation: "Trick Room causes Pokémon with lower Speed stats to act before faster Pokémon within each priority tier for 5 turns."
+  },
+  {
+    question: "Which defensive ability completely ignores the stat boosts (Swords Dance, Calm Mind, etc.) of attacking opponents when taking damage?",
+    options: ["UNAWARE", "CLEAR BODY", "STURDY", "MULTISCALE"],
+    answerIndex: 0,
+    explanation: "Unaware completely ignores the opponent's offensive stat stage changes (Attack/Sp.Atk) when receiving attacks, neutralizing setup sweepers."
+  },
+  {
+    question: "What is the effect of 'Snow' (introduced in Gen 9 to replace Hail) on Ice-type Pokémon?",
+    options: [
+      "BOOSTS ICE-TYPE DEFENSE BY 50% WITH NO PASSIVE CHIP DAMAGE TO NON-ICE FOES",
+      "DEALS CHIP DAMAGE TO NON-ICE AND BOOSTS SPECIAL DEFENSE",
+      "HEALS 1/8TH HP PER TURN TO ICE TYPES",
+      "DOUBLES SPEED OF ALL ICE TYPES"
+    ],
+    answerIndex: 0,
+    explanation: "In Gen 9, Snow replaced Hail: it increases the physical Defense of Ice-type Pokémon by 50% without dealing residual turn-by-turn chip damage."
+  },
+  {
+    question: "How does the ability 'Prankster' modify status moves, and what major vulnerability was added in Gen 7?",
+    options: [
+      "GIVES STATUS MOVES +1 PRIORITY, BUT DARK-TYPE OPPONENTS ARE IMMUNE TO PRANKSTER-BOOSTED MOVES",
+      "GIVES STATUS MOVES 100% ACCURACY BUT CANNOT BE USED AGAINST GHOST TYPES",
+      "DOUBLES THE DURATION OF STATUS MOVES",
+      "ALLOWS STATUS MOVES TO DEAL 50 BASE DAMAGE"
+    ],
+    answerIndex: 0,
+    explanation: "Prankster grants +1 priority to non-damaging moves, but Dark-type Pokémon are completely immune to Prankster-boosted moves targeting them!"
   }
 ];
 
@@ -305,7 +457,7 @@ const HARD_TRIVIA_QUESTIONS: TriviaQuestion[] = [
     explanation: "In Generations 1 to 4, Self-Destruct and Explosion had a hidden effect that halved the target's Defense stat during the damage check, essentially doubling their effective base power!"
   },
   {
-    question: "In Sinnoh's cosmology, has been verified that Giratina represents antimatter, Dialga time, and Palkia space. Where was Giratina banished to by Arceus due to its highly unstable physics?",
+    question: "In Sinnoh's cosmology, it has been verified that Giratina represents antimatter, Dialga time, and Palkia space. Where was Giratina banished to by Arceus due to its highly unstable physics?",
     options: [
       "THE DEPTHS OF MT. CORONET",
       "THE ABYSSAL DEEP SEA TRENCH",
@@ -332,7 +484,7 @@ const HARD_TRIVIA_QUESTIONS: TriviaQuestion[] = [
       "PHYSICAL ATTACK SKILLS",
       "FIRE-BASED MOVES AND RECOIL ATTACKS",
       "RECOVERY MOVES TIER 1",
-      "ANY MOCK STATUS OR NON-DAMAGE STATUS MOVES"
+      "ANY STATUS OR NON-DAMAGE STATUS MOVES"
     ],
     answerIndex: 3,
     explanation: "Assault Vest boosts Special Defense by 50% but restricts the bearer to only spending turns executing offensive damaging attacks. Status moves are completely blocked!"
@@ -397,6 +549,50 @@ const HARD_TRIVIA_QUESTIONS: TriviaQuestion[] = [
     ],
     answerIndex: 0,
     explanation: "Terastallizing into a Tera Type matching an original base type boosts the STAB bonus for that type from 1.5x to 2.0x!"
+  },
+  {
+    question: "What is the speed modifier applied by the ability 'Unburden' upon consuming or losing a held item in battle?",
+    options: [
+      "DOUBLES THE POKÉMON'S EFFECTIVE SPEED STAT (2.0X SPEED)",
+      "BOOSTS SPEED BY 50% (1.5X)",
+      "GRANTS +1 PRIORITY TO ALL MOVES",
+      "INCREASES SPEED BY 100 FLAT STAT POINTS"
+    ],
+    answerIndex: 0,
+    explanation: "Unburden doubles the Pokémon's effective Speed stat as soon as its held item is used or lost, persisting until switched out."
+  },
+  {
+    question: "What unique property prevents the ability 'Multiscale' or 'Shadow Shield' from reducing damage taken?",
+    options: [
+      "DAMAGE TAKEN WHEN CURRENT HP IS NOT AT 100% MAXIMUM HP",
+      "ATTACKS FROM LEVEL 100 POKÉMON",
+      "SPECIAL ATTACKS ONLY",
+      "CRITICAL HITS BLAZING THROUGH BARRIERS"
+    ],
+    answerIndex: 0,
+    explanation: "Multiscale and Shadow Shield reduce incoming damage by 50% only when the bearer is at full (100%) HP."
+  },
+  {
+    question: "How does the move 'Belly Drum' modify the user's Attack stage in battle?",
+    options: [
+      "SACRIFICES 50% MAX HP TO MAXIMIZE ATTACK TO +6 STAGES (4.0X ATTACK)",
+      "INCREASES ATTACK BY +3 STAGES AT COST OF 25% HP",
+      "DOUBLES ATTACK STAT FOR 3 TURNS WITH NO RECOIL",
+      "MAXIMIZES SPECIAL ATTACK AND ACCURACY"
+    ],
+    answerIndex: 0,
+    explanation: "Belly Drum cuts 50% of the user's maximum HP to instantly elevate physical Attack to its absolute maximum (+6 stages / 4x multiplier)!"
+  },
+  {
+    question: "Under Heavy Rain (Primordial Sea) summoned by Primal Kyogre, what happens to Fire-type moves used by either combatant?",
+    options: [
+      "FIRE-TYPE MOVES EVAPORATE AND FAIL COMPLETELY (0 DAMAGE)",
+      "FIRE-TYPE DAMAGE IS REDUCED BY 75%",
+      "FIRE-TYPE MOVES HIT KYOGRE FOR RECOIL DAMAGE",
+      "FIRE-TYPE MOVES BECOME WATER-TYPE MOVES"
+    ],
+    answerIndex: 0,
+    explanation: "Primordial Sea's extremely heavy deluge completely nullifies Fire-type attacks, causing them to fizzle and fail with 0 damage."
   }
 ];
 
@@ -407,9 +603,6 @@ interface PokethologyCombatMissionWidgetProps {
   missionRequiredCount?: number;
   dailyStreak?: number;
 }
-
-
-
 
 function usePersistentState<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [state, setState] = useState<T>(() => {
@@ -435,16 +628,50 @@ function usePersistentState<T>(key: string, initialValue: T): [T, React.Dispatch
 export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWidgetProps> = memo(({ todayStr, isCompleted, missionProgressCount, missionRequiredCount, dailyStreak }) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<'bronze' | 'silver' | 'gold'>('bronze');
 
-  const hash = useMemo(() => todayStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0), [todayStr]);
+  const hash = useMemo(() => {
+    return todayStr.split('').reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 13), 0);
+  }, [todayStr]);
 
-  const easyTriviaQuestion = EASY_TRIVIA_QUESTIONS[hash % EASY_TRIVIA_QUESTIONS.length];
-  const easyTriviaQuestionB = EASY_TRIVIA_QUESTIONS[(hash + 1) % EASY_TRIVIA_QUESTIONS.length];
+  // Distinct daily questions using high-entropy prime offsets
+  const easyTriviaQuestion = useMemo(() => {
+    const idx = Math.abs(hash * 3 + 7) % EASY_TRIVIA_QUESTIONS.length;
+    return EASY_TRIVIA_QUESTIONS[idx];
+  }, [hash]);
+
+  const easyTriviaQuestionB = useMemo(() => {
+    const idx = Math.abs(hash * 7 + 19) % EASY_TRIVIA_QUESTIONS.length;
+    // Guarantee distinct question
+    const finalIdx = idx === (Math.abs(hash * 3 + 7) % EASY_TRIVIA_QUESTIONS.length)
+      ? (idx + 1) % EASY_TRIVIA_QUESTIONS.length
+      : idx;
+    return EASY_TRIVIA_QUESTIONS[finalIdx];
+  }, [hash]);
   
-  const medTriviaQuestion = MEDIUM_TRIVIA_QUESTIONS[(hash + 3) % MEDIUM_TRIVIA_QUESTIONS.length];
-  const medTriviaQuestionB = MEDIUM_TRIVIA_QUESTIONS[(hash + 5) % MEDIUM_TRIVIA_QUESTIONS.length];
+  const medTriviaQuestion = useMemo(() => {
+    const idx = Math.abs(hash * 11 + 31) % MEDIUM_TRIVIA_QUESTIONS.length;
+    return MEDIUM_TRIVIA_QUESTIONS[idx];
+  }, [hash]);
+
+  const medTriviaQuestionB = useMemo(() => {
+    const idx = Math.abs(hash * 17 + 43) % MEDIUM_TRIVIA_QUESTIONS.length;
+    const finalIdx = idx === (Math.abs(hash * 11 + 31) % MEDIUM_TRIVIA_QUESTIONS.length)
+      ? (idx + 1) % MEDIUM_TRIVIA_QUESTIONS.length
+      : idx;
+    return MEDIUM_TRIVIA_QUESTIONS[finalIdx];
+  }, [hash]);
   
-  const hardTriviaQuestion = HARD_TRIVIA_QUESTIONS[Math.abs(hash) % HARD_TRIVIA_QUESTIONS.length];
-  const hardTriviaQuestionB = HARD_TRIVIA_QUESTIONS[(hash + 1) % HARD_TRIVIA_QUESTIONS.length];
+  const hardTriviaQuestion = useMemo(() => {
+    const idx = Math.abs(hash * 23 + 59) % HARD_TRIVIA_QUESTIONS.length;
+    return HARD_TRIVIA_QUESTIONS[idx];
+  }, [hash]);
+
+  const hardTriviaQuestionB = useMemo(() => {
+    const idx = Math.abs(hash * 29 + 71) % HARD_TRIVIA_QUESTIONS.length;
+    const finalIdx = idx === (Math.abs(hash * 23 + 59) % HARD_TRIVIA_QUESTIONS.length)
+      ? (idx + 1) % HARD_TRIVIA_QUESTIONS.length
+      : idx;
+    return HARD_TRIVIA_QUESTIONS[finalIdx];
+  }, [hash]);
 
   const combatChallenges = useMemo(() => getDailyHubCombatChallenges(todayStr), [todayStr]);
 
@@ -467,7 +694,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
   const [hardStatusB, setHardStatusB] = usePersistentState<'unanswered'|'correct'|'incorrect'>(`pokethology_hub_hard_b_${todayStr}`, 'unanswered');
   const [hardOptB, setHardOptB] = usePersistentState<number|null>(`pokethology_hub_hard_optb_${todayStr}`, null);
 
-  // Uncommitted selected choices before submission (matches Theory Exam structure)
+  // Uncommitted selected choices before submission
   const [selectedChoices, setSelectedChoices] = useState<Record<string, number>>({});
 
   // Poll local storage for combat progress and listen to custom sync events
@@ -550,100 +777,131 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     rank: typeof RANK_TIERS[0];
     prevRankTitle: string;
   } | null>(null);
-  const prevRankLevelRef = useRef<number | null>(null);
 
+  const prevRankLevelRef = useRef<number>(1);
   useEffect(() => {
-    try {
-      localStorage.setItem('pokethology_user_rank', operatorRank.title);
-      localStorage.setItem(`pokethology_user_rank_${todayStr}`, operatorRank.title);
-      
-      const celebratedLevelKey = `pokethology_celebrated_rank_level_${todayStr}`;
-      const highestCelebrated = parseInt(localStorage.getItem(celebratedLevelKey) || '1', 10);
-
-      if (prevRankLevelRef.current === null) {
-        prevRankLevelRef.current = operatorRank.level;
-      } else if (operatorRank.level > prevRankLevelRef.current && operatorRank.level > highestCelebrated) {
-        const prevTitle = RANK_TIERS.find(r => r.level === prevRankLevelRef.current)?.title || 'Novice';
-        setCelebratingRank({
-          rank: operatorRank,
-          prevRankTitle: prevTitle
-        });
-        localStorage.setItem(celebratedLevelKey, String(operatorRank.level));
-        try {
-          sounds.victory?.();
-          playHaptic?.();
-        } catch (_) {}
-        prevRankLevelRef.current = operatorRank.level;
-      } else {
-        prevRankLevelRef.current = operatorRank.level;
-      }
-    } catch (_) {}
+    const currentLvl = operatorRank.level;
+    const storedLevelKey = `pokethology_highest_rank_level_${todayStr}`;
+    const storedLevel = parseInt(localStorage.getItem(storedLevelKey) || '1', 10);
+    
+    if (currentLvl > storedLevel && currentLvl > 1) {
+      const prevRank = RANK_TIERS.find(r => r.level === storedLevel) || RANK_TIERS[0];
+      setCelebratingRank({
+        rank: operatorRank,
+        prevRankTitle: prevRank.title
+      });
+      localStorage.setItem(storedLevelKey, String(currentLvl));
+      try {
+        sounds.victory();
+      } catch (_) {}
+    } else if (currentLvl > storedLevel) {
+      localStorage.setItem(storedLevelKey, String(currentLvl));
+    }
+    prevRankLevelRef.current = currentLvl;
   }, [operatorRank, todayStr, RANK_TIERS]);
 
-  const handleSelectChoice = (tier: string, questionId: string, idx: number, isLocked: boolean) => {
+  const handleSelectChoice = (tier: string, qId: 'A' | 'B', optionIdx: number, isLocked: boolean) => {
     if (isLocked) return;
-    const key = `${tier}_${questionId}`;
-    setSelectedChoices(prev => ({ ...prev, [key]: idx }));
-    try { sounds.typing?.(); } catch (_) {}
+    setSelectedChoices(prev => ({
+      ...prev,
+      [`${tier}_${qId}`]: optionIdx
+    }));
+    try {
+      sounds.typing();
+      playHaptic('light');
+    } catch (_) {}
   };
 
-  const handleLockInAnswer = (tier: string, questionId: string, q: any) => {
-    const key = `${tier}_${questionId}`;
-    const chosenIdx = selectedChoices[key];
-    if (chosenIdx === undefined) return;
+  const handleLockInAnswer = (tier: string, qId: 'A' | 'B', questionObj: TriviaQuestion) => {
+    const key = `${tier}_${qId}`;
+    const selectedIdx = selectedChoices[key];
+    if (selectedIdx === undefined) return;
 
-    const answerIdx = q.answerIndex ?? q.correctAnswer ?? 0;
-    const isCorrect = chosenIdx === answerIdx;
+    const isCorrect = selectedIdx === questionObj.answerIndex;
+    const statusVal = isCorrect ? 'correct' : 'incorrect';
 
-    try { sounds.scan(); } catch (_) {}
+    if (tier === 'bronze') {
+      if (qId === 'A') {
+        setEasyStatusA(statusVal);
+        setEasyOptA(selectedIdx);
+      } else {
+        setEasyStatusB(statusVal);
+        setEasyOptB(selectedIdx);
+      }
+    } else if (tier === 'silver') {
+      if (qId === 'A') {
+        setMedStatusA(statusVal);
+        setMedOptA(selectedIdx);
+      } else {
+        setMedStatusB(statusVal);
+        setMedOptB(selectedIdx);
+      }
+    } else if (tier === 'gold') {
+      if (qId === 'A') {
+        setHardStatusA(statusVal);
+        setHardOptA(selectedIdx);
+      } else {
+        setHardStatusB(statusVal);
+        setHardOptB(selectedIdx);
+      }
+    }
+
     if (isCorrect) {
-      try { sounds.success?.(); } catch (_) {}
+      try {
+        sounds.success();
+        playHaptic('heavy');
+      } catch (_) {}
     } else {
-      try { sounds.error?.(); } catch (_) {}
-    }
-    
-    if (tier === 'bronze' && questionId === 'A') {
-      setEasyOptA(chosenIdx); setEasyStatusA(isCorrect ? 'correct' : 'incorrect');
-    } else if (tier === 'bronze' && questionId === 'B') {
-      setEasyOptB(chosenIdx); setEasyStatusB(isCorrect ? 'correct' : 'incorrect');
-    } else if (tier === 'silver' && questionId === 'A') {
-      setMedOptA(chosenIdx); setMedStatusA(isCorrect ? 'correct' : 'incorrect');
-    } else if (tier === 'silver' && questionId === 'B') {
-      setMedOptB(chosenIdx); setMedStatusB(isCorrect ? 'correct' : 'incorrect');
-    } else if (tier === 'gold' && questionId === 'A') {
-      setHardOptA(chosenIdx); setHardStatusA(isCorrect ? 'correct' : 'incorrect');
-    } else if (tier === 'gold' && questionId === 'B') {
-      setHardOptB(chosenIdx); setHardStatusB(isCorrect ? 'correct' : 'incorrect');
+      try {
+        sounds.error();
+        playHaptic('medium');
+      } catch (_) {}
     }
   };
 
-  const renderTrivia = (q: any, tier: string, qId: string, status: string, opt: number | null, num: number) => {
-    let tierColor = "text-amber-400";
+  const renderTrivia = (
+    q: TriviaQuestion, 
+    tier: string, 
+    qId: 'A' | 'B', 
+    status: 'unanswered' | 'correct' | 'incorrect', 
+    submittedOpt: number | null, 
+    num: number
+  ) => {
+    const key = `${tier}_${qId}`;
+    const isLocked = status !== 'unanswered';
+    const isCorrect = status === 'correct';
+    const selectedOption = isLocked ? submittedOpt : selectedChoices[key];
+    const correctIdx = q.answerIndex;
+
+    let tierColor = "text-cyan-400";
     if (tier === 'bronze') tierColor = "text-orange-400";
     if (tier === 'silver') tierColor = "text-slate-300";
     if (tier === 'gold') tierColor = "text-yellow-400";
 
-    const key = `${tier}_${qId}`;
-    const isLocked = status !== 'unanswered';
-    const selectedOption = isLocked ? opt : selectedChoices[key];
-    const correctIdx = q.answerIndex ?? q.correctAnswer ?? 0;
-    const isCorrect = status === 'correct';
-
     return (
-      <div className="bg-slate-950/90 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden shadow-lg text-left">
+      <div 
+        className={cn(
+          "bg-slate-950/80 border rounded-xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden shadow-lg text-left transition-all duration-300",
+          isLocked
+            ? isCorrect
+              ? "border-emerald-500/40 bg-emerald-950/10 shadow-[0_0_20px_rgba(16,185,129,0.1)]"
+              : "border-rose-500/40 bg-rose-950/10 shadow-[0_0_20px_rgba(244,63,94,0.1)]"
+            : "border-slate-800 hover:border-slate-700"
+        )}
+      >
         <HUDCorners />
-        <div className="flex justify-between items-center gap-2">
+        <div className="flex justify-between items-center">
           <h4 className={`text-xs sm:text-sm font-hud ${tierColor} uppercase font-bold tracking-wider flex items-center gap-2`}>
-            <HelpCircle className={`w-4 h-4 ${tierColor} shrink-0`} />
-            Activity {num} • Theory Question
+            <BrainCircuit className={`w-4 h-4 ${tierColor}`} />
+            Activity {num} • Combat Theory
           </h4>
           {isLocked && (
             <span
               className={cn(
-                'px-2 py-0.5 rounded text-[9px] font-mono font-black uppercase tracking-wider flex items-center gap-1 shrink-0',
+                'text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded border flex items-center gap-1',
                 isCorrect
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
-                  : 'bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-[0_0_10px_rgba(244,63,94,0.2)]'
+                  ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40'
+                  : 'bg-rose-950/60 text-rose-300 border-rose-500/40'
               )}
             >
               {isCorrect ? (
@@ -737,6 +995,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
   };
 
   const renderCombatChallenge = (challenge: any, tier: string, num: number) => {
+    if (!challenge) return null;
     const prog = combatProgress[challenge.id] || 0;
     const isDone = prog >= challenge.required;
 

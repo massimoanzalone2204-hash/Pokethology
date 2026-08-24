@@ -4813,6 +4813,8 @@ export default function App() {
             let opponentSpeed = 0;
             let opponentAttack = 0;
             let opponentHp = 0;
+            let opponentSpAtk = 0;
+            let opponentSpDef = 0;
             if (Array.isArray(oppAny.stats)) {
               const defStat = oppAny.stats.find((s: any) => s?.stat?.name === 'defense' || s?.name === 'defense');
               if (defStat) opponentDefense = defStat.base_stat ?? defStat.value ?? 0;
@@ -4825,15 +4827,32 @@ export default function App() {
               
               const hpStat = oppAny.stats.find((s: any) => s?.stat?.name === 'hp' || s?.name === 'hp');
               if (hpStat) opponentHp = hpStat.base_stat ?? hpStat.value ?? 0;
+
+              const spAtkStat = oppAny.stats.find((s: any) => s?.stat?.name === 'special-attack' || s?.name === 'special-attack' || s?.stat?.name === 'sp_attack');
+              if (spAtkStat) opponentSpAtk = spAtkStat.base_stat ?? spAtkStat.value ?? 0;
+
+              const spDefStat = oppAny.stats.find((s: any) => s?.stat?.name === 'special-defense' || s?.name === 'special-defense' || s?.stat?.name === 'sp_defense');
+              if (spDefStat) opponentSpDef = spDefStat.base_stat ?? spDefStat.value ?? 0;
             } else if (oppAny.defense !== undefined) {
               opponentDefense = Number(oppAny.defense);
               opponentSpeed = Number(oppAny.speed || 0);
               opponentAttack = Number(oppAny.attack || 0);
               opponentHp = Number(oppAny.hp || 0);
+              opponentSpAtk = Number(oppAny.specialAttack || oppAny.sp_attack || 0);
+              opponentSpDef = Number(oppAny.specialDefense || oppAny.sp_defense || 0);
             }
 
+            const opponentWeight = Number(oppAny.weight || 0) / 10; // kg
+            const bst = opponentHp + opponentAttack + opponentDefense + opponentSpAtk + opponentSpDef + opponentSpeed;
+
             const opponentName = (oppAny.name || '').toLowerCase();
-            const legendaries = ['articuno', 'zapdos', 'moltres', 'mewtwo', 'mew', 'raikou', 'entei', 'suicune', 'lugia', 'ho-oh', 'celebi', 'regirock', 'regice', 'registeel', 'latias', 'latios', 'kyogre', 'groudon', 'rayquaza', 'jirachi', 'deoxys', 'uxie', 'mesprit', 'azelf', 'dialga', 'palkia', 'heatran', 'regigigas', 'giratina', 'cresselia', 'phione', 'manaphy', 'darkrai', 'shaymin', 'arceus', 'victini', 'cobalion', 'terrakion', 'virizion', 'tornadus', 'thundurus', 'reshiram', 'zekrom', 'landorus', 'kyurem', 'keldeo', 'meloetta', 'genesect', 'xerneas', 'yveltal', 'zygarde', 'diancie', 'hoopa', 'volcanion', 'tapu koko', 'tapu lele', 'tapu bulu', 'tapu fini', 'cosmog', 'cosmoem', 'solgaleo', 'lunala', 'nihilego', 'buzzwole', 'pheromosa', 'xurkitree', 'celesteela', 'kartana', 'guzzlord', 'necrozma', 'magearna', 'marshadow', 'poipole', 'naganadel', 'stakataka', 'blacephalon', 'zeraora', 'meltan', 'melmetal', 'zacian', 'zamazenta', 'eternatus', 'kubfu', 'urshifu', 'zarude', 'regieleki', 'regidrago', 'glastrier', 'spectrier', 'calyrex', 'enamorus', 'great tusk', 'scream tail', 'brute bonnet', 'flutter mane', 'slither wing', 'sandy shocks', 'iron treads', 'iron bundle', 'iron hands', 'iron jugulis', 'iron moth', 'iron thorns', 'wo-chien', 'chien-pao', 'ting-lu', 'chi-yu', 'roaring moon', 'iron valiant', 'koraidon', 'miraidon', 'walking wake', 'iron leaves', 'gouging fire', 'raging bolt', 'iron boulder', 'iron crown', 'terapagos', 'pecharunt'];
+            const isMega = opponentName.includes('-mega') || opponentName.includes('mega-') || opponentName.includes('primal');
+            const isGmax = opponentName.includes('-gmax') || opponentName.includes('gmax') || opponentName.includes('gigantamax');
+            
+            const paradoxNames = ['great tusk', 'scream tail', 'brute bonnet', 'flutter mane', 'slither wing', 'sandy shocks', 'iron treads', 'iron bundle', 'iron hands', 'iron jugulis', 'iron moth', 'iron thorns', 'roaring moon', 'iron valiant', 'walking wake', 'iron leaves', 'gouging fire', 'raging bolt', 'iron boulder', 'iron crown'];
+            const ultraBeastNames = ['nihilego', 'buzzwole', 'pheromosa', 'xurkitree', 'celesteela', 'kartana', 'guzzlord', 'poipole', 'naganadel', 'stakataka', 'blacephalon'];
+
+            const legendaries = ['articuno', 'zapdos', 'moltres', 'mewtwo', 'mew', 'raikou', 'entei', 'suicune', 'lugia', 'ho-oh', 'celebi', 'regirock', 'regice', 'registeel', 'latias', 'latios', 'kyogre', 'groudon', 'rayquaza', 'jirachi', 'deoxys', 'uxie', 'mesprit', 'azelf', 'dialga', 'palkia', 'heatran', 'regigigas', 'giratina', 'cresselia', 'phione', 'manaphy', 'darkrai', 'shaymin', 'arceus', 'victini', 'cobalion', 'terrakion', 'virizion', 'tornadus', 'thundurus', 'reshiram', 'zekrom', 'landorus', 'kyurem', 'keldeo', 'meloetta', 'genesect', 'xerneas', 'yveltal', 'zygarde', 'diancie', 'hoopa', 'volcanion', 'tapu koko', 'tapu lele', 'tapu bulu', 'tapu fini', 'cosmog', 'cosmoem', 'solgaleo', 'lunala', 'necrozma', 'magearna', 'marshadow', 'zeraora', 'meltan', 'melmetal', 'zacian', 'zamazenta', 'eternatus', 'kubfu', 'urshifu', 'zarude', 'regieleki', 'regidrago', 'glastrier', 'spectrier', 'calyrex', 'enamorus', 'wo-chien', 'chien-pao', 'ting-lu', 'chi-yu', 'koraidon', 'miraidon', 'terapagos', 'pecharunt', ...paradoxNames, ...ultraBeastNames];
             const isLegendary = legendaries.some(leg => opponentName.includes(leg));
 
             let latestMissionNotice: { title: string; description: string; isComplete: boolean } | null = null;
@@ -4845,6 +4864,12 @@ export default function App() {
 
             if (currentMission.target === 'legendary') {
               if (isLegendary) matched = true;
+            } else if (currentMission.target === 'mega') {
+              if (isMega) matched = true;
+            } else if (currentMission.target === 'gmax') {
+              if (isGmax) matched = true;
+            } else if (currentMission.target === 'huge_bst') {
+              if (bst >= 540 || isLegendary || isMega) matched = true;
             } else if (currentMission.target === 'high_defense') {
               if (opponentDefense >= 150) matched = true;
             } else if (currentMission.target === 'ultra_defense') {
@@ -4852,9 +4877,12 @@ export default function App() {
             } else if (currentMission.type === 'type') {
               if (opponentTypes.includes(currentMission.target.toLowerCase())) matched = true;
             } else if (currentMission.type === 'stat') {
-              if (currentMission.target === 'defense') {
-                if (opponentDefense >= 100) matched = true;
-              }
+              if (currentMission.target === 'defense' && opponentDefense >= 120) matched = true;
+              if (currentMission.target === 'attack' && opponentAttack >= 130) matched = true;
+              if (currentMission.target === 'speed' && opponentSpeed >= 120) matched = true;
+              if (currentMission.target === 'special-attack' && opponentSpAtk >= 130) matched = true;
+              if (currentMission.target === 'special-defense' && opponentSpDef >= 130) matched = true;
+              if (currentMission.target === 'hp' && opponentHp >= 130) matched = true;
             }
 
             if (matched) {
@@ -4931,13 +4959,49 @@ export default function App() {
                 let isMatch = false;
                 if (challenge.type === 'type') {
                   if (opponentTypes.includes(challenge.target.toLowerCase())) isMatch = true;
+                } else if (challenge.type === 'single_type') {
+                  if (opponentTypes.length === 1) isMatch = true;
+                } else if (challenge.type === 'dual_type') {
+                  if (opponentTypes.length >= 2) isMatch = true;
                 } else if (challenge.type === 'stat') {
-                  if (challenge.target === 'defense' && opponentDefense >= 150) isMatch = true;
-                  if (challenge.target === 'speed' && opponentSpeed >= 120) isMatch = true;
-                  if (challenge.target === 'attack' && opponentAttack >= 130) isMatch = true;
-                  if (challenge.target === 'hp' && opponentHp >= 130) isMatch = true;
-                } else if (challenge.type === 'category' && challenge.target === 'legendary') {
-                  if (isLegendary) isMatch = true;
+                  if (challenge.target === 'defense') {
+                    if (challenge.tier === 'bronze' && opponentDefense >= 110) isMatch = true;
+                    else if (challenge.tier === 'silver' && opponentDefense >= 130) isMatch = true;
+                    else if (challenge.tier === 'gold' && opponentDefense >= 150) isMatch = true;
+                    else if (opponentDefense >= 110) isMatch = true;
+                  } else if (challenge.target === 'speed') {
+                    if (challenge.tier === 'bronze' && opponentSpeed >= 110) isMatch = true;
+                    else if (challenge.tier === 'silver' && opponentSpeed >= 125) isMatch = true;
+                    else if (challenge.tier === 'gold' && opponentSpeed >= 135) isMatch = true;
+                    else if (opponentSpeed >= 110) isMatch = true;
+                  } else if (challenge.target === 'attack') {
+                    if (challenge.tier === 'bronze' && opponentAttack >= 110) isMatch = true;
+                    else if (challenge.tier === 'silver' && opponentAttack >= 130) isMatch = true;
+                    else if (challenge.tier === 'gold' && opponentAttack >= 140) isMatch = true;
+                    else if (opponentAttack >= 110) isMatch = true;
+                  } else if (challenge.target === 'hp') {
+                    if (challenge.tier === 'bronze' && opponentHp >= 110) isMatch = true;
+                    else if (opponentHp >= 130) isMatch = true;
+                  } else if (challenge.target === 'special-attack') {
+                    if (challenge.tier === 'bronze' && opponentSpAtk >= 110) isMatch = true;
+                    else if (challenge.tier === 'silver' && opponentSpAtk >= 130) isMatch = true;
+                    else if (challenge.tier === 'gold' && opponentSpAtk >= 140) isMatch = true;
+                    else if (opponentSpAtk >= 110) isMatch = true;
+                  } else if (challenge.target === 'special-defense') {
+                    if (challenge.tier === 'bronze' && opponentSpDef >= 110) isMatch = true;
+                    else if (challenge.tier === 'silver' && opponentSpDef >= 130) isMatch = true;
+                    else if (challenge.tier === 'gold' && opponentSpDef >= 140) isMatch = true;
+                    else if (opponentSpDef >= 110) isMatch = true;
+                  } else if (challenge.target === 'bst') {
+                    if (challenge.tier === 'bronze' && bst >= 500) isMatch = true;
+                    else if (challenge.tier === 'silver' && bst >= 520) isMatch = true;
+                    else if (challenge.tier === 'gold' && bst >= 580) isMatch = true;
+                    else if (bst >= 500) isMatch = true;
+                  }
+                } else if (challenge.type === 'category') {
+                  if (challenge.target === 'legendary' && isLegendary) isMatch = true;
+                  if (challenge.target === 'mega' && isMega) isMatch = true;
+                  if (challenge.target === 'gmax' && isGmax) isMatch = true;
                 }
                 
                 if (isMatch) {
@@ -6320,10 +6384,10 @@ export default function App() {
                         <X className="w-3 h-3 sm:w-4 sm:h-4" />
                       </motion.button>
                     )}
-                  </AnimatePresence>
+        </AnimatePresence>
                 </motion.div>
               </motion.form>
-            </AnimatePresence>
+        </AnimatePresence>
 
             <motion.button
               whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(250,204,21,0.35)" }}
@@ -7623,7 +7687,7 @@ export default function App() {
                                               className="absolute inset-0 bg-red-500/25 pointer-events-none z-50 "
                                             />
                                           )}
-                                        </AnimatePresence>
+        </AnimatePresence>
                                         {/* Top Left: Opponent Status */}
                                         <OpponentStatusBar
                                           battleOpponent={battleOpponent}
@@ -7852,7 +7916,7 @@ export default function App() {
                                                 onComplete={removeFloatingText}
                                               />
                                             ))}
-                                          </AnimatePresence>
+        </AnimatePresence>
                                         </div>
 
 
@@ -7982,7 +8046,7 @@ export default function App() {
                                               </motion.div>
                                             </motion.div>
                                           )}
-                                        </AnimatePresence>
+        </AnimatePresence>
 
                                          {/* Centered Initiate Battle Trigger embedded on the Arena border (Responsive for Mobile, Tablet & PC) */}
                                          {!isBattling && (
@@ -8106,7 +8170,7 @@ export default function App() {
                                           </div>
                                          </motion.div>
                                        )}
-                                      </AnimatePresence>
+        </AnimatePresence>
 
                                       </div> {/* End of arenaRef Container */}
                                      </div> {/* End of Left Column Wrapper */}
@@ -8115,7 +8179,7 @@ export default function App() {
                                       <div className="lg:col-span-4 flex flex-col gap-4 w-full min-w-0 select-none pb-0 z-20">
                                         <AnimatePresence>
                                           {isBattling && <BattleLog log={battleLog} enableAnimations={enableAnimations} turn={turn || 'player'} isBattling={isBattling} />}
-                                         </AnimatePresence>
+        </AnimatePresence>
 
                                      
                                      {/* AI Coach Tactical Advice Panel - Displayed directly inside the Combat Arena */}
@@ -8584,13 +8648,13 @@ export default function App() {
 
                                         </motion.div>
                                       )}
-                                    </AnimatePresence>
+        </AnimatePresence>
                                     </div> {/* End of flex container */}
                                       </div> {/* End of Right Column */}
                                     </div>
                                   </motion.div>
                                 )}
-                              </AnimatePresence>
+        </AnimatePresence>
                             </motion.div>
 
                             {/* Floating Scroll to Top button for details container */}
@@ -9105,7 +9169,7 @@ export default function App() {
                         )}
                     </motion.div>
                  ) : null}
-               </AnimatePresence>
+        </AnimatePresence>
               </div>
             </div>
         </div>
@@ -10469,92 +10533,85 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0  z-[120] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto custom-scrollbar optimize-scrolling"
+              transition={{ type: "spring", damping: 25, stiffness: 250 }}
+              className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
             >
-              <motion.div
-                initial={{ scale: 0.98, y: 6, opacity: 0 }}
-                animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.98, y: 6, opacity: 0 }}
-                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(34,211,238,0.2)] p-4 sm:p-6 my-auto mx-auto"
-              >
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-hud text-cyan-400 uppercase tracking-widest">Combat Options</h2>
-                  <button onClick={() => setIsMusicOpen(false)} className="text-cyan-600 hover:text-cyan-400">
-                    <X className="w-6 h-6" />
-                  </button>
+              {/* Ambient Glows */}
+              <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Top System Header Bar */}
+              <div className="shrink-0 flex justify-between items-center px-4 sm:px-8 py-3.5 border-b border-cyan-500/30 w-full bg-slate-900/90 z-20 shadow-lg">
+                <div className="flex items-center gap-3">
+                  <motion.div 
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                    className="p-2 bg-cyan-950/80 border border-cyan-500/50 rounded-xl text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.3)]"
+                  >
+                    <Settings className="w-5 h-5 text-cyan-400 shrink-0" />
+                  </motion.div>
+                  <div>
+                    <h2 className="text-sm sm:text-lg font-hud font-black text-cyan-300 uppercase tracking-widest leading-none">
+                      Combat Options
+                    </h2>
+                  </div>
                 </div>
-                <div className="text-slate-300 text-sm space-y-4 font-mono">
-                  <p>Configure system sound effects, automated AI analysis, and visual animation toggles here.</p>
-                  <div className="space-y-4">
+                <button 
+                  onClick={() => setIsMusicOpen(false)} 
+                  className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm"
+                >
+                  <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+                  <span className="hidden sm:inline">CLOSE</span>
+                </button>
+              </div>
+
+              {/* Main Scroller Area */}
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar text-[11.5px] sm:text-[12.5px] leading-relaxed text-slate-300 select-text">
+                <div className="w-full max-w-4xl mx-auto text-slate-300 text-sm space-y-6 font-mono">
+                  <div className="space-y-6">
                     {quotaLimitReached && (
-                      <div className="bg-red-950/40 border border-red-500/30 p-3 rounded-xl flex flex-col gap-1 shadow-lg shadow-red-500/10 mb-4 animate-in fade-in slide-in-from-top-1">
+                      <div className="bg-red-950/40 border border-red-500/30 p-4 rounded-xl flex flex-col gap-2 shadow-lg shadow-red-500/10 mb-4 animate-in fade-in slide-in-from-top-1">
                         <div className="flex items-center gap-2">
-                           <AlertTriangle className="w-3 h-3 text-red-500 animate-pulse" />
-                           <span className="text-[8px] font-bold tracking-wider text-red-400 font-hud uppercase">AI Quota Exhausted</span>
+                           <AlertTriangle className="w-4 h-4 text-red-500 animate-pulse" />
+                           <span className="text-[10px] font-bold tracking-wider text-red-400 font-hud uppercase">AI Quota Exhausted</span>
                         </div>
-                        <p className="text-[8px] text-red-300 font-mono ml-5 leading-relaxed">
+                        <p className="text-xs text-red-300 font-mono ml-6 leading-relaxed">
                           The shared AI quota is exhausted. You can add your own <b>GEMINI_API_KEY</b> in the <b>Settings</b> menu (top-right cog icon) &gt; <b>Secrets</b> to bypass shared limits.
                         </p>
                         <button 
                           onClick={() => setQuotaLimitReached(false)}
-                          className="mt-1 text-[8px] text-cyan-400 font-hud tracking-widest text-left ml-5 underline uppercase"
+                          className="mt-2 text-xs text-cyan-400 font-hud tracking-widest text-left ml-6 underline uppercase hover:text-cyan-300"
                         >
                           Dismiss & Retry
                         </button>
                       </div>
                     )}
-                    <div className="flex items-center justify-between">
-                      <span className="text-cyan-300 font-hud uppercase text-[10px] font-bold tracking-wider tracking-widest">Animations</span>
-                      <button
-                        onClick={() => setEnableAnimations(!enableAnimations)}
-                        className={cn(
-                          "px-4 py-1 rounded font-hud uppercase text-[10px] font-bold tracking-wider tracking-widest transition-all",
-                          enableAnimations ? "bg-cyan-600" : "bg-slate-700 text-slate-400"
-                        )}
-                      >
-                        {enableAnimations ? 'Enabled' : 'Disabled'}
-                      </button>
-                    </div>
+                    
                     <AudioSettings mode="simple" />
 
-                    <div className="pt-4 border-t border-cyan-500/20">
-                      <div className="flex items-center justify-between">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-amber-400 font-hud uppercase text-[10px] font-bold tracking-widest flex items-center gap-1.5">
-                            <Trophy className="w-3.5 h-3.5" />
+                    <div className="pt-6 border-t border-cyan-500/20">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-amber-950/20 p-4 rounded-xl border border-amber-500/20">
+                        <div className="flex flex-col gap-1.5">
+                          <span className="text-amber-400 font-hud uppercase text-xs font-bold tracking-widest flex items-center gap-2">
+                            <Trophy className="w-4 h-4" />
                             Pokéthology Mission
                           </span>
-                          <span className="text-slate-400 text-[9px] max-w-[200px]">Track your overall combat mastery progress.</span>
+                          <span className="text-slate-400 text-xs">Track your overall combat mastery progress.</span>
                         </div>
                         <button
                           onClick={() => {
                             setIsMusicOpen(false);
                             setIsMissionModalOpen(true);
                           }}
-                          className="px-4 py-2 rounded-xl font-hud uppercase text-[10px] font-bold tracking-widest transition-all bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 hover:border-amber-400 hover:shadow-[0_0_15px_rgba(245,158,11,0.3)]"
+                          className="px-6 py-2.5 rounded-xl font-hud uppercase text-[10px] font-bold tracking-widest transition-all bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 hover:border-amber-400 hover:shadow-[0_0_15px_rgba(245,158,11,0.3)] whitespace-nowrap"
                         >
                           Personalize
                         </button>
                       </div>
                     </div>
-
-
-                    
-                  
-
-
                   </div>
                 </div>
-                <div className="mt-6 flex justify-end">
-                  <button
-                    onClick={() => setIsMusicOpen(false)}
-                    className="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 font-hud text-[10px] font-bold tracking-wider uppercase tracking-widest rounded-full transition-all"
-                  >
-                    Close
-                  </button>
-                </div>
-              </motion.div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -10650,7 +10707,7 @@ export default function App() {
                 </motion.div>
               );
             })}
-          </AnimatePresence>
+        </AnimatePresence>
         </div>
 
         {/* Hub Challenge Progress 8-Second Notification HUD */}
