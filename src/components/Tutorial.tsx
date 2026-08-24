@@ -442,6 +442,52 @@ export const Tutorial = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               </div>
               
               <div className="grid grid-cols-1 gap-3.5 text-left">
+                {/* POKÉTHOLOGY MISSION & OPERATOR RANK */}
+                <div className="p-4 rounded-xl border border-amber-500/40 bg-slate-900/70 flex items-start gap-4 group">
+                  <div className="p-3 bg-amber-950 rounded-full border border-amber-500/60 group-hover:scale-110 transition-transform shrink-0">
+                    <Target className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div className="space-y-1.5 w-full min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-hud font-black text-amber-300 text-xs sm:text-sm uppercase tracking-wider block">
+                        Pokéthology Mission & Operator Rank
+                      </span>
+                      <span className="text-[9px] font-mono font-bold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/30">
+                        MONTHLY SEASON
+                      </span>
+                    </div>
+                    <p className="text-[10.5px] sm:text-[11px] text-slate-300 leading-relaxed font-sans pt-0.5">
+                      The core competitive objective is to conquer the arena with every single Pokémon species, Mega Evolution, Gigantamax variant, and Alternate Form in the Pokédex while mastering all 18 elemental types. You can access and review your progress anytime inside the <span className="text-cyan-300 font-bold font-hud uppercase">Combat Options</span> menu (gear icon).
+                    </p>
+                    
+                    {/* Rank Calculation Pillars */}
+                    <div className="bg-slate-950/60 p-3 rounded-lg border border-amber-500/20 space-y-1.5 my-1.5">
+                      <span className="text-[9px] font-hud uppercase tracking-wider text-amber-400/90 font-bold block">
+                        Operator Rank Rating Factors:
+                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 text-[9.5px] sm:text-[10px] font-mono">
+                        <div className="bg-slate-900/90 px-2 py-1 rounded border border-slate-800 text-slate-300 flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                          <span>Pokémon Victories</span>
+                        </div>
+                        <div className="bg-slate-900/90 px-2 py-1 rounded border border-slate-800 text-slate-300 flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          <span>Daily Hub Done</span>
+                        </div>
+                        <div className="bg-slate-900/90 px-2 py-1 rounded border border-slate-800 text-slate-300 flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                          <span>Theory Exams</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-[10px] text-amber-300/90 font-sans italic flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
+                      Competitive Rank tiers (Poké Ball &rarr; Great Ball &rarr; Ultra Ball &rarr; Master Ball) reset on the 1st of every month.
+                    </p>
+                  </div>
+                </div>
+
                 {/* DAILY FEATURED SCAN */}
                 <div className="p-4 rounded-xl border border-amber-500/40 bg-slate-900/70 flex items-start gap-4 group">
                   <div className="p-3 bg-amber-950 rounded-full border border-amber-500/60 group-hover:scale-110 transition-transform shrink-0">

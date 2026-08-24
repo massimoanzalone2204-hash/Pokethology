@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 import { GoogleGenAI, Type } from "@google/genai";
 import { LRUCache } from "lru-cache";
 import fs from "fs";
-import { getEditDistance, extractSuggestedPokemon } from "./server/utils/stringUtils";
+import { extractSuggestedPokemon } from "./server/utils/stringUtils";
 import { strategies } from "./server/utils/battleUtils";
 import { handleApiError } from "./server/utils/errorHandling";
 import { generateWithRetry, isQuotaError, registerApiCallRecorder } from "./server/services/geminiService";
@@ -41,7 +41,6 @@ const suggestionCache = new LRUCache<string, string>({ max: 1000, ttl: 1000 * 60
 const strategyCache = new LRUCache<string, string>({ max: 500, ttl: 1000 * 60 * 10 }); // 10 minutes
 const analysisCache = new LRUCache<string, string>({ max: 200, ttl: 1000 * 60 * 5 }); // 5 minutes
 const chatCache = new LRUCache<string, any>({ max: 500, ttl: 1000 * 60 * 20 }); // 20 minutes chat cache
-const missionsCache = new LRUCache<string, any>({ max: 50, ttl: 1000 * 60 * 60 * 24 }); // 24 hours daily combat missions cache
 
 // Initialize Gemini
 const getApiKey = () => process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
@@ -690,149 +689,6 @@ app.post("/api/quota/reset-metrics", (req, res) => {
   });
 });
 
-app.get("/api/missions", async (req, res) => {
-  const dateStr = (req.query.date as string) || new Date().toISOString().split('T')[0];
-
-  // Return from in-memory cache instantly if available! This drastically speeds up operations.
-  if (missionsCache.has(dateStr)) {
-    console.log(`[Cache Hit] Serving cached daily combat missions for Date: ${dateStr}`);
-    return res.json(missionsCache.get(dateStr));
-  }
-
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    return res.json({
-      success: true,
-      mode: "offline",
-      easyTrivia: null,
-      easyTriviaB: null,
-      medTrivia: null,
-      medTriviaB: null,
-      hardTrivia: null,
-      hardTriviaB: null,
-    });
-  }
-
-  try {
-    const response = await generateWithRetry({
-      model: DEFAULT_MODEL,
-      contents: `You are the Grandmaster of Pokétheology, Sinnoh cosmology, and competitive Pokémon battling.
-      Generate exactly 6 distinct multiple-choice trivia questions for Sinnoh Core Operations daily bulletin on date ${dateStr}.
-      
-      The questions must be structured as:
-      - easy: General type matchup, simple status effect, or straightforward Kanto mechanics.
-      - easyB: Another distinct beginner friendly mechanic or status challenge.
-      - medium: Weather mechanics, speed tier manipulations, complex status conditions, or items like Eviolite/Life Orb.
-      - mediumB: Another mid-level competitive question on ability synergies, terrain effects, or STAB.
-      - hard: Deep legendary mythology (Arceus, Origin Forme, Creation trio, Sinnoh folk tales) or advanced mechanical details.
-      - hardB: Another high-register theory question on Sinnoh space-time distortions or ultimate strategic items like Assault Vest.
-
-      Each question must have exactly 4 uppercase options, a correct answer index (0-3), and a short human explanation. Output must be valid JSON matching the schema.`,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            easy: {
-              type: Type.OBJECT,
-              properties: {
-                question: { type: Type.STRING },
-                options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                answerIndex: { type: Type.INTEGER },
-                explanation: { type: Type.STRING }
-              },
-              required: ["question", "options", "answerIndex", "explanation"]
-            },
-            easyB: {
-              type: Type.OBJECT,
-              properties: {
-                question: { type: Type.STRING },
-                options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                answerIndex: { type: Type.INTEGER },
-                explanation: { type: Type.STRING }
-              },
-              required: ["question", "options", "answerIndex", "explanation"]
-            },
-            medium: {
-              type: Type.OBJECT,
-              properties: {
-                question: { type: Type.STRING },
-                options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                answerIndex: { type: Type.INTEGER },
-                explanation: { type: Type.STRING }
-              },
-              required: ["question", "options", "answerIndex", "explanation"]
-            },
-            mediumB: {
-              type: Type.OBJECT,
-              properties: {
-                question: { type: Type.STRING },
-                options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                answerIndex: { type: Type.INTEGER },
-                explanation: { type: Type.STRING }
-              },
-              required: ["question", "options", "answerIndex", "explanation"]
-            },
-            hard: {
-              type: Type.OBJECT,
-              properties: {
-                question: { type: Type.STRING },
-                options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                answerIndex: { type: Type.INTEGER },
-                explanation: { type: Type.STRING }
-              },
-              required: ["question", "options", "answerIndex", "explanation"]
-            },
-            hardB: {
-              type: Type.OBJECT,
-              properties: {
-                question: { type: Type.STRING },
-                options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                answerIndex: { type: Type.INTEGER },
-                explanation: { type: Type.STRING }
-              },
-              required: ["question", "options", "answerIndex", "explanation"]
-            }
-          },
-          required: ["easy", "easyB", "medium", "mediumB", "hard", "hardB"]
-        }
-      }
-    });
-
-    let rawText = response.text || "";
-    if (rawText.startsWith("```")) {
-      rawText = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
-    }
-    const parsed = JSON.parse(rawText.trim());
-    const result = {
-      success: true,
-      mode: "dynamic",
-      easyTrivia: parsed.easy,
-      easyTriviaB: parsed.easyB,
-      medTrivia: parsed.medium,
-      medTriviaB: parsed.mediumB,
-      hardTrivia: parsed.hard,
-      hardTriviaB: parsed.hardB,
-    };
-    
-    // Save to cache
-    missionsCache.set(dateStr, result);
-    return res.json(result);
-  } catch (err: any) {
-    console.error("Failed to generate dynamic combat missions:", err);
-    return res.json({
-      success: true,
-      mode: "offline",
-      easyTrivia: null,
-      easyTriviaB: null,
-      medTrivia: null,
-      medTriviaB: null,
-      hardTrivia: null,
-      hardTriviaB: null,
-    });
-  }
-});
-
 app.get("/api/proxy", async (req, res) => {
   const targetUrl = req.query.url as string;
   if (!targetUrl) {
@@ -845,13 +701,24 @@ app.get("/api/proxy", async (req, res) => {
   }
 
   try {
-    const response = await fetch(targetUrl);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    const response = await fetch(targetUrl, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'PokethologyApp/2.0 (Mozilla/5.0)'
+      }
+    });
+    clearTimeout(timeout);
     if (!response.ok) {
       return res.status(response.status).json({ error: `Proxy received status ${response.status}` });
     }
     const data = await response.json();
     return res.json(data);
   } catch (err: any) {
+    if (err.name === 'AbortError') {
+      return res.status(504).json({ error: "Proxy upstream PokeAPI timeout" });
+    }
     handleApiError(err, res, "Proxy error");
   }
 });
@@ -1135,13 +1002,14 @@ app.post("/api/chat", async (req, res) => {
         You possess absolute, omniscient mastery over every dimension of the Pokémon universe — spanning official game data, manga canon, anime lore, competitive VGC/Smogon metagames, trading card game history, developer interviews, cultural impact, fan theories, speculative biology, mythical folklore, and deep-dive creative community lore.
 
         APPLICATION CONTEXT & ACTUAL REAL FEATURES:
-        Pokéthology is composed strictly of these core modules:
-        1. Complete Pokédex Registry: All 9 Generations + Alternate Forms (Mega, Gigantamax, Regional Alolan/Galarian/Hisuian/Paldean, Primal, Origin) with official artwork, shiny sprites, showdown 3D sprites, audio cries, base stat radials, type weaknesses/resistances matrix, abilities, movesets, and lore entries. Filtering is done exclusively by Generation/Region and text search (there is NO type filter button).
-        2. Full-Screen 2-Pokémon Comparator: Direct side-by-side comparative diagnostics between two selected species.
-        3. 1v1 Turn-Based Combat Arena: Direct singles duels where the player and opponent command 4 selected moves (with PP, power, accuracy, STAB, critical hits, status conditions, stat modifications, and weather). Includes Chaos Mode for randomized combatants and movesets. There is NO team builder / 6v6 squad builder and NO auto-battle simulator.
-        4. Daily Hub & Utilities: Daily Theory Exam (3 theological lore questions), Daily Combat Missions (6 trivia/battle challenges), Daily Featured Scan, and Favorites Vault.
+        Pokéthology is composed strictly of these real core modules:
+        1. Complete Pokédex Registry: All 9 Generations + Alternate Forms (Mega Evolution, Gigantamax, Regional Alolan/Galarian/Hisuian/Paldean, Primal, Origin) with official artwork, shiny sprites, showdown 3D animated sprites, audio cries, base stat radials, type weaknesses/resistances matrix, abilities, learnable movesets, and lore entries. Filtering is performed by Generation/Region and text search.
+        2. Full-Screen 2-Pokémon Comparator: Direct side-by-side comparative diagnostics between two selected species with stat diffs and typing analysis.
+        3. 1v1 Turn-Based Combat Arena: Single duel simulator where the player and opponent battle with 4 selected moves (with PP, power, accuracy, STAB, critical hits, status conditions, stat buffs/debuffs, and weather). Includes Chaos Mode for randomized combatants and movesets. (Note: There is NO 6v6 squad builder, NO auto-battle simulator, and NO online PvP).
+        4. Pokéthology Mission & Operator Rank: Total Pokédex Mastery (conquering arena battles with all Pokémon species, forms, and elemental types) with monthly competitive rank tiers (Poké Ball -> Great Ball -> Ultra Ball -> Master Ball) and seasonal resets.
+        5. Daily Hub & Utilities: Daily Theory Exam (3 deep lore/mythology questions), Daily Combat Mission Challenges, Daily Featured Scan, and Favorites Vault.
         
-        DO NOT hallucinate non-existent features (e.g. do not tell the user to use a "team builder", "filter by type button", or "auto-battle simulation mode").
+        DO NOT hallucinate non-existent features (e.g., do not suggest or mention a team builder, type-filter buttons, auto-battle bots, or online multiplayer matchmaking).
 
         ABSOLUTE OMNISCIENCE & EXPANDED UNIVERSE MANDATE:
         - You embrace the entire Pokémon world in its fullest breadth: official stats and game mechanics as well as rich fan interpretations, cultural mythos, historical theories (like the Great War of Kanto), anime adaptations, manga arcs (Special/Adventures), and creative worldbuilding.

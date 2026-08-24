@@ -195,14 +195,26 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
             className="flex-1 overflow-y-auto custom-scrollbar p-3.5 sm:p-6 md:p-8 max-w-7xl mx-auto w-full flex flex-col gap-6"
           >
             {/* Primary Objective Banner */}
-            <div className="bg-amber-950/25 border border-amber-500/30 p-3.5 sm:p-4 md:p-5 rounded-2xl shadow-inner flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3.5">
-              <div className="space-y-1">
+            <div className="bg-amber-950/25 border border-amber-500/30 p-3.5 sm:p-4 md:p-5 rounded-2xl shadow-inner flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+              <div className="space-y-1.5 max-w-2xl">
                 <h3 className="text-amber-300 font-hud uppercase tracking-widest text-xs sm:text-sm flex items-center gap-2">
                   <Target className="w-4 h-4 text-amber-400 shrink-0" />
                   Primary Mission Objective
                 </h3>
-                <p className="text-slate-400 text-[11px] sm:text-xs font-sans leading-relaxed max-w-2xl">
-                  Win combat battles using every Pokémon, Mega Evolution, G-Max variant, and Alternate Form while mastering all 18 elemental types.
+                <p className="text-slate-300 text-[11px] sm:text-xs font-sans leading-relaxed">
+                  Conquer combat battles using every Pokémon species, Mega Evolution, G-Max variant, and Alternate Form while mastering all 18 elemental types.
+                </p>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] sm:text-[11px] text-amber-200/90 font-mono">
+                  <span className="text-slate-400 font-sans">Rank calculated from:</span>
+                  <span className="text-cyan-300 bg-cyan-950/50 px-1.5 py-0.5 rounded border border-cyan-500/30">Pokémon Victories</span>
+                  <span className="text-slate-500">•</span>
+                  <span className="text-amber-300 bg-amber-950/50 px-1.5 py-0.5 rounded border border-amber-500/30">Daily Hub Done</span>
+                  <span className="text-slate-500">•</span>
+                  <span className="text-purple-300 bg-purple-950/50 px-1.5 py-0.5 rounded border border-purple-500/30">Theory Exams Done</span>
+                </div>
+                <p className="text-[10px] text-amber-400/90 font-sans italic flex items-center gap-1.5 pt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
+                  Rank season resets automatically on the 1st of every month.
                 </p>
               </div>
 

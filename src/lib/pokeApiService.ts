@@ -212,19 +212,15 @@ class PokeApiService {
       };
     }
 
-    const urlStr = `${BASE_URL}${endpoint}`;
+    const urlStr = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
     
-    // Determine an aggressive but reasonable timeout based on endpoint importance & size
-    const timeoutMs = urlStr.includes('/pokemon?')
-      ? 8000
-      : urlStr.includes('/pokemon/')
-      ? 5000
-      : 2000;
+    // Generous and resilient timeout for direct and proxied PokeAPI requests
+    const timeoutMs = urlStr.includes('limit=') ? 12000 : 8000;
 
     let lastError: any;
     let res: Response | null = null;
     
-    // Reduce to 2 quick retries to avoid long sequential stalls on slow networks
+    // Direct network attempt with quick retry
     for (let i = 0; i < 2; i++) {
       const controller = new AbortController();
       const tId = setTimeout(() => controller.abort(), timeoutMs);
@@ -236,7 +232,7 @@ class PokeApiService {
         clearTimeout(tId);
         lastError = err;
         if (i < 1) {
-          await new Promise(r => setTimeout(r, 150));
+          await new Promise(r => setTimeout(r, 200));
         }
       }
     }
@@ -244,7 +240,7 @@ class PokeApiService {
     // Fall back immediately to local server-side proxy which acts as a secondary cache & network gateway
     if (!res || (!res.ok && res.status !== 404)) {
       const proxyController = new AbortController();
-      const proxyTimeoutId = setTimeout(() => proxyController.abort(), timeoutMs + 1000);
+      const proxyTimeoutId = setTimeout(() => proxyController.abort(), 10000);
       try {
         const proxyUrl = `/api/proxy?url=${encodeURIComponent(urlStr)}`;
         const proxyRes = await fetch(proxyUrl, { signal: proxyController.signal });
@@ -254,7 +250,7 @@ class PokeApiService {
         }
       } catch (proxyErr) {
         clearTimeout(proxyTimeoutId);
-        console.error("Proxy fetch also failed for:", urlStr, proxyErr);
+        // Silently record fallback state without uncaught rejection
       }
     }
 

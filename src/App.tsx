@@ -43,7 +43,6 @@ import { PokethologyQuizWidget } from './components/PokethologyQuizWidget';
 import { MoveModal } from './components/MoveModal';
 import { BattleHistory } from './components/BattleHistory';
 import { PokethologyMissionModal } from './components/PokethologyMissionModal';
-import { PokethologyMissionBadge } from './components/PokethologyMissionBadge';
 import { AboutModal } from './components/AboutModal';
 import { DisclaimerModal, DisclaimerButton } from './components/DisclaimerModal';
 import { PwaInstallModal } from './components/PwaInstallModal';
@@ -8623,7 +8622,6 @@ export default function App() {
                         transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                         className="flex-1 flex flex-col items-center justify-center gap-3 sm:gap-4 md:gap-5 py-3 sm:py-5 px-3 sm:px-4 text-center relative overflow-y-auto custom-scrollbar optimize-scrolling select-none w-full h-full my-auto max-w-5xl mx-auto min-h-0"
                       >
-                        <PokethologyMissionBadge />
                         {/* Top-Right Corner Avatar with Interactive Selector */}
                         <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20 flex flex-col items-end gap-1">
                           <button
@@ -8668,7 +8666,7 @@ export default function App() {
                             <span className="text-cyan-400 text-2xl xxs:text-3xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-black text-glow inline-block py-0.5 ml-1" style={{ textShadow: isLightMode ? 'none' : '0 0 16px rgba(34,211,238,0.7)' }}>OS</span>
                           </h1>
                           <p className="font-serif italic text-xs xxs:text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl text-cyan-400 select-none px-4 mt-0.5 tracking-wider whitespace-normal break-words text-center drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">
-                            "Where dreams and adventures begin!"
+                            Where dreams and adventures begin!
                           </p>
                           
                           
@@ -8794,7 +8792,7 @@ export default function App() {
                                     POKÉTHOLOGY
                                   </h1>
                                   <span className="font-serif italic text-xs xs:text-sm sm:text-base text-cyan-400/90 tracking-wider mt-2 leading-none">
-                                    "Where dreams and adventures begin!"
+                                    Where dreams and adventures begin!
                                   </span>
                                 </div>
                               </div>
@@ -10334,7 +10332,7 @@ export default function App() {
                       About Pokéthology
                     </h3>
                     <div className="bg-slate-950/40 p-4 rounded-xl border border-white/5 shadow-inner leading-relaxed">
-                      <p className="italic text-cyan-300/80 font-serif mb-3 text-sm">"Where dreams and adventures begin!"</p>
+                      <p className="italic text-cyan-300/80 font-serif mb-3 text-sm">Where dreams and adventures begin!</p>
                       <p className="text-[11px] sm:text-[12px] text-slate-400">The primary function of Pokéthology is to act as a highly interactive, all-in-one encyclopedia and combat simulator. Designed with an ultra-high performance gaming framework, it syncs live PokeAPI variables instantly to enable full-scale combat testing under strict competitive parameters.</p>
                     </div>
                   </div>

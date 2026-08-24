@@ -266,9 +266,9 @@ export async function searchPokemon(query: string): Promise<Pokemon> {
         const speciesRes = await fetch(data.species.url);
         if (speciesRes.ok) {
           const speciesData = await speciesRes.json();
-          const defaultVariety = speciesData.varieties.find((v: any) => v.is_default);
+          const defaultVariety = Array.isArray(speciesData?.varieties) ? speciesData.varieties.find((v: any) => v?.is_default) : null;
           
-          if (defaultVariety && defaultVariety.pokemon.url) {
+          if (defaultVariety && defaultVariety.pokemon?.url) {
             const baseRes = await fetch(defaultVariety.pokemon.url);
             if (baseRes.ok) {
               const baseData = await baseRes.json();
@@ -293,7 +293,7 @@ export async function searchPokemon(query: string): Promise<Pokemon> {
           }
         }
       } catch(e) {
-         console.error("Failed to fetch fallback base data for form", e);
+         // Silently handle fallback base data for form
       }
     }
   }
@@ -331,17 +331,17 @@ export async function searchPokemon(query: string): Promise<Pokemon> {
       try {
         const res = await fetch(a.ability.url);
         const abilityDetails = await res.json();
-        let entry = abilityDetails.flavor_text_entries.find((e: any) => e.language.name === baseLang);
-        if (!entry) {
-          entry = abilityDetails.flavor_text_entries.find((e: any) => e.language.name === 'en');
-        }
-        const localizedName = abilityDetails.names?.find((n: any) => n.language.name === baseLang)?.name ||
-                                abilityDetails.names?.find((n: any) => n.language.name === 'en')?.name ||
+        let entry = Array.isArray(abilityDetails?.flavor_text_entries) 
+          ? (abilityDetails.flavor_text_entries.find((e: any) => e?.language?.name === baseLang) || abilityDetails.flavor_text_entries.find((e: any) => e?.language?.name === 'en'))
+          : null;
+
+        const localizedName = abilityDetails?.names?.find((n: any) => n?.language?.name === baseLang)?.name ||
+                                abilityDetails?.names?.find((n: any) => n?.language?.name === 'en')?.name ||
                                 a.ability.name;
         return {
           name: localizedName,
           is_hidden: a.is_hidden,
-          description: entry ? entry.flavor_text : 'No description available.'
+          description: entry?.flavor_text ? entry.flavor_text.replace(/\f/g, ' ').replace(/\u00ad\n/g, '').replace(/\u00ad/g, '').replace(/ \n/g, ' ').replace(/\n/g, ' ').trim() : 'No description available.'
         };
       } catch (e) {
         return {
@@ -359,251 +359,289 @@ export async function searchPokemon(query: string): Promise<Pokemon> {
   let gameDescriptions: { version: string; flavor_text: string }[] = [];
   let varieties: Pokemon['varieties'] = [];
   let baseId = data.id;
-  try {
-    const speciesRes = await fetch(data.species.url);
-    const speciesData = await speciesRes.json();
-    
-    // Original variety mapping
-    varieties = speciesData.varieties
-      .filter((v: any) => 
-        v.pokemon.name !== 'tatsugiri-curly-mega' && 
-        v.pokemon.name !== 'tatsugiri-droopy-mega' &&
-        !v.pokemon.name.startsWith('koraidon-') &&
-        !v.pokemon.name.startsWith('miraidon-')
-      )
-      .map((v: any) => ({
-        ...v,
-        pokemon: {
-          ...v.pokemon,
-          name: REV_MALE_BASE_FORMS[v.pokemon.name] || v.pokemon.name
-        }
-      }));
-    
-    baseId = speciesData.id;
-    
-    let entry = speciesData.flavor_text_entries.find((e: any) => e.language.name === baseLang);
-    if (!entry) {
-      entry = speciesData.flavor_text_entries.find((e: any) => e.language.name === 'en');
-    }
-    if (entry) {
-      description = entry.flavor_text
-        .replace(/\f/g, ' ')
-        .replace(/\u00ad\n/g, '')
-        .replace(/\u00ad/g, '')
-        .replace(/ \n/g, ' ')
-        .replace(/\n/g, ' ')
-        .trim();
-    }
 
-    if (speciesData.flavor_text_entries) {
-      const langEntries = speciesData.flavor_text_entries.filter((e: any) => e.language.name === baseLang);
-      const entriesToUse = langEntries.length > 0 ? langEntries : speciesData.flavor_text_entries.filter((e: any) => e.language.name === 'en');
-      
-      const versionMap = new Map<string, string>();
-      entriesToUse.forEach((e: any) => {
-        const cleanText = e.flavor_text;
-        const vName = e.version?.name;
-        if (vName && cleanText.length > 0 && cleanText !== 'No description available.') {
-          // Keep the first entry for each unique version
-          if (!versionMap.has(vName)) {
-            versionMap.set(vName, cleanText);
+  if (data?.species?.url) {
+    try {
+      const speciesRes = await fetch(data.species.url);
+      if (speciesRes.ok) {
+        const speciesData = await speciesRes.json();
+        
+        if (speciesData && !speciesData.error) {
+          // Safe variety mapping
+          if (Array.isArray(speciesData.varieties)) {
+            varieties = speciesData.varieties
+              .filter((v: any) => 
+                v?.pokemon?.name &&
+                v.pokemon.name !== 'tatsugiri-curly-mega' && 
+                v.pokemon.name !== 'tatsugiri-droopy-mega' &&
+                !v.pokemon.name.startsWith('koraidon-') &&
+                !v.pokemon.name.startsWith('miraidon-')
+              )
+              .map((v: any) => ({
+                ...v,
+                pokemon: {
+                  ...v.pokemon,
+                  name: REV_MALE_BASE_FORMS[v.pokemon.name] || v.pokemon.name
+                }
+              }));
+          }
+          
+          if (speciesData.id) {
+            baseId = speciesData.id;
+          }
+          
+          if (Array.isArray(speciesData.flavor_text_entries)) {
+            let entry = speciesData.flavor_text_entries.find((e: any) => e?.language?.name === baseLang);
+            if (!entry) {
+              entry = speciesData.flavor_text_entries.find((e: any) => e?.language?.name === 'en');
+            }
+            if (entry?.flavor_text) {
+              description = entry.flavor_text
+                .replace(/\f/g, ' ')
+                .replace(/\u00ad\n/g, '')
+                .replace(/\u00ad/g, '')
+                .replace(/ \n/g, ' ')
+                .replace(/\n/g, ' ')
+                .trim();
+            }
+
+            const langEntries = speciesData.flavor_text_entries.filter((e: any) => e?.language?.name === baseLang);
+            const entriesToUse = langEntries.length > 0 ? langEntries : speciesData.flavor_text_entries.filter((e: any) => e?.language?.name === 'en');
+            
+            const versionMap = new Map<string, string>();
+            entriesToUse.forEach((e: any) => {
+              const cleanText = e?.flavor_text;
+              const vName = e?.version?.name;
+              if (vName && cleanText && cleanText.length > 0 && cleanText !== 'No description available.') {
+                // Keep the first entry for each unique version
+                if (!versionMap.has(vName)) {
+                  versionMap.set(vName, cleanText);
+                }
+              }
+            });
+
+            let parsedDescriptions: { version: string; flavor_text: string }[] = [];
+            
+            const pokemonName = (data.name || '').toLowerCase();
+            const zaEntryText = getZAEntry(pokemonName);
+            const isZAMega = zaEntryText !== null || pokemonName.includes('legends-z-a') || pokemonName.includes('legends-za');
+
+            let validVersions: string[] | null = null;
+            if (pokemonName.includes('-gmax')) {
+              validVersions = ['sword', 'shield'];
+            } else if (isZAMega) {
+              validVersions = ['legends-z-a'];
+            } else if (pokemonName.includes('-mega') || pokemonName.includes('-primal')) {
+              validVersions = ['x', 'y', 'omega-ruby', 'alpha-sapphire', 'sun', 'moon', 'ultra-sun', 'ultra-moon', 'lets-go-pikachu', 'lets-go-eevee'];
+            } else if (pokemonName.includes('-alola')) {
+              validVersions = ['sun', 'moon', 'ultra-sun', 'ultra-moon', 'lets-go-pikachu', 'lets-go-eevee', 'sword', 'shield', 'scarlet', 'violet'];
+            } else if (pokemonName.includes('-galar')) {
+              validVersions = ['sword', 'shield', 'scarlet', 'violet'];
+            } else if (pokemonName.includes('-hisui')) {
+              validVersions = ['legends-arceus', 'scarlet', 'violet'];
+            } else if (pokemonName.includes('-paldea')) {
+              validVersions = ['scarlet', 'violet'];
+            }
+
+            ALL_GAME_VERSIONS.forEach(version => {
+              if (versionMap.has(version) && (!validVersions || validVersions.includes(version))) {
+                const text = versionMap.get(version) || "";
+                const cleanText = text
+                  .replace(/\f/g, ' ')
+                  .replace(/\u00ad\n/g, '')
+                  .replace(/\u00ad/g, '')
+                  .replace(/ \n/g, ' ')
+                  .replace(/\n/g, ' ')
+                  .trim();
+                parsedDescriptions.push({ version, flavor_text: cleanText });
+              }
+            });
+            
+            // Fallback for Scarlet and Violet if missing (only for base forms)
+            if (!validVersions) {
+              const fallbackText = parsedDescriptions.length > 0 
+                ? parsedDescriptions[parsedDescriptions.length - 1].flavor_text 
+                : description;
+              if (!parsedDescriptions.some(d => d.version === 'scarlet')) {
+                parsedDescriptions.push({ version: 'scarlet', flavor_text: fallbackText });
+              }
+              if (!parsedDescriptions.some(d => d.version === 'violet')) {
+                parsedDescriptions.push({ version: 'violet', flavor_text: fallbackText });
+              }
+            }
+
+            // Special handling for Legends Z-A Megas
+            if (isZAMega) {
+              const zaText = zaEntryText || description || "Discovered in the Kalos region during urban redevelopment, this Mega Evolution unleashes incredible power in Pokémon Legends: Z-A.";
+              parsedDescriptions = [{ version: 'legends-z-a', flavor_text: zaText }];
+            } else if (validVersions && parsedDescriptions.length === 0) {
+              const fallbackText = description || "Special form entry available in designated games.";
+              validVersions.forEach(v => {
+                parsedDescriptions.push({ version: v, flavor_text: fallbackText });
+              });
+            }
+
+            if (parsedDescriptions.length === 0 && description) {
+              parsedDescriptions.push({ version: 'default', flavor_text: description });
+            }
+
+            gameDescriptions = parsedDescriptions;
+          }
+
+          if (speciesData.evolution_chain?.url) {
+            try {
+              const evoRes = await fetch(speciesData.evolution_chain.url);
+              if (evoRes.ok) {
+                const evoData = await evoRes.json();
+                if (evoData?.chain) {
+                  const formatEvolutionDetails = (detailsArr: any[]) => {
+                    if (!detailsArr || detailsArr.length === 0) return '';
+                    const detail = detailsArr[0];
+                    const parts: string[] = [];
+
+                    if (detail.min_level) {
+                      parts.push(`Lv. ${detail.min_level}`);
+                    }
+
+                    if (detail.trigger?.name === 'use-item' && detail.item?.name) {
+                      parts.push(`Use ${detail.item.name.replace(/-/g, ' ')}`);
+                    } else if (detail.item?.name) {
+                      parts.push(detail.item.name.replace(/-/g, ' '));
+                    }
+
+                    if (detail.held_item?.name) {
+                      parts.push(`Hold ${detail.held_item.name.replace(/-/g, ' ')}`);
+                    }
+
+                    if (detail.min_happiness) {
+                      parts.push(`High Friendship`);
+                    }
+                    if (detail.min_affection) {
+                      parts.push(`High Affection`);
+                    }
+                    if (detail.min_beauty) {
+                      parts.push(`High Beauty`);
+                    }
+
+                    if (detail.gender === 1) parts.push('♀');
+                    if (detail.gender === 2) parts.push('♂');
+
+                    if (detail.time_of_day) {
+                      parts.push(detail.time_of_day.charAt(0).toUpperCase() + detail.time_of_day.slice(1));
+                    }
+
+                    if (detail.location?.name) {
+                      parts.push(`at ${detail.location.name.replace(/-/g, ' ')}`);
+                    }
+
+                    if (detail.known_move?.name) {
+                      parts.push(`knows ${detail.known_move.name.replace(/-/g, ' ')}`);
+                    }
+
+                    if (detail.known_move_type?.name) {
+                      parts.push(`knows ${detail.known_move_type.name} move`);
+                    }
+
+                    if (detail.relative_physical_stats === 1) parts.push('Atk > Def');
+                    if (detail.relative_physical_stats === -1) parts.push('Def > Atk');
+                    if (detail.relative_physical_stats === 0) parts.push('Atk = Def');
+
+                    if (detail.needs_overworld_rain) parts.push('Rain');
+                    if (detail.turn_upside_down) parts.push('Turn Upside Down');
+
+                    if (detail.trigger?.name === 'trade') {
+                      if (!parts.some(p => p.toLowerCase().includes('trade'))) {
+                        parts.unshift('Trade');
+                      }
+                    }
+
+                    if (detail.trigger?.name === 'shed') {
+                      parts.push('Empty Spot');
+                    }
+
+                    if (detail.trigger?.name === 'spin') {
+                      parts.push('Spin Trainer');
+                    }
+
+                    if (parts.length === 0) {
+                      if (detail.trigger?.name === 'level-up') {
+                        return 'Level Up';
+                      } else if (detail.trigger?.name) {
+                        return detail.trigger.name.replace(/-/g, ' ');
+                      }
+                    }
+
+                    return parts.join(' + ');
+                  };
+
+                  const parseEvoChain = (chain: any): EvolutionNode | null => {
+                    if (!chain || !chain.species) return null;
+                    const id = parseInt((chain.species.url || '').split('/').filter(Boolean).pop() || '0', 10);
+                    const min_details = formatEvolutionDetails(chain.evolution_details);
+                    const current: EvolutionNode = {
+                      name: chain.species.name || '',
+                      id,
+                      image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
+                      min_details,
+                      evolves_to: []
+                    };
+                    if (Array.isArray(chain.evolves_to) && chain.evolves_to.length > 0) {
+                      current.evolves_to = chain.evolves_to
+                        .map((next: any) => parseEvoChain(next))
+                        .filter(Boolean) as EvolutionNode[];
+                    }
+                    return current;
+                  };
+                  evolutionChain = parseEvoChain(evoData.chain);
+                }
+              }
+            } catch (evoErr) {
+              // Gracefully handle evolution fetch
+            }
           }
         }
-      });
-
-      let parsedDescriptions: { version: string; flavor_text: string }[] = [];
-      
-      const pokemonName = data.name.toLowerCase();
-      const zaEntryText = getZAEntry(pokemonName);
-      const isZAMega = zaEntryText !== null || pokemonName.includes('legends-z-a') || pokemonName.includes('legends-za');
-
-      let validVersions: string[] | null = null;
-      if (pokemonName.includes('-gmax')) {
-        validVersions = ['sword', 'shield'];
-      } else if (isZAMega) {
-        validVersions = ['legends-z-a'];
-      } else if (pokemonName.includes('-mega') || pokemonName.includes('-primal')) {
-        validVersions = ['x', 'y', 'omega-ruby', 'alpha-sapphire', 'sun', 'moon', 'ultra-sun', 'ultra-moon', 'lets-go-pikachu', 'lets-go-eevee'];
-      } else if (pokemonName.includes('-alola')) {
-        validVersions = ['sun', 'moon', 'ultra-sun', 'ultra-moon', 'lets-go-pikachu', 'lets-go-eevee', 'sword', 'shield', 'scarlet', 'violet'];
-      } else if (pokemonName.includes('-galar')) {
-        validVersions = ['sword', 'shield', 'scarlet', 'violet'];
-      } else if (pokemonName.includes('-hisui')) {
-        validVersions = ['legends-arceus', 'scarlet', 'violet'];
-      } else if (pokemonName.includes('-paldea')) {
-        validVersions = ['scarlet', 'violet'];
       }
-
-      ALL_GAME_VERSIONS.forEach(version => {
-        if (versionMap.has(version) && (!validVersions || validVersions.includes(version))) {
-          const text = versionMap.get(version) || "";
-          const cleanText = text
-            .replace(/\f/g, ' ')
-            .replace(/\u00ad\n/g, '')
-            .replace(/\u00ad/g, '')
-            .replace(/ \n/g, ' ')
-            .replace(/\n/g, ' ')
-            .trim();
-          parsedDescriptions.push({ version, flavor_text: cleanText });
-        }
-      });
-      
-      // Fallback for Scarlet and Violet if missing (only for base forms)
-      if (!validVersions) {
-        const fallbackText = parsedDescriptions.length > 0 
-          ? parsedDescriptions[parsedDescriptions.length - 1].flavor_text 
-          : description;
-        if (!parsedDescriptions.some(d => d.version === 'scarlet')) {
-          parsedDescriptions.push({ version: 'scarlet', flavor_text: fallbackText });
-        }
-        if (!parsedDescriptions.some(d => d.version === 'violet')) {
-          parsedDescriptions.push({ version: 'violet', flavor_text: fallbackText });
-        }
-      }
-
-      // Special handling for Legends Z-A Megas
-      if (isZAMega) {
-        const zaText = zaEntryText || description || "Discovered in the Kalos region during urban redevelopment, this Mega Evolution unleashes incredible power in Pokémon Legends: Z-A.";
-        parsedDescriptions = [{ version: 'legends-z-a', flavor_text: zaText }];
-      } else if (validVersions && parsedDescriptions.length === 0) {
-        const fallbackText = description || "Special form entry available in designated games.";
-        validVersions.forEach(v => {
-          parsedDescriptions.push({ version: v, flavor_text: fallbackText });
-        });
-      }
-
-      if (parsedDescriptions.length === 0 && description) {
-        parsedDescriptions.push({ version: 'default', flavor_text: description });
-      }
-
-      gameDescriptions = parsedDescriptions;
+    } catch (e) {
+      // Species fetch failed or timed out
     }
+  }
 
-    const evoRes = await fetch(speciesData.evolution_chain.url);
-    const evoData = await evoRes.json();
-
-    const formatEvolutionDetails = (detailsArr: any[]) => {
-      if (!detailsArr || detailsArr.length === 0) return '';
-      const detail = detailsArr[0];
-      const parts: string[] = [];
-
-      if (detail.min_level) {
-        parts.push(`Lv. ${detail.min_level}`);
+  // Ensure default fallback variety if species varieties was empty
+  if (!varieties || varieties.length === 0) {
+    varieties = [{
+      is_default: true,
+      pokemon: {
+        name: data.name,
+        url: `https://pokeapi.co/api/v2/pokemon/${data.id || ''}`
       }
-
-      if (detail.trigger?.name === 'use-item' && detail.item?.name) {
-        parts.push(`Use ${detail.item.name.replace(/-/g, ' ')}`);
-      } else if (detail.item?.name) {
-        parts.push(detail.item.name.replace(/-/g, ' '));
-      }
-
-      if (detail.held_item?.name) {
-        parts.push(`Hold ${detail.held_item.name.replace(/-/g, ' ')}`);
-      }
-
-      if (detail.min_happiness) {
-        parts.push(`High Friendship`);
-      }
-      if (detail.min_affection) {
-        parts.push(`High Affection`);
-      }
-      if (detail.min_beauty) {
-        parts.push(`High Beauty`);
-      }
-
-      if (detail.gender === 1) parts.push('♀');
-      if (detail.gender === 2) parts.push('♂');
-
-      if (detail.time_of_day) {
-        parts.push(detail.time_of_day.charAt(0).toUpperCase() + detail.time_of_day.slice(1));
-      }
-
-      if (detail.location?.name) {
-        parts.push(`at ${detail.location.name.replace(/-/g, ' ')}`);
-      }
-
-      if (detail.known_move?.name) {
-        parts.push(`knows ${detail.known_move.name.replace(/-/g, ' ')}`);
-      }
-
-      if (detail.known_move_type?.name) {
-        parts.push(`knows ${detail.known_move_type.name} move`);
-      }
-
-      if (detail.relative_physical_stats === 1) parts.push('Atk > Def');
-      if (detail.relative_physical_stats === -1) parts.push('Def > Atk');
-      if (detail.relative_physical_stats === 0) parts.push('Atk = Def');
-
-      if (detail.needs_overworld_rain) parts.push('Rain');
-      if (detail.turn_upside_down) parts.push('Turn Upside Down');
-
-      if (detail.trigger?.name === 'trade') {
-        if (!parts.some(p => p.toLowerCase().includes('trade'))) {
-          parts.unshift('Trade');
-        }
-      }
-
-      if (detail.trigger?.name === 'shed') {
-        parts.push('Empty Spot');
-      }
-
-      if (detail.trigger?.name === 'spin') {
-        parts.push('Spin Trainer');
-      }
-
-      if (parts.length === 0) {
-        if (detail.trigger?.name === 'level-up') {
-          return 'Level Up';
-        } else if (detail.trigger?.name) {
-          return detail.trigger.name.replace(/-/g, ' ');
-        }
-      }
-
-      return parts.join(' + ');
-    };
-
-    const parseEvoChain = (chain: any): EvolutionNode => {
-      const id = parseInt(chain.species.url.split('/').filter(Boolean).pop() || '0', 10);
-      const min_details = formatEvolutionDetails(chain.evolution_details);
-      const current: EvolutionNode = {
-        name: chain.species.name,
-        id,
-        image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
-        min_details,
-        evolves_to: []
-      };
-      if (chain.evolves_to && chain.evolves_to.length > 0) {
-        current.evolves_to = chain.evolves_to.map((next: any) => parseEvoChain(next));
-      }
-      return current;
-    };
-    evolutionChain = parseEvoChain(evoData.chain);
-  } catch (e) {
-    console.error("Failed to fetch evolutions", e);
+    }];
   }
 
   // Calculate weaknesses
   const typeMultipliers: Record<string, number> = {};
   try {
-    await Promise.all(data.types.map(async (t: any) => {
-      const typeRes = await fetch(t.type.url);
-      const typeData = await typeRes.json();
-      const locName = typeData.names?.find((n: any) => n.language.name === baseLang)?.name;
-      t.type.localized_name = locName || t.type.name.toUpperCase();
-      const relations = typeData.damage_relations;
-      
-      relations.double_damage_from.forEach((r: any) => {
-        typeMultipliers[r.name] = (typeMultipliers[r.name] || 1) * 2;
-      });
-      relations.half_damage_from.forEach((r: any) => {
-        typeMultipliers[r.name] = (typeMultipliers[r.name] || 1) * 0.5;
-      });
-      relations.no_damage_from.forEach((r: any) => {
-        typeMultipliers[r.name] = 0;
-      });
-    }));
+    if (Array.isArray(data.types)) {
+      await Promise.all(data.types.map(async (t: any) => {
+        if (!t?.type?.url) return;
+        const typeRes = await fetch(t.type.url);
+        const typeData = await typeRes.json();
+        const locName = typeData?.names?.find((n: any) => n?.language?.name === baseLang)?.name;
+        t.type.localized_name = locName || t.type.name.toUpperCase();
+        const relations = typeData?.damage_relations;
+        
+        relations?.double_damage_from?.forEach((r: any) => {
+          if (r?.name) typeMultipliers[r.name] = (typeMultipliers[r.name] || 1) * 2;
+        });
+        relations?.half_damage_from?.forEach((r: any) => {
+          if (r?.name) typeMultipliers[r.name] = (typeMultipliers[r.name] || 1) * 0.5;
+        });
+        relations?.no_damage_from?.forEach((r: any) => {
+          if (r?.name) typeMultipliers[r.name] = 0;
+        });
+      }));
+    }
   } catch (e) {
-    console.error("Failed to fetch type relations", e);
+    // Fail silently for type relations
   }
 
   const weaknesses = Object.entries(typeMultipliers)
@@ -611,28 +649,46 @@ export async function searchPokemon(query: string): Promise<Pokemon> {
     .map(([name]) => name);
 
   // Fetch moves details (limited to avoid 100+ requests)
-  let movesSource = data.moves || [];
+  let movesSource = Array.isArray(data.moves) ? data.moves : [];
 
   // Prioritize level-up moves
   const levelUpMoves = movesSource.filter((m: any) => 
-    m.version_group_details.some((v: any) => v.move_learn_method.name === 'level-up')
+    Array.isArray(m?.version_group_details) && m.version_group_details.some((v: any) => v?.move_learn_method?.name === 'level-up')
   );
   const otherMoves = movesSource.filter((m: any) => 
-    !m.version_group_details.some((v: any) => v.move_learn_method.name === 'level-up')
+    !Array.isArray(m?.version_group_details) || !m.version_group_details.some((v: any) => v?.move_learn_method?.name === 'level-up')
   );
   
   const movesToFetch = [...levelUpMoves, ...otherMoves].slice(0, 150); // Increased to 150 to fetch all possible moves for comprehensive analysis
   const moves: Move[] = await Promise.all(
     movesToFetch.map(async (m: any) => {
       try {
+        if (!m?.move?.url) {
+          return {
+            name: m?.move?.name || 'unknown',
+            url: '',
+            learn_method: 'other' as const,
+            power: null,
+            accuracy: null,
+            priority: 0,
+            type: 'normal',
+            pp: 5,
+            damage_class: 'physical' as const,
+            description: 'Failed to load move data.',
+            effect_chance: null,
+            target: 'selected-pokemon'
+          };
+        }
         const res = await fetch(m.move.url);
         const moveData = await res.json();
         
         // Find description
         let description = 'No description available.';
-        const entry = moveData.flavor_text_entries.find((e: any) => e.language.name === baseLang) || 
-                      moveData.flavor_text_entries.find((e: any) => e.language.name === 'en');
-        if (entry) {
+        const entry = Array.isArray(moveData?.flavor_text_entries)
+          ? (moveData.flavor_text_entries.find((e: any) => e?.language?.name === baseLang) || 
+             moveData.flavor_text_entries.find((e: any) => e?.language?.name === 'en'))
+          : null;
+        if (entry?.flavor_text) {
           description = entry.flavor_text
             .replace(/\f/g, ' ')
             .replace(/\u00ad\n/g, '')
@@ -642,37 +698,37 @@ export async function searchPokemon(query: string): Promise<Pokemon> {
             .trim();
         }
 
-        const versionGroup = m.version_group_details[0];
+        const versionGroup = m.version_group_details?.[0] || {};
         let learnMethod: Move['learn_method'] = 'other';
-        if (versionGroup.move_learn_method.name === 'level-up') learnMethod = 'level-up';
-        else if (versionGroup.move_learn_method.name === 'machine') learnMethod = 'machine';
-        else if (versionGroup.move_learn_method.name === 'egg') learnMethod = 'egg';
-        else if (versionGroup.move_learn_method.name === 'tutor') learnMethod = 'tutor';
+        if (versionGroup?.move_learn_method?.name === 'level-up') learnMethod = 'level-up';
+        else if (versionGroup?.move_learn_method?.name === 'machine') learnMethod = 'machine';
+        else if (versionGroup?.move_learn_method?.name === 'egg') learnMethod = 'egg';
+        else if (versionGroup?.move_learn_method?.name === 'tutor') learnMethod = 'tutor';
 
         return {
           name: m.move.name,
           url: m.move.url,
-          level_learned_at: versionGroup.level_learned_at,
+          level_learned_at: versionGroup?.level_learned_at || 0,
           learn_method: learnMethod,
-          power: moveData.power,
-          accuracy: moveData.accuracy,
-          priority: moveData.priority,
-          type: moveData.type.name,
-          pp: moveData.pp,
-          damage_class: moveData.damage_class.name,
+          power: moveData?.power ?? null,
+          accuracy: moveData?.accuracy ?? null,
+          priority: moveData?.priority || 0,
+          type: moveData?.type?.name || 'normal',
+          pp: moveData?.pp || 5,
+          damage_class: (moveData?.damage_class?.name || 'physical') as any,
           description,
-          effect_chance: moveData.effect_chance,
-          stat_changes: moveData.stat_changes.map((sc: any) => ({
+          effect_chance: moveData?.effect_chance ?? null,
+          stat_changes: Array.isArray(moveData?.stat_changes) ? moveData.stat_changes.map((sc: any) => ({
             change: sc.change,
-            stat: { name: sc.stat.name }
-          })),
-          meta: moveData.meta,
-          target: moveData.target.name
+            stat: { name: sc.stat?.name || '' }
+          })) : [],
+          meta: moveData?.meta,
+          target: moveData?.target?.name || 'selected-pokemon'
         };
       } catch (e) {
         return {
-          name: m.move.name,
-          url: m.move.url,
+          name: m?.move?.name || 'unknown',
+          url: m?.move?.url || '',
           learn_method: 'other' as const,
           power: null,
           accuracy: null,
