@@ -5345,7 +5345,7 @@ export default function App() {
                 }
               }
 
-              // B. Competitive Stat Buffing (Setup Sweeper)
+              // B. Competitive Stat Buffing (Stat Buffer)
               if (move.stat_changes && move.stat_changes.length > 0) {
                 if (opponentHealthPercent > 45 && turnNumber < 8) {
                   let setupBonus = 0;
@@ -7521,7 +7521,7 @@ export default function App() {
                                   >
                                     {/* ─── DUAL MODEL MATCHUP PREVIEW REMOVED (THE ARENA ONLY IS SUFFICIENT) ─── */}
 
-                                    <div className="w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-start max-w-full pb-2 sm:pb-3">
+                                    <div className="w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 items-start max-w-full pb-2 sm:pb-3">
                                       {/* Left Column (Arena, Actions) */}
                                       <div className="lg:col-span-8 flex flex-col w-full min-w-0">
                                         
@@ -7552,7 +7552,7 @@ export default function App() {
                                         animate={screenShake ? { x: [-10, 10, -10, 10, 0] } : {}}
                                         transition={{ duration: 0.5 }}
                                         className={cn(
-                                          "flex flex-row justify-between items-center bg-slate-900/80 rounded-xl border border-cyan-500/30 relative z-20 shadow-lg shrink-0 transition-all duration-300 w-full overflow-hidden flex-nowrap",
+                                          "flex flex-row justify-between items-center bg-slate-900/80 rounded-none border-b border-cyan-500/30 relative z-20 shadow-lg shrink-0 transition-all duration-300 w-full !mx-0 !mt-0 overflow-hidden flex-nowrap",
                                           "p-1.5 sm:p-2.5 mb-2.5"
                                         )}>
                                         <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink">
@@ -9983,10 +9983,13 @@ export default function App() {
                   <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)] shrink-0">
                     <BrainCircuit className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 animate-pulse" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-widest leading-none">
+                  <div className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
+                    <h2 className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-widest leading-none whitespace-nowrap">
                       THEORY EXAM
                     </h2>
+                    <span className="px-2 py-0.5 rounded-full bg-cyan-950/90 border border-cyan-500/40 text-cyan-300 text-[10px] sm:text-xs font-mono font-bold whitespace-nowrap shadow-sm">
+                      {today}
+                    </span>
                   </div>
                 </div>
 
@@ -10121,7 +10124,7 @@ export default function App() {
                   <AudioSettings mode="simple" />
 
                   {/* Theme Toggle Selector */}
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-800/80">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 ">
                     <div className="flex flex-col text-center sm:text-left">
                       <span className="text-cyan-300 font-hud uppercase text-xs font-bold tracking-widest">Interface Theme</span>
                       <span className="text-[10px] font-mono text-slate-400">Toggle dark / light display mode</span>

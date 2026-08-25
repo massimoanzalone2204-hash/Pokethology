@@ -62,7 +62,7 @@ export function NowPlayingToast() {
                 alt="Poké & Chill Album Cover" 
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-black/20" />
+              <div className="absolute inset-0" style={{ backgroundColor: "rgba(0,0,0,0.2)" }} />
               {/* Music Bar Overlay */}
               <div className="absolute bottom-1 left-1 right-1 flex justify-center items-end gap-[2px] h-3">
                 <div className="w-[2px] bg-emerald-400 rounded-sm animate-[music-bar_1s_ease-in-out_infinite]" style={{ height: '40%' }} />

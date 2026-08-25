@@ -1546,25 +1546,6 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
 
   return (
     <div className="w-full flex flex-col gap-4 text-left font-sans">
-      {/* DAILY REFRESH STATUS BANNER */}
-      <div className="bg-slate-900/60 border border-cyan-500/20 rounded-xl p-2.5 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
-          <span className="text-[10px] font-mono font-bold text-cyan-300 tracking-wider uppercase">
-            {formattedToday.toUpperCase()}
-          </span>
-        </div>
-        <button
-          type="button"
-          onClick={handleRerollDailyExam}
-          className="flex items-center gap-1 text-[9.5px] font-mono font-bold text-amber-300 bg-amber-950/80 hover:bg-amber-900 border border-amber-500/40 px-2.5 py-1 rounded-md transition-all cursor-pointer shadow-md active:scale-95"
-          title="Generate a fresh set of questions"
-        >
-          <RotateCcw className="w-3 h-3 text-amber-400 shrink-0" />
-          <span>NEW EXAM SET</span>
-        </button>
-      </div>
-
       {/* REGION SELECTION TABS */}
       <div className="w-full flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1.5 shrink-0">
         {allExams.map((rData, idx) => {

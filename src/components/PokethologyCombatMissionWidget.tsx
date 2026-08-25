@@ -52,35 +52,35 @@ export interface CombatMission {
 }
 
 export const COMBAT_MISSIONS: CombatMission[] = [
-  { id: 'water', type: 'type', target: 'water', description: 'Defeat Water-type Pokémon in battle to complete the mission.', rewardPoints: 180 },
-  { id: 'fire', type: 'type', target: 'fire', description: 'Defeat Fire-type Pokémon in battle to complete the mission.', rewardPoints: 180 },
-  { id: 'grass', type: 'type', target: 'grass', description: 'Defeat Grass-type Pokémon in battle to complete the mission.', rewardPoints: 180 },
-  { id: 'electric', type: 'type', target: 'electric', description: 'Defeat Electric-type Pokémon in battle to complete the mission.', rewardPoints: 180 },
-  { id: 'dragon', type: 'type', target: 'dragon', description: 'Defeat Dragon-type Pokémon in battle to complete the mission.', rewardPoints: 300 },
-  { id: 'steel', type: 'type', target: 'steel', description: 'Defeat Steel-type Pokémon in battle to complete the mission.', rewardPoints: 250 },
-  { id: 'ghost', type: 'type', target: 'ghost', description: 'Defeat Ghost-type Pokémon in battle to complete the mission.', rewardPoints: 250 },
-  { id: 'flying', type: 'type', target: 'flying', description: 'Defeat Flying-type Pokémon in battle to complete the mission.', rewardPoints: 180 },
-  { id: 'psychic', type: 'type', target: 'psychic', description: 'Defeat Psychic-type Pokémon in battle to complete the mission.', rewardPoints: 220 },
-  { id: 'dark', type: 'type', target: 'dark', description: 'Defeat Dark-type Pokémon in battle to complete the mission.', rewardPoints: 220 },
-  { id: 'fairy', type: 'type', target: 'fairy', description: 'Defeat Fairy-type Pokémon in battle to complete the mission.', rewardPoints: 250 },
-  { id: 'ice', type: 'type', target: 'ice', description: 'Defeat Ice-type Pokémon in battle to complete the mission.', rewardPoints: 220 },
-  { id: 'fighting', type: 'type', target: 'fighting', description: 'Defeat Fighting-type Pokémon in battle to complete the mission.', rewardPoints: 200 },
-  { id: 'ground', type: 'type', target: 'ground', description: 'Defeat Ground-type Pokémon in battle to complete the mission.', rewardPoints: 200 },
-  { id: 'rock', type: 'type', target: 'rock', description: 'Defeat Rock-type Pokémon in battle to complete the mission.', rewardPoints: 200 },
-  { id: 'bug', type: 'type', target: 'bug', description: 'Defeat Bug-type Pokémon in battle to complete the mission.', rewardPoints: 180 },
-  { id: 'poison', type: 'type', target: 'poison', description: 'Defeat Poison-type Pokémon in battle to complete the mission.', rewardPoints: 180 },
-  { id: 'normal', type: 'type', target: 'normal', description: 'Defeat Normal-type Pokémon in battle to complete the mission.', rewardPoints: 180 },
-  { id: 'heavy', type: 'stat', target: 'high_defense', description: 'Defeat a Pokémon with a very high Defense stat (150+ Base Defense) in battle.', rewardPoints: 250 },
-  { id: 'ultra_def', type: 'stat', target: 'ultra_defense', description: 'Defeat a Fortress Pokémon with extreme Defense (180+ Base Defense).', rewardPoints: 320 },
-  { id: 'speed_demon', type: 'stat', target: 'speed', description: 'Defeat high-speed speedsters with Base Speed of 120 or higher.', rewardPoints: 220 },
-  { id: 'physical_power', type: 'stat', target: 'attack', description: 'Defeat physical powerhouses with Base Attack of 130 or higher.', rewardPoints: 240 },
-  { id: 'special_sweeper', type: 'stat', target: 'special-attack', description: 'Defeat Special Attack powerhouses with Base Sp.Atk of 130 or higher.', rewardPoints: 240 },
-  { id: 'special_wall', type: 'stat', target: 'special-defense', description: 'Defeat Special Defense fortresses with Base Sp.Def of 130 or higher.', rewardPoints: 240 },
-  { id: 'colossal_hp', type: 'stat', target: 'hp', description: 'Defeat massive stamina champions with Base HP of 130 or higher.', rewardPoints: 240 },
-  { id: 'huge_bst', type: 'stat', target: 'huge_bst', description: 'Defeat Pokémon with Huge Total Base Stats (540+ Base Stats).', rewardPoints: 280 },
-  { id: 'legendary', type: 'category', target: 'legendary', description: 'Defeat Legendary or Mythical Pokémon in combat.', rewardPoints: 350 },
-  { id: 'mega', type: 'category', target: 'mega', description: 'Defeat Mega-Evolved or Primal Pokémon forms in battle.', rewardPoints: 320 },
-  { id: 'gmax', type: 'category', target: 'gmax', description: 'Defeat Gigantamax & Dynamax Powerhouses in battle.', rewardPoints: 320 }
+  { id: 'water', type: 'type', target: 'water', description: 'Defeat Water-type Pokémon.', rewardPoints: 180 },
+  { id: 'fire', type: 'type', target: 'fire', description: 'Defeat Fire-type Pokémon.', rewardPoints: 180 },
+  { id: 'grass', type: 'type', target: 'grass', description: 'Defeat Grass-type Pokémon.', rewardPoints: 180 },
+  { id: 'electric', type: 'type', target: 'electric', description: 'Defeat Electric-type Pokémon.', rewardPoints: 180 },
+  { id: 'dragon', type: 'type', target: 'dragon', description: 'Defeat Dragon-type Pokémon.', rewardPoints: 300 },
+  { id: 'steel', type: 'type', target: 'steel', description: 'Defeat Steel-type Pokémon.', rewardPoints: 250 },
+  { id: 'ghost', type: 'type', target: 'ghost', description: 'Defeat Ghost-type Pokémon.', rewardPoints: 250 },
+  { id: 'flying', type: 'type', target: 'flying', description: 'Defeat Flying-type Pokémon.', rewardPoints: 180 },
+  { id: 'psychic', type: 'type', target: 'psychic', description: 'Defeat Psychic-type Pokémon.', rewardPoints: 220 },
+  { id: 'dark', type: 'type', target: 'dark', description: 'Defeat Dark-type Pokémon.', rewardPoints: 220 },
+  { id: 'fairy', type: 'type', target: 'fairy', description: 'Defeat Fairy-type Pokémon.', rewardPoints: 250 },
+  { id: 'ice', type: 'type', target: 'ice', description: 'Defeat Ice-type Pokémon.', rewardPoints: 220 },
+  { id: 'fighting', type: 'type', target: 'fighting', description: 'Defeat Fighting-type Pokémon.', rewardPoints: 200 },
+  { id: 'ground', type: 'type', target: 'ground', description: 'Defeat Ground-type Pokémon.', rewardPoints: 200 },
+  { id: 'rock', type: 'type', target: 'rock', description: 'Defeat Rock-type Pokémon.', rewardPoints: 200 },
+  { id: 'bug', type: 'type', target: 'bug', description: 'Defeat Bug-type Pokémon.', rewardPoints: 180 },
+  { id: 'poison', type: 'type', target: 'poison', description: 'Defeat Poison-type Pokémon.', rewardPoints: 180 },
+  { id: 'normal', type: 'type', target: 'normal', description: 'Defeat Normal-type Pokémon.', rewardPoints: 180 },
+  { id: 'heavy', type: 'stat', target: 'high_defense', description: 'Defeat a Pokémon with 150+ Base Defense.', rewardPoints: 250 },
+  { id: 'ultra_def', type: 'stat', target: 'ultra_defense', description: 'Defeat a Pokémon with 180+ Base Defense.', rewardPoints: 320 },
+  { id: 'speed_demon', type: 'stat', target: 'speed', description: 'Defeat a Pokémon with 120+ Base Speed.', rewardPoints: 220 },
+  { id: 'physical_power', type: 'stat', target: 'attack', description: 'Defeat a Pokémon with 130+ Base Attack.', rewardPoints: 240 },
+  { id: 'special_attacker', type: 'stat', target: 'special-attack', description: 'Defeat a Pokémon with 130+ Base Sp.Atk.', rewardPoints: 240 },
+  { id: 'special_defender', type: 'stat', target: 'special-defense', description: 'Defeat a Pokémon with 130+ Base Sp.Def.', rewardPoints: 240 },
+  { id: 'colossal_hp', type: 'stat', target: 'hp', description: 'Defeat a Pokémon with 130+ Base HP.', rewardPoints: 240 },
+  { id: 'huge_bst', type: 'stat', target: 'huge_bst', description: 'Defeat a Pokémon with 540+ Total Base Stats.', rewardPoints: 280 },
+  { id: 'legendary', type: 'category', target: 'legendary', description: 'Defeat a Legendary or Mythical Pokémon.', rewardPoints: 350 },
+  { id: 'mega', type: 'category', target: 'mega', description: 'Defeat a Mega-Evolved or Primal Pokémon.', rewardPoints: 320 },
+  { id: 'gmax', type: 'category', target: 'gmax', description: 'Defeat a Gigantamax or Dynamax Pokémon.', rewardPoints: 320 }
 ];
 
 export const getDailyCombatMission = (todayStr: string, isHardMode: boolean = false): CombatMission => {
@@ -112,7 +112,7 @@ const EASY_TRIVIA_QUESTIONS: TriviaQuestion[] = [
     question: "Which status condition is famously known to cut the inflicted Pokémon's offensive physical Attack stat by 50% in standard combat generations?",
     options: ["PARALYSIS", "BURN", "POISON", "SLEEP"],
     answerIndex: 1,
-    explanation: "Burn! Aside from dealing constant minor damage each turn, a Burn reduces physical damage output (Attack stat) by half, making it a critical strategic counter against physical sweepers."
+    explanation: "Burn! Aside from dealing constant minor damage each turn, a Burn reduces physical damage output (Attack stat) by half, making it a critical strategic counter against physical attackers."
   },
   {
     question: "Under normal battle circumstances, which of these dual-type combinations yields a completely unique type profile with absolutely zero weakness?",
@@ -385,7 +385,7 @@ const MEDIUM_TRIVIA_QUESTIONS: TriviaQuestion[] = [
     question: "Which defensive ability completely ignores the stat boosts (Swords Dance, Calm Mind, etc.) of attacking opponents when taking damage?",
     options: ["UNAWARE", "CLEAR BODY", "STURDY", "MULTISCALE"],
     answerIndex: 0,
-    explanation: "Unaware completely ignores the opponent's offensive stat stage changes (Attack/Sp.Atk) when receiving attacks, neutralizing setup sweepers."
+    explanation: "Unaware completely ignores the opponent's offensive stat stage changes (Attack/Sp.Atk) when receiving attacks, neutralizing setup attackers."
   },
   {
     question: "What is the effect of 'Snow' (introduced in Gen 9 to replace Hail) on Ice-type Pokémon?",
