@@ -55,7 +55,7 @@ export function sendDiscoveryNotifications() {
     try {
       new Notification('Pokéthology Neural Terminal', {
         body: 'Universal combat sync and daily battle notifications enabled!',
-        icon: '/icon.svg'
+        icon: '/logo.png'
       });
       
       // Schedule more notifications during the day
@@ -100,7 +100,7 @@ export function sendDiscoveryNotifications() {
       dailyNotifications.forEach(({ title, body, delay }) => {
         setTimeout(() => {
           if (Notification.permission === 'granted') {
-            new Notification(title, { body, icon: '/icon.svg' });
+            new Notification(title, { body, icon: '/logo.png' });
           }
         }, delay);
       });
@@ -110,7 +110,7 @@ export function sendDiscoveryNotifications() {
         if (Notification.permission === 'granted') {
            new Notification('Pokéthology Hourly Sync', {
              body: 'Trainers are waiting! Check the Arena and your daily Pokémon scans.',
-             icon: '/icon.svg'
+             icon: '/logo.png'
            });
         }
       }, 3600000); // every 1 hour
