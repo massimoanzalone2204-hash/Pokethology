@@ -71,14 +71,14 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
             {/* Background blurred cover */}
             <div 
               className="absolute inset-0 z-0 opacity-20 blur-2xl scale-125 saturate-150"
-              style={{ backgroundImage: 'url(https://f4.bcbits.com/img/a2187607759_10.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+              style={{ backgroundImage: 'url(https://f4.bcbits.com/img/a4164358298_10.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/60 to-transparent z-10" />
             
             {/* Foreground Album Cover */}
             <div className="relative z-20 shrink-0 shadow-2xl shadow-black/60 rounded-xl overflow-hidden border border-white/10 w-24 h-24 sm:w-28 sm:h-28">
               <img 
-                src="https://f4.bcbits.com/img/a2187607759_10.jpg" 
+                src="https://f4.bcbits.com/img/a4164358298_10.jpg" 
                 alt="Poké & Chill Album Cover" 
                 className="w-full h-full object-cover"
                 
@@ -105,9 +105,11 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
             <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 onClick={() => sounds.playPrevBGM()}
-                className="p-1.5 sm:p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors"
+                className="flex items-center gap-1 p-1.5 sm:px-2.5 sm:py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors group"
+                title="Previous Track"
               >
                 <SkipBack className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline-block text-[9px] font-hud uppercase tracking-wider text-slate-400 group-hover:text-slate-300">PREV</span>
               </button>
               <button
                 onClick={handleToggleBgm}
@@ -116,13 +118,16 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
                     ? 'bg-emerald-600 hover:bg-emerald-500 text-slate-950 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
                     : 'bg-slate-700 hover:bg-slate-600 text-slate-200'
                 }`}
+                title={isPlaying ? "Pause" : "Play"}
               >
                 {isPlaying ? <Pause className="w-4 h-4 sm:w-5 sm:h-5 fill-current" /> : <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current ml-1" />}
               </button>
               <button
                 onClick={() => sounds.playNextBGM()}
-                className="p-1.5 sm:p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors"
+                className="flex items-center gap-1 p-1.5 sm:px-2.5 sm:py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors group"
+                title="Next Track"
               >
+                <span className="hidden sm:inline-block text-[9px] font-hud uppercase tracking-wider text-slate-400 group-hover:text-slate-300">NEXT</span>
                 <SkipForward className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
               <button
@@ -139,11 +144,24 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
               </button>
             </div>
             <div className="flex flex-col items-end min-w-0 flex-1 ml-4">
-              <span className="text-[9px] sm:text-[10px] font-hud uppercase font-black text-emerald-400 tracking-wider truncate w-full text-right">
+              <div className="flex items-center gap-1.5 mb-0.5 justify-end w-full">
+                {isPlaying && (
+                  <div className="flex items-end gap-[2px] h-[8px] mr-1">
+                    <div className="w-[3px] bg-emerald-400 rounded-sm animate-[music-bar_1s_ease-in-out_infinite]" style={{ height: '40%' }} />
+                    <div className="w-[3px] bg-emerald-400 rounded-sm animate-[music-bar_1.2s_ease-in-out_infinite_0.2s]" style={{ height: '80%' }} />
+                    <div className="w-[3px] bg-emerald-400 rounded-sm animate-[music-bar_0.8s_ease-in-out_infinite_0.4s]" style={{ height: '60%' }} />
+                    <div className="w-[3px] bg-emerald-400 rounded-sm animate-[music-bar_1.1s_ease-in-out_infinite_0.1s]" style={{ height: '100%' }} />
+                  </div>
+                )}
+                <span className="text-[8px] font-mono font-bold text-emerald-500/80 uppercase tracking-widest truncate">
+                  Now Playing
+                </span>
+              </div>
+              <span className="text-[10px] sm:text-[11px] font-hud uppercase font-black text-emerald-400 tracking-wider truncate w-full text-right drop-shadow-sm">
                 {bgmState?.trackName || 'Loading...'}
               </span>
-              <span className="text-[9px] font-mono text-slate-400 mt-0.5">
-                {formatTime(bgmState?.currentTime || 0)} / {formatTime(bgmState?.duration || 0)}
+              <span className="text-[9px] font-mono text-slate-400 mt-1 font-medium">
+                {formatTime(bgmState?.currentTime || 0)} <span className="text-slate-600">/</span> {formatTime(bgmState?.duration || 0)}
               </span>
             </div>
           </div>

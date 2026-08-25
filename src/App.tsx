@@ -31,6 +31,7 @@ import { StatRadar } from './components/StatRadar';
 import { SingleStatRadar } from './components/SingleStatRadar';
 import Markdown from 'react-markdown';
 import { AudioSettings } from './components/AudioSettings';
+import { NowPlayingToast } from './components/NowPlayingToast';
 import ReactPlayer from 'react-player';
 
 import { pokeApi, isApiError } from './lib/pokeApiService';
@@ -6110,6 +6111,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
+      <NowPlayingToast />
       <Suspense fallback={null}>
         <div className={cn(
       "w-full h-screen h-[100dvh] flex items-stretch justify-center transition-colors duration-300 ease-out bg-slate-950 relative overflow-hidden overflow-x-hidden",

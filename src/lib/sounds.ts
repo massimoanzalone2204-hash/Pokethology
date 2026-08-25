@@ -865,11 +865,13 @@ export const sounds = {
   toggleShuffle: () => {
     const w = window as any;
     w.soundsYTShuffle = !w.soundsYTShuffle;
+    if (w.soundsYTShuffle) w.soundsYTLoop = false;
     return w.soundsYTShuffle;
   },
   toggleLoop: () => {
     const w = window as any;
     w.soundsYTLoop = !w.soundsYTLoop;
+    if (w.soundsYTLoop) w.soundsYTShuffle = false;
     return w.soundsYTLoop;
   },
   isShuffleEnabled: () => {
