@@ -3254,7 +3254,11 @@ export default function App() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstallable, setIsInstallable] = useState(() => {
     if (typeof window === 'undefined') return false;
-    return !(window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
+    if (isStandalone) return false;
+    
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    return isIOS;
   });
 
   useEffect(() => {
@@ -3264,23 +3268,21 @@ export default function App() {
       setIsInstallable(true);
     };
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    
+    const handleAppInstalled = () => {
+      setIsInstallable(false);
+    };
+    window.addEventListener('appinstalled', handleAppInstalled);
+    
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
-
   const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
 
-  const handleInstallPWA = async () => {
+  const handleInstallPWA = () => {
     setIsPwaModalOpen(true);
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        setDeferredPrompt(null);
-        setIsInstallable(false);
-      }
-    }
   };
   const [isRebooting, setIsRebooting] = useState(false);
   const [autoResetTime, setAutoResetTime] = useState<number | null>(null);
@@ -10159,7 +10161,6 @@ export default function App() {
                   </span>
                   
                   <div className="flex flex-col gap-2.5">
-                    {isInstallable && (
                       <motion.button
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
@@ -10176,10 +10177,9 @@ export default function App() {
                           </div>
                         </div>
                         <span className="text-[8px] font-mono text-cyan-300 group-hover:text-white uppercase tracking-widest bg-cyan-900/60 px-2.5 py-1 rounded border border-cyan-500/40">
-                          Install
+                          {isInstallable ? 'Install' : 'View'}
                         </span>
                       </motion.button>
-                    )}
 
                     <motion.button
                       whileTap={{ scale: 0.98 }}

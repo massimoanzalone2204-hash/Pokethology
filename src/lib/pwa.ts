@@ -12,7 +12,12 @@ if (typeof window !== 'undefined') {
 export function isPwaInstallable(): boolean {
   if (typeof window === 'undefined') return false;
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
-  return !isStandalone && (deferredPrompt !== null || /iPad|iPhone|iPod|Android/.test(navigator.userAgent));
+  if (isStandalone) return false;
+  
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  if (isIOS) return true;
+  
+  return deferredPrompt !== null;
 }
 
 export async function promptPwaInstall(): Promise<'accepted' | 'dismissed' | 'unsupported'> {
