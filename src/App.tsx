@@ -2559,21 +2559,28 @@ export default function App() {
   const [viewAllGenerations, setViewAllGenerations] = useState(false);
 
   // --- Animation Helpers ---
-  const getBattleSpriteAnimation = (animation: string | null, status: string | null) => {
+  const getBattleSpriteAnimation = (animation: string | null, status: string | null, statAnimation?: string | null) => {
+    if (statAnimation === 'boost') {
+        return { scale: [1, 1.15, 1], filter: ['brightness(1) drop-shadow(0 0 0 rgba(16,185,129,0))', 'brightness(1.5) sepia(1) hue-rotate(90deg) saturate(3) drop-shadow(0 0 40px rgba(16,185,129,1))', 'brightness(1)'] };
+    }
+    if (statAnimation === 'lower') {
+        return { scale: [1, 0.9, 1], filter: ['brightness(1) drop-shadow(0 0 0 rgba(239,68,68,0))', 'brightness(0.7) sepia(1) hue-rotate(-50deg) saturate(5) drop-shadow(0 0 40px rgba(239,68,68,1))', 'brightness(1)'] };
+    }
+
     switch (animation) {
-      case 'faint': return { opacity: 0.5, scale: 0.5 };
+      case 'faint': return { opacity: 0.5, scale: 0.5, filter: 'brightness(0.3) grayscale(100%)' };
       case 'attack_physical': return { scale: 1.05 };
       case 'attack_special': return { scale: 1.05 };
-      case 'hit': return { scale: 0.95 };
-      case 'hit_critical': return { scale: 1.1 };
+      case 'hit': return { scale: [1, 0.95, 1], filter: ['brightness(1)', 'brightness(2) invert(1)', 'brightness(1)'], x: [0, -15, 15, -10, 10, -5, 5, 0] };
+      case 'hit_critical': return { scale: [1, 1.1, 1], filter: ['brightness(1)', 'brightness(2.5) sepia(1) hue-rotate(-50deg) saturate(3)', 'brightness(1)'], x: [0, -25, 25, -20, 20, -10, 10, 0] };
       case 'hit_status': return { scale: 1.02 };
-      default: return { scale: 1, opacity: 1, rotate: 0 };
+      default: return { scale: 1, opacity: 1, rotate: 0, x: 0, filter: 'brightness(1)' };
     }
   };
 
-  const getBattleSpriteTransition = (animation: string | null): any => ({
+  const getBattleSpriteTransition = (animation: string | null, statAnimation?: string | null): any => ({
     type: 'tween',
-    duration: (enableAnimations && animation !== 'none' && animation !== null) ? 0.2 : 0, 
+    duration: (enableAnimations && ((animation !== 'none' && animation !== null) || (statAnimation !== 'none' && statAnimation !== null))) ? 0.6 : 0, 
   });
 
   const [hoveredMove, setHoveredMove] = useState<Move | null>(null);
@@ -3207,13 +3214,15 @@ export default function App() {
   const [isReplacingMove, setIsReplacingMove] = useState(false);
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
   const [isCombatMoveModalOpen, setIsCombatMoveModalOpen] = useState(false);
-  const [attackerAnimation, setAttackerAnimation] = useState<'none' | 'attack_physical' | 'attack_special' | 'hit' | 'hit_critical' | 'hit_status' | 'faint'>('none');
-  const [defenderAnimation, setDefenderAnimation] = useState<'none' | 'attack_physical' | 'attack_special' | 'hit' | 'hit_critical' | 'hit_status' | 'faint'>('none');
+  const [attackerAnimation, setAttackerAnimation] = useState<'none' | 'attack_physical' | 'attack_special' | 'hit' | 'hit_critical' | 'hit_status' | 'faint' | 'boost' | 'drop'>('none');
+  const [defenderAnimation, setDefenderAnimation] = useState<'none' | 'attack_physical' | 'attack_special' | 'hit' | 'hit_critical' | 'hit_status' | 'faint' | 'boost' | 'drop'>('none');
   const [moveAnimation, setMoveAnimation] = useState<'none' | 'physical' | 'special'>('none');
   const [battleMessage, setBattleMessage] = useState<{ text: string; type: 'default' | 'critical' | 'effective' | 'status' | 'move' } | null>(null);
   const [floatingTexts, setFloatingTexts] = useState<{ id: string | number; text: string; type: 'damage' | 'super-damage' | 'weak-damage' | 'crit-damage' | 'boost' | 'lower' | 'status' | 'effective' | 'not-effective'; x: string; y: string }[]>([]);
   const [statEffects, setStatEffects] = useState<{ id: string | number; type: 'boost' | 'lower'; isPlayer: boolean }[]>([]);
   const [arenaCriticalNotify, setArenaCriticalNotify] = useState<boolean>(false);
+  const [playerAnimMode, setPlayerAnimMode] = useState<'idle' | 'hit' | 'boost' | 'drop'>('idle');
+  const [opponentAnimMode, setOpponentAnimMode] = useState<'idle' | 'hit' | 'boost' | 'drop'>('idle');
 
   const addFloatingText = useCallback((text: string, type: any, isPlayer: boolean) => {
     const id = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
@@ -6225,7 +6234,7 @@ export default function App() {
                   <img 
                     src={(isShiny ? (pokemon?.sprites?.other?.home?.front_shiny || pokemon?.sprites?.other?.['official-artwork']?.front_shiny) : (pokemon?.sprites?.other?.home?.front_default || pokemon?.sprites?.other?.['official-artwork']?.front_default)) || pokemon?.sprites?.other?.home?.front_default || pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.front_default || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'} 
                     alt={pokemon?.name} 
-                    className="max-w-full max-h-full object-contain scale-x-[-1] filter drop-shadow-[0_8px_20px_rgba(6,182,212,0.5)] relative z-10 transition-transform hover:scale-105" 
+                    className={cn("max-w-full max-h-full object-contain scale-x-[-1] filter drop-shadow-[0_8px_20px_rgba(6,182,212,0.5)] relative z-10 transition-transform hover:scale-105", playerAnimMode === 'hit' && "animate-hit", playerAnimMode === 'boost' && "animate-stat-boost", playerAnimMode === 'drop' && "animate-stat-drop")} 
                     referrerPolicy="no-referrer"
                     onError={(e) => {
                       const fallback = pokemon?.sprites?.other?.home?.front_default || pokemon?.sprites?.other?.['official-artwork']?.front_default || pokemon?.sprites?.front_default;
@@ -6287,7 +6296,7 @@ export default function App() {
                   <img 
                     src={(isOpponentShiny ? (battleOpponent?.sprites?.other?.home?.front_shiny || battleOpponent?.sprites?.other?.['official-artwork']?.front_shiny) : (battleOpponent?.sprites?.other?.home?.front_default || battleOpponent?.sprites?.other?.['official-artwork']?.front_default)) || battleOpponent?.sprites?.other?.home?.front_default || battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.front_default || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'} 
                     alt={battleOpponent?.name} 
-                    className="max-w-full max-h-full object-contain filter drop-shadow-[0_8px_20px_rgba(239,68,68,0.5)] relative z-10 transition-transform hover:scale-105" 
+                    className={cn("max-w-full max-h-full object-contain filter drop-shadow-[0_8px_20px_rgba(239,68,68,0.5)] relative z-10 transition-transform hover:scale-105", opponentAnimMode === 'hit' && "animate-hit", opponentAnimMode === 'boost' && "animate-stat-boost", opponentAnimMode === 'drop' && "animate-stat-drop")} 
                     referrerPolicy="no-referrer"
                     onError={(e) => {
                       const fallback = battleOpponent?.sprites?.other?.home?.front_default || battleOpponent?.sprites?.other?.['official-artwork']?.front_default || battleOpponent?.sprites?.front_default;
@@ -7735,8 +7744,8 @@ export default function App() {
                                             <motion.div
                                               key={battleOpponent?.name + '-' + isBattling}
                                               initial={{ opacity: 1, scale: 0.8 }}
-                                              animate={getBattleSpriteAnimation(defenderAnimation, opponentStatus)}
-                                              transition={getBattleSpriteTransition(defenderAnimation)}
+                                              animate={getBattleSpriteAnimation(defenderAnimation, opponentStatus, opponentStatAnimation)}
+                                              transition={getBattleSpriteTransition(defenderAnimation, opponentStatAnimation)}
 
                                               className="relative flex flex-col items-center justify-end   group"
                                             >
@@ -7817,8 +7826,8 @@ export default function App() {
                                           <motion.div
                                             key={pokemon?.name + '-' + isBattling}
                                             initial={{ opacity: 1, scale: 0.8 }}
-                                            animate={getBattleSpriteAnimation(attackerAnimation, pokemonStatus)}
-                                            transition={getBattleSpriteTransition(attackerAnimation)}
+                                            animate={getBattleSpriteAnimation(attackerAnimation, pokemonStatus, playerStatAnimation)}
+                                            transition={getBattleSpriteTransition(attackerAnimation, playerStatAnimation)}
 
                                             className="relative flex flex-col items-center justify-end   group"
                                           >
@@ -10104,8 +10113,7 @@ export default function App() {
               {/* Scrollable Content Body */}
               <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-4 sm:p-6 md:p-8 max-w-2xl mx-auto w-full flex flex-col gap-5">
                 {/* Audio & Visuals Settings */}
-                <div className="flex flex-col gap-3 bg-slate-900/90 p-4 sm:p-6 rounded-2xl border border-cyan-500/30 shadow-xl w-full">
-                  <HUDCorners />
+                <div className="flex flex-col gap-4 w-full">
                   <span className="text-[10px] font-hud font-black text-cyan-400 uppercase tracking-widest block mb-1">
                     AUDIO & DISPLAY CONTROLS
                   </span>
@@ -10139,8 +10147,7 @@ export default function App() {
                 </div>
 
                 {/* Registry & Utilities */}
-                <div className="flex flex-col gap-3 bg-slate-900/90 p-4 sm:p-6 rounded-2xl border border-cyan-500/30 shadow-xl w-full">
-                  <HUDCorners />
+                <div className="flex flex-col gap-4 w-full">
                   <span className="text-[10px] font-hud font-black text-cyan-400 uppercase tracking-widest block mb-1">
                     REGISTRY & COMMUNITY UTILITIES
                   </span>

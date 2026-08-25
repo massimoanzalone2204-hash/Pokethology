@@ -104,14 +104,14 @@ export const BattleMessage: React.FC<BattleMessageProps> = memo(({ message, type
       }}
       exit={enableAnimations ? { opacity: 0, scale: 1.05, y: -15, x: '-50%' } : { opacity: 0 }}
       className={cn(
-        "absolute top-[38%] left-1/2 z-[100] px-3.5 sm:px-5 py-2 sm:py-3 rounded-2xl border-2 backdrop-blur-md pointer-events-none w-auto max-w-[92vw] sm:max-w-[85vw] md:max-w-xl lg:max-w-2xl transform-gpu flex items-center justify-center gap-2 sm:gap-3 box-border",
+        "absolute top-[15%] left-1/2 z-[100] px-3.5 sm:px-5 py-2 sm:py-3 rounded-2xl border-2 backdrop-blur-md pointer-events-none w-auto max-w-[92vw] sm:max-w-[85vw] md:max-w-xl lg:max-w-2xl transform-gpu flex flex-col items-center justify-center gap-2 sm:gap-3 box-border",
         styles.container
       )}
     >
       <div className="shrink-0 relative z-10 flex items-center">{styles.icon}</div>
 
       {isMultiMessage ? (
-        <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 max-w-full relative z-10">
+        <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2 max-w-full relative z-10 w-full">
           {subMessages.map((sub, idx) => (
             <span
               key={`sub-msg-${idx}-${sub}`}
