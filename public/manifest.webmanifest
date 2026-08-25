@@ -1,7 +1,7 @@
 {
-  "name": "Pokéthology",
-  "short_name": "Pokéthology",
-  "description": "Advanced Pokédex, Combat Simulator & Analytics Companion",
+  "name": "Pok\u00e9thology",
+  "short_name": "Pok\u00e9thology",
+  "description": "Advanced Pok\u00e9dex, Combat Simulator & Analytics Companion",
   "start_url": "/",
   "display": "standalone",
   "orientation": "any",
@@ -9,22 +9,28 @@
   "theme_color": "#020617",
   "icons": [
     {
-      "src": "/icon.svg",
-      "sizes": "192x192 512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://i.postimg.cc/1zgPj6SW/20260201-111647-0000.png",
+      "src": "/logo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://i.postimg.cc/1zgPj6SW/20260201-111647-0000.png",
+      "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

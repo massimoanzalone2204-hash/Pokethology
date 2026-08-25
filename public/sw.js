@@ -1,9 +1,9 @@
-const CACHE_NAME = 'pokethology-v2.6';
+const CACHE_NAME = 'pokethology-v2.8';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
-  '/icon.svg',
+  '/logo.png',
 ];
 
 // Install Event - Pre-cache core shell assets
@@ -86,7 +86,7 @@ self.addEventListener('push', (event) => {
   let data = {
     title: 'Pokéthology World Alert ⚡',
     body: 'Ask the AI Chatbot anything! Discover Pokémon lore, battle strategies, general knowledge, or any topic in Pokéthology!',
-    icon: '/icon.svg'
+    icon: '/logo.png'
   };
 
   if (event.data) {
@@ -99,8 +99,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body,
-    icon: data.icon || '/icon.svg',
-    badge: '/icon.svg',
+    icon: data.icon || '/logo.png',
+    badge: '/logo.png',
     vibrate: [100, 50, 100],
     data: { dateOfArrival: Date.now(), primaryKey: '1' },
     actions: [
