@@ -103,10 +103,10 @@ export const PwaInstallModal: React.FC<PwaInstallModalProps> = ({ isOpen, onClos
           <div className="max-w-2xl mx-auto space-y-5">
             <div className="bg-slate-900/70 p-5 rounded-2xl border border-slate-800 space-y-2 shadow-lg">
               <div className="flex items-center gap-2 text-cyan-400 font-hud text-xs sm:text-sm font-bold uppercase tracking-wider">
-                <Sparkles className="w-4 h-4 text-yellow-400" /> Offline Playability & App Launcher
+                <Sparkles className="w-4 h-4 text-yellow-400" /> App Launcher & Native Experience
               </div>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
-                Install Pokéthology on your iOS, Android, macOS, or Windows device for full offline access, zero-clipping launcher icon, fast cold start, and full-screen tactical battle simulation.
+                Install Pokéthology on your iOS, Android, macOS, or Windows device for a zero-clipping launcher icon, fast cold start, and full-screen tactical battle simulation.
               </p>
             </div>
 

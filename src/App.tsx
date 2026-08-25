@@ -7,6 +7,7 @@ import { Download, Search, Loader2, Database, Sparkles, Volume2, VolumeX, Copy, 
 import { EvolutionNodeComponent } from './components/EvolutionNodeComponent';
 
 import { PokethologyLogo } from './components/PokethologyLogo';
+import { PokeballIcon } from './components/PokeballIcon';
 import { BattleMessage } from './components/BattleMessage';
 import { StatChangeEffect } from './components/StatChangeEffect';
 import { FloatingText } from './components/FloatingText';
@@ -3251,7 +3252,10 @@ export default function App() {
   const [isOpponentShiny, setIsOpponentShiny] = useState(false);
   const [isOpponentFemale, setIsOpponentFemale] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isInstallable, setIsInstallable] = useState(false);
+  const [isInstallable, setIsInstallable] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return !(window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone);
+  });
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -6149,7 +6153,7 @@ export default function App() {
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               />
               <div className="absolute inset-0 flex items-center justify-center">
-                <PokethologyLogo className="w-12 h-12 object-contain animate-pulse" />
+                <PokeballIcon className="w-8 h-8 text-red-500 animate-pulse" />
               </div>
             </div>
             <div className="flex flex-col items-center gap-2">
@@ -7555,7 +7559,7 @@ export default function App() {
                                           "p-1.5 sm:p-2.5 mb-2.5"
                                         )}>
                                         <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink">
-                                          <PokethologyLogo className={cn(
+                                          <PokeballIcon className={cn(
                                             "animate-pulse shrink-0 transition-all duration-300",
                                             "w-6 h-6 sm:w-9 sm:h-9"
                                           )} />
