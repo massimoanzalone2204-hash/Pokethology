@@ -3,7 +3,7 @@ const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
-  '/logo.png',
+  '/icon.svg',
 ];
 
 // Install Event - Pre-cache core shell assets
@@ -86,7 +86,7 @@ self.addEventListener('push', (event) => {
   let data = {
     title: 'Pokéthology World Alert ⚡',
     body: 'Ask the AI Chatbot anything! Discover Pokémon lore, battle strategies, general knowledge, or any topic in Pokéthology!',
-    icon: '/logo.png'
+    icon: '/icon.svg'
   };
 
   if (event.data) {
@@ -99,8 +99,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body,
-    icon: data.icon || '/logo.png',
-    badge: '/logo.png',
+    icon: data.icon || '/icon.svg',
+    badge: '/icon.svg',
     vibrate: [100, 50, 100],
     data: { dateOfArrival: Date.now(), primaryKey: '1' },
     actions: [

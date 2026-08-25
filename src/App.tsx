@@ -6150,7 +6150,7 @@ export default function App() {
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               />
               <div className="absolute inset-0 flex items-center justify-center">
-                <PokeballIcon className="w-8 h-8 text-red-500 animate-pulse" />
+                <PokethologyLogo className="w-12 h-12" />
               </div>
             </div>
             <div className="flex flex-col items-center gap-2">
@@ -7556,9 +7556,10 @@ export default function App() {
                                           "p-1.5 sm:p-2.5 mb-2.5"
                                         )}>
                                         <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink">
-                                          <PokeballIcon className={cn(
+                                          <PokethologyLogo className={cn(
                                             "animate-pulse shrink-0 transition-all duration-300",
-                                            "w-6 h-6 sm:w-9 sm:h-9"
+                                            "w-6 h-6 sm:w-9 sm:h-9",
+                                            "object-contain"
                                           )} />
                                           <div className="flex flex-col min-w-0">
                                             <h3 className={cn(
