@@ -8901,7 +8901,7 @@ export default function App() {
                                   <img 
                                     src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                                     alt={currentAvatar.name}
-                                    className="w-20 h-20 xs:w-24 xs:h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 object-contain drop-shadow-[0_5px_16px_rgba(34,211,238,0.5)] [image-rendering:pixelated] relative z-10"
+                                    className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-[0_5px_16px_rgba(34,211,238,0.5)] [image-rendering:pixelated] relative z-10"
                                   />
                                 </button>
                                 <div className="text-right hidden sm:flex flex-col items-end -mt-1">

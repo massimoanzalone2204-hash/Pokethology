@@ -72,7 +72,7 @@ export function sendDiscoveryNotifications() {
         },
         {
           title: '🌟 Pokéthology World Exploration',
-          body: 'Explore over 1,000+ Pokémon, evolutions, abilities & competitive movesets offline!',
+          body: 'Explore over 1,000+ Pokémon, evolutions, abilities & competitive movesets effortlessly!',
           delay: 45000,
         },
         {
@@ -86,14 +86,39 @@ export function sendDiscoveryNotifications() {
           delay: 7200000, // 2 hours
         },
         {
+          title: '⚡ Daily Scans Reset Soon',
+          body: 'Your 3 daily Pokémon scans will reset. Use them to expand your Pokédex now!',
+          delay: 10800000, // 3 hours
+        },
+        {
           title: '⚔️ Arena Awaits',
           body: 'Your rivals are waiting in the Arena. Jump in and battle now!',
           delay: 14400000, // 4 hours
         },
         {
+          title: '🎶 Audio Journey',
+          body: 'Did you know you can customize the battle music? Check out the Audio Settings.',
+          delay: 18000000, // 5 hours
+        },
+        {
+          title: '📊 Type Chart Mastery',
+          body: 'Having trouble in battles? Use the Type Chart to study type matchups and advantages!',
+          delay: 21600000, // 6 hours
+        },
+        {
           title: '📚 Lore Master',
           body: 'Discover the deep lore of legendary Pokémon and mythical regions in the Pokédex.',
           delay: 28800000, // 8 hours
+        },
+        {
+          title: '🌟 Vault Check',
+          body: 'Review your Favorites Vault and assemble your ultimate dream team!',
+          delay: 36000000, // 10 hours
+        },
+        {
+          title: '⚔️ Become Champion',
+          body: 'Can you defeat the Champions in the Arena? Test your limits!',
+          delay: 43200000, // 12 hours
         }
       ];
 
@@ -105,16 +130,25 @@ export function sendDiscoveryNotifications() {
         }, delay);
       });
       
-      // Set an interval for generic hourly reminders
+      // Set an interval for generic reminders
+      const recurringNotifications = [
+        { title: 'Pokéthology Hourly Sync', body: 'Trainers are waiting! Check the Arena and your daily Pokémon scans.' },
+        { title: 'Pokédex Insight', body: 'Discover new team synergies and movesets in the Pokédex today.' },
+        { title: 'Tactical Alert', body: 'Remember to check Type Weaknesses before entering the Arena!' },
+        { title: 'Lore Discovery', body: 'Explore the mythology of the Pokémon world with our AI assistant.' },
+      ];
+      
+      let reminderIndex = 0;
       setInterval(() => {
         if (Notification.permission === 'granted') {
-           new Notification('Pokéthology Hourly Sync', {
-             body: 'Trainers are waiting! Check the Arena and your daily Pokémon scans.',
+           const notification = recurringNotifications[reminderIndex % recurringNotifications.length];
+           new Notification(notification.title, {
+             body: notification.body,
              icon: '/icon.svg'
            });
+           reminderIndex++;
         }
-      }, 3600000); // every 1 hour
-
+      }, 5400000); // every 1.5 hours
     } catch (_) {}
   }
 }
