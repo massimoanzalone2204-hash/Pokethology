@@ -12,12 +12,7 @@ if (typeof window !== 'undefined') {
 export function isPwaInstallable(): boolean {
   if (typeof window === 'undefined') return false;
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
-  if (isStandalone) return false;
-  
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-  if (isIOS) return true;
-  
-  return deferredPrompt !== null;
+  return !isStandalone && (deferredPrompt !== null || /iPad|iPhone|iPod|Android/.test(navigator.userAgent));
 }
 
 export async function promptPwaInstall(): Promise<'accepted' | 'dismissed' | 'unsupported'> {
@@ -60,7 +55,7 @@ export function sendDiscoveryNotifications() {
     try {
       new Notification('Pokéthology Neural Terminal', {
         body: 'Universal combat sync and daily battle notifications enabled!',
-        icon: '/icon.png'
+        icon: '/icon.svg'
       });
       
       // Schedule more notifications during the day
@@ -105,7 +100,7 @@ export function sendDiscoveryNotifications() {
       dailyNotifications.forEach(({ title, body, delay }) => {
         setTimeout(() => {
           if (Notification.permission === 'granted') {
-            new Notification(title, { body, icon: '/icon.png' });
+            new Notification(title, { body, icon: '/icon.svg' });
           }
         }, delay);
       });
@@ -115,7 +110,7 @@ export function sendDiscoveryNotifications() {
         if (Notification.permission === 'granted') {
            new Notification('Pokéthology Hourly Sync', {
              body: 'Trainers are waiting! Check the Arena and your daily Pokémon scans.',
-             icon: '/icon.png'
+             icon: '/icon.svg'
            });
         }
       }, 3600000); // every 1 hour

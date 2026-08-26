@@ -3252,16 +3252,21 @@ export default function App() {
   const [isOpponentShiny, setIsOpponentShiny] = useState(false);
   const [isOpponentFemale, setIsOpponentFemale] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isInstallable, setIsInstallable] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
-    if (isStandalone) return false;
-    
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-    return isIOS;
-  });
+  const [isInstallable, setIsInstallable] = useState(false);
 
   useEffect(() => {
+    const checkIsInstallable = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || ('standalone' in window.navigator && (window.navigator as any).standalone) || document.referrer.includes('android-app://');
+      if (isStandalone) {
+        setIsInstallable(false);
+        return;
+      }
+      if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream) {
+        setIsInstallable(true);
+      }
+    };
+    checkIsInstallable();
+
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -3269,20 +3274,30 @@ export default function App() {
     };
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     
-    const handleAppInstalled = () => {
-      setIsInstallable(false);
+    const mediaQuery = window.matchMedia('(display-mode: standalone)');
+    const handleDisplayModeChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setIsInstallable(false);
     };
-    window.addEventListener('appinstalled', handleAppInstalled);
-    
+    mediaQuery.addEventListener('change', handleDisplayModeChange);
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
+      mediaQuery.removeEventListener('change', handleDisplayModeChange);
     };
   }, []);
+
   const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
 
-  const handleInstallPWA = () => {
+  const handleInstallPWA = async () => {
     setIsPwaModalOpen(true);
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+        setIsInstallable(false);
+      }
+    }
   };
   const [isRebooting, setIsRebooting] = useState(false);
   const [autoResetTime, setAutoResetTime] = useState<number | null>(null);
@@ -8717,14 +8732,14 @@ export default function App() {
                             <img 
                               src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                               alt={currentAvatar.name}
-                              className="w-14 h-14 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 object-contain drop-shadow-[0_2px_10px_rgba(34,211,238,0.3)] [image-rendering:pixelated] relative z-10"
+                              className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-[0_2px_10px_rgba(34,211,238,0.3)] [image-rendering:pixelated] relative z-10"
                             />
                           </button>
                           <div className="text-right hidden xs:flex flex-col items-end -mt-1">
-                            <span className="font-hud font-bold text-[10px] sm:text-xs text-cyan-300 uppercase tracking-widest leading-none drop-shadow">
+                            <span className="font-hud font-bold text-[9px] sm:text-[10px] text-cyan-300 uppercase tracking-widest leading-none drop-shadow">
                               {currentAvatar.name}
                             </span>
-                            <span className="text-[8px] sm:text-[9px] font-mono text-cyan-400/75 tracking-wider uppercase leading-none mt-0.5">
+                            <span className="text-[7px] sm:text-[8px] font-mono text-cyan-400/75 tracking-wider uppercase leading-none mt-0.5">
                               {currentAvatar.role}
                             </span>
                           </div>
@@ -8886,14 +8901,14 @@ export default function App() {
                                   <img 
                                     src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                                     alt={currentAvatar.name}
-                                    className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-[0_5px_16px_rgba(34,211,238,0.5)] [image-rendering:pixelated] relative z-10"
+                                    className="w-20 h-20 xs:w-24 xs:h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 object-contain drop-shadow-[0_5px_16px_rgba(34,211,238,0.5)] [image-rendering:pixelated] relative z-10"
                                   />
                                 </button>
                                 <div className="text-right hidden sm:flex flex-col items-end -mt-1">
-                                  <span className="font-hud font-bold text-[10px] sm:text-xs text-cyan-300 uppercase tracking-widest leading-none drop-shadow">
+                                  <span className="font-hud font-bold text-[9px] sm:text-[10px] text-cyan-300 uppercase tracking-widest leading-none drop-shadow">
                                     {currentAvatar.name}
                                   </span>
-                                  <span className="text-[8px] sm:text-[9px] font-mono text-cyan-400/75 tracking-wider uppercase leading-none mt-0.5">
+                                  <span className="text-[7px] sm:text-[8px] font-mono text-cyan-400/75 tracking-wider uppercase leading-none mt-0.5">
                                     {currentAvatar.role}
                                   </span>
                                 </div>
@@ -9306,23 +9321,23 @@ export default function App() {
                             key={trainer.id}
                             onClick={() => { setCurrentAvatar(trainer); try { sounds.scan() } catch(e){} }}
                             className={cn(
-                              "relative aspect-square rounded-2xl border-2 transition-colors group overflow-hidden flex flex-col items-center justify-center p-3 sm:p-4",
+                              "relative aspect-square rounded-2xl border-2 transition-all duration-300 group overflow-hidden flex flex-col items-center justify-center p-3 sm:p-4",
                               "[content-visibility:auto] contain-intrinsic-size-[100px]",
                               currentAvatar.id === trainer.id 
                                 ? "border-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.5)] bg-cyan-900/60" 
-                                : "border-slate-700/40 hover:border-cyan-500/60 hover:bg-slate-800/80 bg-slate-900/40"
+                                : "border-slate-700/40 hover:border-cyan-500/60 hover:bg-slate-800/80 hover:shadow-[0_0_20px_rgba(34,211,238,0.3)] bg-slate-900/40"
                             )}
                           >
                             <img 
                               src={`https://play.pokemonshowdown.com/sprites/trainers/${trainer.id}.png`} 
                               alt={trainer.name}
                               className={cn(
-                                "w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-contain transition-transform duration-300 drop-shadow-md [image-rendering:pixelated]",
-                                currentAvatar.id === trainer.id ? "scale-110 drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]" : "group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                                "w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-contain transition-all duration-300 drop-shadow-md [image-rendering:pixelated]",
+                                currentAvatar.id === trainer.id ? "scale-110 drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]" : "group-hover:scale-110 opacity-70 group-hover:opacity-100 group-hover:drop-shadow-[0_0_15px_rgba(34,211,238,0.4)]"
                               )}
                             />
                             <div className={cn(
-                              "absolute bottom-0 inset-x-0 bg-black/80 py-1.5 px-2 transition-opacity duration-200 border-t border-cyan-500/30",
+                              "absolute bottom-0 inset-x-0 bg-black/80 py-1.5 px-2 transition-opacity duration-300 border-t border-cyan-500/30",
                               currentAvatar.id === trainer.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                             )}>
                               <span className="block w-full text-center text-[10px] sm:text-xs font-bold text-cyan-100 truncate tracking-wider uppercase">
@@ -10161,6 +10176,7 @@ export default function App() {
                   </span>
                   
                   <div className="flex flex-col gap-2.5">
+                    {isInstallable && (
                       <motion.button
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
@@ -10177,9 +10193,10 @@ export default function App() {
                           </div>
                         </div>
                         <span className="text-[8px] font-mono text-cyan-300 group-hover:text-white uppercase tracking-widest bg-cyan-900/60 px-2.5 py-1 rounded border border-cyan-500/40">
-                          {isInstallable ? 'Install' : 'View'}
+                          Install
                         </span>
                       </motion.button>
+                    )}
 
                     <motion.button
                       whileTap={{ scale: 0.98 }}
