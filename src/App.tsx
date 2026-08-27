@@ -1150,7 +1150,7 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
             scaleX: finalFlip ? -scaleFactor : scaleFactor, 
             scaleY: scaleFactor, 
             opacity: (!imageLoaded && fallbackLevel < 5) ? 0.6 : 0,
-            y: arenaMode ? [0, -10, 0] : 0 
+            y: 0 
           }}
           transition={{ 
             opacity: { duration: 0.5, ease: "easeInOut" },
@@ -1189,7 +1189,7 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
             scaleX: finalFlip ? -scaleFactor : scaleFactor, 
             scaleY: scaleFactor, 
             opacity: imageLoaded && fallbackLevel < 5 ? 1 : 0, 
-            y: arenaMode ? [0, -10, 0] : 0 
+            y: 0 
           }}
           transition={{ 
             opacity: { duration: 0.4, ease: "easeOut" },
@@ -7759,7 +7759,7 @@ export default function App() {
                                         />
 
                                         {/* Opponent Sprite (Top Right Area) */}
-                                        <div className="absolute top-[12%] right-2 xs:top-[15%] xs:right-4 sm:top-[20%] sm:right-12 md:top-[25%] md:right-16 lg:top-[35%] xl:top-[30%] lg:-translate-y-1/2 lg:right-24 xl:right-32 lg:bottom-auto pointer-events-auto z-10">
+                                        <div className="absolute top-[12%] right-2 xs:top-[15%] xs:right-4 sm:top-[20%] sm:right-12 md:top-[50%] md:-translate-y-1/2 md:right-16 lg:right-32 pointer-events-auto z-10">
                                           {battleOpponent && (
                                             <motion.div
                                               key={battleOpponent?.name + '-' + isBattling}
@@ -7782,7 +7782,7 @@ export default function App() {
                                               )}
                                               <motion.div
                                                 animate={enableAnimations ? {
-                                                  y: [0, -0.5, 0],
+                                                  y: 0,
                                                   scaleY: [1, 1.005, 1],
                                                   scaleX: [1, 0.995, 1],
                                                 } : {}}
@@ -7842,7 +7842,7 @@ export default function App() {
 
 
                                         {/* Player Sprite (Bottom Left Area) */}
-                                        <div className="absolute bottom-20 left-2 xs:bottom-24 xs:left-4 sm:bottom-28 sm:left-12 md:bottom-32 md:left-16 lg:top-[35%] xl:top-[30%] lg:-translate-y-1/2 lg:left-24 xl:left-32 lg:bottom-auto pointer-events-auto z-10">
+                                        <div className="absolute bottom-20 left-2 xs:bottom-24 xs:left-4 sm:bottom-28 sm:left-12 md:bottom-auto md:top-[50%] md:-translate-y-1/2 md:left-16 lg:left-32 pointer-events-auto z-10">
                                           <motion.div
                                             key={pokemon?.name + '-' + isBattling}
                                             initial={{ opacity: 1, scale: 0.8 }}
@@ -7864,7 +7864,7 @@ export default function App() {
                                               )}
                                               <motion.div
                                                 animate={enableAnimations ? {
-                                                  y: [0, -0.5, 0],
+                                                  y: 0,
                                                   scaleY: [1, 1.005, 1],
                                                   scaleX: [1, 0.995, 1],
                                                 } : {}}
@@ -8715,7 +8715,7 @@ export default function App() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98, y: -12 }}
                         transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-                        className="flex-1 flex flex-col items-center justify-center gap-3 sm:gap-4 md:gap-5 lg:gap-2 xl:gap-3 py-3 sm:py-5 px-3 sm:px-4 text-center relative overflow-y-auto lg:overflow-hidden custom-scrollbar optimize-scrolling select-none w-full h-full my-auto max-w-5xl mx-auto min-h-0"
+                        className="flex-1 flex flex-col items-center justify-center gap-3 sm:gap-4 md:gap-5 py-3 sm:py-5 px-3 sm:px-4 text-center relative overflow-y-auto custom-scrollbar optimize-scrolling select-none w-full h-full my-auto max-w-5xl mx-auto min-h-0"
                       >
                         {/* Top-Right Corner Avatar with Interactive Selector */}
                         <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20 flex flex-col items-end gap-1">
@@ -8732,7 +8732,7 @@ export default function App() {
                             <img 
                               src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                               alt={currentAvatar.name}
-                              className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-[0_2px_10px_rgba(34,211,238,0.3)] [image-rendering:pixelated] relative z-10"
+                              className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-24 md:h-24 lg:w-28 lg:h-28 object-contain drop-shadow-[0_2px_10px_rgba(34,211,238,0.3)] [image-rendering:pixelated] relative z-10"
                             />
                           </button>
                           <div className="text-right hidden xs:flex flex-col items-end -mt-1">
@@ -8748,24 +8748,24 @@ export default function App() {
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/5 to-transparent pointer-events-none"></div>
                         
                         <motion.div 
-                          className="relative w-52 h-52 xxs:w-60 xxs:h-60 xs:w-72 xs:h-72 sm:w-80 sm:h-80 md:w-[28rem] md:h-[28rem] lg:w-[22rem] lg:h-[22rem] xl:w-[26rem] xl:h-[26rem] flex items-center justify-center shrink-0 max-h-[35vh] sm:max-h-[45vh] lg:max-h-[35vh] xl:max-h-[40vh] -mt-8 sm:-mt-16 lg:mt-0 mb-2 sm:mb-6 lg:mb-1 xl:mb-3"
+                          className="relative w-48 h-48 xs:w-56 xs:h-56 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 flex items-center justify-center shrink min-h-0 max-h-[35vh] sm:max-h-[40vh] -mt-8 sm:-mt-12 mb-2 sm:mb-4"
                           initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: "easeOut" }}
                         >
                           <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 75%)' }}></div>
                           <PokethologyLogo className="w-full h-full object-contain filter drop-shadow-[0_0_30px_rgba(6,182,212,0.5)]" />
                         </motion.div>
 
-                        <div className="flex flex-col gap-2 sm:gap-3 lg:gap-1 xl:gap-2 relative z-10 shrink-0 w-full max-w-4xl px-2 sm:px-4">
-                          <h1 className={cn("flex flex-row flex-wrap items-center justify-center gap-1.5 sm:gap-3 lg:gap-4 text-3xl xxs:text-4xl xs:text-5xl sm:text-6xl md:text-6xl lg:text-6xl xl:text-7xl font-hud font-black tracking-normal sm:tracking-[0.05em] leading-tight text-center w-full break-words py-1 px-1 overflow-visible font-extrabold", isLightMode ? 'text-slate-900' : 'bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]')}>
+                        <div className="flex flex-col gap-2 sm:gap-3 relative z-10 shrink-0 w-full max-w-4xl px-2 sm:px-4">
+                          <h1 className={cn("flex flex-row flex-wrap items-center justify-center gap-1.5 sm:gap-3 lg:gap-4 text-3xl xxs:text-4xl xs:text-5xl sm:text-6xl md:text-6xl lg:text-7xl font-hud font-black tracking-normal sm:tracking-[0.05em] leading-tight text-center w-full break-words py-1 px-1 overflow-visible font-extrabold", isLightMode ? 'text-slate-900' : 'bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]')}>
                             <span className="inline-block py-0.5 whitespace-nowrap">POKÃ‰THOLOGY</span>
-                            <span className="text-cyan-400 text-2xl xxs:text-3xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-5xl xl:text-6xl font-black text-glow inline-block py-0.5 ml-1" style={{ textShadow: isLightMode ? 'none' : '0 0 16px rgba(34,211,238,0.7)' }}>OS</span>
+                            <span className="text-cyan-400 text-2xl xxs:text-3xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-black text-glow inline-block py-0.5 ml-1" style={{ textShadow: isLightMode ? 'none' : '0 0 16px rgba(34,211,238,0.7)' }}>OS</span>
                           </h1>
-                          <p className="font-serif italic text-xs xxs:text-sm xs:text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl text-cyan-400 select-none px-4 mt-0.5 lg:mt-0 tracking-wider whitespace-normal break-words text-center drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">
+                          <p className="font-serif italic text-xs xxs:text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl text-cyan-400 select-none px-4 mt-0.5 tracking-wider whitespace-normal break-words text-center drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">
                             Where dreams and adventures begin!
                           </p>
                           
                           
-                          <div className="flex justify-center items-center mt-3 sm:mt-5 md:mt-5 lg:mt-2 xl:mt-4 w-full max-w-md mx-auto px-4">
+                          <div className="flex justify-center items-center mt-3 sm:mt-5 md:mt-5 w-full max-w-md mx-auto px-4">
                             <motion.button
                               disabled={isInitializingDb}
                               whileHover={isInitializingDb ? {} : { scale: 1.05, boxShadow: "0 0 30px rgba(34,211,238,0.7)" }}
@@ -8817,7 +8817,7 @@ export default function App() {
                           </div>
 
                           {/* Home Screen Copyright & Legal Disclaimer Toggle */}
-                          <div className="flex flex-col items-center justify-center mt-12 sm:mt-16 md:mt-24 lg:mt-6 xl:mt-10 mb-2 select-none px-2">
+                          <div className="flex flex-col items-center justify-center mt-12 sm:mt-16 md:mt-24 mb-2 select-none px-2">
                             <DisclaimerButton onClick={() => setIsDisclaimerOpen(true)} variant="pill" />
                           </div>
                         </div>
@@ -8901,7 +8901,7 @@ export default function App() {
                                   <img 
                                     src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                                     alt={currentAvatar.name}
-                                    className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-[0_5px_16px_rgba(34,211,238,0.5)] [image-rendering:pixelated] relative z-10"
+                                    className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-24 md:h-24 lg:w-28 lg:h-28 object-contain drop-shadow-[0_5px_16px_rgba(34,211,238,0.5)] [image-rendering:pixelated] relative z-10"
                                   />
                                 </button>
                                 <div className="text-right hidden sm:flex flex-col items-end -mt-1">
@@ -9249,30 +9249,30 @@ export default function App() {
 
                 <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
                   {/* Left Side: Avatar Details & Default Save */}
-                  <div className="w-full lg:w-[300px] xl:w-[360px] 2xl:w-[400px] bg-slate-950/80 p-3 sm:p-5 lg:p-4 xl:p-6 flex flex-col border-b lg:border-b-0 lg:border-r border-cyan-900/50 shrink-0 z-10 shadow-2xl relative overflow-y-auto">
+                  <div className="w-full lg:w-[350px] xl:w-[400px] bg-slate-950/80 p-3 sm:p-5 lg:p-8 flex flex-col border-b lg:border-b-0 lg:border-r border-cyan-900/50 shrink-0 z-10 shadow-2xl relative overflow-y-auto custom-scrollbar">
                     <div className="absolute inset-0 bg-gradient-to-b   from-cyan-900/10 to-transparent pointer-events-none" />
                     
-                    <div className="flex flex-row lg:flex-col items-center lg:items-center xl:items-stretch gap-3 lg:gap-0 h-full mb-3 lg:mb-0">
+                    <div className="flex flex-row lg:flex-col items-center lg:items-stretch gap-3 lg:gap-0 h-full mb-3 lg:mb-0">
                       {/* Avatar Image */}
-                      <div className="relative w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 xl:w-48 xl:h-48 mx-auto mb-0 lg:mb-3 xl:mb-5 bg-slate-900/50 rounded-full flex items-center justify-center border-4 border-cyan-500/30 shadow-[0_0_30px_rgba(34,211,238,0.15)] group shrink-0">
+                      <div className="relative w-20 h-20 sm:w-28 sm:h-28 lg:w-48 lg:h-48 mx-auto mb-0 lg:mb-4 bg-slate-900/50 rounded-full flex items-center justify-center border-4 border-cyan-500/30 shadow-[0_0_30px_rgba(34,211,238,0.15)] group shrink-0">
                         <div className="absolute inset-0 rounded-full bg-cyan-400/5 animate-pulse" />
                         <img 
                           src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                           alt={currentAvatar.name}
-                          className="w-16 h-16 sm:w-24 sm:h-24 lg:w-28 lg:h-28 xl:w-40 xl:h-40 object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform duration-300 [image-rendering:pixelated]"
+                          className="w-16 h-16 sm:w-24 sm:h-24 lg:w-40 lg:h-40 object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform duration-300 [image-rendering:pixelated]"
                         />
                       </div>
                       
                       {/* Avatar Details */}
-                      <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling pr-1 sm:pr-2 lg:pr-4 flex flex-col max-h-[22vh] lg:max-h-[35vh] xl:max-h-none">
-                        <h3 className="text-base sm:text-2xl lg:text-3xl xl:text-4xl font-hud font-black text-left lg:text-center text-cyan-300 uppercase tracking-[0.2em] mb-1 sm:mb-2 drop-shadow-lg shrink-0">
+                      <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling pr-1 sm:pr-2 lg:pr-4 flex flex-col max-h-[22vh] lg:max-h-none">
+                        <h3 className="text-base sm:text-2xl lg:text-5xl font-hud font-black text-left lg:text-center text-cyan-300 uppercase tracking-[0.2em] mb-1 sm:mb-2 drop-shadow-lg shrink-0">
                           {currentAvatar.name}
                         </h3>
-                        <div className="text-[9px] sm:text-xs lg:text-sm xl:text-base text-emerald-400 font-bold uppercase tracking-widest text-center mb-1.5 sm:mb-4 py-0.5 sm:py-1 px-2 sm:px-4 border border-emerald-500/30 bg-emerald-950/30 rounded-full self-start lg:self-center shrink-0">
+                        <div className="text-[9px] sm:text-xs lg:text-lg text-emerald-400 font-bold uppercase tracking-widest text-center mb-1.5 sm:mb-6 py-0.5 sm:py-1 px-2 sm:px-4 border border-emerald-500/30 bg-emerald-950/30 rounded-full self-start lg:self-center shrink-0">
                           {currentAvatar.role}
                         </div>
 
-                        <p className="text-[11px] sm:text-sm lg:text-base xl:text-lg font-serif italic text-slate-300 leading-relaxed opacity-90 text-left lg:text-center mb-1 sm:mb-6">
+                        <p className="text-[11px] sm:text-sm lg:text-xl font-serif italic text-slate-300 leading-relaxed opacity-90 text-left lg:text-center lg:text-left mb-1 sm:mb-6">
                           "{currentAvatar.lore}"
                         </p>
                       </div>
@@ -9315,7 +9315,7 @@ export default function App() {
                     </div>
 
                     <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-4 sm:p-6 lg:p-8 z-10">
-                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4 sm:gap-5 xl:gap-6 pb-20">
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6 pb-20">
                         {TRAINER_SPRITES.filter(t => avatarFilter === 'All' || t.role === avatarFilter).map(trainer => (
                           <button
                             key={trainer.id}
@@ -9560,35 +9560,68 @@ export default function App() {
                         <span className="text-xl font-mono text-cyan-400">{selectedMoveDetail.accuracy ? `${selectedMoveDetail.accuracy}%` : '--'}</span>
                       </div>
                       <div className="bg-slate-950 p-3 rounded-xl border border-cyan-900/30 flex flex-col items-center justify-center gap-1 col-span-2 sm:col-span-1">
-                        <span className="text-[8px] font-bold tracking-wider text-cyan-700 uppercase font-hud">Effect Chance</sxœì=írÛ¸µÿ÷)`Mod÷Šú²ì8®¬ÇqRO7µ=Ûîd2YŠ„$Ô$Á eÕãgèÏû÷9ú&}’{ø-e;¹Î6œH‚ÀÁù>°oz£~ šk(|Ó#–c
-ñÎtéQCÒiÜ8dÂ=i¸ÜãD=±¦gºÝÆèVP‡Z’Úoù5}E¥Éœ6LàÑgkfz%?’_·¶ÕÝýJIÓ0šwÃ1ÒÀ8ìØìºü¥ö•öÅmç÷äBš’œ S*Èï;weÍJ ð™‚?{öŒ¬iÒv¨7•32"]l½]> 3|ÀƒE…Ñoh±1¬Pëãó)"Ø˜;6‘i]1ojÌ™Mƒýö»]ú>,SÐèƒY¸Ô^H2æ|gŒ“êÛÝng·Kü±ÑkŒÞr›Mô}ªH*†Ù@ñÒ§³	þÏ°¸#Œ™š~Å„×£íšþö¶°Z„í£‘Õ9`®èâè–ÝåOá˜’/öº=˜¦Ñ'=›Ú1VÑï’‰CoÈßB!ÙdaŒ©œSê&©+‹z’³RÐ”
-_"já>öº•ÔM©˜EÔRj{Ðk; ¾lµÝ4š-Ò$Í5WÛ­åU!¯F}€Q±4ZkúƒYD$VBôcÜÿ4 ,+Uú#zP[=¨ìoç®zÂÈhKþúß¿ËžÝ¡¾ÊîÈÅåñ›Ój®Es…nS ï”)§5j_•v†
-ñØ¶™dÜ3òÄkèbóßœvËáã•)Í(·~¤ÜbI~QO.¢Ö‘:Rw#Íˆ$iÃÆLå›(A¶ŽŽHÓãmê©Y>áR¸Œâh.ÝÁëÏèøì§·§ï.ï£ª
-J¡¨k £†v\'¶:©-§˜00¹PT@“3a˜'BˆçgïÏÏ.y %ª}Çdú_ïÒ¦T~<ÐÎ­ÒÍIñ7º<>súÖ†ï¯gþ÷òîK‹G³\Ë„ñ¥1(zd•>ØpJÉ=¢“{'³®Žn·•O)¨<âÞûÔÛž˜Ž Úyæ!»1ˆv€›™šªô&Oöo>2g½ê¸T™Õ[6v±kLBÇÁ—žP–Í0áVÌL›ÏÝÏÝÏ½=ÿæs0›Û»ƒV¿×kõwZÝö`çS¹S¥#ü‰ÃŠc0Á„†Êæ7ˆÛJ;.Ç¹´WÞéÞäh5ì{Ì)ùPA!ÍÚ/C	
-	Œ?HgDòïïoÀ4¼‘o‘péd½ªÀ“J	´Â'è>ïfµàÀ§L$_bï«
-k˜Mw	GÌr›ÎÑí-áà|–=Çön™gÍhðB³Þj3zÃäº®ŠCcÂnÀ”1pdtÉ?€“ûÝO‘”æã¤%‘…ðk€²2­tÕ9è6 ´?±éLæ(" !gÔ¥†ƒÏK2¸Â(Zô$,Ó¡0§ö‹¹õK&WÀTÜ¾§Z—6NðU«çÒ`”BlQúw´F©‰t÷o2dÜ5oŒ¹!\‚Úeâ€|Ï˜m×ä¥}¯[*íýO
-óÂ=ôýˆJø?ôe•#;XV%¢ZÇ\HïŽ5fq8ëkS©jLƒe½\å¶ªŒÃ0•ÒÜØscÌŒ½F^¢óWòM©J›õKgÛŸ2C“÷T™”zU™!YJdªˆÇ¡›í_‹ÓÜ‡iîk¦©WÜ:µ]Æ†Ú-'|4N)ÀKèºÕØ!ÿPÕþÌ›pÕV¡®i‰äâµ<ËRå–°¬Ý
-	§ÔX–ü•05k¬W7+Æ~
-¯ü2[®á‹2Ò­ÈÐîrnXçó!f7‘§Çö‘<¢Æèb!`Aªòr«üÔòœ¹(Í™£„*äËrº[¥µ´¸ü™Ñ¹`Ýd*=®ÿ'Y+øKßåí‘åí%çWÊW|"2‡LK’‹R‡È|‚R—úÄÛ[9Y/yÈ®¢->Lyû»Ä=žÄÝæñO~/2Ô	9$Ã·œë^kó&_L8_1á;æ£Rú-Êæ2î›ê¦‰«Ë¯ÌàªYŽÑoË\¾³ÖÙÊïž¿Ù¤*
-<{úî§
-SDÁõMŠíØ”Ò¡—˜Èùê":3=Û¡Q(pPš,‡ÁfÂ;ÔÆ,à9sŽbûx„‹T(>»9ñQÏ"a(ÊOîEA|ðy=é!®4úéœãD|œ=³Â@ðÀð¸ÄÏøœÚ_Hä’E{­ôœs	zäÄš/'ÉÃ¬`J•ŒÓs† ý×(&`—:ÿb¢©_‚ÊV*½i·ÛÊXÅ|H"®Ô˜­êª‚Gu$K©¨ã‹ûI:LŒÊG“ð¯º€iû—JO‘?RÇß<s}Œß~K¹û’¼ýî=òödÿÚ÷áIÂ-ª’ßv¢¾D+¯äéiÍ<}÷Ekÿ ÿSiúÍóðŠ2K«Ô‰=Ù­QÉVðöÊ%½,_?F=!ÜÃòäýJ‰ÆJî>r2âuÜ?ò9‘<–G]^½2±^”Fmj=šè^1·-Ìª…ƒå¬ydŽ:£gÈs«/)_,3„Y#ÃÌŒÏ»×³OÄJq×VÀgl$)­”'Ô5…Xåéw¤ä®¾*13Š9²åŒ¦¦ÞÊY]Â"¾ƒØ0Ñ±÷iw5€ùZ¥å’`ÐjÚ8~@´Xcôò_Q°rà2 g	c:t"AOØê†zÔ]ä^C¶ÉŸ(õ¡¡š¼™QÓ‘3PmØ"gb¦]O©p‹•—!€Á®`^a œˆ£3Á=pX$™3µö¼þ˜0#OCÇ, ª\sØñ7*iþBô6Ý1êqõ•Qü/3SÐºà!±ùOéBXÈ¦w+6ú÷ÿüü!po:z„è±Ü&zB>€Ú :º ‚H`M˜`›¼6*Â„Ú¡ÁA^)'¹5ì@×5GM:9	¹¡/Mù,ã)—ÛÔA(€í`A¬`ÑÞd¨ã3åº€Ë†Qš‘4áÕPOÒé¢IØD‘cnz ö5³ÇƒÖ³f*@8ÆJ's˜;­€aØ	Xø1øÕß¡Ä°qgÇžÌL.âÙý•ÓÇ^Ç_QP—3À-CÝ1	=q›Í]Eù­òò¤á8èŒ‚ŠsŠå›>PS9çÉ·1÷´«¾­ð*>8¾Âú&ÑDúb]Ü f|QÙË…
-YP/‚»œ‚úTP
-|ÃAÓybk3u¶Ì;$Eÿ…z¶ÆCyˆk€¡'x./U'ø8jÔ"Mðcš;-¢
-½ ì½áDuë	Å0jvãà%Yÿ†Ã–û”ýG‡-µê‹jÇ-+õEÅØ©}NíýbšØ[.-êß‹véòÔƒòàeóØ¥Fá"/p˜G‰M-vV•ãÄIðì­Á'dØƒÆ.pUCr¢x³<ÌÑ¨É‡Äi‘ß~°›X.á® uV¼<&©e¸ÑžŒ1%Úµý¯œq‡O†x	¤Æ6N´æBa'û™%	Ó	K3Ï«ØÉU´úLš`YHÉ\ÀÃŠŠÝ™Ñ ¸" ¦+”É‡È‚k
+                        <span className="text-[8px] font-bold tracking-wider text-cyan-700 uppercase font-hud">Effect Chance</span>
+                        <span className="text-xl font-mono text-cyan-400">{selectedMoveDetail.effect_chance ? `${selectedMoveDetail.effect_chance}%` : '--'}</span>
+                      </div>
+                    </div>
+                  </div>
 
-¬ÝÐÎÕ1KÜ	´ÆÌCoÂR¼Ä'Ô¡¯Ž­žz3ðÁ“eÈpð]ƒQßfn€+±‘µ°îS›™
-Z‹»cðàsCà´ÉÄ5&ú¦8Ä&“ Ü	t
-âE
-ˆtp<Ì'£” Ó
-j
->GùQq˜d€š€+_à¾òøÜ‹ w1‚2´q¼„‘–hÅ>‡é:TèÍ•CâÆqd‘¡Sde–0qcÔ3ÛääaA& ?P›ã§¦ï“€^s#h¨æ2e×˜ÁU¡D‡Ó¹.bFBsËpÜ^b›Òl? ¾$Ÿ¾À]“ *H;>	`°ÌÑ‚ˆÐE€Uô¦žuŸøR_¹‰`¾EF{¡MÔäTœf3a¡½—*ý–Œj. Š]Ì	sâX,Bóx¡‚gµÏ^­T9Šä «)™–šÂO¹ðiÌTj%Kªëº¼ˆ
-·‹F©ÅVàK 8qË³(å3¬ë"´c! Y•©(Ðñ™XbÿšŒæRÜ–È¬*@–©±ºL£¦È&<†Ò4b¥Sk:ÞS?ƒ~@Ùìµ»ínå‚G´G‰ÏAŸÚÈù8«ZXøúÇUÅBÔª-&eLÚ{²Åýà›JÀÔn)€ØOÝÀƒVo°×ê=÷”ÈÈ*ÇÐX…1Ž¬žö‚QT*°q´•Öx|·òã}·×~øvŽ/´ucÿKnÝhŒR¸Q¯ï³¡"+ŸºÏnŠ§°wB”eQ[v¬BéøþèdÆqožr7'æ5î¹E‰A´z*E´J(ŠÛèt ³†vœc6ØQ]`8ñµ+Æƒ·Á%û‰¹LžSÓšUï.	ò’bšAYáÌ^¼ÃßØÍÉ¬nIé%¢Ö-þ•|Þë"Ç­a`„eÚê_á0õÃÀÈÇ ËªvW×«“©Þ,<<vh /fzS IwsU6hø˜ýø¿¢fMu]Z*Rç†dA·ìPpeÿŒ&§73´
-µ×m2^³Å¸$ßÁX(WÉÊ[\Œ4V‚å
-<`,€ž% ¯¸#gšÀßŽrè€+Ó¶#ÁÂXu8½9}{öîì38¢Ÿÿtúÿ(‰(áeRû©»ÔÉ62ŒZq„ÐzJ˜Å½òl*ÿ5‡¨ZF­AÇæœÀå ´h2ô
-µI²n4^«ÊôÏËBºf4^92¹$l™VÅà²ìÐÕL-Ø**f™µŒÁ´ãW‘ø.t>#çT‹
-<ê£÷ZVÕ`f½X2½úÐ¸j›]•ÒÖ°[*ÃõjãVløq(¹t‘°¸X+öêg©<#gôÎC¥ÔŒ·žLjb&ÕR‹´óúL*  ÝûÀ±êP¯UÁé³SO•Wno™ùÛ
-©©}òFŒþzé‰UDº¥è®ò¼¦Â´ð¬¦|šEêÌ¦Ô!~žz2éa7Ú!´¨ª¨¸\êý;Àû×¯úòÊ*I¯*°|<þZ‚©| î‘Üœç#”gýooÑ¥'¿Î_žÙSaþ¸š±(D{câŠïŠBãÇ”„¢“ý•y¿1ºxýWò3wB·r‹ŒÏ<\?Ð¢³ÃG €kè[¹Ì;jt«˜7G^Eð/}è¢]ÕÆ¦3täÏ¦Rl»WÑdT[BJ#)òÚ ¬€š3Û¾úÚá¦Ü¦ÉÙ@×Ø»þ :RŒ<TÒbt“±y.añ"Xa< T•i‘x»ÏÕâ“ZAñdšÑI„&|ùÆxòå›·¿yžÜ½Ojþóx2[œ‹ê"ö»+«ô>¦—«õ[¬>j1Ô|‡§ýµôÄiÆ%¹jéÕoÚ¯nÊ!ÚR›z£Ú¼=o±¾Ù¹Éê4;ÅsÏfÅ-5?EçÈ*!]sŽì:‡ˆDGÌª®êÅÅkOWMø8„çgå Ú¥5™ûª§êÓYs›÷ÈÑÑQôqU&¯%Ï(Ÿ§jžM¶nÀ¼¿uÐ]Ù¢ú<bÉ'K”{Õ‘²•)š›£^†Ï˜u{|£‹MÈvD<Î:¢AS= 
-6wÖ˜îÆß kkyG¨ÌózV¸d.å¡Ü®ƒ0¼˜,YìDç™æ°‘É}„i-8w-Äï®CHÅ[Í&k¼*S¯›®ÁÔ:P2ÖDu”¼-ìgÏâ
-³ïêœ«Nµ³•û8[èË/ÔÍ(f‘ÉÇA‹ôú-2øÈÎ)=lP°èÐæÌ›à’à¢Eì0ª¿Ãu»ü à"ôÒeó>ž+]™¯Ü Ö"›Ã·D÷¿œû€D tÿA€èšT?^•êvÝRÁšô­Î—Ü´àªæbž+“ãõ»rde¡³ôËbéÈþÓ;›´~Aˆ:‰óá®_²Dý½‰4CÞjñ¸•Ú•!X¢–}^uT÷†e"­¬”á fÉHúI­â‘êa»q¡‹gE´ï«0È
-™‹‚Xêu§ÕTƒ"‡Ùk4ô¬»¯Ø(ö/%þt‘°‘Ç¹ÍØQŽþÒîÐ}‘ú©é_? ¹?†Ð‹ÿBîðˆì‹dM6]í­ºµeá¶
-¼¦bê—x»¥²‰êþ§¨ok%¥X"s‘«BwÃÎE(@ã‰øõ°s<x‰´3ƒ>?îî‡ÿ  ÿÿ “2®-
+                  {/* Stat Changes */}
+                  {selectedMoveDetail.stat_changes && selectedMoveDetail.stat_changes.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-[8px] font-bold tracking-wider text-cxœì}ÛvÛH’àû|E·ºDõŠI‰*Y-ÉCQ´Å-ÝZ¤«ÚëãcƒdŠDØ hŠ¥ÖÌËÎËž³çìË>ïìûüÉüÀî'lD&.	 3R²Ë56gÚ%‰¼FDÆ=–†]Ù«ÕÈ|6£îÐð(¹ul¿2™ˆïÃ¦=®,Ìõ|2pÜu+ƒðáÞ}V«mïÔÈlP©—Ž/œ‘ykR—tnoéÐ÷·'»ÇÿD¤ŸÃ‘ù‘-Ãó.)=*]sDðŸÊÐ±¼JŒY¥QR½NÈ½G-„Ž.œô”ú†iU=ßðß'†=¦^ujÌÊeo¸EÌMrtLÊÊž‚É| Ë£û÷Þ°òý½7d]=¯Ú07òó~5Þ?ˆSŒ+žeø´ò¬YÛnÂ&TÄuæöˆŽ‚=ÊlU£Fn-zG~{¾y»¬¨¿ Ô&¦O§^eHmŸºš5³¹z3Ã§áÓ;Ÿ°É¾½©×fwoùQ+u–n|ÆÑ±—ŽÃE³5W]:³Œ!-oT6¶ÈÙØ|8ÜÆW›ÛýÐÖm;~JÅ'<ul§´•Ó¬‚ 9&5ò<èìÂ.ãþ”ÈAð“KGìm›ú#¦|ÿŸ¿{xãÅßH¯ßzÙÑoaî6n´ªln>¨PNý¢òt&ùõ~ûÏ¤5™¾éØ†E. ûÈŸ·eãÊ°tŠÍøA‘iÂ Û1¤•¥†Nv3øðf_O1Î<ñöãÔðGÐ¾§}*?+†¼5§GÖ«N<’*ü1
+„G“Ó„ÓÅïŽŽÈ†íØtC}šòKi`z‹ùZökáçSžãV÷ü¢sÙ?X‡V%¨B’0ØŒä1oUh+?±™k:®é/Ù)àskÚpï|!q}Ó½ºéö_?â$ÂM~ áò?û¾û†;¦þgØg´ ‚kÓrAÑþ÷[7/;}>|#øù¬Å"¬{Owu¥OfæWv“<™–;Ì}ß±‰bžŽÝ¶Ìá‡£û2ã9=êw½xç®fÔ.ß–G•gvWÙ'3¸ø0šÑ]5ÞÜƒð—&üßYE8©ø®K_qëZ¹[>´=vŸUøêMŒ‘³¨¼©½«½«7gwïÜñÀ(ïìn5êõ­ÆÎþV­º»ùVÎK©Ž»m90‹\˜KÏôgË·[Ö…âÜ¥?nO\K5óLõD8 Ãí–mN7®]êQ{Hc¸:ü…ZCgJAò{_xßôð°îM/h_Ä*°	PÚ†p’|Ÿôç>>ÃJ¼þÈ^õÝyâÍíxe‡aCa†â»Òy%z'¶-îÃµóÒv¦3Ã5=ÇîPWº%q+6dÎ¦$[KðgfÚpõ38ºç_ã·‚(ÆÍøŸÉ{ŒÂ]¦uQž±áï “	Àã¿¤)æ™lgÞ’²‡hæ=¯zCÃÞ$üûRÞüŠº<3f¾9,oXæxâo$zxxHìç9¶ Ð£¸©Ñ—ñÜ£¿‘e?´$góy8îQ("tEîý0ïñ 0ë:ÁUfïÁÃŸRHˆòui„/µ Ó
+ã¦)†iÍAÐ¾'ðýpÁ€Põ¦–Ÿ`¢Y=ÛŒÞ™~^W1¡Ã–þrFA@ô€½°Ç¥-22¦ NãÒhn¼nmêyøUÒ•xß›wÀŒ™6 F¥FÈo•7p¯¾å÷þƒŒ>Ièží“Ðã‘ëÌ*kîVwAZká˜£µ“»•&rL(›Ldá_ÂKžD$Kß~ÆÀs¬¹—[#½õ+õí]²¨<Û#üG¸i¶ëµä%Áæ¹óœ9&Þ™ú÷*(”Dª“3øÀ"?…ñ]„áì`ºÞ$[Ôwf¤·ô|:%gÔÀ+ñÄpl•7˜ø “”Š‚M.
+ÆG
+ßŸ#wÜ…7=ïò¢º'Ã¢ð· Ó¨…×®5–p#R3Ñ1ëHÊÇ¤ß]Àì&ð?˜é¢›ÿT„Í¾³pÐ¨Éô[À«£L½Àà«œ—ØÛªï7€h +±³ù–„Û­âÃú€(“er»°ˆ]¾ˆ&_C“$µc·¦…S`X&ÎcOÊÒìK“c6¼Šé,v*Nlgá3²˜@®æà¿¨Ö<i$ºù>Îë/þ¯v€Ü,Ÿ}£‹·`'¡ìH3€ ~Eì)<)BNAê~MÎ^(X¸IC±œ´HÒ@$©U›)4`ÑI)ì!TîÖR+ùáh;<Ae3É™Õ†PêM•ë¾÷á[Êyµ$¤g[³¿sXÒQJÔ¸—Îƒ1&â…-eKÂï.É}–„<¡á'¤ün“ÜË¶ s9âG<k8jNwªW™ “¤7‘<Œ‡É=ü×Ãóå_w"ÉˆýÈŽ3'Â{IÙf8w=Ç­Wˆ„~!ÆÖ«)	(F<„RÁ»°$˜b²&Ùßô-Ø.•;Þp3ÛJ
+R“‘A6r…oŠëøüR×Îþ¼uÜ)Í]ƒýÔ@¹œà¥‘•s$xr¦m™pÝ·Ï¯zà«$9):äÜÄŒvÖcæhY1@>sô‹ ¶Ö±,=€íóÍ©ù~‚C!³Ü*{d:‚ÿì“©qW`nzÇ{Zp²“àÖd70ŠþÄ±œñ˜ÿá_˜žûø‹9B‘ìˆ‘dô|÷( ²6\>²¨OGÈ×}F¿Iß™òF×®3¦:˜ÛÀùÊ~•áeÐî†þ}nº(:‰o'~•½ÍXzX5€	_²m³aöô)ÇbÎjøs˜7i;ÞÔ’Ð3ïñ‚vJ>l±¡x‰’ŒîVcè›iÐíäˆ”Ùû/©„â•é·tjX\Îž½`ßƒ·6ÉsÉ¯ä 1¿HÆžÌ`°Ì˜±äÐ[Ó•Ë Óö’Ý±Ïj2ÛØ|^E®â>AAºY“dø>2!Œ÷QpÀ½¥ c=nÄ “‚Cz³–ÿÈ%z3:!·²ÒR½Ù)½}šqW]0$zìÀt$N­”)2?²Cò‡d›Ôk›Ußybv¹¾)…zÖôB|D.R…ËÂqË9½’?“jc¿¶¿«éµk'Ôûe\K¹xÇ¤"L¯7¤c-X£ŸÆò­Xß
+Þô|€3–Ms‘œf£Ú¨íî5òz5¦œõ€ÜKá#jðœûb1ˆ”Ã§ËØÇÂˆþÚØØŒ¬Û•í17/lV­ŒÆ†MÖêMRš¹ âî™3•’†çUsDŽ`µða#g[àT =´æ •7¦tlða4F¼˜M×Üoœë/÷Ã+×Âó0½ÞÄ´—@Ü³'ó¼Šš(wÐñ'Ô}^}³áÜÞšœ|ðn6Þ
+ºÀ‰¾óX?ò)¦û™88eá½M¸Hl¸7SW4tW¶³Ø,ÅÞÚsË/8/Ýú‚žp¦OÔSv­OÓqšE[ýLÖë(ïÝ÷ßŸyÛÛ®±¨ŽM2Ì=\à-4dé6vÜºîn}nOd èk AßfSÞNoÄö÷÷18o0¸ÚÞ€ãÚØxøþ^Š‡Õ™=~/Eb`¡{€I×0?Tiª|4,Òé€ºŒŠ0ê;š ˜¼• ÅÐÉÙ£gðts35„K9´36\µö:¡¿FÙX®À.¬Â.¬Ä.¦Æ~REögWeËäÚ"êì5ÚBÐSh´¡Óv\ô{­vF¯Âï°›L`lÄ&€ôa2l›ÊTÝ+(»ã­û¼ÚîÇé»×ÕxÇ«Í¨¼ù£Çé¼»Í­zs«^/¦ô†eôf†ûÁÞ³˜â;šeHm*³¹åÉA™õ¯ñ³(¦ÙÖxé=B{Í×Q\}­sÛà
+ë^»u¹¡ö7Qj­•š…7Çg$­ÆT¶¡ª!ÔÙÓÌJõCßt¯9º×bÚW•3ËçÐÀ>^«ó§QA/Þ,=¦>5%mÎ)’g´d_³è•ò(­í®TgûcFg[èæÈ„Xãƒ´÷í^ †ž¬­‚šàÞœƒaÍ§6ˆõg¨vÙõ¨m™ÂñÄÛôzJ»æPÎÊÈ¦h¢ãë8qã6CüjH¯ç£‘ý¶0É¹e°mxcXõu"¢><áðìÕiÛqa¡ž”I‰7­s7šgú¤Ë’¶áŽB[¼jc”[“Ïa¨Y˜F=-d:`6ÇÜÛWå9©°1Ên·øBVúå)‰ Öô°³¤ÉíAâ>aÿ¦FŽÖ	ÇDz×v÷¢sÉîÃËÎzé9ÎÚ­I¹©ÇÌÓ~-¦äÚõý§ûž²ŒD}…Cw$•AÂÜ¬ÎŒQÑ¸¼³E6j‡_ýÕ7<~B¼5DBÎœJÊn¿ïŒÇÈ³ý@Úî’ô-7W€ô|p» /­ã$6„ç«;3g4%b<T=¢AÖXÊìsÈD:0„Q]ìyîÐzÝð#c¼NcƒLyƒ™b
+s]9£%c¢"W‡hƒD¶ È²44É1>e.âÆ¢ç¤”UR/“\ø‡CE‘#^®¤AüäEH]´ÎóBžÔ^¾B«':ÖÀÆöElhäG;Cj-ž,û!{°Q»Ïs®/:Or²y!°F€à®’:ôóOV»XºÌô€ë÷ò6ÅŸÒÝ&þÀæYô7m == õj­™,ìÅ¾1^«UŸå¾ö¤Š½DÇÐÕQ‰¯X™kàˆƒšäFFƒÈ–ä6N‰¬‹=)•10úêˆFþIˆ¶õÐ¿£‘¸{„«Iu…b®Â­L*ìF¾fÉ°¼ wkÔOñAÚà> Zµ<œœ#ajqqˆÉžºCÍ!¶±<ï\= oj[¤R‡ðµ·¨wHj(Ò"#Œç‘“ÃŸQŠ¢›P`¥Ü:EI;q.JY:U’þ\Ÿ·^“öÍk-)KP‘õãœ4,æÜL• h<%-nw!½‰³`œRq®2’ò°…¨¯¨
+Ä½@ƒ¸—¯Öxã#´ ñ¿ðkyhºC‹¾Ã@|Öhë£á–+5¡Ú™y›› ù.ˆþ‚6¾I>š†€©¾#|IêÈ•‚ïn»!F¤dŠ—s¨efw¨•Ý‘keÍÍ·:yP¥þí%°CÑ²a5¾dÉø3bÎÌpQµ"Qú'—^L“‹õ´ÍéXÇHyîðè>6S+TŠücXþ‘äöeA±º÷„]ãÚ¶8üsÂÿt¿Ò! 2WŸ(]·òƒkÂÁ(„ª}ßÃ7R¶¹z…\LÜÙ•6ud•YÊ]ê^;pa.J¶S	R¿¦<Â|rJp¸‘ _â•®Ö.eáUÐë„BdBŠÛGdÚIè†•RœM&;™Q¡¯Pa‚
+ª‰Fõï¢þ¦žO¬òŠH™ÈD2ŒØE§B˜ì§±.Ž9‡·{jæS?Wý#™:ƒîyã3Ï›-b&ÌçúÔ‡}xÿÄiåû{ŸõÉQ;Ì‡Â˜ÈÄbjE¿Yàù½Ý{=xtTò¦97µŽÔJù(„:YæÃøs=Yz&Ì—LE-ÓÇ'y&8ÑP[å1)#YµJCP£d!¥-P®¹c¼©€‚MnÀªu33hUCÄ.Ÿuº/Ïú‚Ä¥ó	µªiˆ¸¼ãûÀkðLÉ6¹Ýë6îE—½‡R®S/Žþ‡=œ_žúpfswfÑàxBWÆòaŒy$µx:“w¤“Ìrè¸º•!{ÌE.Eñ‹¡~ÞaÇÚœuOZ8§¦é¸hÝ¼&­“îy·ßíôÖSòG§ÏdXÅ¥P zŒæ$‹ÈOø 4ÉÝ0gÖÈ&w‚»ƒŽd¨?w\µŒ¤¾œÑPÆmc± 2¬¦¼«šùaf:œØìZáóøhzsŒÀ·Gð£ï€øNÇ,óNq¸Ì3&ì÷RC`“d×·£´ý¡#‰ùt'Í€ÊfÅŒ
+ÕfÆ~—°ˆö»”UDOV‹Ÿgl81ÜöD%™€Æî¦ïT‹eë™KÇ'­^õ{¤uÙ:Ýï¶sñ=ÿ>ÔRßÀ þaŸ<òRÏMAÁFhÏd™ÒäZ;j‘qk1ŸE’ %`NgMŽ‰k¤‰Ì?ÌtÖi÷ÏÈõU÷Î¾|v½Y$IP^^&Ñn{?™Ë¨&Ù¦{>IðU™;Yg\L{žæ.;5ƒI4œ¨Éq¹&'ÊÂ?Ñ)u‹çÓ%Ó‰t€P"ž¿´˜0`¬?9  h%]ŸË“ÙæÃŸÞ£Š5W›™³¿¹r	cŸ¾bLº>{Ýë¶[ç¤Õï·Ú?=bŠ-â	ûJq)’d™ÿè'Ç%¾ÃOŒO9Xƒ‘{ß°æœœv^t.uþ‰™w3hÃRÁ¤±&hüJÑ&ÌŽƒX]ÎOŠ3Áþ~^¤éÍ¾öÛ†¹æ=Ée9ŒˆXÃ"™¿Rœ	]egEÕ“cÛßÏŽ3_ù]âÌ\5\$Ñ¶økE¾%â þjì|
+ÄþÜˆƒI¾b¼ù©{ÙéwÛèÞ9}ÖˆBpm`‡¿R´	÷$ÀŸÖ§ÀØàÏ¤'x¤A¦54FsòX¨Ž70ðoô›\«__œ¯?”Ä:˜èÚ·Ž4î4tµ’¸èE³bÁ&Ìü¢ÍøÌz„	ö‰Vºù®cåêÏÈ Ç]O2åT2žœ‚!/$Úœ†—Ž¯ÿö¿GpîÛw—@!ÙÀÚ¹ÍdÆ°_o*^˜Ï=ŒŒE°Æ`~6_Óaqs™ó)`Ò®ÊöÉó!Î\ZaÁ…1
+‰å/®1; †½\L¨K7r½<%^*°;C×œ!©Ó^¾Û³OHŽXÄÎ)õ>î¹¹Š…8qcS{$‰Il…¾Ö©@„C¡¤ágbØ£(Æ‡½§pÕV¤ƒ?êˆdÍkZßódÐ`Î	[yæ}oX!éØØÜ"%Ñy&Eúfw•=Œ·Ø%ß…x FÂb.b2êŸr·æ‘ÅiÏÒ˜èèB+V±Jæ¹“ü…è>Š´‘õEŒä»—27Éx³Ü&ÞÄœÓ’c©,xÉ¡•Ô5L»mºÃ¹)µ”FWHÊ{ :
+œbÞlÒühòåãŸ»_È‹WççqÌcë¦}Öý9WJÌcY§:ÅÓ”/Hf‡ß,¯%±?¡èõÆÜ:wÆôñ©ÿ:7{DRø¿Ãëß²ÂË
+_4ƒŽ U=Ybøoáÿ¸ásïM^ø"1ßr¾ÇŸþYçêæ5éü­u¡¸ö¾e}O>Y'ë»LÐä
+ïß'Èô-[Ð·Lí&T«Ÿ%7ûîãr³#^)Ù?CòÌT·81|€rC=LÌ)a¯yþ¼Ç˜p¡Ÿ°rÖ€5B¥oXù8coBG‰<f¡«ðþ-Q4+*—•­‰Åß¹šÍàR°£>ÂïÙ–çÎ8lŠÏ1Éæ%‹8:ºÿ–Ìãì:šÉÙu¢>W0*6ˆÿ–ôpaÜ	°o²~‚f‰¯’Þp“ç^Ôÿ*ë/l˜ü¾Z®(ÿ% ÞZ>ù".ÄÉºe7tŠ58äº €ôGãúé`BËt‚bv™°‘1ÕŽLË-Nb0,oÀ÷ùLÒMßœRgîKSââÎmÞK9õæÃK×ª,zæØ]ó˜ûŠeÃüùs˜°¼^f†-¦ëƒòÆÈðÉ
+-4g¿_¶·‘ j¹Ô6‡•t‡×!”EXÎ|aC9ÍÙ–×"—Y–geoÚFAG/`µC ;* 	ûÊkwàH]þ7¦^ù>(! 2ùV˜ÜŸýÎ™Ÿü1LhÏ~ev0öýhx<¦š æÁri_¿úß{.'!!-¿y«¦G”‚B|9áµæ÷ÌéÜbìFYÕÕvöâ»_ú­ùÈt0½yBÄX…È†02=œñ)q™<i:¸¿¡ÆÐ¯ÂE¸×±(ÚËì73ÄðxDkrÚs×: ñøÉZñ8ÓÚŒ-g`XsÏ¶ÛfåmqªKÖ94I¾÷‘å¥À~y†ŠäSËqf)Lò÷ÀN[ª¥*ÖóhDö ¡º™ñ‹Ø2Gê#ióVTÑ^ÝÞ"ïwaØ Ü.™éÞþ 2åOœP¬3ù¦ºFh¶]T)Ô±qcYÞ³£û l»›,"Š¹Ãƒå­¥Fô‚—¿)¿)‹*c¦o:DÙü¾2bD^×Ôz€ÒpVÎB°–óg@N£ŒHõš·¡ôÓy¬¢ñP%*Õg½N¿ß½|Ù[Ikø©µgâ­óMyöMyö¹”gºäÚùWÇ'H¨ÝÈQ´1‘…D3¹nòù™E·{1«Z4;x:Ö^—Ò;7Ù°Œ²EäZMÄb¯.	k½:í^Á*O»=žîê²su.#hjs€¬1Û¾hÏ¦¨-*y&}”×üˆ¬øS$&¼’½£Ê¢­ßs€ö·ë,Špël$Çóa„7ŒÖIZ‚¼:§ï²þÐÉ#.wqü[cHùîå$¢X!­u”£tœÈÈp?mÂ.ŒPäeg«TçNR$MéÊyF£[‘{Œ±]áP½!Ï#XG’üãŠØ?) %¹2”8sŸÉ§Ì@™Êœ+œò …”–Š&‚È¸ µ— %Þˆ^òœ4ö‰¢DSøÑ†‚,ØÄºV‘ ¸£í4éS§lFHR2«dj‘£M[.¿Íå¹ðÊŸŽRjŽÔ¶&6(‘®ZÄ –¸8‚™è9OX¬Aén§öéºOÎé°7·“ìÅæe^ËäðÂqd“|œÕ©=ó2Hº"'ÌÒáÐ±éaeïÈ+_— é{%ßt^v{ý›×˜_ÿêââÕe·ÿš¼ê)}1II¢ªbz]Ûó€ÁÓä .˜ZNÚ÷uta—aNþƒ_ÿÒJg’ŸÕôÏÉO!:V ð·‹ž"{™\Ìü~Q¸4eiŸÅØœ»Ld—uÄ8¯ˆÉWB`>ÙB×˜ŽvÔäU9u¶å£|‡\i¢å j]!m…*‘läPŸ§¶ÛX$˜.M‚"²£¿Èn±~nÖ/*@ÒšÍHP¥PJ‰ÜOLë™„±Œ4aûµ¤ÇÖÔG¿©x:,–$p{ ,ó¦µ
+@–ÎÜ%#úÑæ°»lšþÒ/R¶¬Yþn®ÙÐÜ	rï1…(Fþ%ê.(ýÅ´@l¤fñú¬u€o*Ê<‚·×\ …É¿R¦£?Xfö†ÄÐžxaíC¹¼õn‹Ø6²—Q¹©ÝŸqwCy™€fá+ãQBLQÊŸ¤º £ÇùÀÌmŸâÐ’ý§ úŸ‘ä'hköë&L-@ôã\ŸR’ÿrn"™[Ö2žç–{u,Ìuyöê”ÜRÃŸ»ôI2¬®¾<¹oêÊ5¨D¼Ê™ë´,)Z-oe(ºž¸ôö¨ÖÓ^,U¯Ž±kLYíwïª³Ø±úîÝssìMŽ^ÿú_]ú«5¿85GgÎo*æÏ7Ü1õJï@V²?¨Z¹ÔÂóì  ¾íä¥š—×qáôøi)¬:yDPãÔX–°VŠPê!¦²‰k¹Ž›ËØ{¡R’\‡‰p°£U8ü(Îg!Þ:rÝ¡,Ÿ^G“þF¯I´mŸ`³ýÆ¨Ë$û…cYÎ‚üs†6@O˜ªu„u‘€rcZ„/‚bK!(~ÒX“bÿlÜ­E²Ç‘é±éOæFŸ§°|sêöo†gÔhÔv+Ã›lŽãÿQ‰óïÊþ&YÉßž¾d ñùÍ!¦°Mg°M7tæÀ2–§âwb|±z0æq‡8ÞV¾9Ã9z‰2ÿA<?»û(â©\­ìI¾>bEmDÊÎØ[z€¬7”ÕØ–¿12=ÔœÐõ†µò¦ë‘B’¼†@ÙoœØ%É ð Añ÷‚DS€D«:¼Gáåø·€"ÚŽ¯9ñò‰ä
+Æxµ¶ —¡SÞ0ÿšöp‘26†$³´E„cBsGItŒ+mjS­OËtµ‚µ˜$ÂyN6n:'WWèF®¯~ú·9íü­Z­n|Òë·núÑï¤÷º×ï\l¨m}ëY÷‹<«=mÁë‘™¢˜²:®5Gá©ÈgñÔAwBŒ]çÎÄêö­ér·ËU³Yxg$úXÁýó;šk½Ãë»¡w¸Îœ:*"d8µ½ßLùOGëx›é]ËÕû˜ØÉøvilÜ)©;‹°§a]^ÖZê8îl±®Yç2)çÂ»`/™pN(oÈ$Ó¹ƒDËán-ªh¸ólkoÿ?°Î*Q„¬Ä1/N—3Ž'pæK_r>î¸GZC„‰môó':1m ÁJ†k#¡4‡€Eüä Âd¶wì‡E¥×Gc7¼•ÞøÅñólI’.Ñ9-í²	»,cÞn!÷wìSà0¤ÜD £J&‚Ì¿‹[uý¾k6z™I|î—Ð"é)f•o_æ ž¼žƒéæÜÈojÕz“Nß²‚†*ÿÊ“+¸h{Ý‹Wç­~÷êò¹tâ
+?ñl^¼X––^N1*ÿfÅ\9@:kŸ¿êÁ\Iÿì¦Óê“ÓN¿ÓîwN¥S—ä±S:²ë2îñ:·…2&`;åO:L*“JßléÌ‰7þX¶˜Î¨*£<ô˜`Ö1ã9yhàcY²¡3…§dæ:c¸€½°8ñ°P0dž¿Ý™ÛžñæÂ	Fé’…‰Ä€*x¥ztj&%ÝÒ1ü150ÒÓZ’ÙÜSÆ†Àv,Nuí³‘V~ÜQCú¡F¬*h³]ßœŠ±·ÔÆãæ¹eá¾‰Ö=	O¤µ+$@‘<.¹Íþ.	Ä²ô-oêõ¬<piÕô‹UuùQMEˆ…Ø(u‘’î8
+¡gÒÁ:z×ù[·/¥WÀ'  5¸²[Rž‰ÐÃsQ¸s{cSã_Àeþ›¹­ö*{ ÇæõñÂ¢™¼B'O ó_"ô†ìÂnMä*öåz‹1”H‡)è•û­‰Üg¹Ïµ¼}uù¢{s±:˜¯˜ñé¤È3jÍVOƒÈ_ÆwW`þÒ„Æµ…ÆZJh…ßMhÜg’ÝÞ–vG4òã–v»e²dÁ×‹G~µ©‘Q­±VFmÊeT +‹žY¹iW.qY)¿B‚È&Ë9w™€“{•89¾Ã‚Îg ;Ãpz L†ª¦-QR™ˆ”D©äòMSÆ¡°HàtÐ$õ(m¯Hrå§h"Òè 4©¼ù±öqò¶P8"75-ÊÕaky:îŽ<b,Q’"2\ÚGSVŒ<‘Ygfá÷AÔ	îž·N{G11xªÃJÇLr
+ïÓCo^¯X)#ÐÍP›N—ÂC–ì J~¢tm]ÒðÉ„–?ízß‘î-1¢®ÇÔ÷à«ÇòÿËü ëš» œ8ºé9ö`¿PC
+ûGl˜3‚9tlº3‰WyÚ•ª†OtÞ’êŠkxªÄOü—	H© s1±wä<×øÜ*pâáú°éž¯Ÿ?´ÌãÿÿV'8~7DT6€\%sœVâÙð$EUòÂð6†§=GUÈÀc‡ ßïùßnC×G;i»&õ„¡ûÆá,†)Œt´p v.€G†î²ºÊP­.cÅ€²ÅÃ0bI6àQNÏgñM(–Dzc„žî8 …Ã	ß@#Ô¬žjfq¸=·V4•>ÈÊÊM­³B¡&´í‰á°¤Aô1ô)e24ª?Í5‘|ÜÎm,ÍÈ™²ÃÿNjy8p·+~KÆ0™ÁzÄ_8á» eÕ1ÂÛ@a¾nø[pÌÞ0æzÜ`ßÓöÂrã1ÒÈ•LHR=Š¹p v¶÷Ýjm…Û3›®"¡à[Ã0hJ- wÃ
+-`B™ÒæÃñKÇlýîK’ËXñ™•2|ë.Š5VÅ’®\_ž¯ùélxº®eÂÖ¶6žJØB½|rÇA–XOÊbš˜½HÐªm±ÿ«îmn%­„b|!ÓÓ$M];þ¬6B~ü	Ä³ÀùcFJcrÇv3™¯j7®âQˆ½O™yÞ®lÛNC®k§KfxL"AZZÅ"g'sM`´€%j“(’ñ(¹u¦{ÉŸŒýQùÜ mÝÚlÔULmrWeðâž\v†íØ	‚ Ð;Uµ¥®~ÜS«4Í[sÈæŒŽÒì>`íê„<Ò]ÊÓä2dîöT–´Èy3…ˆEèìJ°.¿œ¥òþ•²Že§¿¨ÔYî#$žŽ4HˆŸÖÀ™û‰0W¯dru6ÕÝ›jHàmÚ6Ë„‘â†Uû`¯M w˜ŒƒEåi`¹tAœ™¢S;)`ÂÈ¥ÆÔc\*9°ýÝrÍØ´Uœjvl‘—­&Z¤óØ cäÔp—ÈÛs{s›4Î%Í¡ÏÒ²’	l-æ&ƒ-Â&lWÉ0°iË¡åÌèÈ4ØBs°ÇÓÍ:nK±™c£ÛLYr2· 6+Ø1`et˜=PtëÂ²Žû©(¼¥=D#Z×]òÑpMô®ôÒbÖ_´UÛ,-âP…qáT|ª°cx×2«õŒú&£M3‡„õy*‡Î½â)”!xÜDÔÂØÜ1Ù_ù“
+™XóR#H–^4W£:ÝŽÂY—9H‡;-ßÒº°¥™Ò²è„€é£ä—|“yå_U¡Ë 3VBø%ð¥QtrðbmCQô^P2•&¬	Á¨Šxe±‘k,8ªðõúŸ/uzË) <rš‚ùŒ€ÐùÑ¤a3XtH ]Æ€ià€~„~cißÿàÛpîxPR´xÎ¿ÇpGiˆXÚ–øåÙ³£¸ä?øâ{Ôýˆž$æˆ’—.“´º¤=1üã`à:wKÔçb­gàò°Ì±‡H€JI_ÙŠ®½@‡IŸ§1†‹¨5™Ã?ú~IÁÉ©iŒm.U¸™¹¬o.ú'¸“Ñ\6Sò™Ÿ€É'C€¬›£²Í>XáªÝ%3?6Iú)Ú¾JD]HŠúZ(`Þ`w¹®
+±ôR_ñ.—}‘¬ÆúšT˜/ïJ!k,|$rVÅÛC¨yÊÿ]3xt'	ch~l²ð“Ònæ¶Í#;â„sL> Ÿ;¾q²—5&@™y£Ðë6HB‰Ð›Ç«Ç»±¥E;$®&1ÿp×ò'ßÌŸ|35ùf±Éç=ø.‹UÀªd½¤(Ç^ÉIyéºÝ¹-L =¡Ãê,bbàXfWŸ"‰"óübÙœeJE"“"0°Æ!Û¨w*ŒcÄdNðúü‹™=Ð´&i¨C5[ÚŠ®)Z”ô9× &y<T8M­>mÜ•AðmˆßI„àñvqf{åèšÊÌæ(ÚÜ®øŽT@<Uö£*“bqŸ‹”Õj•!(<Ð©¤$Óe’Ò•6/èŸ,Íf[XœBNér	H‘’J±´'OBµ"5ß‘d‹]åÖJ9ÎAvjÿÿÞUû§NŸ\w¯;çÝËüŠÑ²»@mÖEšÀÂãÕ—˜CmiÖ¦)!ü°†aÉ[IÉÒùÛ¨SŒ^OÜÃ¼ãÑðŠÓ`ì½fjïÛW——,Þ|í€ZQêâ­ô¾,þð°ù‡-=¼Ï›lÐa÷òeˆ.§Ý^4ŠYòî1}`w´DB¢2âè=`j m_½¼ìbÀé\¾\BûI1XÍ•>£ ¾»|^ê¡?Lÿ{~Õn“«/“Hûê¦ÃÎøeç¢{Ù%(p¼8oõÎ¾³”un~îÜ‹ÎÅÕÍë';äµŽvJ§Ž»<£Æì•Ç¸Ð÷ß‹RÏ.NÈ6QµèOkAF"®.dô:íW ßÀ@}…”òê²·,ˆ7Ê#Á!$âhšËÀ‚ðð´`Æ?Ãù²5ôØ‘c€ýÉy·w·ÈåÕé'9u»„.&§ÝÖËË«^¿ÛîáÆö®Î;ŠJ
+Ð¾,ãóþñ2D«7À-¹Y$ós±¼ô¢#ÉVTLN›^ê¨¿[bn 32Gnþê‚ÜB8«ÅŠúÊ#/Óá†‘ ¬ð‡àºó•Ùñ•õ0òB\è¢50eØt°¢ŠC ºMž,–“UtÒWí>CÀîe¿s~Þ}Ù¹ì JÎ¯^®›ƒGFkJÇ÷1è^‘™zT&¥ÌÏñ-EQ*M$£¹Ì––HéTê8ÂsËËˆ]ñ“ÄI®ÃÈ°?™öÈ;ÜGŸÛì´}GuÃ‚
+’@Heó^‡±øyÂêƒâG—ÒJC_ñƒg~îŒ=tÛ¥Æt¥#•±õÐ©ÎeÖÜBàÂðñ6â,ªScV.[Îx¨ëˆÞ1OJÊgøà)ïßãˆ•ïïYÿðŒVõæ4(Ûãrko>¼×Ÿ£’øßŠ¦¨KøQÿ»œ[ƒ
+ëÃø×gÚCk>¢^¹ô¦÷ªÝîôzoK›R	6â7€ý_µë_Z7—b¿‡ÿ5z½úIì3ö 
+¥åØ1"§g–	?:0ÅŠ¾‡üj"ÁD43ÉÉ‚–7€´çÂµ™M…»}¥+‰ÈlMÖŽ¤¬Êsjz0ª	`w¢öŽÅiÌ¸×ˆíÃ\M Ú+åÐ(š5`=?ðB¿ÙòB/èÐ)\ú¢8« ®hC¨­±WKÖhŠ¸VMË%òˆÊ`äÝÙÝ»Fäæº¿UßmnÕÄ@ÃÝÇD#ÞíÒÓürÞY}êÀã½e„ÛŒ?>à¹­Æ«ûÂ³¿|gøÏQ5ù[ÑdíàyE“aœ§-™Ø×«œœœ©—ŒtMSo9#_ðÚ¬Ÿ¶xro) ¯sz@vö”,\‹FQåá:0Ž.Q$¸½—[„…,CE­á*uYuYTuI[`)#§\ÒÎîV£^ßjììó¢Í+ä»”—o–8ÅÇ.-ªk]Ïýª•LúÜYpÝék¡=Aå6w,ºš1u›B¶N¥åÌÏ…-36$º€¢à4É‹) û
+‹'ÍÕ/ÓJ"ÃÆ´\j¬_YÈP‰¼ý}«Í”Ç/ÿ!­œLA‘ÇêìVð×·@"àkW¨°,ARÅ—èò*ÉžªaÖqH§–ÎÆIÉd˜
+ŸKŒoÐð/!åãt ï‡–m …[`ð¿že²?*L»Æê–ê,,Åòë«Éér,rd‹ƒ4³æxmµ»µ2³©¡\I¦Å„·_	ƒåÿŠgL:w@>Jk·®úV6Æ7…™¤båþÔ-ƒŒ-pÑ1ºËÝÚ0”„†“¯òoØ)c4â%ìœ…·Î17¿k]wßýÔydæX{ækC&€ý<¥öœ”`/K†Ï`ºI~ûáÍ‡.õyk@ÊÁrçe!¶(Èùþ)Cn´×cøÉ^“M#©VhçáŒ˜F%qPIkoÆêf®añjìYÐóÚo,Iòzµ
+Lwæ§¦75=ŒÝ»A» fcuŽOZÀUl•œZ½êºT•µ—ÑbEpC“P]›¢V,ÈŽ7n^Mv¦IâzÐ £½6–-öäÓÌ0oŽÛ³†=,¥°]±ˆûÎËl*}ç'K	1Ï£ØÉ€· aSã³šïQ«7Í	éaJÇ}\z@þ>¢öÜ
+C¦,§Ë2J¤Z},¹ÏqÅ]©˜0‘3ýºŠÂá+|w™‚«HYIm9á´bs/TlŠ\Šõ2RÎ¤”ð™+J¨¼fw2Ž&qËt‘‰a‚Ú3òœ¨"mîo Í„gI-—µèö5È6,ó7ú)höª±’Ÿ¶¬@ø%tS$¼Æ£\ÁÖ[Ær…jð~üúw˜)…÷G+a·â¤’‚+
+«_˜Q£ˆjV?ÀS¤”(	µÕÔ]$5IFÆ‹Ý¤j2i©@e®ZË V#º3±´If¤äÉ²¸,wõFà>?Ælp¡î0è‡ÿ‘wþµm„yã7B~?bºëYÖKæ»{¯›Þƒêüú+pÂ¾Ÿ;
+#|—)kòiêu¼°ƒEYc¡Ò¾w¹„>£Ð¯s~IàYšap(«÷eõÂ_3«Üçîî²´ QM ¦ÏzK¦£Tw—X@ €È›0¹
+†0f:‚7ü9sfçÜÙiÁ=ë+p>`K/R‹†ŒdÝÛÉ@GVO_n¾¾ù¶”¾8±oßô-u´vËÚ-gq2fÓìMi[v”]¬qÄrŒü%ÍEci¶ô*ZwBpähJ²Òò}Ò!'¶a_•½83W"Û…0,Û8±QUICqý}V)0Ý&Ès-Ûo>'·ÂF„ÚÍ¨#P gÐx¶ÒnÞy;"N#wW¾Â®µGVØ•U€Uª7ŠîID‘³#ñòö#¡iÊlK}\êc^ÎìÕ§KÃx$ñ5G2~YífÔ¬Iµ¶Äb9r®[ãn¦RV3!ø‘1"ðöµƒëmÇbN/\’`K–wWÀû©”ºQ˜bWâŸ¸ýLRL)+›£ÄÎî-~]©œbÁ~*HžKõ"YL¯<séGüÿ[½5Ñ¡ìã>ŒaIæb$cå™‹uä‚G†ËŠ=°'c¶UN29~ŠØÉ#»íëD*ŠP3™¬	– Ô4è«)<VÙD²<hIYæ<°ŒÍã”wj ŠœPðzxŠ­:G…Ü):.®ªî’Â ’´‹ù ÂBšE”[l}Ü´•WMÈ÷q]ªÊcÚ—hQÙ­¢µþ…Îbâ«.˜'8*6·¼‚À
+û9fz¸ÀÆRxÿJï„8;ƒÚ˜¡$TçšTÜ”•²!$ÈÉ-ÖÄ´÷16^§äaUxL‡h®f‰V=@ûk ¤Æ˜,Ñ*‡Ö£iê‹EJ¨³³¿¦,ŠUÑ³Fe—2ï0ü5
+ÍBAÅÒG²,b5I’¤ÊÜ©aå”’ÂO a }]“ù-È7yÕd¼j/ŽÔ?Ó¥©
+Ò¬‹Üž–Eí1ƒö+= Þp¯%„Z”uëŽ&óAÔqØïüÏ€q¯>Z¢ÿx‚«*¬FÊããd<×H'áºÖeàö
+(¨UØc¶~øc?äÂü¢¿aÁ‚PkVT±\YFï	´U™T±!#xWi†®jböX¹ÝcW>å™òÅe9G”	¾ñí«‹ëóN¿SÚ”àßsRÊ0»Yét/)‰í4¥Òéf°ÍHŸ’A”ƒFLrDQG©@Šè× ó#xüFü!¢«bšrüü\âJõZíO
+Ÿ<=ÃÖÊ¶*ÀýbîEd¡¬i€dàpä"Ë ~Bk†ßàñ÷˜ŽK¿q êGèbî¯ŠN$²Pâ¤Š-Å]lójŸ^= !‘‹£lçŸdßŸg4?Zñw9&Zé=Ì\$ôbfÔ•ÚAÎÈêîRé‚aqr(—Ú¹‹iè4€Ãªœ€6a•Šž{X­Ôyµˆw‘ôŠ†¡$Uå?ÝÔ´áæû<ÎÃ*ßý)?‘¶è»"ä«Uñ—kéÿý¯ÿö/ä´Õ=lÛ	¹:ù/¸~Ñé3ƒÍ¿ÿÏÿþÿÏ¿
+Màý“VŸ\ß\½¼éôzŠ vmuøôÖ #€Â÷eÎÈù5“jŠ9`Åvê0qºÔ)]yóÇ¾ÊwX]^%ŒKkßž—ÞTíÖÛœ‚cÖk/tç,WÓ¦Ïþ®ô@^õ¨ÄËˆ[!Ï	Ô}Ã
+Â‰÷Í)uæþ½­¥s7aáŽä´•‹° Ÿ©7I]3‡+@%Q"¨+)f¯“¾ ¦¥áø“í7*#ŽJ¡?™-Yp –’Ö7æäO6‹òì¹à
+C‚dI¯f#D•„H,ÖtÃ_Ç·AzüÎm¢<O$TîæIy_®TYË3H¥ÊÆn(V6ö5uîAÄÜCó±~*±'[¢N”™;¼(Õ¤7Y™1T(¤ÎÎï)vn&pp‰*jHÎvÈx/ŒKÛKùºæóK5å§P13’¢¿éX}AÉ±>!yˆ”NÃG+ÜtJGÄ©ÀO(«˜}™ò9„ShÃéúd;zpCÿ>7]:
+ülXæªsü´Þ^ùÔ·M-:p×u ‹é¯ØÚað•ŽÂ¾èÀ\­ÇW³Y¬JUº<UÖ*š¾½Ñ	‡{‡Tˆªã}¬8ü<òCq{@ÔY’¦¬áÑXÒ"§3,åª
++R”‡¦,Ú;ÃÇ×¼•õ5¨ím¾«ýiK°5¾û±ö'Œh©VôÍƒ‰Ã–9	KÏxÕB\ìÝ©}ÆºÈG\/
+¼¾_¼TW3[9öØØ_¿2òžÂµŒÉ|Ùò´’UÔü¦ˆ/Ü½Õº€»k;®™æ%·žT)™ÃëX¥¼\Í_/h„+¬&Mð’k\º ‘®~4±²éCwb,½¶Ó`1¼BëJž“Ž¢ÁÍ(çÆyaÔ?RÖpò°²›ÃyÌ	þ“ö1ÏÆß#ÀŠÕê"ÙðZ"iúÀä= ý+Æ¡#â>Aº°AQy¸G92¼	sMÇ¼4“;—Ë“óÜ%dmƒ=Û"«o[ýÉ·$–	þ“Ú6Ç÷ãm9ø5w­ °c%mÙúøôöRóHE%‹ëÉ…žq¡G¥ª”Iu5ø+X| ÀëW›oŸ&?Kˆš9…PgEKUÍ+.§¤+ö‰#šQÉˆxëŸÉs³Ú}*)¥Ûëabâ Ø‹Wç«É'’Œ
+3T6åSP¡L¶
+Z>š‚s$­PW"Ï¤Hª q›x–Ž<¯Í²•…<)Ù0µñA¡ÅÜ[ççÑDJlLqÊ•Ý§Ò¥Hü,t@î—,Ñˆå[
+A²,åÊÞ
+ŒBk\Õkýº£À/ ¡Jõ¼‡ëê0.Œ‰¿ƒ~˜¿™RàÿÈ¡ uì1È*•*j…Õ¬“ÛÚ`Aøï­iYb
+x•GÃCnÓ8¹º|¥I,¼RuâCc­±2e‡ú8ÕŸ|)Üûž\~¥,W˜Gzó)–2”%T/SJ“Ey’ÁE»FœU9üË ÏžË+€Že”jw<U–‚¤)ò”ût…91"§®01n:£RœšeOec’¬*ÇLá ¶–‰2í•™ Ì2³ÚL­Ë‹æ³4´Û7Ón¿Å²õ·¯N;+YSQÇ×W?u*÷§0RÕvåÍªïôx‚ÑÍªg™CZ®ìm>¬ŒÅ:jß›ôm·ä;Ÿ§úÜÊ£a¢5¨q¹{*Gó×íc2À!s5t±vèÄßbJxÕN¦’^^-(Æ‡w´œ[0÷‰’/B€åŒÇL§ÏrI ˜`%¶DÁR•)OL"*'#V¬”¹ÿÅ‚Ý0Éx´©‹f,è)nÎÕ‘†í‡È*ËùÎÈXf3S0‘KÉA	¾Uîc€x¹…”*W^ú=©n4'RkPªÝƒ=¼`½ª74Ð-˜Ì@ê?3€œËÂÅ†²ßàV XHùÝ&¹—‹Pù’U¸oX¡•¹ÊÂÌE–/æ ë©Ü™žo,ªL„ªHÍLÌ¹<^¼!ƒ˜#œ¦ÈÏöß¦’aOÏÖ>ou/ÈIëô%pŸ?–:JJ~×$œá#¢Š•{CŒÒ%qŽXœ»3[ò„2’4œqKöPÙô0Ÿ¯I&fœÁ
+±Çñ¨.?m:#ŒÀÉÅ³ÀÚÇ*Hg“Î¸7ŸL†ÍŒXLVµû‡0Ï#F…’mr2“:s\é.²wÔSf‹Ì5j(I¤czçxˆX˜ûŒ¾Hrx½0ºX>Ú²ÔÓ‚6…wQl›·ƒ"$¾0>:.fu †mŒéU¥?p—Éö1jÍZ¨gµ+<ÿì’-¾ÝGŠÏ}¸r-v…Šâ÷äz,ïöceH®äŠ	*„÷¨á'¼‘HóRbÎ‰á;ó‹éO¢Þ¬#NTcÃô%#m¶[dcÀºL_7àA,Ú7ÐÇÓ²´ÙÃj0^zG÷ü¿ JPÎÃíÞätÛ¨ÝávÇu÷_á„é<üÓ?ý   ÿÿ  -î
