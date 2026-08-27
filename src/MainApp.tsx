@@ -2,8 +2,10 @@ import React, { Suspense } from 'react';
 import { idbGet, idbSet, idbGetAll, idbDelete, STORES } from "./lib/indexedDB";
 import { checkQuotaAllowed, recordApiUsage } from "./lib/quotaManager";
 import { useState, useEffect, useRef, useTransition, useMemo, useCallback, memo } from 'react';
+
 import { Download, Search, Loader2, Database, Sparkles, Volume2, VolumeX, Copy, Check, Send, MessageSquare, Info, X, ChevronLeft, ChevronRight, ChevronDown, Plus, Zap, BrainCircuit, MoveRight, Flame, Moon, Music, HardDrive, Settings, Sun, RotateCcw, Swords, Crosshair, Globe, Layers, Cpu, Book, BookOpen, AlertTriangle, Shield, Skull, TrendingUp, TrendingDown, Target, Activity, Dna, User, RefreshCw, BarChart, CreditCard, Trophy, Star, Clock, ArrowUp, Trash2, Eye, Mic, MicOff, Instagram, Image, Gamepad2, GitFork, Github, ArrowLeftRight, Wifi, WifiOff, Bookmark } from 'lucide-react';
 import { EvolutionNodeComponent } from './components/EvolutionNodeComponent';
+
 import { PokethologyLogo } from './components/PokethologyLogo';
 import { PokeballIcon } from './components/PokeballIcon';
 import { BattleMessage } from './components/BattleMessage';
@@ -24,13 +26,17 @@ import { OpponentStatusBar, PlayerStatusBar } from './components/BattleStatusBar
 import { TypeBadge } from './components/TypeBadge';
 import { BattleErrorBoundary } from './components/BattleErrorBoundary';
 import { ErrorBoundary } from './components/ErrorBoundary';
+
 import { StatRadar } from './components/StatRadar';
 import { SingleStatRadar } from './components/SingleStatRadar';
 import Markdown from 'react-markdown';
 import { AudioSettings } from './components/AudioSettings';
 import { NowPlayingToast } from './components/NowPlayingToast';
 import ReactPlayer from 'react-player';
+
 import { pokeApi, isApiError } from './lib/pokeApiService';
+
+// Directly imported UI and modal components for instant rendering
 import { BattleResultScreen } from './components/BattleResultScreen';
 import { Tutorial } from './components/Tutorial';
 import { WelcomeModal } from './components/WelcomeModal';
@@ -50,6 +56,7 @@ import { CombatStatsSection } from './components/CombatStatsSection';
 import { MovesetAnalysisSection } from './components/MovesetAnalysisSection';
 import { FavoritesVaultModal } from './components/FavoritesVaultModal';
 import { TypeChartModal } from './components/TypeChartModal';
+
 const TRAINER_SPRITES = [
   {
     "name": "Brock",
@@ -658,9 +665,12 @@ const TRAINER_SPRITES = [
     "lore": "A culinary expert from Paldea on a quest to find the mythical Herba Mystica to heal his partner Pokemon."
   }
 ];;
+
 const getShowdownName = (name: string, isFemale: boolean = false) => {
   if (!name) return '';
   let slug = name.toLowerCase().trim();
+  
+  // Mega/Gmax/Form/Paradox handling
   const specialForms: Record<string, string> = {
     'ho-oh': 'hooh',
     'kommo-o': 'kommoo',
@@ -826,6 +836,7 @@ const getShowdownName = (name: string, isFemale: boolean = false) => {
     'terapagos-terastal': 'terapagos-terastal',
     'terapagos-stellar': 'terapagos-stellar',
   };
+
   if (specialForms[slug] || slug === 'pyroar' || slug === 'meowstic') {
     let result = specialForms[slug] || slug;
     if (isFemale && !result.endsWith('f')) {
@@ -838,22 +849,30 @@ const getShowdownName = (name: string, isFemale: boolean = false) => {
     }
     return result;
   }
+
+  // Default stripping logic for species that doesn't have a special form mapping
   let processed = slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+  
   if (isFemale) {
     if (processed === 'nidoranm') return 'nidoranf';
     if (!processed.endsWith('f')) {
       processed += 'f'; // Showdown uses pikachuf, wobbuffetf, etc without dash
     }
   }
+
   return processed;
 };
+
+// Custom Typewriter component for typewriter visual text effects on both PC and mobile devices
 const TypewriterText = memo(({ text, delay = 12, onComplete }: { text: string; delay?: number; onComplete?: () => void }) => {
   const [displayedText, setDisplayedText] = useState('');
+
   useEffect(() => {
     let currentText = '';
     setDisplayedText(currentText);
     let index = 0;
     let timer: any = null;
+    
     const run = () => {
       if (index < text.length) {
         currentText += text.charAt(index);
@@ -869,26 +888,34 @@ const TypewriterText = memo(({ text, delay = 12, onComplete }: { text: string; d
         onComplete?.();
       }
     };
+    
     timer = setTimeout(run, delay);
     return () => clearTimeout(timer);
   }, [text, delay, onComplete]);
+
   return <span>{displayedText}</span>;
 });
 TypewriterText.displayName = "TypewriterText";
+
+// Custom Sprite Component for perfect Battle Arena sizing and Showdown fallbacks
 const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, className, onClick, arenaMode = false, flip, scaleMultiplier = 1, isPlayer = false, use2dSprite = false }: any) => {
   const [fallbackLevel, setFallbackLevel] = useState(0);
   const [imageLoaded, setImageLoaded] = useState(false);
+
   useEffect(() => {
     setFallbackLevel(0);
     setImageLoaded(false);
   }, [pokemon?.name, isShiny, isFemale, use2dSprite]);
+
   const generateSrc = (level: number) => {
     if (!pokemon) return '';
     const cleanName = getShowdownName(pokemon?.name, isFemale);
     const effectiveLevel = level;
     const idNum = pokemon.id || pokemon.url?.split('/').filter(Boolean).pop() || pokemon.name;
     const shinyPath = isShiny ? 'shiny/' : '';
+
     if (use2dSprite) {
+      // 2D PIXEL ART SPRITE MODE (Pok√©API 2D pixel art for every Pok√©mon: base, mega, gmax, regional, alternative forms)
       if (effectiveLevel === 0 && pokemon.sprites) {
         if (isFemale) {
           const fem = isBack 
@@ -901,6 +928,8 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
           : (isShiny ? (pokemon.sprites.front_shiny || pokemon.sprites.front_default) : pokemon.sprites.front_default);
         if (spr) return spr;
       }
+
+      // Level 1: Direct Pok√©API raw 2D pixel art sprite URL (covers 10000+ IDs for megas, gmax, regional forms!)
       if (effectiveLevel <= 1) {
         if (isFemale) {
           return isBack 
@@ -911,19 +940,29 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
           ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${shinyPath}${idNum}.png`
           : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyPath}${idNum}.png`;
       }
+
+      // Level 2: Showdown static 2D sprite
       if (effectiveLevel === 2) {
         const basePath = isBack ? `gen5-back${isShiny ? '-shiny' : ''}` : `gen5${isShiny ? '-shiny' : ''}`;
         return `https://play.pokemonshowdown.com/sprites/${basePath}/${cleanName}.png`;
       }
+
+      // Level 3: Showdown animated 2D sprite
       if (effectiveLevel === 3) {
         const basePath = isBack ? `ani-back${isShiny ? '-shiny' : ''}` : `ani${isShiny ? '-shiny' : ''}`;
         return `https://play.pokemonshowdown.com/sprites/${basePath}/${cleanName}.gif`;
       }
+
+      // Level 4: Pok√©API front 2D sprite fallback if back was requested but missing
       if (effectiveLevel === 4) {
         return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyPath}${idNum}.png`;
       }
+
+      // Level 5: Official artwork fallback
       return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shinyPath}${idNum}.png`;
     }
+
+    // HOME 3D ARTWORK MODE (Default)
     if (effectiveLevel === 0 && pokemon.sprites) {
       if (arenaMode && pokemon.sprites.other?.home) {
         const home = pokemon.sprites.other.home;
@@ -947,6 +986,8 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
           const offArt = pokemon.sprites.other['official-artwork'];
           return isShiny ? (offArt.front_shiny_female || offArt.front_female) : offArt.front_female;
         }
+        // If female is requested, but official arts lack it, we skip returning here 
+        // to let it fall through to Showdown (Level 1) which often has the female sprite.
       } else {
         const offArt = pokemon.sprites.other?.['official-artwork'];
         const homeArt = pokemon.sprites.other?.home;
@@ -957,14 +998,20 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
         }
       }
     }
+    
+    // Level 1: Showdown animated gif
     if (effectiveLevel <= 1) {
       const basePath = isBack ? `ani-back${isShiny ? '-shiny' : ''}` : `ani${isShiny ? '-shiny' : ''}`;
       return `https://play.pokemonshowdown.com/sprites/${basePath}/${cleanName}.gif`;
     }
+    
+    // Level 2: Showdown static 2D
     if (effectiveLevel === 2) {
       const basePath = isBack ? `gen5-back${isShiny ? '-shiny' : ''}` : `gen5${isShiny ? '-shiny' : ''}`;
       return `https://play.pokemonshowdown.com/sprites/${basePath}/${cleanName}.png`;
     }
+
+    // Level 3: Pokemon object regular sprite
     if (effectiveLevel === 3 && pokemon.sprites) {
       if (isFemale) {
         return isBack 
@@ -975,6 +1022,9 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
         ? (isShiny ? (pokemon.sprites.back_shiny || pokemon.sprites.back_default) : pokemon.sprites.back_default)
         : (isShiny ? (pokemon.sprites.front_shiny || pokemon.sprites.front_default) : pokemon.sprites.front_default);
     }
+
+    // Fallback URL generation
+    
     if (effectiveLevel === 4) {
       let spriteId = idNum;
       if (isShiny && (idNum === '10309' || idNum === 10309 || pokemon.name?.includes('garchomp-mega-z'))) {
@@ -982,19 +1032,24 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
       }
       return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shinyPath}${spriteId}.png`;
     }
+    
     return isBack 
       ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${shinyPath}${idNum}.png`
       : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyPath}${idNum}.png`;
   };
+
   const currentSrc = generateSrc(fallbackLevel);
   const autoShouldFlip = isBack && (currentSrc.includes('official-artwork') || (!currentSrc.includes('back') && !currentSrc.includes('ani-back') && !currentSrc.includes('gen5-back')));
   const finalFlip = flip !== undefined ? flip : autoShouldFlip;
+  
   const isMega = pokemon?.name ? pokemon.name.includes('-mega') : false;
   const isGmax = pokemon?.name ? pokemon.name.includes('-gmax') : false;
   const isMegaOrGmax = isMega || isGmax;
+  
   const scaleFactor = useMemo(() => {
     if (!pokemon) return 1;
     if (!arenaMode) {
+      // In database details view, keep a consistent beautiful size that never clips
       return use2dSprite ? (isMegaOrGmax ? 1.05 : 1.1) : (isMegaOrGmax ? 0.92 : 0.95);
     }
     const h = pokemon.height || 10; // default 1.0m
@@ -1004,7 +1059,9 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
     else if (h <= 20) baseScale = 1.50;   // Normal-Large (e.g. Charizard)
     else if (h <= 60) baseScale = 1.65;   // Huge
     else baseScale = 1.75;                // Giant (e.g. Steelix, Wailord) is clamped to fit perfectly
+    
     if (use2dSprite) {
+      // Improved dimensions for 2D pixel sprites in combat arena so they are larger and crisp
       if (h <= 4) {
         baseScale = 2.45; // Extra boost for tiny 2D pixel sprites (e.g. Joltik, Flab√©b√©, Cosmog)
       } else if (h <= 9) {
@@ -1022,7 +1079,11 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
     }
     return baseScale * scaleMultiplier;
   }, [pokemon?.height, pokemon?.name, isMega, isGmax, isMegaOrGmax, arenaMode, scaleMultiplier, use2dSprite]);
+
+  
   const [clickAura, setClickAura] = useState(false);
+
+
   const handleClick = (e: any) => {
     if (isMegaOrGmax) {
       setClickAura(true);
@@ -1030,9 +1091,12 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
     }
     if (onClick) onClick(e);
   };
+
+  // Preloading image in background to support progressive load
   useEffect(() => {
     setImageLoaded(false);
     if (!currentSrc || fallbackLevel >= 5) return;
+
     const img = new window.Image();
     img.src = currentSrc;
     img.referrerPolicy = "no-referrer";
@@ -1040,12 +1104,15 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
       setImageLoaded(true);
     };
   }, [currentSrc, fallbackLevel]);
+
   if (!pokemon) return null;
+
   const idNum = pokemon.id || pokemon.url?.split('/').filter(Boolean).pop() || pokemon.name;
   const shinyPath = isShiny ? 'shiny/' : '';
   const silhouetteUrl = isBack
     ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${shinyPath}${idNum}.png`
     : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyPath}${idNum}.png`;
+
   return (
     <div 
       className={cn(
@@ -1062,11 +1129,13 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
           transition={{ duration: 0.5, ease: "easeOut" }}
         />
       )}
+
       <div className={cn("absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300", fallbackLevel >= 5 ? "opacity-100" : "opacity-0")}>
         <div className="text-[10px] font-mono text-cyan-500/60 uppercase tracking-widest p-4 border border-cyan-500/20 bg-cyan-950/40 rounded-xl whitespace-nowrap">
           artwork invisible
         </div>
       </div>
+
       <div className="relative w-full h-full flex items-center justify-center">
         {/* Silhouette low-resolution placeholder */}
         <motion.img
@@ -1099,6 +1168,7 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
           }}
           referrerPolicy="no-referrer"
         />
+
         {/* Full high-resolution / animated sprite */}
         <motion.img
           src={fallbackLevel >= 5 ? undefined : currentSrc}
@@ -1140,8 +1210,10 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
     </div>
   );
 });
+
 const getOpponentMoveQuote = (pokeName: string, moveName: string) => {
   const lowerMove = moveName.toLowerCase();
+  
   const translations: Record<string, Record<string, string>> = {
     it: {
       default: `Ecco il potere di ${pokeName}!`,
@@ -1209,10 +1281,14 @@ const getOpponentMoveQuote = (pokeName: string, moveName: string) => {
       healing: "Cellular reconstruction process initialized!"
     }
   };
+
   const pool = translations['en'];
+  
   if (lowerMove.includes('protect') || lowerMove.includes('detect') || lowerMove.includes('substitute')) return pool.protect;
   if (lowerMove.includes('recover') || lowerMove.includes('heal') || lowerMove.includes('roost') || lowerMove.includes('rest')) return pool.healing;
   if (lowerMove.includes('dance') || lowerMove.includes('calm') || lowerMove.includes('nasty') || lowerMove.includes('swords') || lowerMove.includes('charge')) return pool.boost;
+  
+  // check category or type
   if (lowerMove.includes('fire') || lowerMove.includes('burn') || lowerMove.includes('flame')) return pool.fire;
   if (lowerMove.includes('water') || lowerMove.includes('wave') || lowerMove.includes('surf') || lowerMove.includes('hydro')) return pool.water;
   if (lowerMove.includes('bolt') || lowerMove.includes('thunder') || lowerMove.includes('spark') || lowerMove.includes('shock')) return pool.electric;
@@ -1220,8 +1296,10 @@ const getOpponentMoveQuote = (pokeName: string, moveName: string) => {
   if (lowerMove.includes('ice') || lowerMove.includes('freeze') || lowerMove.includes('blizzard') || lowerMove.includes('chill')) return pool.ice;
   if (lowerMove.includes('psych') || lowerMove.includes('mind') || lowerMove.includes('zen') || lowerMove.includes('teleport')) return pool.psychic;
   if (lowerMove.includes('dragon') || lowerMove.includes('draco') || lowerMove.includes('claw') || lowerMove.includes('outrage')) return pool.dragon;
+  
   return pool.default;
 };
+
 const getMoveButtonClasses = (type: string) => {
   const map: Record<string, string> = {
     normal: 'border-stone-500/50 text-stone-400',
@@ -1245,6 +1323,7 @@ const getMoveButtonClasses = (type: string) => {
   };
   return map[type] ? `bg-slate-950 border ${map[type]} hover:bg-slate-900` : "bg-slate-900 border border-cyan-900/40 hover:border-cyan-500/60 text-cyan-300 hover:text-white";
 };
+
 const typeBaseColors: Record<string, string> = {
   normal: 'bg-[#A8A77A]',
   fire: 'bg-[#EE8130]',
@@ -1265,6 +1344,7 @@ const typeBaseColors: Record<string, string> = {
   steel: 'bg-[#B7B7CE]',
   fairy: 'bg-[#D685AD]',
 };
+
 const typeHeaderGradients: Record<string, string> = {
   normal: 'bg-gradient-to-r from-[#8A8A68] via-[#686848] to-slate-900',
   fire: 'bg-gradient-to-r from-[#D06010] via-[#9C3800] to-slate-900',
@@ -1286,7 +1366,9 @@ const typeHeaderGradients: Record<string, string> = {
   fairy: 'bg-gradient-to-r from-[#C87088] via-[#984860] to-slate-900',
   stellar: 'bg-gradient-to-r from-[#2080D0] via-[#1040A0] to-slate-900',
 };
+
 const baseBadge = "relative overflow-hidden inline-flex items-center justify-center font-hud font-black uppercase tracking-widest text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4),inset_0_-3px_6px_rgba(0,0,0,0.3),0_2px_8px_rgba(0,0,0,0.5)] border border-white/20 rounded-md transition-all before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/20 before:to-transparent before:pointer-events-none";
+
 const typeColors: Record<string, string> = {
   normal: `${baseBadge} bg-gradient-to-br from-[#A8A878] to-[#787848] ring-1 ring-[#A8A878]/50`,
   fire: `${baseBadge} bg-gradient-to-br from-[#F08030] to-[#C04000] ring-1 ring-[#F08030]/50`,
@@ -1308,6 +1390,7 @@ const typeColors: Record<string, string> = {
   fairy: `${baseBadge} bg-gradient-to-br from-[#EE99AC] to-[#BD687B] ring-1 ring-[#EE99AC]/50`,
   stellar: `${baseBadge} bg-gradient-to-br from-[#40A8FF] to-[#1068C0] ring-1 ring-[#40A8FF]/50`,
 };
+
 const statExplanations: Record<string, string> = {
   hp: "Hit Points: Determines how much damage a Pok√©mon can take before fainting.",
   attack: "Physical Attack: Affects the damage dealt by physical moves.",
@@ -1316,6 +1399,7 @@ const statExplanations: Record<string, string> = {
   "special-defense": "Special Defense: Reduces the damage taken from special moves.",
   speed: "Speed: Determines which Pok√©mon moves first in battle.",
 };
+
 const NATURES = [
   { name: 'Hardy', plus: null, minus: null },
   { name: 'Lonely', plus: 'attack', minus: 'defense' },
@@ -1343,6 +1427,7 @@ const NATURES = [
   { name: 'Careful', plus: 'special-defense', minus: 'special-attack' },
   { name: 'Quirky', plus: null, minus: null },
 ];
+
 const TYPE_CHART: Record<string, Record<string, number>> = {
   normal: { rock: 0.5, ghost: 0, steel: 0.5 },
   fire: { fire: 0.5, water: 0.5, grass: 2, ice: 2, bug: 2, rock: 0.5, dragon: 0.5, steel: 2 },
@@ -1363,6 +1448,8 @@ const TYPE_CHART: Record<string, Record<string, number>> = {
   steel: { fire: 0.5, water: 0.5, electric: 0.5, ice: 2, rock: 2, steel: 0.5, fairy: 2 },
   fairy: { fire: 0.5, fighting: 2, poison: 0.5, dragon: 2, dark: 2, steel: 0.5 },
 };
+
+
 const getBattleBackground = (playerType?: string, opponentType?: string) => {
   const map: Record<string, string> = {
     normal: 'grassy meadow with wild daisies and soft rustic plains', 
@@ -1384,28 +1471,36 @@ const getBattleBackground = (playerType?: string, opponentType?: string) => {
     flying: 'soaring high-altitude sky filled with epic turbulent thunderstorm clouds and sky ribbons', 
     fairy: 'magical glowing fantasy dreamscape meadow with pastel crystal spires and sparkling glitter dust'
   };
+
   const pType = playerType || 'normal';
   const oType = opponentType || 'normal';
+
   const pDesc = map[pType] || `${pType} wilderness`;
   const oDesc = map[oType] || `${oType} sanctuary`;
+
   let keyword = '';
   if (pType === oType) {
     keyword = `pure majestic landscape of a ${pDesc}`;
   } else {
     keyword = `epic symmetric split-screen Pok√©mon stadium battleground arena: on the left side is a gorgeous ${pDesc} fading into a stunning ${oDesc} on the right side, seamlessly merged at the vertical center line`;
   }
+
   const basePrompt = `16-bit vintage retro pixel art aesthetic pokemon showdown battle stadium arena background, high detail pixel texture, beautiful scenic landscape environment, ${keyword}, epic cinematic mood, high-contrast, beautiful rich colors, native game screen capture`;
   const prompt = encodeURIComponent(basePrompt);
+  
   const textSeed = `${pType}-${oType}-clear`;
   let seedVal = 42;
   for (let i = 0; i < textSeed.length; i++) {
     seedVal = (seedVal * 31 + textSeed.charCodeAt(i)) % 1000;
   }
+  
   return `https://image.pollinations.ai/prompt/${prompt}?width=1024&height=576&nologo=true&seed=${seedVal || 42}`;
 };
+
 const getBattleFallbackGradient = (playerType?: string, opponentType?: string) => {
   const pType = playerType || 'normal';
   const oType = opponentType || 'normal';
+  
   const colors: Record<string, string> = {
     normal: '#4b5563', grass: '#047857', bug: '#4d7c0f',
     fire: '#b91c1c', water: '#1d4ed8', ice: '#0369a1',
@@ -1414,17 +1509,23 @@ const getBattleFallbackGradient = (playerType?: string, opponentType?: string) =
     ghost: '#6d28d9', dark: '#111827', poison: '#7e22ce',
     dragon: '#4338ca', flying: '#0284c7', fairy: '#9d174d'
   };
+
   const color1 = colors[pType] || colors.normal;
   const color2 = colors[oType] || colors.normal;
+  
   return `linear-gradient(135deg, ${color1}cc 0%, ${color1}cc 40%, #020617 40%, #020617 60%, ${color2}cc 60%, ${color2}cc 100%)`;
 };
+
 const HUDCorners = memo(({ className }: { className?: string }) => null);
+
 interface PokethologyRadarScannerProps {
   onAbort: () => void;
   targetName?: string;
 }
+
 const PokethologyRadarScanner = memo(({ onAbort, targetName }: PokethologyRadarScannerProps) => {
   const [progress, setProgress] = useState(0);
+
   useEffect(() => {
     const progressTimer = setInterval(() => {
       setProgress(prev => {
@@ -1434,18 +1535,23 @@ const PokethologyRadarScanner = memo(({ onAbort, targetName }: PokethologyRadarS
         return prev;
       });
     }, 80);
+
     const watchdog = setTimeout(onAbort, 4000); // 4s buffer auto-bypass for smooth data pre-caching
+
     return () => {
       clearInterval(progressTimer);
       clearTimeout(watchdog);
     };
   }, [onAbort]);
+
   const formattedName = targetName ? targetName.replace(/-/g, ' ').toUpperCase() : "POK√âMON";
+
   return (
     <div className="flex-1 flex flex-col items-center justify-center min-h-[300px] w-full max-w-sm mx-auto p-6 text-center select-none relative overflow-hidden my-auto">
       {/* Sleek Glowing Pok√©ball Spinner */}
       <div className="relative w-24 h-24 mb-5 flex items-center justify-center shrink-0">
         <div className="absolute inset-0 rounded-full bg-cyan-500/15 blur-xl animate-pulse" />
+        
         {/* Modern Pokeball vector spinner */}
         <div className="relative w-16 h-16 rounded-full border-3 border-slate-950 bg-white overflow-hidden shadow-[0_0_20px_rgba(34,211,238,0.3)] animate-spin" style={{ animationDuration: '1.6s' }}>
           <div className="absolute top-0 inset-x-0 h-8 bg-gradient-to-b from-red-500 to-rose-600 border-b-3 border-slate-950" />
@@ -1454,6 +1560,7 @@ const PokethologyRadarScanner = memo(({ onAbort, targetName }: PokethologyRadarS
           </div>
         </div>
       </div>
+
       {/* Clean Status Text */}
       <div className="space-y-1 mb-5 z-10">
         <h2 className="font-hud text-base sm:text-lg font-black tracking-wider text-slate-100 uppercase">
@@ -1463,6 +1570,7 @@ const PokethologyRadarScanner = memo(({ onAbort, targetName }: PokethologyRadarS
           Syncing Pok√©dex Registry
         </p>
       </div>
+
       {/* Minimalist Progress Line */}
       <div className="w-full max-w-xs flex flex-col items-center gap-3 z-10">
         <div className="w-full h-1.5 bg-slate-900/90 rounded-full overflow-hidden border border-slate-800/80 relative">
@@ -1471,6 +1579,7 @@ const PokethologyRadarScanner = memo(({ onAbort, targetName }: PokethologyRadarS
             className="absolute top-0 left-0 h-full bg-gradient-to-r from-cyan-500 to-blue-500 shadow-[0_0_10px_rgba(34,211,238,0.7)] transition-all duration-200"
           />
         </div>
+        
         <button
           onClick={onAbort}
           className="text-[11px] font-mono text-slate-400 hover:text-cyan-300 transition-colors uppercase tracking-wider underline cursor-pointer py-1 px-3"
@@ -1481,8 +1590,12 @@ const PokethologyRadarScanner = memo(({ onAbort, targetName }: PokethologyRadarS
     </div>
   );
 });
+
 PokethologyRadarScanner.displayName = "PokethologyRadarScanner";
+
+
 const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: string; opponentType?: string }) => {
+  // Determine ambient effect based on primary pokemon types
   const effectType = useMemo(() => {
     if (playerType === 'fire' || opponentType === 'fire') return 'fire';
     if (playerType === 'water' || opponentType === 'water') return 'water';
@@ -1491,7 +1604,9 @@ const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: string;
     if (playerType === 'ghost' || opponentType === 'ghost' || playerType === 'dark' || opponentType === 'dark') return 'shadow';
     return null;
   }, [playerType, opponentType]);
+
   if (!effectType) return null;
+
   return (
     <div className="absolute inset-0 z-[1] overflow-hidden pointer-events-none select-none rounded-xl sm:rounded-2xl ">
       {/* Electric ambient overlay */}
@@ -1518,6 +1633,7 @@ const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: string;
           </div>
         </div>
       )}
+
       {/* Fire weather effect */}
       {effectType === 'fire' && (
         <div className="absolute inset-0 bg-red-950/20">
@@ -1541,6 +1657,7 @@ const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: string;
           </div>
         </div>
       )}
+
       {/* Water weather effect */}
       {effectType === 'water' && (
         <div className="absolute inset-0 bg-blue-950/15">
@@ -1564,6 +1681,7 @@ const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: string;
           </div>
         </div>
       )}
+
       {/* Ice weather effect */}
       {effectType === 'ice' && (
         <div className="absolute inset-0 bg-cyan-950/20">
@@ -1586,6 +1704,7 @@ const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: string;
           </div>
         </div>
       )}
+
       {/* Shadow / Twilight ambient effect */}
       {effectType === 'shadow' && (
         <div className="absolute inset-0 bg-purple-950/15">
@@ -1611,10 +1730,13 @@ const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: string;
     </div>
   );
 });
+
 TerrainEffect.displayName = "TerrainEffect";
+
 const PokemonTcgCard = memo(({ displayId, pokemonName, className }: { displayId: string; pokemonName: string; className?: string }) => {
   const [error, setError] = useState(false);
   const artworkUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${displayId}.png`;
+
   if (error) {
     return (
       <div className={cn(className, "border border-slate-700 bg-slate-900/50 flex justify-center items-center rounded text-[8px] text-slate-400 font-mono text-center p-2")}>
@@ -1622,6 +1744,7 @@ const PokemonTcgCard = memo(({ displayId, pokemonName, className }: { displayId:
       </div>
     );
   }
+
   return (
     <img
       src={artworkUrl}
@@ -1633,16 +1756,20 @@ const PokemonTcgCard = memo(({ displayId, pokemonName, className }: { displayId:
     />
   );
 });
+
 const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny, use2dSprite }: { pokemonName: string; id: string | undefined; className: string; isShiny?: boolean; use2dSprite?: boolean }) => {
     const [fallbackLvl, setFallbackLvl] = useState(0);
+
   useEffect(() => {
     setFallbackLvl(0);
   }, [pokemonName, isShiny, use2dSprite]);
+
   const getSrcAtLevel = (lvl: number): string => {
     const cleanName = getShowdownName(pokemonName);
     const parsedId = id && !isNaN(parseInt(id, 10)) ? parseInt(id, 10) : undefined;
     const normName = pokemonName?.toLowerCase()?.trim() || '';
     const formId = POKEMON_FORM_IDS[normName] || (parsedId && parsedId > 1025 ? parsedId : undefined);
+
     if (use2dSprite) {
       if (lvl === 0) {
         return getPokemonSpriteUrl({ name: pokemonName, formId, displayId: parsedId }, { isShiny, use2d: true });
@@ -1655,18 +1782,24 @@ const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny, use2dSpri
       }
       return getPokemonArtworkUrl({ name: pokemonName, formId, displayId: parsedId }, { isShiny });
     }
+    
     if (lvl === 0) {
       return getPokemonArtworkUrl({ name: pokemonName, formId, displayId: parsedId }, { isShiny });
     }
     if (lvl === 1) {
+      // Showdown 2D png fallback (good for megas and gmax)
       return `https://play.pokemonshowdown.com/sprites/gen5${isShiny ? '-shiny' : ''}/${cleanName}.png`;
     }
     if (lvl === 2) {
+      // Showdown Animated gif fallback
       return `https://play.pokemonshowdown.com/sprites/ani${isShiny ? '-shiny' : ''}/${cleanName}.gif`;
     }
+    // Final fallback to raw PokeAPI sprite
     return getPokemonSpriteUrl({ name: pokemonName, formId, displayId: parsedId }, { isShiny });
   };
+
   const currentSrc = getSrcAtLevel(fallbackLvl);
+
   return (
     <img
       src={currentSrc}
@@ -1685,15 +1818,18 @@ const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny, use2dSpri
     />
   );
 });
+
 const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations, onClick, isShiny, isCardView, isLightMode, use2dSprite, isFav, onToggleFavorite }: any) => {
     const id = p.url.split('/').filter(Boolean).pop();
   const displayId = p.displayId || p.baseId || id;
   const isSpecial = parseInt(id || "0") > 1025 && !p.displayId;
   const isMega = p.name.includes('-mega');
   const isGmax = p.name.includes('-gmax');
+
   const [clickAura, setClickAura] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [cardType, setCardType] = useState<string | null>(null);
+
   useEffect(() => {
     if ((isHovered || isSelected || isOpponentSelected) && !cardType && p.url) {
       let isMounted = true;
@@ -1708,11 +1844,16 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
       return () => { isMounted = false; };
     }
   }, [isHovered, isSelected, isOpponentSelected, cardType, p.url]);
+
+
+  // Framer Motion spring-bound coordinates for hyper-optimized 3D Tilt hover effect (Zero React Re-renders)
   const mouseX = useMotionValue(0.5);
   const mouseY = useMotionValue(0.5);
+
   const springConfig = { damping: 20, stiffness: 240, mass: 0.5 };
   const rotateX = useSpring(useTransform(mouseY, [0, 1], [10, -10]), springConfig);
   const rotateY = useSpring(useTransform(mouseX, [0, 1], [-10, 10]), springConfig);
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!enableAnimations) return;
     const rect = e.currentTarget.getBoundingClientRect();
@@ -1723,11 +1864,13 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
     mouseX.set(valX);
     mouseY.set(valY);
   };
+
   const handleMouseLeave = () => {
     setIsHovered(false);
     mouseX.set(0.5);
     mouseY.set(0.5);
   };
+
   const handleClick = () => {
     if (isMega || isGmax) {
       setClickAura(true);
@@ -1735,12 +1878,14 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
     }
     onClick(p.name);
   };
+  
   const spriteClasses = cn(
     "transition-transform duration-500  select-none max-w-[150%] max-h-[150%]",
     (isSelected || isOpponentSelected) 
       ? "!scale-[1.6]" 
       : "opacity-90 group-hover:opacity-100"
   );
+  
   return (
     <motion.div
       layout={enableAnimations}
@@ -1798,6 +1943,7 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
         />
       )}
       <div className="absolute inset-0 bg-gradient-to-b  r from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
       {/* Type-based Particle Aura */}
       <AnimatePresence>
         {(isHovered || isSelected || isOpponentSelected) && cardType && typeBaseColors[cardType] && (
@@ -1837,6 +1983,7 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
         )}
       </AnimatePresence>
       {!isCardView && <HUDCorners />}
+      
       {/* ID Badge */}
       {!isCardView && (
         <div className="absolute top-2 left-2.5 px-1.5 py-0.5 rounded bg-slate-950/80 border border-slate-800 text-[7px] font-bold font-mono text-cyan-600 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all flex items-center gap-1 z-20">
@@ -1845,6 +1992,7 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
             : `#${String(displayId || "0").padStart(4, '0')}`}
         </div>
       )}
+
       {/* Favorite Star Toggle (Opposite side of ID badge) */}
       {!isCardView && onToggleFavorite && (
         <button 
@@ -1875,11 +2023,14 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
           />
         </button>
       )}
+
       {/* Scanline Effect */}
       {!isCardView && <div className="absolute inset-0 pointer-events-none opacity-[0.03] group-hover:opacity-[0.07] transition-opacity z-30 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]"></div>}
+
       <div className={cn("relative z-10 flex items-center justify-center", isCardView ? "w-full h-full" : "w-20 h-20 sm:w-24 sm:h-24")}>
         {/* Sprite Glow */}
         <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.05) 0%, transparent 70%)' }}></div>
+        
         {enableAnimations && (isSelected || isOpponentSelected) && (
           <motion.div 
             className={cn(
@@ -1890,6 +2041,7 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
             transition={{ duration: 3, repeat: Infinity }}
           />
         )}
+        
         {isCardView ? (
           <PokemonTcgCard displayId={String(displayId)} pokemonName={p.name} className="w-full h-full" />
         ) : (
@@ -1902,6 +2054,7 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
           />
         )}
       </div>
+
       {!isCardView && (
         <span className={cn(
           "font-hud text-[9px] sm:text-[10px] md:text-[11px] font-bold tracking-wider uppercase tracking-[0.1em] sm:tracking-[0.2em] mt-2 relative z-20 transition-colors break-words whitespace-normal leading-tight w-full text-center px-1",
@@ -1913,17 +2066,20 @@ const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations,
     </motion.div>
   );
 });
+
 interface QuizQuestion {
   question: string;
   options: string[];
   answerIndex: number;
   explanation: string;
 }
+
 interface QuizData {
   date: string;
   questions: QuizQuestion[];
   isFallback?: boolean;
 }
+
 const OFFLINE_QUIZ_FALLBACK = {
   date: new Date().toISOString().split('T')[0],
   isFallback: true,
@@ -1953,7 +2109,9 @@ const OFFLINE_QUIZ_FALLBACK = {
     }
   ]
 };
+
 let globalPrefetchedQuiz: any = null;
+
 if (typeof window !== 'undefined') {
   fetch('/api/quiz')
     .then(r => {
@@ -1965,6 +2123,10 @@ if (typeof window !== 'undefined') {
     })
     .catch(() => {});
 }
+
+// PokethologyQuizWidget is imported from ./components/PokethologyQuizWidget
+
+
 const PokemonGrid = memo(({ list, displayLimit, selectedName, opponentName, enableAnimations, onClick, isShiny, isCardView, isLightMode, use2dSprite, isFavorite, onToggleFavorite }: any) => {
   return (
     <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-4 py-2 px-1">
@@ -1987,13 +2149,16 @@ const PokemonGrid = memo(({ list, displayLimit, selectedName, opponentName, enab
     </div>
   );
 });
+
 const BattleLog = memo(({ log, enableAnimations, turn, isBattling }: { log: (LogEntry & { turn?: number })[]; enableAnimations: boolean; turn: string; isBattling: boolean }) => {
     const logRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (logRef.current) {
       logRef.current.scrollTop = logRef.current.scrollHeight;
     }
   }, [log.length, isBattling, turn]);
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 10, scale: 0.98 }}
@@ -2008,6 +2173,7 @@ const BattleLog = memo(({ log, enableAnimations, turn, isBattling }: { log: (Log
         const isLatest = i === log.length - 1;
         let colorClass = "text-slate-400 border-slate-800 bg-slate-900/40";
         let Icon = Info;
+
         if (entry.type === 'player') { 
           colorClass = "text-cyan-400 border-cyan-500/30 bg-cyan-950/40 shadow-[0_0_10px_rgba(34,211,238,0.1)]"; 
           Icon = Swords; 
@@ -2057,6 +2223,7 @@ const BattleLog = memo(({ log, enableAnimations, turn, isBattling }: { log: (Log
             Icon = Shield;
           }
         }
+
         return (
           <div 
             key={`battle-log-${entry.turn || turn}-${entry.type || ''}-${i}`} 
@@ -2085,8 +2252,10 @@ const BattleLog = memo(({ log, enableAnimations, turn, isBattling }: { log: (Log
     </motion.div>
   );
 });
+
 const StatusOverlay = memo(({ status }: { status: string | null }) => {
   if (!status) return null;
+
   return (
     <div className="absolute inset-0 pointer-events-none touch-none select-none z-20 flex items-center justify-center overflow-visible ">
       {/* BRN - Burn */}
@@ -2109,6 +2278,7 @@ const StatusOverlay = memo(({ status }: { status: string | null }) => {
           </motion.div>
         </div>
       )}
+
       {/* PSN - Poison */}
       {(status === 'PSN' || status === 'POI') && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none touch-none">
@@ -2129,6 +2299,7 @@ const StatusOverlay = memo(({ status }: { status: string | null }) => {
           </motion.div>
         </div>
       )}
+
       {/* PAR - Paralysis */}
       {status === 'PAR' && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none touch-none">
@@ -2169,6 +2340,7 @@ const StatusOverlay = memo(({ status }: { status: string | null }) => {
           </div>
         </div>
       )}
+
       {/* FRZ - Freeze */}
       {status === 'FRZ' && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none touch-none">
@@ -2189,6 +2361,7 @@ const StatusOverlay = memo(({ status }: { status: string | null }) => {
           </motion.div>
         </div>
       )}
+
       {/* SLP - Sleep */}
       {(status === 'SLP' || status === 'SLE') && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none touch-none">
@@ -2215,6 +2388,7 @@ const StatusOverlay = memo(({ status }: { status: string | null }) => {
           </div>
         </div>
       )}
+
       {/* CON - Confusion */}
       {status === 'CON' && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none touch-none">
@@ -2231,12 +2405,15 @@ const StatusOverlay = memo(({ status }: { status: string | null }) => {
     </div>
   );
 });
+
 const HPBar = memo(({ current, max, enableAnimations }: { current: number; max: number; enableAnimations: boolean }) => {
   const percent = max > 0 ? Math.max(0, Math.min(1, current / max)) : 0;
   const color = percent > 0.5 ? "#4ade80" : percent > 0.2 ? "#facc15" : "#f87171";
+  
   const prevPercentRef = useRef(percent);
   const [isDamaged, setIsDamaged] = useState(false);
   const [glowTrigger, setGlowTrigger] = useState(0);
+  
   useEffect(() => {
     if (percent < prevPercentRef.current) {
       setIsDamaged(true);
@@ -2249,6 +2426,7 @@ const HPBar = memo(({ current, max, enableAnimations }: { current: number; max: 
     }
     prevPercentRef.current = percent;
   }, [percent]);
+
   return (
     <motion.div 
       className="relative h-2.5 sm:h-3.5 bg-slate-950/90 rounded-full overflow-hidden mb-1 mt-1 shadow-inner"
@@ -2299,6 +2477,8 @@ const HPBar = memo(({ current, max, enableAnimations }: { current: number; max: 
     </motion.div>
   );
 });
+
+
 const VictoryConfetti = () => {
   return (
     <div className="absolute inset-0 z-[100] pointer-events-none">
@@ -2319,6 +2499,8 @@ const VictoryConfetti = () => {
     </div>
   );
 };
+
+
 const statNameMap: Record<string, string> = {
   'hp': 'HP',
   'attack': 'Attack',
@@ -2327,9 +2509,11 @@ const statNameMap: Record<string, string> = {
   'special-defense': 'Special Defense',
   'speed': 'Speed'
 };
+
 const getEvolutionLineInfo = (node: any): { names: string[], stagesCount: number } => {
   if (!node) return { names: [], stagesCount: 0 };
   const names: string[] = [];
+  
   const traverse = (n: any) => {
     if (n && n.name) {
       names.push(n.name);
@@ -2338,16 +2522,23 @@ const getEvolutionLineInfo = (node: any): { names: string[], stagesCount: number
       n.evolves_to.forEach(traverse);
     }
   };
+  
   traverse(node);
+  
   const getDepth = (n: any): number => {
     if (!n || !n.evolves_to || n.evolves_to.length === 0) return 1;
     return 1 + Math.max(...n.evolves_to.map((child: any) => getDepth(child)));
   };
+  
   const stagesCount = getDepth(node);
   return { names, stagesCount };
 };
+
+
 export default function App() {
+  
   const { state: simState, dispatch: battleDispatch } = useBattleSimulation();
+
   const [query, setQuery] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -2366,6 +2557,8 @@ export default function App() {
   }, []);
   const [isPending, startTransition] = useTransition();
   const [viewAllGenerations, setViewAllGenerations] = useState(false);
+
+  // --- Animation Helpers ---
   const getBattleSpriteAnimation = (animation: string | null, status: string | null, statAnimation?: string | null) => {
     if (statAnimation === 'boost') {
         return { scale: [1, 1.15, 1], filter: ['brightness(1) drop-shadow(0 0 0 rgba(16,185,129,0))', 'brightness(1.5) sepia(1) hue-rotate(90deg) saturate(3) drop-shadow(0 0 40px rgba(16,185,129,1))', 'brightness(1)'] };
@@ -2373,6 +2566,7 @@ export default function App() {
     if (statAnimation === 'lower') {
         return { scale: [1, 0.9, 1], filter: ['brightness(1) drop-shadow(0 0 0 rgba(239,68,68,0))', 'brightness(0.7) sepia(1) hue-rotate(-50deg) saturate(5) drop-shadow(0 0 40px rgba(239,68,68,1))', 'brightness(1)'] };
     }
+
     switch (animation) {
       case 'faint': return { opacity: 0.5, scale: 0.5, filter: 'brightness(0.3) grayscale(100%)' };
       case 'attack_physical': return { scale: 1.05 };
@@ -2383,15 +2577,18 @@ export default function App() {
       default: return { scale: 1, opacity: 1, rotate: 0, x: 0, filter: 'brightness(1)' };
     }
   };
+
   const getBattleSpriteTransition = (animation: string | null, statAnimation?: string | null): any => ({
     type: 'tween',
     duration: (enableAnimations && ((animation !== 'none' && animation !== null) || (statAnimation !== 'none' && statAnimation !== null))) ? 0.6 : 0, 
   });
+
   const [hoveredMove, setHoveredMove] = useState<Move | null>(null);
   const [loadingPokemon, setLoadingPokemon] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pokemon, setPokemon] = useState<Pokemon | null>(null);
   const [selectedGameDescIndex, setSelectedGameDescIndex] = useState<number>(0);
+
   useEffect(() => {
     setSelectedGameDescIndex(0);
   }, [pokemon?.id, pokemon?.name]);
@@ -2417,9 +2614,11 @@ export default function App() {
   const [filteredList, setFilteredList] = useState<any[]>([]);
   const { favorites, isFavorite, toggleFavorite, loadFavorites } = useFavorites();
   const [isFavoritesModalOpen, setIsFavoritesModalOpen] = useState(false);
+  
   const [loadingList, setLoadingList] = useState<boolean>(false);
   const [isInitializingDb, setIsInitializingDb] = useState<boolean>(false);
   const [debouncedQuery, setDebouncedQuery] = useState<string>('');
+  
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedQuery(inputValue);
@@ -2428,6 +2627,7 @@ export default function App() {
   }, [inputValue]);
   const [battleOpponent, setBattleOpponent] = useState<Pokemon | null>(null);
   const [battleResult, setBattleResult] = useState<'victory' | 'defeat' | null>(null);
+
   useEffect(() => {
     if (battleOpponent) {
       const rivals = TRAINER_SPRITES.filter(t => t.id !== currentAvatar.id);
@@ -2438,6 +2638,8 @@ export default function App() {
       }
     }
   }, [battleOpponent?.id, battleOpponent?.name, currentAvatar.id]);
+
+
   const [sessionWins, setSessionWins] = useState<number>(() => {
     const saved = sessionStorage.getItem('pokethology_session_wins');
     return saved ? parseInt(saved, 10) : 0;
@@ -2446,6 +2648,7 @@ export default function App() {
     const saved = sessionStorage.getItem('pokethology_session_losses');
     return saved ? parseInt(saved, 10) : 0;
   });
+  
   const [activePlayerIndex, setActivePlayerIndex] = useState(0);
   const [opponentTeam, setOpponentTeam] = useState<Pokemon[]>([]);
   const [activeOpponentIndex, setActiveOpponentIndex] = useState(0);
@@ -2464,6 +2667,7 @@ export default function App() {
   const [playerTeam, setPlayerTeam] = useState<Pokemon[]>([]);
   const [inspectingOpponent, setInspectingOpponent] = useState<boolean>(false);
   const basePlayerPokemonRef = useRef<Pokemon | null>(null);
+
   useEffect(() => {
     if (pokemon) {
       if (!basePlayerPokemonRef.current || basePlayerPokemonRef.current.id !== pokemon.id) {
@@ -2471,14 +2675,18 @@ export default function App() {
       }
     }
   }, [pokemon]);
+
   useEffect(() => {
     if (!battleOpponent) {
       setInspectingOpponent(false);
     }
   }, [battleOpponent]);
+
   useEffect(() => {
     setInspectingOpponent(false);
   }, [pokemon?.name]);
+
+  // Universal haptic + button click sound feedback on EVERY button across the application
   useEffect(() => {
     const handleGlobalButtonClick = (e: MouseEvent | TouchEvent | PointerEvent) => {
       const target = e.target as HTMLElement | null;
@@ -2489,36 +2697,44 @@ export default function App() {
         try { playHaptic(20); } catch (_) {}
       }
     };
+
     window.addEventListener('pointerdown', handleGlobalButtonClick, { capture: true, passive: true });
     return () => {
       window.removeEventListener('pointerdown', handleGlobalButtonClick, { capture: true });
     };
   }, []);
+
   const handleTabChange = useCallback((tab: 'data' | 'chat' | 'battle') => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
     setChatSpeakingIndex(null);
     setIsTabTransitioning(true);
+
     setTimeout(() => {
       setActiveTab(tab);
       setShowDetailsScrollTop(false);
+
       if (tab === 'battle') {
         setInspectingOpponent(false);
         setAttackerAnimation('none');
         setDefenderAnimation('none');
+
         if (basePlayerPokemonRef.current) {
           setPokemon(basePlayerPokemonRef.current);
         }
+
         const currentPoke = basePlayerPokemonRef.current || pokemon;
         const pBase = currentPoke?.stats?.find((s: any) => s.stat.name === 'hp')?.base_stat || 50;
         const oBase = battleOpponent?.stats?.find((s: any) => s.stat.name === 'hp')?.base_stat || 50;
         const pMax = Math.floor(pBase * 2 + 110);
         const oMax = Math.floor(oBase * 2 + 110);
+
         setPokemonMaxHP(pMax);
         setOpponentMaxHP(oMax);
         setPokemonHP(pMax);
         setOpponentHP(oMax);
+
         setPokemonStatus(null);
         setOpponentStatus(null);
         setPokemonFlinched(false);
@@ -2535,6 +2751,7 @@ export default function App() {
         setBattleLog([]);
         setIsBattleHistoryExpanded(false);
       }
+
       setTimeout(() => {
         if (detailsContainerRef.current) {
           detailsContainerRef.current.scrollTo({ top: 0, behavior: 'instant' });
@@ -2544,11 +2761,14 @@ export default function App() {
         }
       }, 10);
     }, 150);
+
     setTimeout(() => {
       setIsTabTransitioning(false);
     }, 300);
+
     try { sounds.scan(); playHaptic('light'); } catch (_) {}
   }, [pokemon, battleOpponent]);
+
   const slideSection = useCallback((tab: 'data' | 'chat' | 'battle') => {
     if (tab === 'battle') {
       try { sounds.scan(); playHaptic('light'); } catch (_) {}
@@ -2565,6 +2785,8 @@ export default function App() {
     }
     try { sounds.scan(); playHaptic('light'); } catch (_) {}
   }, []);
+
+
   const slideGrid = useCallback(() => {
     if (gridScrollRef.current) {
       const top = gridScrollRef.current.scrollTop;
@@ -2580,10 +2802,17 @@ export default function App() {
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
   const aiCache = useRef<Record<string, string>>({});
   const [quotaLimitReached, _setQuotaLimitReached] = useState<boolean>(false);
+
   const setQuotaLimitReached = useCallback((val: boolean) => {
     _setQuotaLimitReached(val);
   }, []);
+
+  
+
+  
+
   const [lastQuotaError, setLastQuotaError] = useState<string | null>(null);
+  
   const suggestTimeoutRef = useRef<any>(null);
   const [opponentDialogue, setOpponentDialogue] = useState<string | null>(null);
   const [playerDialogue, setPlayerDialogue] = useState<string | null>(null);
@@ -2594,47 +2823,61 @@ export default function App() {
   const [pokemonFlinched, setPokemonFlinched] = useState(false);
   const [opponentFlinched, setOpponentFlinched] = useState(false);
   const statusStartTurnRef = useRef<{player: number | null, opponent: number | null}>({player: null, opponent: null});
+
   useEffect(() => {
     if (pokemonStatus && statusStartTurnRef.current.player === null) statusStartTurnRef.current.player = turnNumber;
     if (!pokemonStatus) statusStartTurnRef.current.player = null;
     if (opponentStatus && statusStartTurnRef.current.opponent === null) statusStartTurnRef.current.opponent = turnNumber;
     if (!opponentStatus) statusStartTurnRef.current.opponent = null;
   }, [pokemonStatus, opponentStatus, turnNumber]);
+// Helper function to build standard welcome message for Chatbot
   const getChatWelcomeMessage = useCallback((pokemonName?: string) => {
     const nameUpper = pokemonName ? pokemonName.toUpperCase() : null;
     return `Hello! I am Pok√©thology AI. I can assist you with Pok√©mon strategies, biology, stats, and canonical lore. ${nameUpper ? `I see you have selected **${nameUpper}**. ` : ""}How can I assist you today?`;
   }, []);
+
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState<{role: 'user' | 'model', text: string, groundingChunks?: any[], groundingMetadata?: any}[]>([{ role: 'model', text: getChatWelcomeMessage() }]);
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [chatSpeakingIndex, setChatSpeakingIndex] = useState<number | null>(null);
   const [chatCopiedIndex, setChatCopiedIndex] = useState<number | null>(null);
+
   const handleChatTTS = useCallback((text: string, index: number) => {
     if (!('speechSynthesis' in window)) return;
+
     if (chatSpeakingIndex === index) {
       window.speechSynthesis.cancel();
       setChatSpeakingIndex(null);
       return;
     }
+
     window.speechSynthesis.cancel();
+
+    // Clean text: strip emojis, markdown symbols, and collapse spaces
     const cleanText = text
       .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{2300}-\u{23FF}]/gu, '')
       .replace(/[*_#`~>|-]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
+
     if (!cleanText) return;
+
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
+
     const voices = window.speechSynthesis.getVoices();
     const englishVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha')));
     if (englishVoice) utterance.voice = englishVoice;
+
     utterance.onstart = () => setChatSpeakingIndex(index);
     utterance.onend = () => setChatSpeakingIndex(null);
     utterance.onerror = () => setChatSpeakingIndex(null);
+
     window.speechSynthesis.speak(utterance);
     try { sounds.scan(); playHaptic('light'); } catch (_) {}
   }, [chatSpeakingIndex]);
+
   const handleChatCopy = useCallback((text: string, index: number) => {
     navigator.clipboard.writeText(text);
     setChatCopiedIndex(index);
@@ -2644,6 +2887,8 @@ export default function App() {
   const [battleLog, setBattleLog] = useState<(LogEntry & { turn?: number })[]>([]);
   const [isBattling, setIsBattling] = useState(false);
   const [usedSuperEffectiveCurrentBattle, setUsedSuperEffectiveCurrentBattle] = useState(false);
+
+  // --- WebSocket Integration ---
   const [wsStatus, setWsStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
   const [wsTelemetry, setWsTelemetry] = useState<any | null>(null);
   const [wsClientId, setWsClientId] = useState<string | null>(null);
@@ -2651,32 +2896,38 @@ export default function App() {
   const wsRef = useRef<WebSocket | null>(null);
   const streamQueueRef = useRef<string[]>([]);
   const streamTimerRef = useRef<any>(null);
+
   useEffect(() => {
     let socket: WebSocket | null = null;
     let reconnectTimer: any = null;
     let isCleanup = false;
     let reconnectAttempts = 0;
     const maxReconnectAttempts = 7;
+
     function connect() {
       if (isCleanup) return;
       setWsStatus('connecting');
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const wsUrl = `${protocol}//${window.location.host}/ws`;
       console.log("[WS] Connecting to:", wsUrl);
+      
       try {
         socket = new WebSocket(wsUrl);
         wsRef.current = socket;
+
         socket.onopen = () => {
           if (isCleanup) return;
           console.log("[WS] Connected successfully.");
           setWsStatus('connected');
           reconnectAttempts = 0; // reset on successful connection
         };
+
       socket.onmessage = (event) => {
         if (isCleanup) return;
         try {
           const data = JSON.parse(event.data);
           const { type, payload } = data;
+
           if (type === "connection_established") {
             setWsClientId(payload.clientId);
           } else if (type === "telemetry:update") {
@@ -2687,6 +2938,7 @@ export default function App() {
             if (payload.chunk) {
               const chars = payload.chunk.split('');
               streamQueueRef.current.push(...chars);
+              
               if (!streamTimerRef.current) {
                 setChatMessages(prev => {
                   const updated = [...prev];
@@ -2698,6 +2950,7 @@ export default function App() {
                   }
                   return updated;
                 });
+                
                 streamTimerRef.current = setInterval(() => {
                   if (streamQueueRef.current.length > 0) {
                     const char = streamQueueRef.current.shift();
@@ -2774,10 +3027,12 @@ export default function App() {
           console.error("[WS Client] failed to parse message", e);
         }
       };
+
       socket.onclose = (event) => {
           if (isCleanup) return;
           console.log("[WS] Connection closed:", event.reason);
           setWsStatus('disconnected');
+          
           if (reconnectAttempts < maxReconnectAttempts) {
             const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
             reconnectAttempts++;
@@ -2787,6 +3042,7 @@ export default function App() {
             console.log("[WS] Max reconnect attempts reached.");
           }
         };
+
         socket.onerror = (err) => {
           if (isCleanup) return;
           console.log("[WS] Socket error (expected in iframe if cookies blocked):", err);
@@ -2802,7 +3058,9 @@ export default function App() {
         }
       }
     }
+
     connect();
+
     return () => {
       isCleanup = true;
       clearTimeout(reconnectTimer);
@@ -2814,13 +3072,16 @@ export default function App() {
       }
     };
   }, []);
+
   useEffect(() => {
     if (isBattling) {
       setUsedSuperEffectiveCurrentBattle(false);
     }
   }, [isBattling]);
+
   useEffect(() => {
     if (battleResult && !isBattling && pokemon && battleOpponent) {
+        
         const newRecord = {
             id: Date.now().toString(),
             playerPokemon: pokemon.name,
@@ -2858,10 +3119,12 @@ export default function App() {
              }
            });
         });
+
         window.dispatchEvent(new Event('storage'));
     }
   }, [battleResult, isBattling, pokemon, battleOpponent, usedSuperEffectiveCurrentBattle]);
   const [battleDuration, setBattleDuration] = useState(0);
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isBattling) {
@@ -2880,10 +3143,13 @@ export default function App() {
   const vsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const vsPlayerCryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const vsOpponentCryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const [pokemonHP, setPokemonHP] = useState(100);
   const [opponentHP, setOpponentHP] = useState(100);
   const [turn, setTurn] = useState<'player' | 'opponent' | null>(null);
   const [tempoTier, setTempoTier] = useState(1.0);
+
+  // Sync active battle metrics via websocket stream
   useEffect(() => {
     if (isBattling && pokemon && battleOpponent && wsRef.current && wsStatus === 'connected') {
       wsRef.current.send(JSON.stringify({
@@ -2897,10 +3163,12 @@ export default function App() {
       }));
     }
   }, [isBattling, pokemonHP, opponentHP, battleOpponent, pokemon, wsStatus]);
+
   const [isAnimating, setIsAnimating] = useState(false);
   const [moveBeingLearned, setMoveBeingLearned] = useState<Move | null>(null);
   const [isMoveLearningOpen, setIsMoveLearningOpen] = useState(false);
   const [actionAfterMoveLearn, setActionAfterMoveLearn] = useState<'rematch' | 'new_battle' | null>(null);
+
   const handlePostBattleAction = (action: 'rematch' | 'new_battle') => {
     setBattleResult(null); // Remove victory/defeat interface
     if (pokemon) {
@@ -2908,6 +3176,7 @@ export default function App() {
       const potentialMoves = pokemon.moves.filter(m => 
         !currentSelectedMoves.some(sm => sm.name === m.name)
       );
+      
       if (potentialMoves.length > 0) {
         const shuffled = [...potentialMoves].sort(() => 0.5 - Math.random());
         const offered = shuffled.slice(0, Math.min(3, shuffled.length));
@@ -2918,6 +3187,7 @@ export default function App() {
         return;
       }
     }
+    // If no moves to learn, execute immediately
     if (action === 'rematch') {
       sounds.battleStart(); playHaptic('heavy');
       setIsBattling(false);
@@ -2927,6 +3197,7 @@ export default function App() {
       resetSimulation();
     }
   };
+
   const finalizeMoveLearn = () => {
     setIsMoveLearningOpen(false);
     if (actionAfterMoveLearn === 'rematch') {
@@ -2952,16 +3223,21 @@ export default function App() {
   const [arenaCriticalNotify, setArenaCriticalNotify] = useState<boolean>(false);
   const [playerAnimMode, setPlayerAnimMode] = useState<'idle' | 'hit' | 'boost' | 'drop'>('idle');
   const [opponentAnimMode, setOpponentAnimMode] = useState<'idle' | 'hit' | 'boost' | 'drop'>('idle');
+
   const addFloatingText = useCallback((text: string, type: any, isPlayer: boolean) => {
     const id = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    // If player is attacking (isPlayer=true), target is opponent (top-right)
+    // If opponent is attacking (isPlayer=false), target is player (bottom-left)
     const x = isPlayer ? '70%' : '30%';
     const y = isPlayer ? '25%' : '65%';
     setFloatingTexts(prev => [...prev, { id, text, type, x, y }]);
   }, []);
+
   const addStatEffect = useCallback((type: 'boost' | 'lower', isPlayer: boolean) => {
      const id = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
      setStatEffects(prev => [...prev, { id, type, isPlayer }]);
   }, []);
+
   const handleBattleMessageComplete = useCallback(() => setBattleMessage(null), []);
   const removeFloatingText = useCallback((id: string | number) => {
     setFloatingTexts(prev => prev.filter(t => t.id !== id));
@@ -2977,6 +3253,7 @@ export default function App() {
   const [isOpponentFemale, setIsOpponentFemale] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstallable, setIsInstallable] = useState(false);
+
   useEffect(() => {
     const checkIsInstallable = () => {
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || ('standalone' in window.navigator && (window.navigator as any).standalone) || document.referrer.includes('android-app://');
@@ -2989,23 +3266,28 @@ export default function App() {
       }
     };
     checkIsInstallable();
+
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
       setIsInstallable(true);
     };
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    
     const mediaQuery = window.matchMedia('(display-mode: standalone)');
     const handleDisplayModeChange = (e: MediaQueryListEvent) => {
       if (e.matches) setIsInstallable(false);
     };
     mediaQuery.addEventListener('change', handleDisplayModeChange);
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       mediaQuery.removeEventListener('change', handleDisplayModeChange);
     };
   }, []);
+
   const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
+
   const handleInstallPWA = async () => {
     setIsPwaModalOpen(true);
     if (deferredPrompt) {
@@ -3032,10 +3314,13 @@ export default function App() {
   const [customStats, setCustomStats] = useState<Record<string, number>>({});
   const [playerSpriteFlip, setPlayerSpriteFlip] = useState<boolean>(true);
   const [opponentSpriteFlip, setOpponentSpriteFlip] = useState<boolean>(false);
+  
+  // Custom Special Mechanics State
   const [playerSubstitute, setPlayerSubstitute] = useState(0);
   const [opponentSubstitute, setOpponentSubstitute] = useState(0);
   const [playerProtected, setPlayerProtected] = useState(false);
   const [opponentProtected, setOpponentProtected] = useState(false);
+
   const [playerStatStages, setPlayerStatStages] = useState<Record<string, number>>({});
   const [opponentStatStages, setOpponentStatStages] = useState<Record<string, number>>({});
   const [statAnimation, setStatAnimation] = useState<'none' | 'boost' | 'lower'>('none');
@@ -3049,6 +3334,7 @@ export default function App() {
   const [diagnosticProgress, setDiagnosticProgress] = useState(0);
   const [diagnosticLogs, setDiagnosticLogs] = useState<string[]>([]);
   const [diagnosticsCompleted, setDiagnosticsCompleted] = useState(false);
+
   const runDiagnosticsCheck = useCallback(() => {
     if (isDiagnosticRunning) return;
     setIsDiagnosticRunning(true);
@@ -3056,9 +3342,11 @@ export default function App() {
     setDiagnosticsCompleted(false);
     setDiagnosticLogs(["[SYSTEM INIT] Activating diagnostic check via WebSockets..."]);
     sounds?.boot?.();
+
     if (wsRef.current && wsStatus === 'connected') {
       wsRef.current.send(JSON.stringify({ type: "diag:start" }));
     } else {
+      // Fallback to offline local simulation
       const logSteps = [
         { text: "[DATABASE] Loading Pok√©dex data... Loaded 1025 Pok√©mon.", delay: 400, progress: 20 },
         { text: "[CONNECTIONS] Connecting to Pok√©mon endpoints... Successful.", delay: 850, progress: 45 },
@@ -3073,6 +3361,7 @@ export default function App() {
         { text: "[MISSIONS] Daily missions and activities loaded.", delay: 2200, progress: 95 },
         { text: "[SUCCESS] Setup complete! Welcome to Pok√©thology.", delay: 2600, progress: 100 }
       ];
+
       logSteps.forEach((step) => {
         setTimeout(() => {
           setDiagnosticLogs(prev => [...prev, step.text]);
@@ -3087,6 +3376,7 @@ export default function App() {
       });
     }
   }, [quotaLimitReached, isDiagnosticRunning, wsStatus]);
+
   const [isBattleHelpOpen, setIsBattleHelpOpen] = useState(false);
   const [showStatComparison, setShowStatComparison] = useState(false);
   const [showCombatOptionsCompare, setShowCombatOptionsCompare] = useState(false);
@@ -3098,6 +3388,7 @@ export default function App() {
   const [isDailyHubOpen, setIsDailyHubOpen] = useState<boolean>(false);
   const [isComparisonOpen, setIsComparisonOpen] = useState<boolean>(false);
   const [pinnedComparisonPokemon, setPinnedComparisonPokemon] = useState<Pokemon | null>(null);
+
   const handleOpenComparison = (p?: Pokemon) => {
     const targetPokemon = p || pokemon;
     if (targetPokemon) {
@@ -3113,6 +3404,8 @@ export default function App() {
   const [missionRequiredCount, setMissionRequiredCount] = useState<number>(3);
   const [playerStatAnimation, setPlayerStatAnimation] = useState<'none' | 'boost' | 'lower'>('none');
   const [opponentStatAnimation, setOpponentStatAnimation] = useState<'none' | 'boost' | 'lower'>('none');
+
+  // Interactive Toast notification system
   interface AppToast {
     id: string;
     title: string;
@@ -3127,6 +3420,8 @@ export default function App() {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 5000);
   };
+
+  // Celebratory overlay state for Daily Combat Mission completes
   const [showMissionCelebration, setShowMissionCelebration] = useState<boolean>(false);
   const [showMissionUpdateHUD, setShowMissionUpdateHUD] = useState<boolean>(false);
   const [hubChallengeProgressMessage, setHubChallengeProgressMessage] = useState<string | null>(null);
@@ -3137,12 +3432,16 @@ export default function App() {
   } | null>(null);
   const hubProgressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [celebratedMission, setCelebratedMission] = useState<any>(null);
+
   const today = new Date().toISOString().split('T')[0];
+
+  // 24-hour automatic reset and pruning of historical data for smaller, cleaner database
   useEffect(() => {
     const now = Date.now();
     const lastResetKey = 'pokethology_last_24h_reset';
     const lastReset = localStorage.getItem(lastResetKey);
     const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+
     if (!lastReset || now - parseInt(lastReset, 10) > TWENTY_FOUR_HOURS) {
       const runPruning = async () => {
         try {
@@ -3154,6 +3453,7 @@ export default function App() {
         }
       };
       runPruning();
+
       try {
         const scanHistory = JSON.parse(localStorage.getItem('pokethology_scan_history') || '[]');
         const prunedScans = scanHistory.filter((item: any) => !item.timestamp || now - item.timestamp < TWENTY_FOUR_HOURS);
@@ -3161,46 +3461,60 @@ export default function App() {
       } catch (e) {
         console.error("Error pruning scan history", e);
       }
+
       localStorage.setItem(lastResetKey, now.toString());
     }
   }, [today]);
+
   useEffect(() => {
     const isHardMode = (localStorage.getItem(`pokethology_mission_hard_${today}`) || localStorage.getItem(`poketheology_mission_hard_${today}`)) === 'true';
     const currentMission = getDailyCombatMission(today, isHardMode);
     const required = getRequiredCount(currentMission, isHardMode);
     setMissionRequiredCount(required);
+
     const countKey = `pokethology_mission_progress_count_${today}`;
     const completedKey = `pokethology_mission_completed_${today}`;
     const legacyCompletedKey = `poketheology_mission_completed_${today}`;
+
     let savedCountStr = localStorage.getItem(countKey);
     let currentCount = savedCountStr ? parseInt(savedCountStr, 10) : 0;
+
     const isCompletedVal = (localStorage.getItem(completedKey) || localStorage.getItem(legacyCompletedKey)) === 'true';
     if (isCompletedVal && currentCount < required) {
       currentCount = required;
       localStorage.setItem(countKey, String(required));
     }
+
     setMissionProgressCount(currentCount);
     setIsMissionCompleted(currentCount >= required);
   }, [today]);
   const dailyId = useMemo(() => {
+    // High-entropy split-mix string hash seed
     let hash = 0;
     for (let i = 0; i < today.length; i++) {
       hash = today.charCodeAt(i) + ((hash << 5) - hash);
     }
+    // High-quality deterministic seeded LCG step to yield wildly scattered pseudo-random index
     let seed = Math.abs(hash);
+    // Linear Congruential Generator step with standard parameters
     seed = (seed * 1664525 + 1013904223) % 4294967296;
     seed = (seed * 1103515245 + 12345) % 4294967296;
+    // Map to total pokedex range (1025 standard Gen 1-9 species)
     return (seed % 1025) + 1;
   }, [today]);
+
   const [dailyPokemon, setDailyPokemon] = useState<any>(null);
   const [dailyFemalePokemon, setDailyFemalePokemon] = useState<any>(null);
   const [dailyGender, setDailyGender] = useState<'male' | 'female'>('male');
+
   useEffect(() => {
     const fetchDaily = async () => {
       try {
         const p = await searchPokemon(dailyId.toString());
         setDailyPokemon(p);
+        
         let femaleP = null;
+        // Search for female varieties first
         if (p.varieties && p.varieties.length > 1) {
           const femaleVariety = p.varieties.find((v: any) => 
             v.pokemon?.name?.includes('-female') || 
@@ -3208,6 +3522,7 @@ export default function App() {
             (p.name === 'nidoran-m' && v.pokemon?.name === 'nidoran-f') ||
             (p.name === 'nidoran-f' && v.pokemon?.name === 'nidoran-m')
           );
+          
           if (femaleVariety && femaleVariety.pokemon?.name !== p.name) {
             try {
               femaleP = await searchPokemon(femaleVariety.pokemon?.name);
@@ -3216,6 +3531,8 @@ export default function App() {
             }
           }
         }
+
+        // Add manual fallback for significant gender differences not in varieties (Pyroar, Jellicent, etc.)
         if (!femaleP) {
           const genderDifferents = ['pyroar', 'unfezant', 'frillish', 'jellicent', 'hippowdon', 'hippopotas', 'meowstic', 'indeedee', 'oinkologne', 'basculegion'];
           const baseName = p.name.split('-')[0].toLowerCase();
@@ -3223,6 +3540,7 @@ export default function App() {
             femaleP = { ...p, name: `${baseName}-female` };
           }
         }
+
         setDailyFemalePokemon(femaleP);
       } catch (e) {
         console.error("Daily fetch failed", e);
@@ -3230,10 +3548,13 @@ export default function App() {
     };
     fetchDaily();
   }, [dailyId]);
+
   useEffect(() => {
+    // Manage Daily Streak
     const lastActiveDate = localStorage.getItem('pokethology_last_active_date') || localStorage.getItem('poketheology_last_active_date');
     const savedStreak = localStorage.getItem('pokethology_daily_streak') || localStorage.getItem('poketheology_daily_streak');
     const streakNum = savedStreak ? parseInt(savedStreak, 10) : 0;
+
     const todayDate = new Date().toISOString().split('T')[0];
     if (lastActiveDate === todayDate) {
       setDailyStreak(streakNum || 1);
@@ -3256,6 +3577,7 @@ export default function App() {
       localStorage.setItem('pokethology_last_active_date', todayDate);
     }
   }, []);
+
   useEffect(() => {
     const loadSavedTeam = async () => {
       try {
@@ -3273,10 +3595,12 @@ export default function App() {
           setPlayerTeam(loaded.filter((p): p is Pokemon => p !== null));
         }
       } catch (e) {
+        
       }
     };
     loadSavedTeam();
   }, [searchPokemon]);
+
   const [scanHistory, setScanHistory] = useState<{name: string, id: number, types: string[], bst?: number}[]>(() => {
     try {
       const saved = localStorage.getItem('pokethology_scan_history');
@@ -3285,10 +3609,13 @@ export default function App() {
       return [];
     }
   });
+
   const [showScrollTop, setShowScrollTop] = useState(false);
   const gridScrollRef = useRef<HTMLDivElement>(null);
+
   const [arenaScale, setArenaScale] = useState(1);
   const arenaObserverRef = useRef<HTMLDivElement | null>(null);
+
   const arenaCallbackRef = useCallback((node: HTMLDivElement | null) => {
     if (arenaObserverRef.current) {
       const oldObserver = (arenaObserverRef.current as any).__observer;
@@ -3313,6 +3640,7 @@ export default function App() {
       (node as any).__observer = observer;
     }
   }, []);
+
   useEffect(() => {
     try {
       localStorage.setItem('pokethology_scan_history', JSON.stringify(scanHistory));
@@ -3320,9 +3648,11 @@ export default function App() {
       console.error(e);
     }
   }, [scanHistory]);
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isOfflineManagerOpen, setIsOfflineManagerOpen] = useState(false);
   const [isOnline, setIsOnline] = useState<boolean>(typeof navigator !== 'undefined' ? navigator.onLine : true);
+
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -3339,7 +3669,9 @@ export default function App() {
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [pendingAction, setPendingAction] = useState<'flee' | 'run' | null>(null);
   const [isLightMode, setIsLightMode] = useState<boolean>(false);
+
   const [arenaArtworkMode, setArenaArtworkMode] = useState<'home' | '2d'>('home');
+
   useEffect(() => {
     if (isLightMode) {
       document.documentElement.classList.add('light');
@@ -3352,6 +3684,7 @@ export default function App() {
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
   const [displayLimit, setDisplayLimit] = useState(50);
+
   const handleAbort = useCallback(() => {
     setLoadingPokemon(false);
     setError(null);
@@ -3364,6 +3697,7 @@ export default function App() {
     sounds.scan(); playHaptic('light');
   }, [setLoadingPokemon, setError, setPokemon, setBattleOpponent, setIsBattling, setIsChaosModeActive, setBattleState, setListMode, sounds]);
   const [isMusicOpen, setIsMusicOpen] = useState(false);
+  // Lock body scrolling when any modal is active so main app background stays fixed
   useEffect(() => {
     const isAnyModalOpen = isDailyHubOpen || isDailyScanOpen || isDailyQuizOpen || isSettingsOpen || isTutorialOpen || isWelcomeOpen || isMusicOpen || isComparisonOpen || isTypeChartOpen || isAvatarModalOpen;
     if (isAnyModalOpen) {
@@ -3387,9 +3721,11 @@ export default function App() {
   const [ytPlaying, setYtPlaying] = useState(false);
   const [ytVolume, setYtVolume] = useState(0.5);
   const [globalMusicConnected, setGlobalMusicConnected] = useState(false);
+
   const [enableAnimations, setEnableAnimations] = useState(true);
   const [battleSpeed, setBattleSpeed] = useState<'normal' | 'fast' | 'turbo'>('normal');
   const [pokemonMaxHP, setPokemonMaxHP] = useState(100);
+
   useEffect(() => {
     if (pokemonMaxHP > 0) {
       const hpPercent = (pokemonHP / pokemonMaxHP) * 100;
@@ -3399,6 +3735,7 @@ export default function App() {
       } else if (hpPercent < 50) {
         newTempo = 1.25;
       }
+      
       if (newTempo !== tempoTier) {
         setTempoTier(newTempo);
         sounds.setTempoMultiplier(newTempo);
@@ -3417,8 +3754,10 @@ export default function App() {
   const [isChatDragging, setIsChatDragging] = useState(false);
   const chatDragStartY = useRef(0);
   const chatDragScrollTop = useRef(0);
+
   const handleThemeToggle = () => {
     sounds.boot(); playHaptic('medium');
+    
     const toggle = () => {
       setIsLightMode(prev => {
         const next = !prev;
@@ -3426,12 +3765,14 @@ export default function App() {
         return next;
       });
     };
+
     if ('startViewTransition' in document) {
       (document as any).startViewTransition(() => toggle());
     } else {
       toggle();
     }
   };
+
   const getTypeEffectiveness = useCallback((moveType: string, targetTypes: string[]) => {
     let multiplier = 1;
     targetTypes.forEach(t => {
@@ -3441,13 +3782,18 @@ export default function App() {
     });
     return multiplier;
   }, []);
+
   const getBestMove = useCallback((opponentTypes: string[], moves: Move[]) => {
     if (opponentTypes.length === 0 || moves.length === 0) return null;
+    
     let bestMove: Move | null = null;
     let maxMultiplier = 0;
+
     for (const move of moves) {
       if (!move.type || move.type === '???') continue;
+      
       let multiplier = getTypeEffectiveness(move.type.toLowerCase(), opponentTypes.map(t => t.toLowerCase()));
+      
       if (multiplier > maxMultiplier) {
         maxMultiplier = multiplier;
         bestMove = move;
@@ -3457,18 +3803,22 @@ export default function App() {
     }
     return bestMove?.name || null;
   }, [getTypeEffectiveness]);
+
   const getBattleStrategy = useCallback(async () => {
     if (!pokemon || !battleOpponent) return;
     setIsAiSuggesting(true);
+    
     const opponentTypes = battleOpponent.types.map((t: any) => t.type.name);
     const bestMove = getBestMove(opponentTypes, selectedMoves);
     setRecommendedMove(bestMove);
+    
     try {
       const battleKey = `${pokemon?.name}-${battleOpponent?.name}-${pokemonHP}-${opponentHP}-${pokemonStatus}-${opponentStatus}`;
       if (aiCache.current[battleKey]) {
         setBattleSuggestion(aiCache.current[battleKey]);
         return;
       }
+
       const battleData = {
         player: { 
           name: pokemon?.name, 
@@ -3483,6 +3833,7 @@ export default function App() {
           types: battleOpponent.types.map(t => t.type.name)
         }
       };
+
       recordApiUsage("gemini_ai", 1);
       const response = await fetch("/api/strategy", {
         method: "POST",
@@ -3495,12 +3846,15 @@ export default function App() {
           lang: 'en'
         }),
       });
+
       const responseText = await response.text();
       let data: any = {};
       try { data = JSON.parse(responseText); } catch (_) { data = { strategy: null }; }
+
       const resultStrategy = data?.strategy || (bestMove 
         ? `‚Ä¢ üîÆ **ANALYSIS**: Opponent ${battleOpponent?.name} is vulnerable to optimal type matchups.\n‚Ä¢ ‚öîÔ∏è **COMMAND**: Execute ${bestMove.toUpperCase()} immediately for maximum damage.`
         : `‚Ä¢ üîÆ **ANALYSIS**: Maintain tactical momentum against ${battleOpponent?.name}.\n‚Ä¢ ‚öîÔ∏è **COMMAND**: Focus on high-power moves and HP preservation.`);
+
       aiCache.current[battleKey] = resultStrategy;
       setBattleSuggestion(resultStrategy);
     } catch (err: any) {
@@ -3513,25 +3867,41 @@ export default function App() {
       setIsAiSuggesting(false);
     }
   }, [pokemon, battleOpponent, pokemonHP, pokemonMaxHP, selectedMoves, opponentHP, opponentMaxHP, opponentStatus, pokemonStatus, getBestMove, 'en']);
+
   const getEffectiveStat = useCallback((p: Pokemon | null, statName: string, isPlayer: boolean) => {
     if (!p) return 0;
     const baseRaw = p.stats.find((s: any) => s.stat.name === statName)?.base_stat || 50;
+    
+    // Proper level 50 stat calculation (assuming 31 IVs and 0 EVs)
+    // HP = floor((2 * Base + 31) * 50 / 100) + 50 + 10 = Base + 75
+    // Other Stats = floor((2 * Base + 31) * 50 / 100) + 5 = Base + 20
     const calculatedBase = statName === 'hp' ? baseRaw + 75 : baseRaw + 20;
     const base = isChaosModeActive ? calculatedBase + 20 : calculatedBase;
+    
     const boost = p.name === pokemon?.name ? (customStats[statName] || 0) : 0;
     const totalBase = base + boost;
+
+    // Stat stages don't apply to HP
     if (statName === 'hp') {
       return totalBase;
     }
+    
+    // Stat stages
     const stages = isPlayer ? playerStatStages : opponentStatStages;
     const stage = stages[statName] || 0;
+    
+    // Stage multipliers in Pok√©mon: 2/2, 3/2, 4/2... or 2/3, 2/4...
     const stageMultiplier = Math.max(2, 2 + stage) / Math.max(2, 2 - stage);
+    
+    // Status effects
     const status = isPlayer ? pokemonStatus : opponentStatus;
     let multiplier = stageMultiplier;
     if (status === 'PAR' && statName === 'speed') multiplier *= 0.5;
     if (status === 'BRN' && statName === 'attack') multiplier *= 0.5;
+    
     return Math.floor(totalBase * multiplier);
   }, [pokemon, customStats, playerStatStages, opponentStatStages, pokemonStatus, opponentStatus, isChaosModeActive]);
+
   const skipVSScreen = useCallback(() => {
     if (vsTimeoutRef.current) {
       clearTimeout(vsTimeoutRef.current);
@@ -3545,11 +3915,14 @@ export default function App() {
       clearTimeout(vsOpponentCryTimeoutRef.current);
       vsOpponentCryTimeoutRef.current = null;
     }
+    
     setShowVSScreen(false);
     setIsBattling(true);
     setBattleState('battling');
     setActiveTab('battle');
     setBattleLog([{ text: "BATTLE START!", type: 'system' }]);
+
+    // Smoothly scroll combat section / arena into view after VS screen closes
     setTimeout(() => {
       const arenaElem = arenaRef.current || document.getElementById('battle-arena-container');
       if (arenaElem) {
@@ -3559,6 +3932,7 @@ export default function App() {
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 320);
+
     const pMaxHP = Math.floor(((pokemon?.stats?.find(s => s.stat.name === 'hp')?.base_stat || 50) + (customStats['hp'] || 0)) * 2 + 110);
     const oMaxHP = Math.floor((battleOpponent?.stats?.find(s => s.stat.name === 'hp')?.base_stat || 50) * 2 + 110);
     setPokemonMaxHP(pMaxHP);
@@ -3569,22 +3943,27 @@ export default function App() {
     setOpponentStatus(null);
     setPokemonFlinched(false);
     setOpponentFlinched(false);
+
     setPlayerSubstitute(0);
     setOpponentSubstitute(0);
     setPlayerProtected(false);
     setOpponentProtected(false);
     setPlayerStatStages({});
     setOpponentStatStages({});
+
     setSelectedMoves(prev => prev.map(m => ({ ...m, currentPP: m.pp })));
+    
     if (battleOpponent) {
       setOpponentMoves(generateCompetitiveMoveset(battleOpponent, [], pokemon));
     } else {
       setOpponentMoves([]);
     }
+
     const pSpeed = getEffectiveStat(pokemon, 'speed', true);
     const oSpeed = getEffectiveStat(battleOpponent, 'speed', false);
     setTurn(pSpeed >= oSpeed ? 'player' : 'opponent');
   }, [pokemon, battleOpponent, customStats, getEffectiveStat]);
+
   const resetSimulation = useCallback(() => {
     setIsBattling(false);
     setIsChaosModeActive(false);
@@ -3607,55 +3986,77 @@ export default function App() {
     setDefenderAnimation('none');
     setMoveAnimation('none');
   }, [pokemonMaxHP, opponentMaxHP]);
+
   const handleSystemRestart = useCallback(() => {
     setIsRebooting(true);
     sounds.boot(); playHaptic('medium');
+    
     setTimeout(() => {
+      // 1. Core State Reset
       setIsSettingsOpen(false);
       setIsTutorialOpen(false);
       setIsMusicOpen(false);
       setIsTypeChartOpen(false);
       setIsMoveDetailOpen(false);
       setIsBattleHelpOpen(false);
+      
+      // 2. Search & List Reset
       setQuery('');
       setInputValue('');
       setLastSearched('');
       setListMode('home');
       setCurrentGenId(1);
+      
       setTypeFilter(null);
       setSortBy('id');
       setSortOrder('asc');
       setDisplayLimit(50);
+      
+      // 3. Selection & Team Reset
       setPokemon(null);
       setCurrentVariety(null);
       setBattleOpponent(null);
+      
       setOpponentTeam([]);
       setActivePlayerIndex(0);
       setActiveOpponentIndex(0);
       setBattleResult(null);
+      
+      // 4. Interface State
       setActiveTab('data');
       setChatMessages([]);
       setIsSelectingOpponent(false);
+      
+      // 5. Battle & Chaos Reset
       setIsChaosMatchSetup(false);
       setChaosPhase('none');
       setSelectedMoves([]);
       setOpponentMoves([]);
       setCustomStats({});
+      
+      // 6. Simulation Reset
       resetSimulation();
+      
+      // 7. Data Cleanup
       setError(null);
       setAiSuggestion(null);
       setBattleSuggestion(null);
       setFloatingTexts([]);
+
       setTimeout(() => {
         setIsRebooting(false);
         setListMode('home');
       }, 350);
     }, 150);
   }, [resetSimulation]);
+
   const delay = useCallback((ms: number) => new Promise(resolve => setTimeout(resolve, ms)), []);
+
+  // Automatic simulation reset watchdog after battle finishes (disabled to allow the user full control of rematch/finish choices)
   useEffect(() => {
     setAutoResetTime(null);
   }, []);
+
   useEffect(() => {
     if (autoResetTime === null) return;
     if (autoResetTime <= 0) {
@@ -3667,6 +4068,7 @@ export default function App() {
     }, 1000);
     return () => clearTimeout(timer);
   }, [autoResetTime, resetSimulation]);
+
   const executeMove = useCallback(async (attacker: Pokemon, defender: Pokemon, move: Move, isPlayer: boolean) => {
     if (isAnimating) return 0;
     setIsAnimating(true);
@@ -3676,7 +4078,13 @@ export default function App() {
       const speedFactor = battleSpeed === 'normal' ? 0.95 : battleSpeed === 'fast' ? 0.5 : 0.25;
       return delay(ms * speedFactor);
     };
+
+    // Turn anomaly roll in Chaos Mode
+    // Effect removed.
+    
     const attackerStatus = isPlayer ? pokemonStatus : opponentStatus;
+    
+    // Check for flinch
     if (isPlayer && pokemonFlinched) {
       setPokemonFlinched(false);
       log(`${attacker.name.toUpperCase()} flinched and couldn't move!`, 'status-effect');
@@ -3692,6 +4100,8 @@ export default function App() {
       setBattleMessage(null);
       return 0;
     }
+
+    // Check for status effects that prevent moving
     if (attackerStatus === 'PAR' && Math.random() < 0.25) {
       log(`${attacker.name.toUpperCase()} is paralyzed! It can't move!`, 'status-effect');
       setBattleMessage({ text: "PARALYZED", type: 'status' });
@@ -3724,6 +4134,7 @@ export default function App() {
       setBattleMessage(null);
       return 0;
     }
+
     if (attackerStatus === 'CON') {
       if (Math.random() < 0.25) {
         log(`${attacker.name.toUpperCase()} snapped out of its confusion!`, 'status-effect');
@@ -3737,10 +4148,12 @@ export default function App() {
           log(`It hurt itself in its confusion!`, 'status-effect');
           setBattleMessage({ text: "HURT SELF!", type: 'status' });
                     sounds.hit();
+          
           const level = 50;
           const a = getEffectiveStat(attacker, 'attack', isPlayer);
           const d = getEffectiveStat(attacker, 'defense', isPlayer);
           const confusionDamage = Math.max(1, Math.floor((((2 * level / 5 + 2) * 40 * (a / d)) / 50) + 2));
+          
           if (isPlayer) {
             setPokemonHP(prev => Math.max(0, prev - confusionDamage));
             setAttackerAnimation('hit');
@@ -3752,12 +4165,15 @@ export default function App() {
             await battleDelay(400);
             setDefenderAnimation('none');
           }
+          
           await battleDelay(600);
           setBattleMessage(null);
           return 0;
         }
       }
     }
+
+    // Accuracy check
     if (move.accuracy && Math.random() * 100 > move.accuracy) {
       log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
       log(`But it missed!`, 'normal');
@@ -3767,13 +4183,17 @@ export default function App() {
       setBattleMessage(null);
       return 0;
     }
+
+    // Special handling for Transform
     if (move.name.toLowerCase() === 'transform') {
       log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
       setBattleMessage({ text: "TRANSFORM!", type: 'move' });
       sounds.playMoveSound('normal', true);
       await battleDelay(600);
+      
       log(`${attacker.name.toUpperCase()} transformed into ${defender.name.toUpperCase()}!`, 'system');
       setBattleMessage({ text: "TRANSFORMED!", type: 'move' });
+            
       const transformedData: Pokemon = {
         ...attacker,
         name: defender.name,
@@ -3787,6 +4207,7 @@ export default function App() {
         moves: [...defender.moves],
         cries: defender.cries ? { ...defender.cries } : attacker.cries,
       };
+
       if (isPlayer) {
         setPokemon(transformedData);
         setSelectedMoves([...opponentMoves]);
@@ -3796,12 +4217,17 @@ export default function App() {
         setOpponentMoves([...selectedMoves]);
         setOpponentStatStages({...playerStatStages});
       }
+      
       await battleDelay(800);
       setBattleMessage(null);
       return 0;
     }
+
+    // Add Accuracy mechanics!
     const moveAccuracy = move.accuracy;
     const doesHit = moveAccuracy === null || (Math.random() * 100) <= moveAccuracy;
+
+    // Disabled dialog bubble quotes to prevent overlapping text and clutter
     const speakQuote = getOpponentMoveQuote(attacker.name, move.name);
     /* 
     if (isPlayer) {
@@ -3812,12 +4238,19 @@ export default function App() {
       setTimeout(() => setOpponentDialogue(null), 3000);
     }
     */
+
     log(`${move.name.toUpperCase()}!`, isPlayer ? 'player' : 'opponent');
     setBattleMessage({ text: move.name.toUpperCase(), type: 'move' });
+    
+    // Determine Damage Class precisely from the API
     const isSpecial = move.damage_class === 'special';
     sounds.playMoveSound(move.type, isSpecial);
+
+    // Turn Reset logic for volatile states
     if (isPlayer) setPlayerProtected(false);
     else setOpponentProtected(false);
+
+    // Custom Protection Engine
     const isDefenderProtected = isPlayer ? opponentProtected : playerProtected;
     const isProtectMove = move.name === 'protect' || move.name === 'detect' || move.name === 'spiky-shield' || move.name === 'kings-shield';
     if (isProtectMove) {
@@ -3829,6 +4262,7 @@ export default function App() {
       setBattleMessage(null);
       return 0; // successfully protected this turn
     }
+
     if (isDefenderProtected && (move.power !== null && move.power > 0 || (move.stat_changes && move.stat_changes.some(s => s.change < 0)))) {
        await battleDelay(400);
        log(`${defender.name.toUpperCase()} protected itself!`, 'normal');
@@ -3837,10 +4271,13 @@ export default function App() {
        setBattleMessage(null);
        return 0;
     }
+    
+    // Custom Substitute Engine (Creation)
     if (move.name === 'substitute') {
       const currentAttackerHP = isPlayer ? pokemonHP : opponentHP;
       const attackerMaxHP = isPlayer ? pokemonMaxHP : opponentMaxHP;
       const subCost = Math.floor(attackerMaxHP * 0.25);
+      
       if (currentAttackerHP <= subCost) {
         log(`But it failed! Not enough HP.`, 'not-effective');
         addFloatingText("FAILED", 'not-effective', isPlayer);
@@ -3859,6 +4296,7 @@ export default function App() {
       setBattleMessage(null);
       return 0;
     }
+
     if (!doesHit) {
       await battleDelay(600);
       log(`${attacker.name.toUpperCase()}'s attack missed!`, 'normal');
@@ -3867,14 +4305,18 @@ export default function App() {
       setBattleMessage(null);
       return 0; // Turn ends on miss!
     }
+
+    // Calculate type effectiveness for both damaging and status moves
     const targetTypes = defender.types.map(t => t.type.name);
     const attackerTypes = attacker.types.map(t => t.type.name);
     const effectiveness = getTypeEffectiveness(move.type, targetTypes);
+
     const isDamaging = move.power !== null && move.power > 0;
     let totalDamage = 0;
     let anyCrit = false;
     let turnOutcomeMessages: string[] = [];
     let highestMsgType: any = "move";
+
     if (effectiveness === 0) {
       log(`It had no effect on ${defender.name.toUpperCase()}...`, 'not-effective');
       addFloatingText("NO EFFECT", 'not-effective', isPlayer);
@@ -3882,30 +4324,43 @@ export default function App() {
       highestMsgType = 'status';
       await battleDelay(350);
     } else if (isDamaging) {
+      // Determine number of hits
       const minHits = move.meta?.min_hits || 1;
       const maxHits = move.meta?.max_hits || 1;
       const numHits = Math.floor(Math.random() * (maxHits - minHits + 1)) + minHits;
+      
       for (let i = 0; i < numHits; i++) {
+        // Critical Hit (6.25% chance)
         const isCrit = Math.random() < 0.0625;
         if (isCrit) anyCrit = true;
         const critMultiplier = isCrit ? 1.5 : 1;
         const stabMultiplier = attackerTypes.includes(move.type) ? 1.5 : 1;
+        
+        // Determine if move is physical or special
         const attackStat = isSpecial ? getEffectiveStat(attacker, 'special-attack', isPlayer) : getEffectiveStat(attacker, 'attack', isPlayer);
         const defenseStat = isSpecial ? getEffectiveStat(defender, 'special-defense', !isPlayer) : getEffectiveStat(defender, 'defense', !isPlayer);
+        
         const baseDamage = move.power || 40;
         const randomMultiplier = 0.85 + Math.random() * 0.15;
         const weatherMultiplier = 1;
+
         const damage = Math.max(1, Math.floor((((baseDamage * (attackStat / defenseStat) * effectiveness * critMultiplier * stabMultiplier * weatherMultiplier) / 5) + 2) * randomMultiplier));
         totalDamage += damage;
+        
         sounds.hit();
         let dmgType: any = 'damage'; if (critMultiplier > 1) dmgType = 'crit-damage'; else if (effectiveness > 1) dmgType = 'super-damage'; else if (effectiveness < 1) dmgType = 'weak-damage'; addFloatingText(damage.toString(), dmgType, isPlayer);
+        
+        // Trigger visual effect
         if (enableAnimations) {
           const animationType = isSpecial ? 'special' : 'physical';
+          
           setMoveAnimation(animationType);
+          
           if (isPlayer) {
             setAttackerAnimation(isSpecial ? 'attack_special' : 'attack_physical');
             await battleDelay(80);
             setAttackerAnimation('none');
+            
             setDefenderAnimation('hit');
             await battleDelay(200);
             setDefenderAnimation('none');
@@ -3913,17 +4368,23 @@ export default function App() {
             setDefenderAnimation(isSpecial ? 'attack_special' : 'attack_physical');
             await battleDelay(80);
             setDefenderAnimation('none');
+            
             setAttackerAnimation('hit');
             await battleDelay(200);
             setAttackerAnimation('none');
           }
+          
           setMoveAnimation('none');
         }
+
+        // Visual feedback for move execution
         if (numHits > 1) {
           setBattleMessage({ text: `${move.name.toUpperCase()} (Hit ${i + 1})`, type: 'move' });
         }
         await battleDelay(250);
         setBattleMessage(null);
+
+        // Detailed Logging
         let damageDetails = `Damage: ${damage}`;
         if (isCrit) {
           damageDetails += " - Critical Hit!";
@@ -3947,10 +4408,12 @@ export default function App() {
         }
         log(damageDetails, isCrit ? 'critical' : 'normal');
       }
+
       if (numHits > 1) {
         log(`Hit ${numHits} times!`, 'normal');
         setBattleMessage(null);
       }
+
       if (effectiveness > 1) {
         log("It's super effective!", 'effective');
         if (isPlayer) {
@@ -3959,8 +4422,11 @@ export default function App() {
       } else if (effectiveness < 1 && effectiveness > 0) {
         log("It's not very effective...", 'not-effective');
       }
+      
+      // Unified aesthetic battle message for hits
       let hitMsg = "";
       let hitType = 'default';
+      
       if (anyCrit && effectiveness > 1) {
           hitMsg = "CRITICAL & EFFECTIVE!";
           hitType = 'critical';
@@ -3977,15 +4443,18 @@ export default function App() {
           hitMsg = "NOT VERY EFFECTIVE...";
           hitType = 'status';
       }
+      
       if (hitMsg) {
         turnOutcomeMessages.push(hitMsg);
         if (hitType === 'critical') highestMsgType = 'critical';
         else if (hitType === 'effective' && highestMsgType !== 'critical') highestMsgType = 'effective';
         else if (hitType === 'status' && highestMsgType === 'move') highestMsgType = 'status';
       }
+
       let hpDamageRemaining = totalDamage;
       const setDefenderSubstitute = isPlayer ? setOpponentSubstitute : setPlayerSubstitute;
       const defenderSubstitute = isPlayer ? opponentSubstitute : playerSubstitute;
+
       if (defenderSubstitute > 0) {
         if (totalDamage >= defenderSubstitute) {
           log(`The substitute broke from the damage!`, 'status-effect');
@@ -3999,6 +4468,7 @@ export default function App() {
           hpDamageRemaining = 0;
         }
       }
+
       if (isPlayer) {
         setOpponentHP(prev => {
           const next = Math.max(0, prev - hpDamageRemaining);
@@ -4029,9 +4499,13 @@ export default function App() {
       await battleDelay(300);
       setBattleMessage(null);
     }
+
+    // Chance to apply status effects (only if not immune)
     const defenderStatus = isPlayer ? opponentStatus : pokemonStatus;
     const setDefenderStatus = isPlayer ? setOpponentStatus : setPokemonStatus;
     let applied = false;
+
+    // Handle Healing Moves
     if (move.meta?.healing && move.meta.healing > 0) {
       const attackerMaxHP = isPlayer ? pokemonMaxHP : opponentMaxHP;
       const healAmount = Math.floor(attackerMaxHP * (move.meta.healing / 100));
@@ -4047,6 +4521,8 @@ export default function App() {
       sounds.statBoost();
       await battleDelay(350);
     }
+
+    // Handle Drain Moves
     if (move.meta?.drain && move.meta.drain !== 0 && totalDamage > 0) {
       const drainAmount = Math.floor(totalDamage * (move.meta.drain / 100));
       if (drainAmount > 0) {
@@ -4055,6 +4531,7 @@ export default function App() {
         log(`${attacker.name.toUpperCase()} drained health!`, 'system');
         addFloatingText(`+${drainAmount}`, 'boost', !isPlayer);
       } else if (drainAmount < 0) {
+        // Recoil
         const recoil = Math.abs(drainAmount);
         if (isPlayer) setPokemonHP(prev => Math.max(0, prev - recoil));
         else setOpponentHP(prev => Math.max(0, prev - recoil));
@@ -4063,16 +4540,22 @@ export default function App() {
       }
       await battleDelay(350);
     }
+    
+    // Apply stat changes (only if not immune when targeting opponent)
     if (move.stat_changes) {
       for (const change of move.stat_changes) {
         const targetsUser = move.target === 'user' || move.target === 'users-field';
         if (!targetsUser && effectiveness === 0) continue; // Immune target cannot have stats lowered
+        
         const targetStages = targetsUser ? (isPlayer ? playerStatStages : opponentStatStages) : (isPlayer ? opponentStatStages : playerStatStages);
         const setTargetStages = targetsUser ? (isPlayer ? setPlayerStatStages : setOpponentStatStages) : (isPlayer ? setOpponentStatStages : setPlayerStatStages);
+        
+        // Prevent lowering stats if opponent has a substitute
         if (!targetsUser && (isPlayer ? opponentSubstitute : playerSubstitute) > 0) {
            log(`But it failed because of the substitute!`, 'not-effective');
            continue; 
         }
+        
         const statName = change.stat.name;
         const currentStage = targetStages[statName] || 0;
         if (currentStage === (change.change > 0 ? 6 : -6)) {
@@ -4089,9 +4572,12 @@ export default function App() {
             setOpponentStatAnimation(change.change > 0 ? 'boost' : 'lower');
             setTimeout(() => setOpponentStatAnimation('none'), 600);
           }
+          
+          // Floating text on the correct target
           const floatingTarget = targetsUser ? !isPlayer : isPlayer;
           turnOutcomeMessages.push(`${statName.toUpperCase()} ${change.change > 0 ? 'ROSE' : 'FELL'}!`);
           addStatEffect(change.change > 0 ? 'boost' : 'lower', floatingTarget);
+          
           if (change.change > 0) sounds.statBoost(); else sounds.statLower();
           await battleDelay(450);
           setStatAnimation('none');
@@ -4100,6 +4586,7 @@ export default function App() {
         }
       }
     }
+
     if (effectiveness > 0 && !defenderStatus && move.meta?.ailment && Math.random() < (move.meta.ailment_chance || 100) / 100) {
       const ailment = move.meta.ailment.name;
       if (ailment === 'paralysis') {
@@ -4138,6 +4625,7 @@ export default function App() {
         turnOutcomeMessages.push("CONFUSED!");
         applied = true;
       }
+      
       if (applied && enableAnimations) {
         if (isPlayer) {
           setDefenderAnimation('hit_status');
@@ -4150,9 +4638,12 @@ export default function App() {
         }
       }
     }
+    
+    // Catch-all for Status Moves that don't fall into the simplified ailments/stat changes
     const hasStatChanges = move.stat_changes && move.stat_changes.length > 0;
     const hasHealing = move.meta?.healing && move.meta.healing > 0;
     const hasDrain = move.meta?.drain && move.meta.drain !== 0 && totalDamage > 0;
+    
     if (effectiveness > 0 && !isDamaging && !hasStatChanges && !hasHealing && !hasDrain && !applied) {
       if (move.description && move.description !== 'No description available.') {
         log(`Effect: ${move.description.replace(/\n|\f|\r/g, ' ')}`, 'system');
@@ -4161,14 +4652,18 @@ export default function App() {
       }
       await battleDelay(450);
     }
+    
     if (turnOutcomeMessages.length > 0) {
       setBattleMessage({ text: turnOutcomeMessages.join(' ‚Ä¢ '), type: highestMsgType });
       await battleDelay(1250);
       setBattleMessage(null);
     }
+
+    // Check for flinch
     const pSpeed = getEffectiveStat(pokemon, 'speed', true);
     const oSpeed = getEffectiveStat(battleOpponent, 'speed', false);
     const goesFirst = isPlayer ? (pSpeed >= oSpeed) : (oSpeed > pSpeed);
+
     if (goesFirst && move.meta?.flinch_chance && Math.random() < move.meta.flinch_chance / 100) {
       if (isPlayer) {
         setOpponentFlinched(true);
@@ -4176,16 +4671,24 @@ export default function App() {
         setPokemonFlinched(true);
       }
     }
+    
     await battleDelay(200);
     return totalDamage;
   }, [pokemonMaxHP, opponentMaxHP, pokemonStatus, opponentStatus, pokemonFlinched, opponentFlinched, pokemon, battleOpponent, selectedMoves, opponentMoves, playerStatStages, opponentStatStages, enableAnimations, battleSpeed, delay, addFloatingText, getEffectiveStat, getTypeEffectiveness, isAnimating, customStats, turnNumber, pokemonHP, opponentHP]);
+
   const getAiBattleSuggestion = async () => {
     if (!pokemon || !battleOpponent || isChatLoading) return;
     sounds.scan(); playHaptic('light');
+    
+    // Switch to tactical chat tab
     setActiveTab('chat');
+    
+    // Construct extremely concise tactical prompt for the unified coach chatbot
     const prompt = `Give me a highly concise tactical tip for my active battle match: my **${pokemon.name}** vs opponent's **${battleOpponent.name}**. My current moves: ${selectedMoves.map(m => m.name).join(', ')}. HP status: Player ${pokemonHP}/${pokemonMaxHP}, Opponent ${opponentHP}/${opponentMaxHP}.`;
+    
     submitChatMessage(prompt);
   };
+
   const handleRun = () => {
     sounds.flee();
     setBattleLog(prev => [{ text: "PLAYER QUIT THE BATTLE!", type: 'system' }, ...prev]);
@@ -4195,40 +4698,57 @@ export default function App() {
       setBattleLog([]);
     }, 1000);
   };
+
   const runBattle = async () => {
     if (!pokemon || !battleOpponent || selectedMoves.length === 0) {
       setBattleLog([{ text: "SELECT 4 MOVES BEFORE STARTING!", type: 'system' }]);
       return;
     }
+    
+    // 1. Instantly display matchup VS screen & play high quality matchup buzzer
     setActiveTab('battle');
     setShowVSScreen(true);
     sounds.battleStart(); playHaptic('heavy');
     playHaptic('heavy');
+
+    // 2. Clear previous active animations & timeouts
     if (vsTimeoutRef.current) clearTimeout(vsTimeoutRef.current);
     if (vsPlayerCryTimeoutRef.current) clearTimeout(vsPlayerCryTimeoutRef.current);
     if (vsOpponentCryTimeoutRef.current) clearTimeout(vsOpponentCryTimeoutRef.current);
+
     setAttackerAnimation('none');
     setDefenderAnimation('none');
     setMoveAnimation('none');
+
+    // 3. Play both Pokemon cries completely in sequence before transition auto-completes
     (async () => {
+      // 300ms initial enter delay
       await new Promise(r => setTimeout(r, 300));
+
       if (pokemon?.cries?.latest) {
         playHaptic('cry');
         await sounds.playCry(pokemon?.name ?? '', pokemon.cries.latest, pokemon?.name?.includes('-gmax') ?? false, false);
       } else {
         await new Promise(r => setTimeout(r, 900));
       }
+
+      // 350ms buffer between cries
       await new Promise(r => setTimeout(r, 350));
+
       if (battleOpponent?.cries?.latest) {
         playHaptic('cry');
         await sounds.playCry(battleOpponent?.name ?? '', battleOpponent.cries.latest, battleOpponent?.name?.includes('-gmax') ?? false, false);
       } else {
         await new Promise(r => setTimeout(r, 900));
       }
+
+      // Buffer to allow echo to conclude smoothly
       await new Promise(r => setTimeout(r, 550));
+
       skipVSScreen();
     })();
   };
+
   const applyEndOfTurnEffects = async (isPlayer: boolean) => {
     const status = isPlayer ? pokemonStatus : opponentStatus;
     const startTurn = isPlayer ? statusStartTurnRef.current.player : statusStartTurnRef.current.opponent;
@@ -4236,6 +4756,7 @@ export default function App() {
     if (!p) return 0;
     const maxHP = isPlayer ? pokemonMaxHP : opponentMaxHP;
     const log = (msg: string, type: LogEntry['type'] = 'status-effect') => setBattleLog(prev => [...prev, { text: msg, type, turn: turnNumber }].slice(-50));
+    
     if (status && startTurn !== null && turnNumber - startTurn >= 3) {
       if (isPlayer) setPokemonStatus(null);
       else setOpponentStatus(null);
@@ -4244,6 +4765,7 @@ export default function App() {
       await new Promise(r => setTimeout(r, 200));
       return 0;
     }
+    
     let damage = 0;
     if (status === 'BRN') {
       damage = Math.max(1, Math.floor(maxHP / 16));
@@ -4258,8 +4780,10 @@ export default function App() {
       else setOpponentHP(prev => Math.max(0, prev - damage));
       await new Promise(r => setTimeout(r, 200));
     }
+    
     return damage;
   };
+
   useEffect(() => {
     if (battleState === 'battling') {
       if (pokemonHP <= 0) {
@@ -4280,6 +4804,10 @@ export default function App() {
           setAttackerAnimation('none');
           setDefenderAnimation('none');
         }, 2000);
+
+        // Simulate learning a new move after defeat too
+
+
       } else if (opponentHP <= 0) {
         setBattleLog(prev => [...prev, { text: `${pokemon?.name?.toUpperCase()} IS THE VICTOR!`, type: 'system' }]);
         setBattleMessage({ text: "VICTORY!", type: 'effective' });
@@ -4292,8 +4820,11 @@ export default function App() {
           return next;
         });
         sounds.victory();
+
+        // Check and update Daily Combat Mission & Daily Hub Combat Challenges on victory
         if (battleOpponent) {
           try {
+            // Robust extractor for opponent types
             const oppAny = battleOpponent as any;
             const opponentTypes: string[] = [];
             if (Array.isArray(oppAny.types)) {
@@ -4306,6 +4837,8 @@ export default function App() {
             if (oppAny.type && typeof oppAny.type === 'string') {
               opponentTypes.push(oppAny.type.toLowerCase());
             }
+
+            // Robust extractor for opponent stats
             let opponentDefense = 0;
             let opponentSpeed = 0;
             let opponentAttack = 0;
@@ -4315,14 +4848,19 @@ export default function App() {
             if (Array.isArray(oppAny.stats)) {
               const defStat = oppAny.stats.find((s: any) => s?.stat?.name === 'defense' || s?.name === 'defense');
               if (defStat) opponentDefense = defStat.base_stat ?? defStat.value ?? 0;
+              
               const spdStat = oppAny.stats.find((s: any) => s?.stat?.name === 'speed' || s?.name === 'speed');
               if (spdStat) opponentSpeed = spdStat.base_stat ?? spdStat.value ?? 0;
+
               const atkStat = oppAny.stats.find((s: any) => s?.stat?.name === 'attack' || s?.name === 'attack');
               if (atkStat) opponentAttack = atkStat.base_stat ?? atkStat.value ?? 0;
+              
               const hpStat = oppAny.stats.find((s: any) => s?.stat?.name === 'hp' || s?.name === 'hp');
               if (hpStat) opponentHp = hpStat.base_stat ?? hpStat.value ?? 0;
+
               const spAtkStat = oppAny.stats.find((s: any) => s?.stat?.name === 'special-attack' || s?.name === 'special-attack' || s?.stat?.name === 'sp_attack');
               if (spAtkStat) opponentSpAtk = spAtkStat.base_stat ?? spAtkStat.value ?? 0;
+
               const spDefStat = oppAny.stats.find((s: any) => s?.stat?.name === 'special-defense' || s?.name === 'special-defense' || s?.stat?.name === 'sp_defense');
               if (spDefStat) opponentSpDef = spDefStat.base_stat ?? spDefStat.value ?? 0;
             } else if (oppAny.defense !== undefined) {
@@ -4333,19 +4871,27 @@ export default function App() {
               opponentSpAtk = Number(oppAny.specialAttack || oppAny.sp_attack || 0);
               opponentSpDef = Number(oppAny.specialDefense || oppAny.sp_defense || 0);
             }
+
             const opponentWeight = Number(oppAny.weight || 0) / 10; // kg
             const bst = opponentHp + opponentAttack + opponentDefense + opponentSpAtk + opponentSpDef + opponentSpeed;
+
             const opponentName = (oppAny.name || '').toLowerCase();
             const isMega = opponentName.includes('-mega') || opponentName.includes('mega-') || opponentName.includes('primal');
             const isGmax = opponentName.includes('-gmax') || opponentName.includes('gmax') || opponentName.includes('gigantamax');
+            
             const paradoxNames = ['great tusk', 'scream tail', 'brute bonnet', 'flutter mane', 'slither wing', 'sandy shocks', 'iron treads', 'iron bundle', 'iron hands', 'iron jugulis', 'iron moth', 'iron thorns', 'roaring moon', 'iron valiant', 'walking wake', 'iron leaves', 'gouging fire', 'raging bolt', 'iron boulder', 'iron crown'];
             const ultraBeastNames = ['nihilego', 'buzzwole', 'pheromosa', 'xurkitree', 'celesteela', 'kartana', 'guzzlord', 'poipole', 'naganadel', 'stakataka', 'blacephalon'];
+
             const legendaries = ['articuno', 'zapdos', 'moltres', 'mewtwo', 'mew', 'raikou', 'entei', 'suicune', 'lugia', 'ho-oh', 'celebi', 'regirock', 'regice', 'registeel', 'latias', 'latios', 'kyogre', 'groudon', 'rayquaza', 'jirachi', 'deoxys', 'uxie', 'mesprit', 'azelf', 'dialga', 'palkia', 'heatran', 'regigigas', 'giratina', 'cresselia', 'phione', 'manaphy', 'darkrai', 'shaymin', 'arceus', 'victini', 'cobalion', 'terrakion', 'virizion', 'tornadus', 'thundurus', 'reshiram', 'zekrom', 'landorus', 'kyurem', 'keldeo', 'meloetta', 'genesect', 'xerneas', 'yveltal', 'zygarde', 'diancie', 'hoopa', 'volcanion', 'tapu koko', 'tapu lele', 'tapu bulu', 'tapu fini', 'cosmog', 'cosmoem', 'solgaleo', 'lunala', 'necrozma', 'magearna', 'marshadow', 'zeraora', 'meltan', 'melmetal', 'zacian', 'zamazenta', 'eternatus', 'kubfu', 'urshifu', 'zarude', 'regieleki', 'regidrago', 'glastrier', 'spectrier', 'calyrex', 'enamorus', 'wo-chien', 'chien-pao', 'ting-lu', 'chi-yu', 'koraidon', 'miraidon', 'terapagos', 'pecharunt', ...paradoxNames, ...ultraBeastNames];
             const isLegendary = legendaries.some(leg => opponentName.includes(leg));
+
             let latestMissionNotice: { title: string; description: string; isComplete: boolean } | null = null;
+
+            // 1. Evaluate Main Daily Combat Mission
             const isHardMode = (localStorage.getItem(`pokethology_mission_hard_${today}`) || localStorage.getItem(`poketheology_mission_hard_${today}`)) === 'true';
             const currentMission = getDailyCombatMission(today, isHardMode);
             let matched = false;
+
             if (currentMission.target === 'legendary') {
               if (isLegendary) matched = true;
             } else if (currentMission.target === 'mega') {
@@ -4368,23 +4914,30 @@ export default function App() {
               if (currentMission.target === 'special-defense' && opponentSpDef >= 130) matched = true;
               if (currentMission.target === 'hp' && opponentHp >= 130) matched = true;
             }
+
             if (matched) {
               const countKey = `pokethology_mission_progress_count_${today}`;
               const required = getRequiredCount(currentMission, isHardMode);
+              
               const savedCountStr = localStorage.getItem(countKey);
               let prevCount = savedCountStr ? parseInt(savedCountStr, 10) : 0;
               let nextCount = Math.min(required, prevCount + 1);
+              
               localStorage.setItem(countKey, String(nextCount));
               setMissionProgressCount(nextCount);
+              
               if (nextCount >= required) {
                 const completedKey = `pokethology_mission_completed_${today}`;
                 localStorage.setItem(completedKey, 'true');
                 setIsMissionCompleted(true);
+                
                 latestMissionNotice = {
                   title: "Daily Combat Protocol",
                   description: `Protocol Fully Cleared (${nextCount}/${required})!`,
                   isComplete: true
                 };
+
+                // Trigger celebratory animation, award sound and success toast
                 if (prevCount < required) {
                   setCelebratedMission(currentMission);
                   setShowMissionCelebration(true);
@@ -4403,8 +4956,11 @@ export default function App() {
                   description: `Progress Updated: ${nextCount}/${required} Defeats Recorded.`,
                   isComplete: false
                 };
+
+                // Show floating animated HUD element for status update
                 setShowMissionUpdateHUD(true);
                 setTimeout(() => setShowMissionUpdateHUD(false), 4500);
+                
                 if (nextCount === required - 1) {
                   addToast(
                     "üéØ DAILY MISSION FOCUS", 
@@ -4420,11 +4976,15 @@ export default function App() {
                 }
               }
             }
+
+            // 2. ALWAYS Evaluate All Daily Hub Combat Challenges (Bronze, Silver, Gold activities)
             const hubChallenges = getDailyHubCombatChallenges(today);
             let hubMessageToDisplay: string | null = null;
+
             for (const challenge of hubChallenges) {
               const stateKey = `pokethology_hub_combat_${today}_${challenge.id}`;
               const currentProgress = parseInt(localStorage.getItem(stateKey) || '0', 10);
+              
               if (currentProgress < challenge.required) {
                 let isMatch = false;
                 if (challenge.type === 'type') {
@@ -4473,11 +5033,13 @@ export default function App() {
                   if (challenge.target === 'mega' && isMega) isMatch = true;
                   if (challenge.target === 'gmax' && isGmax) isMatch = true;
                 }
+                
                 if (isMatch) {
                   const newProgress = Math.min(challenge.required, currentProgress + 1);
                   localStorage.setItem(stateKey, String(newProgress));
                   const isFinished = newProgress >= challenge.required;
                   const wasFinished = currentProgress >= challenge.required;
+                  
                   if (isFinished) {
                     if (!wasFinished) {
                       try {
@@ -4525,6 +5087,7 @@ export default function App() {
                 }
               }
             }
+
             if (hubMessageToDisplay) {
               setHubChallengeProgressMessage(hubMessageToDisplay);
               if (hubProgressTimeoutRef.current) clearTimeout(hubProgressTimeoutRef.current);
@@ -4532,9 +5095,12 @@ export default function App() {
                 setHubChallengeProgressMessage(null);
               }, 8000);
             }
+
             if (latestMissionNotice) {
               setLastBattleMissionNotice(latestMissionNotice);
             }
+
+            // Sync state with open widgets immediately
             try {
               window.dispatchEvent(new Event('pokethology_hub_update'));
               window.dispatchEvent(new Event('storage'));
@@ -4547,23 +5113,35 @@ export default function App() {
           setAttackerAnimation('none');
           setDefenderAnimation('none');
         }, 2000);
+        
+
       }
     }
   }, [pokemonHP, opponentHP, battleState, pokemon, battleOpponent]);
+
   const handleFlee = () => {
     sounds.flee();
     resetSimulation();
   };
+
   const handlePlayerMove = async (move: Move) => {
     playHaptic(30);
     if (turn !== 'player' || !isBattling || isAnimating || !pokemon || !battleOpponent || isProcessingMoveRef.current) return;
     isProcessingMoveRef.current = true;
+    
+    // Smoothly scroll the arena into view and keep it centered
     arenaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+    // Clear old AI battle suggestions as the turn state advances
     setBattleSuggestion(null);
+    
     try {
+      // Deduct PP
       setSelectedMoves(prev => prev.map(m => m.name === move.name ? { ...m, currentPP: Math.max(0, (m.currentPP ?? m.pp) - 1) } : m));
+      
       await executeMove(pokemon, battleOpponent, move, true);
       await applyEndOfTurnEffects(true);
+      
       setTurn('opponent');
     } catch (err) {
       console.error("Error during player move:", err);
@@ -4572,19 +5150,26 @@ export default function App() {
       isProcessingMoveRef.current = false;
     }
   };
+
   const opponentTurnStartedRef = useRef(false);
+
   useEffect(() => {
     if (battleState === 'battling' && turn === 'opponent' && opponentHP > 0 && pokemonHP > 0) {
       if (opponentTurnStartedRef.current) return;
       opponentTurnStartedRef.current = true;
+      
       const timer = setTimeout(async () => {
         if (!pokemon || !battleOpponent) {
           opponentTurnStartedRef.current = false;
           return;
         }
+
+        // Check speeds: if opponent is faster than the player, do not permit attack until completely scrolled up on the arena
         const playerSpe = getEffectiveStat(pokemon, 'speed', true);
         const oppSpe = getEffectiveStat(battleOpponent, 'speed', false);
+
         if (oppSpe > playerSpe) {
+          // Smoothly scroll completely up to the top of the battle arena
           const arenaContainer = document.getElementById('battle-arena-container');
           if (arenaContainer) {
             arenaContainer.scrollTo({ top: 0, behavior: 'smooth' });
@@ -4594,33 +5179,49 @@ export default function App() {
             detailsContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
           }
           window.scrollTo({ top: 0, behavior: 'smooth' });
+
+          // Block execution until scrolling animation is 100% complete
           await new Promise(resolve => setTimeout(resolve, 650));
         }
+
+        // Master Competitive Opponent AI Move Selection
         const chooseOptimalMove = () => {
           if (!opponentMoves || opponentMoves.length === 0) return battleOpponent.moves[0];
+
+          // Filter moves with available PP
           const availableMoves = opponentMoves.filter(m => (m.currentPP ?? m.pp) > 0);
           if (availableMoves.length === 0) return opponentMoves[0];
+
           let bestMove = availableMoves[0];
           let highestScore = -1000000;
+
           const playerTypes = pokemon.types.map(t => t.type.name.toLowerCase());
           const oppTypes = battleOpponent.types.map(t => t.type.name.toLowerCase());
+
           const opponentHealthPercent = (opponentHP / opponentMaxHP) * 100;
           const playerHealthPercent = (pokemonHP / pokemonMaxHP) * 100;
+
+          // Effective stats incorporating stat stage multipliers
           const oppAtk = getEffectiveStat(battleOpponent, 'attack', false);
           const oppSpA = getEffectiveStat(battleOpponent, 'special-attack', false);
           const oppSpe = getEffectiveStat(battleOpponent, 'speed', false);
+
           const playerDef = getEffectiveStat(pokemon, 'defense', true);
           const playerSpD = getEffectiveStat(pokemon, 'special-defense', true);
           const playerSpe = getEffectiveStat(pokemon, 'speed', true);
           const playerAtk = getEffectiveStat(pokemon, 'attack', true);
           const playerSpA = getEffectiveStat(pokemon, 'special-attack', true);
+
           const opponentIsFaster = oppSpe >= playerSpe;
           const isFaintingSoon = opponentHealthPercent < 22;
+
           for (const move of availableMoves) {
             let score = 0;
             const moveNameLower = move.name.toLowerCase();
             const moveType = (move.type || 'normal').toLowerCase();
             const effectiveness = getTypeEffectiveness(moveType, playerTypes);
+
+            // 0. Hard Immunity Check: NEVER pick an immune move (0x multiplier)
             if (effectiveness === 0) {
               score = -500000;
               if (score > highestScore) {
@@ -4629,56 +5230,85 @@ export default function App() {
               }
               continue;
             }
+
             if (move.power && move.power > 0) {
+              // Level 50 Competitive Damage Estimation
               const atkVal = move.damage_class === 'special' ? oppSpA : oppAtk;
               const defVal = move.damage_class === 'special' ? playerSpD : playerDef;
+              
               let baseDamage = Math.floor(((22 * move.power * (atkVal / defVal)) / 50) + 2);
+
+              // STAB (Same Type Attack Bonus)
               if (oppTypes.includes(moveType)) {
                 baseDamage = Math.floor(baseDamage * 1.5);
               }
+
+              // Multi-hit moves adjustment (e.g. Icicle Spear, Bullet Seed)
               const isMultiHit = moveNameLower.includes('bullet seed') || moveNameLower.includes('icicle spear') || moveNameLower.includes('rock blast') || moveNameLower.includes('pin missile');
               if (isMultiHit) {
                 baseDamage = Math.floor(baseDamage * 3.1);
               }
+
               const accuracy = move.accuracy || 100;
               const expectedDamage = Math.floor(baseDamage * effectiveness * (accuracy / 100));
+
               score += expectedDamage * 15;
+
+              // 1. GUARANTEED KO FINISHER (Prefer 100% accuracy move if multiple moves KO)
               if (expectedDamage >= pokemonHP) {
                 let koBonus = opponentIsFaster || (move.priority || 0) > 0 ? 600000 : 350000;
+                // Prefer reliable 100% accuracy over risky move for KO
                 if (accuracy >= 95) koBonus += 50000;
                 score += koBonus;
               }
+
+              // Multi-hit bonus if player has Substitute active
               if (playerSubstitute > 0 && isMultiHit) {
                 score += 45000; // Multi-hit breaks Substitute!
               }
+
+              // 2. PRIORITY STRIKE TACTICS
               const movePriority = move.priority || 0;
               if (movePriority > 0) {
+                // If player is faster and can finish off AI, or player HP is low, use priority!
                 if (!opponentIsFaster && (playerHealthPercent < 35 || isFaintingSoon)) {
                   score += expectedDamage >= pokemonHP ? 500000 : 55000;
                 } else {
                   score += 12000;
                 }
               }
+
+              // 3. TYPE MATCHUP & DEFENSIVE WEAKNESS EXPLOITATION
               if (effectiveness >= 2) {
                 score += 8000 * effectiveness;
               } else if (effectiveness < 1) {
                 score -= 4000; // Avoid resisted attacks
               }
+
+              // Target physical/special defense weakness
               if (move.damage_class === 'physical' && playerDef < playerSpD * 0.8) {
                 score += 4500; // Exploit weak Physical Defense
               } else if (move.damage_class === 'special' && playerSpD < playerDef * 0.8) {
                 score += 4500; // Exploit weak Special Defense
               }
+
+              // 4. DRAIN / RECOIL SYNERGY
               if (move.meta?.drain && move.meta.drain > 0 && opponentHealthPercent < 75) {
                 score += 18000; // Great sustain
               }
               if (move.meta?.drain && move.meta.drain < 0 && opponentHealthPercent < 30) {
                 score -= 12000; // Avoid suicidal recoil when low
               }
+
+              // 5. ABOUT TO FAINT: ATTACK HARD WITH FASTEST/HIGHEST POWER MOVE
               if (isFaintingSoon) {
                 score += 35000;
               }
+
             } else {
+              // STATUS, SETUP, RECOVERY & UTILITY AI
+
+              // If player has a Substitute active, status & stat-lowering moves WILL FAIL!
               if (playerSubstitute > 0) {
                 if (move.meta?.ailment || (move.stat_changes && move.stat_changes.some(c => c.change < 0))) {
                   score = -300000;
@@ -4689,6 +5319,8 @@ export default function App() {
                   continue;
                 }
               }
+
+              // If AI is low on HP, penalize non-damaging utility moves heavily (except healing)
               if (isFaintingSoon && !(move.meta?.healing && move.meta.healing > 0) && !moveNameLower.includes('recover') && !moveNameLower.includes('roost')) {
                 score = -100000;
                 if (score > highestScore) {
@@ -4697,16 +5329,22 @@ export default function App() {
                 }
                 continue;
               }
+
+              // A. Strategic Status Ailment Application
               if (move.meta?.ailment && move.meta.ailment.name !== 'none') {
                 const ailment = move.meta.ailment.name.toLowerCase();
+
+                // Do not re-inflict status if target already afflicted
                 if (pokemonStatus) {
                   score = -300000;
                 } else {
+                  // Immunity checks
                   const isImmuneParalysis = (ailment === 'paralysis' && playerTypes.includes('electric')) ||
                     (ailment === 'paralysis' && moveType === 'electric' && playerTypes.includes('ground'));
                   const isImmuneBurn = ailment === 'burn' && playerTypes.includes('fire');
                   const isImmunePoison = (ailment === 'poison' || ailment === 'toxic') && (playerTypes.includes('poison') || playerTypes.includes('steel'));
                   const isImmuneSleep = (ailment === 'sleep' && playerTypes.includes('grass') && moveNameLower.includes('powder'));
+
                   if (isImmuneParalysis || isImmuneBurn || isImmunePoison || isImmuneSleep) {
                     score = -300000;
                   } else if (opponentHealthPercent > 30) {
@@ -4726,6 +5364,8 @@ export default function App() {
                   }
                 }
               }
+
+              // B. Competitive Stat Buffing (Stat Buffer)
               if (move.stat_changes && move.stat_changes.length > 0) {
                 if (opponentHealthPercent > 45 && turnNumber < 8) {
                   let setupBonus = 0;
@@ -4752,6 +5392,8 @@ export default function App() {
                   score -= 12000;
                 }
               }
+
+              // C. Critical Recovery & Healing Logic
               if (move.meta?.healing && move.meta.healing > 0 || moveNameLower.includes('recover') || moveNameLower.includes('roost') || moveNameLower.includes('soft-boiled') || moveNameLower.includes('synthesis')) {
                 if (opponentHealthPercent < 55 && opponentHealthPercent > 18) {
                   score += 45000; // Vital recovery priority
@@ -4759,6 +5401,8 @@ export default function App() {
                   score = -100000; // Don't waste heal when healthy
                 }
               }
+
+              // D. Substitute Tactical Usage
               if (moveNameLower === 'substitute') {
                 if (opponentSubstitute === 0 && opponentHealthPercent > 35) {
                   score += 38000; // Create protective puppet!
@@ -4766,6 +5410,8 @@ export default function App() {
                   score = -200000;
                 }
               }
+
+              // E. Protect / Stall Logic
               if (moveNameLower === 'protect' || moveNameLower === 'detect') {
                 if (!opponentProtected) {
                   if (pokemonStatus === 'PSN' || pokemonStatus === 'BRN') {
@@ -4779,24 +5425,41 @@ export default function App() {
                   score = -300000; // Consecutive Protect usually fails
                 }
               }
+
               if (moveNameLower === 'transform') {
                 score += 20000;
               }
             }
+
             score += Math.random() * 5; // Slight tie-breaking variance
+
             if (score > highestScore) {
               highestScore = score;
               bestMove = move;
             }
           }
+
           return bestMove;
         };
+
         const move = chooseOptimalMove();
+        
         if (move) {
           try {
             setOpponentMoves(prev => prev.map(m => m.name === move.name ? { ...m, currentPP: Math.max(0, (m.currentPP ?? m.pp) - 1) } : m));
+            
             const damage = await executeMove(battleOpponent, pokemon, move, false);
+            
+            // We must use the latest state values here, or just let the state updates happen
+            // The issue is `pokemonHP` and `opponentHP` in this closure are stale.
+            // We can just rely on the state updates in `executeMove` and `applyEndOfTurnEffects`.
+            // Wait, `executeMove` updates the state, but `damage` is returned.
+            // We don't need to manually calculate `newPokemonHP` because `executeMove` already called `setPokemonHP`.
+            // We just need to check if the battle is over.
+            // Let's just set turn to player and let the battle over effect handle it.
+            
             await applyEndOfTurnEffects(false);
+            
             setTurnNumber(prev => prev + 1);
             setTurn('player');
           } catch (err) {
@@ -4811,11 +5474,14 @@ export default function App() {
       }, 500);
       return () => {
         clearTimeout(timer);
+        // We don't reset opponentTurnStartedRef here because the timer might have already fired,
+        // and we want to prevent concurrent executions.
       };
     } else {
       opponentTurnStartedRef.current = false;
     }
   }, [turn, battleState]);
+
   useEffect(() => {
     setSelectedMoves([]);
     setBattleLog([]);
@@ -4825,14 +5491,19 @@ export default function App() {
     setAttackerAnimation('none');
     setDefenderAnimation('none');
   }, [pokemon?.id]);
+
   useEffect(() => {
+    // Play boot sound when app loads
     sounds.boot(); playHaptic('medium');
+    
+    // Check if it's the first time opening the app
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcomeMessage');
     if (!hasSeenWelcome) {
       setIsWelcomeOpen(true);
       localStorage.setItem('hasSeenWelcomeMessage', 'true');
     }
   }, []);
+
   useEffect(() => {
     const handleGlobalScroll = (e: Event) => {
       const target = e.target as HTMLElement;
@@ -4851,27 +5522,33 @@ export default function App() {
       window.removeEventListener('scroll', handleGlobalScroll, true);
     };
   }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(query);
     }, 300);
     return () => clearTimeout(timer);
   }, [query]);
+
   useEffect(() => {
     if (detailsContainerRef.current) {
       detailsContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [activeTab]);
+
+  // Stop any active voices/speech synthesis when changing sections, tabs, or Pokemon
   useEffect(() => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
     setChatSpeakingIndex(null);
   }, [activeTab, pokemon?.id, pokemon?.name, currentVariety]);
+
   useEffect(() => {
     if (listMode === 'home') return;
     loadAllPokemon();
   }, [currentGenId, viewAllGenerations, listMode]);
+
   useEffect(() => {
     if (chatScrollRef.current) {
       chatScrollRef.current.scrollTo({
@@ -4881,6 +5558,8 @@ export default function App() {
       savedChatScrollTopRef.current = chatScrollRef.current.scrollHeight;
     }
   }, [chatMessages, isChatLoading]);
+
+  // Instantly show the last message when opening or switching to the Pok√©thology chat tab
   useEffect(() => {
     if (activeTab === 'chat' && chatScrollRef.current) {
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
@@ -4892,12 +5571,15 @@ export default function App() {
       return () => clearTimeout(timer);
     }
   }, [activeTab]);
+
   const handleBattleAnalysis = async () => {
     if (isChatLoading || isAiAnalyzing) return;
     setIsAiAnalyzing(true);
     setIsChatLoading(true);
     sounds.scan(); playHaptic('light');
+    
     setChatMessages(prev => [...prev, { role: 'user', text: "Requesting tactical analysis..." }]);
+
     try {
       const battleData = {
         player: {
@@ -4916,6 +5598,8 @@ export default function App() {
         },
         turn: turnNumber
       };
+
+      
       const { allowed: analyzeAllowed } = checkQuotaAllowed("gemini_ai");
       if (!analyzeAllowed) {
         throw new Error("Local AI Quota Exceeded! Please reset quota or wait until tomorrow.");
@@ -4932,6 +5616,7 @@ export default function App() {
           lang: 'en'
         }),
       });
+
       const responseText = await response.text();
       let data: any = {};
       try { data = JSON.parse(responseText); } catch (_) { data = { error: responseText || "Rate limit or server error", isQuotaExhausted: true }; }
@@ -4954,15 +5639,19 @@ export default function App() {
         }
       }
       if (!response.ok) throw new Error(data.error || "Connection lost to battle server.");
+
       setIsAiTyping(true);
       setChatMessages(prev => [...prev, { role: 'model', text: data.analysis }]);
+      
       const typingInterval = setInterval(() => {
         if (Math.random() > 0.3) sounds.typing();
       }, 150);
+      
       setTimeout(() => {
         clearInterval(typingInterval);
         setIsAiTyping(false);
       }, Math.min(data.analysis.length * 15, 3000));
+
     } catch (err: any) {
       if (err.message !== "QUOTA_LIMIT" && !err.message?.includes("Quota")) {
         console.error(err);
@@ -4973,9 +5662,13 @@ export default function App() {
       setIsChatLoading(false);
     }
   };
+
   const submitChatMessage = async (msg: string) => {
     if (!msg.trim() || isChatLoading) return;
+
     const userMessage = msg.trim();
+
+    // Check if device is offline
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
       setChatMessages(prev => [...prev, 
         { role: 'user' as const, text: userMessage },
@@ -4987,9 +5680,11 @@ export default function App() {
       sounds.error();
       return;
     }
+
     setChatMessages(prev => [...prev, { role: 'user' as const, text: userMessage }]);
     setIsChatLoading(true);
     sounds.scan(); playHaptic('light');
+
     const context = {
       selectedPokemon: pokemon ? {
         name: pokemon?.name,
@@ -5004,6 +5699,8 @@ export default function App() {
         opponentHP: opponentHP
       } : null
     };
+
+    // If WebSocket is active, route all chat communications through WS
     if (wsRef.current && wsStatus === 'connected') {
       wsRef.current.send(JSON.stringify({
         type: "chat:message",
@@ -5015,7 +5712,10 @@ export default function App() {
       }));
       return;
     }
+
+    // Fallback REST endpoint execution
     try {
+      
       const { allowed: chatAllowed } = checkQuotaAllowed("gemini_ai");
       if (!chatAllowed) {
         throw new Error("Local AI Quota Exceeded! Please reset quota or wait until tomorrow.");
@@ -5033,6 +5733,7 @@ export default function App() {
           lang: 'en'
         }),
       });
+
       const responseText = await response.text();
       let data: any = {};
       try { data = JSON.parse(responseText); } catch (_) { data = { error: responseText || "Rate limit or server error", isQuotaExhausted: true }; }
@@ -5062,6 +5763,7 @@ export default function App() {
         }
       }
       if (!response.ok) throw new Error(data.error || "Offline");
+
       setIsAiTyping(true);
       const finalMsg = { role: 'model' as const, text: data.text, groundingChunks: data.groundingChunks, groundingMetadata: data.groundingMetadata };
       if (data.navigatePokemon) {
@@ -5070,13 +5772,16 @@ export default function App() {
       } else {
         setChatMessages(prev => [...prev, finalMsg]);
       }
+      
       const typingInterval = setInterval(() => {
         if (Math.random() > 0.3) sounds.typing();
       }, 150);
+      
       setTimeout(() => {
         clearInterval(typingInterval);
         setIsAiTyping(false);
       }, Math.min(data.text.length * 15, 3000));
+
       sounds.success();
     } catch (err: any) {
       if (!err.message?.includes("OVERLOAD")) {
@@ -5091,6 +5796,7 @@ export default function App() {
       setIsChatLoading(false);
     }
   };
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatInput.trim() || isChatLoading) return;
@@ -5098,13 +5804,16 @@ export default function App() {
     setChatInput('');
     await submitChatMessage(msg);
   };
+
   const loadAllPokemon = useCallback(async (overrideGenId?: number, overrideViewAll?: boolean) => {
     sounds.scan(); playHaptic('light');
     setListMode('pokemon');
+    
     setLoadingList(true);
     try {
       const isAll = overrideViewAll !== undefined ? overrideViewAll : viewAllGenerations;
       const genId = overrideGenId !== undefined ? overrideGenId : currentGenId;
+      
       const gen = isAll 
         ? { start: 1, end: 1025 } 
         : (GENERATIONS.find(g => g.id === genId) || GENERATIONS[0]);
@@ -5116,13 +5825,16 @@ export default function App() {
       setLoadingList(false);
     }
   }, [viewAllGenerations, currentGenId]);
+
   const loadTypePokemon = useCallback(async (type: string, overrideGenId?: number, overrideViewAll?: boolean) => {
     sounds.scan(); playHaptic('light');
     setListMode('pokemon');
+    
     setLoadingList(true);
     try {
       const isAll = overrideViewAll !== undefined ? overrideViewAll : viewAllGenerations;
       const genId = overrideGenId !== undefined ? overrideGenId : currentGenId;
+
       const gen = isAll 
         ? { start: 1, end: 1025 } 
         : (GENERATIONS.find(g => g.id === genId) || GENERATIONS[0]);
@@ -5134,17 +5846,22 @@ export default function App() {
       setLoadingList(false);
     }
   }, [viewAllGenerations, currentGenId]);
+
   const performSearch = useCallback(async (searchQuery: string, fromChat: boolean = false, targetTab?: 'data' | 'chat' | 'battle') => {
     const formatted = searchQuery.trim().toLowerCase();
     if (!formatted) return;
+
     setLastSearched(formatted);
     sounds.scan(); playHaptic('light');
     setLoadingPokemon(true);
     setError(null);
+    // REMOVED: setPokemon(null); to prevent jarring layout teardown
     setCurrentVariety(null);
     setQuery(searchQuery);
     setInputValue(searchQuery);
+
     try {
+      // Fetch PokeAPI data
       const pokeData = await searchPokemon(searchQuery);
       setPokemon(pokeData);
       basePlayerPokemonRef.current = pokeData;
@@ -5158,30 +5875,40 @@ export default function App() {
       });
       setAttackerAnimation('none');
       setLoadingPokemon(false);
+      
+      // Scroll to top of details container and browser
       if (detailsContainerRef.current) {
         detailsContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
       if (!fromChat) {
+        // Reset chat messages to remove precedent messages and show directly the typical chatbot welcome message
         setChatMessages([{ 
           role: 'model' as const, 
           text: getChatWelcomeMessage(pokeData.name)
         }]);
       }
       setActiveTab(targetTab || 'data');
+      
       setBattleOpponent(null);
       setIsBattling(false);
       setBattleLog([]);
       setBattleState('setup');
       setTurnNumber(1);
+      
       setIsShiny(false);
       setIsFemale(false);
       sounds.success();
       setAiSuggestion(null);
+      
+      // Auto-generate AI suggestion with cache and quota check
       if (suggestTimeoutRef.current) clearTimeout(suggestTimeoutRef.current);
+
       if (aiCache.current[pokeData.name]) {
         setAiSuggestion(aiCache.current[pokeData.name]);
       } else if (!quotaLimitReached && autoAiEnabled) {
+        // Use a small delay before fetching auto-suggestion to avoid spam during rapid browsing
         suggestTimeoutRef.current = setTimeout(() => {
           fetch("/api/suggest", {
             method: "POST",
@@ -5224,9 +5951,12 @@ export default function App() {
           });
         }, 1200);
       }
+
       if (pokeData.cries?.latest && !fromChat) {
         setTimeout(() => sounds.playCry(pokeData.name, pokeData.cries?.latest, pokeData.name.includes('-gmax')), 400);
       }
+      
+      // If we are on home, switch to pokemon list mode to show the context
       setListMode(prev => prev === 'home' ? 'pokemon' : prev);
     } catch (err: any) {
       sounds.error();
@@ -5237,8 +5967,11 @@ export default function App() {
       setLoadingPokemon(false);
     }
   }, []);
+
   const sortedAndFilteredList = useMemo(() => {
     let list = listMode === 'favorites' ? [...favorites] : [...filteredList];
+    
+    // Search filtering
     if (debouncedQuery.trim()) {
       const search = debouncedQuery.toLowerCase().trim();
       list = list.filter(p => 
@@ -5246,11 +5979,14 @@ export default function App() {
         p.url.split('/').filter(Boolean).pop()?.includes(search)
       );
     }
+
+    // Sorting
     list.sort((a, b) => {
       if (sortBy === 'id') {
         const idA = a.displayId || parseInt(a.url.split('/').filter(Boolean).pop() || '0', 10);
         const idB = b.displayId || parseInt(b.url.split('/').filter(Boolean).pop() || '0', 10);
         if (idA === idB) {
+          // If they share the same base ID, base form comes first
           if (!a.isForm && b.isForm) return -1;
           if (a.isForm && !b.isForm) return 1;
           return a.name.localeCompare(b.name);
@@ -5260,12 +5996,15 @@ export default function App() {
         return sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
       }
     });
+
     return list;
   }, [filteredList, sortBy, sortOrder, debouncedQuery, listMode, favorites]);
+
   const isSelectingOpponentRef = useRef(isSelectingOpponent);
   useEffect(() => {
     isSelectingOpponentRef.current = isSelectingOpponent;
   }, [isSelectingOpponent]);
+
   const handlePokemonClick = useCallback(async (name: string) => {
     if (isSelectingOpponentRef.current) {
       sounds.scan(); playHaptic('light');
@@ -5303,9 +6042,11 @@ export default function App() {
     }
     performSearch(name);
   }, [performSearch, inspectingOpponent]);
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSelectingOpponent) return;
+    
     const formatted = inputValue.trim().toLowerCase();
     if (formatted && formatted !== lastSearched) {
       if (inspectingOpponent) {
@@ -5324,12 +6065,14 @@ export default function App() {
       }
     }
   };
+
   const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setInputValue(val);
     startTransition(() => {
       setQuery(val);
     });
+    
     if (val.trim()) {
       const q = val.toLowerCase().trim();
       const matches = allPokemonRef.current.filter(p => p.includes(q)).slice(0, 5);
@@ -5341,6 +6084,7 @@ export default function App() {
     }
     sounds.typing();
   };
+
   const isStandard1025Pokemon = useCallback((p: any): boolean => {
     if (!p) return false;
     const idNum = typeof p.baseId === 'number' ? p.baseId : (typeof p.id === 'number' ? p.id : parseInt(p.id, 10));
@@ -5364,6 +6108,7 @@ export default function App() {
     }
     return true;
   }, []);
+
   const handleClear = () => {
     setQuery('');
     setInputValue('');
@@ -5372,10 +6117,12 @@ export default function App() {
     setDebouncedQuery('');
     setLastSearched('');
     setError(null);
+    
     if (isSelectingOpponent) {
       sounds.scan(); playHaptic('light');
       return;
     }
+    
     setPokemon(null);
     setListMode('pokemon');
     setActiveTab('data');
@@ -5386,9 +6133,11 @@ export default function App() {
     setIsOpponentFemale(false);
     sounds.boot(); playHaptic('medium');
   };
+
   useEffect(() => {
     setDisplayLimit(50);
   }, [filteredList, query, sortBy, sortOrder]);
+
   return (
     <ErrorBoundary>
       <NowPlayingToast />
@@ -5398,6 +6147,8 @@ export default function App() {
       "bg-[linear-gradient(to_right,rgba(6,182,212,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(6,182,212,0.015)_1px,transparent_1px)] bg-[size:48px_48px]",
       isLightMode && "light bg-slate-50 bg-[linear-gradient(to_right,rgba(15,23,42,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.015)_1px,transparent_1px)]"
     )}>
+
+
       {/* System Reboot Overlay */}
       <AnimatePresence>
         {isRebooting && (
@@ -5446,6 +6197,7 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+        
       {/* Tab Change Black Vision Overlay */}
       <AnimatePresence>
         {isTabTransitioning && (
@@ -5459,6 +6211,7 @@ export default function App() {
           />
         )}
       </AnimatePresence>
+
       {/* VS Screen Matchup Transition Overlay */}
       <AnimatePresence>
         {showVSScreen && pokemon && battleOpponent && (
@@ -5475,6 +6228,7 @@ export default function App() {
               <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-72 h-72 sm:w-96 sm:h-96 bg-red-500/15 rounded-full blur-3xl" />
               <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:20px_20px] sm:[background-size:24px_24px]" />
             </div>
+
             {/* Main Content Container - Fitted for Mobile & Desktop */}
             <motion.div 
               initial={{ scale: 0.92, opacity: 0 }}
@@ -5494,6 +6248,7 @@ export default function App() {
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                   USER
                 </div>
+
                 <div className="w-28 h-28 xs:w-36 xs:h-36 sm:w-60 sm:h-60 relative flex items-center justify-center shrink-0">
                   <div className="absolute inset-0 bg-cyan-500/15 rounded-full blur-2xl animate-pulse" />
                   <img 
@@ -5511,6 +6266,7 @@ export default function App() {
                     }}
                   />
                 </div>
+
                 <div className="bg-slate-950/90 border-2 border-cyan-400/80 px-2.5 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl z-20 shadow-[0_0_20px_rgba(6,182,212,0.3)] flex flex-col items-center gap-1 w-full max-w-[130px] xs:max-w-[160px] sm:max-w-[280px] md:max-w-[340px] text-center backdrop-blur-md">
                   <span className="font-hud uppercase text-cyan-100 tracking-[0.08em] sm:tracking-[0.14em] text-xs xs:text-sm sm:text-xl md:text-2xl font-black drop-shadow-[0_0_10px_rgba(34,211,238,0.6)] w-full break-words leading-tight">
                     {pokemon?.name?.replace(/-/g, ' ')}
@@ -5522,6 +6278,7 @@ export default function App() {
                   </div>
                 </div>
               </motion.div>
+
               {/* Central VS Badge */}
               <motion.div
                 initial={{ scale: 2.5, rotate: -180, opacity: 0 }}
@@ -5541,6 +6298,7 @@ export default function App() {
                   </h1>
                 </div>
               </motion.div>
+
               {/* Opponent Pokemon (Right Side) */}
               <motion.div
                 initial={{ x: 120, opacity: 0 }}
@@ -5552,6 +6310,7 @@ export default function App() {
                   <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
                   OPPONENT
                 </div>
+
                 <div className="w-28 h-28 xs:w-36 xs:h-36 sm:w-60 sm:h-60 relative flex items-center justify-center shrink-0">
                   <div className="absolute inset-0 bg-red-500/15 rounded-full blur-2xl animate-pulse" />
                   <img 
@@ -5569,6 +6328,7 @@ export default function App() {
                     }}
                   />
                 </div>
+
                 <div className="bg-slate-950/90 border-2 border-red-500/80 px-2.5 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl z-20 shadow-[0_0_20px_rgba(239,68,68,0.3)] flex flex-col items-center gap-1 w-full max-w-[130px] xs:max-w-[160px] sm:max-w-[280px] md:max-w-[340px] text-center backdrop-blur-md">
                   <span className="font-hud uppercase text-red-100 tracking-[0.08em] sm:tracking-[0.14em] text-xs xs:text-sm sm:text-xl md:text-2xl font-black drop-shadow-[0_0_10px_rgba(239,68,68,0.6)] w-full break-words leading-tight">
                     {battleOpponent?.name?.replace(/-/g, ' ')}
@@ -5581,6 +6341,7 @@ export default function App() {
                 </div>
               </motion.div>
             </motion.div>
+
             {/* Bottom Status Indicator */}
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
@@ -5596,12 +6357,14 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
       <div className={cn(
         "w-full h-full overflow-hidden overflow-x-hidden flex flex-col relative z-10 transition-all duration-300",
         isLightMode 
           ? "bg-slate-50 text-slate-800 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-sky-50/70 via-slate-50 to-slate-100" 
           : "bg-slate-950 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black"
       )}>
+        
         {/* Single Panel Layout */}
         <div className="flex-1 flex flex-col relative overflow-hidden overflow-x-hidden bg-transparent w-full">
           {/* Compact Top Bar with Integrated Search */}
@@ -5656,6 +6419,7 @@ export default function App() {
                 </motion.div>
               </motion.form>
         </AnimatePresence>
+
             <motion.button
               whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(250,204,21,0.35)" }}
               whileTap={{ scale: 0.95 }}
@@ -5682,6 +6446,7 @@ export default function App() {
               </motion.div>
               <span className="hidden sm:inline font-hud tracking-[0.1em] relative z-10 font-black">{'Favs'}</span>
             </motion.button>
+            
             <motion.button
               whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(34,211,238,0.35)" }}
               whileTap={{ scale: 0.95 }}
@@ -5709,6 +6474,14 @@ export default function App() {
               </motion.div>
               <span className="hidden sm:inline font-hud tracking-[0.1em] relative z-10 font-black">{'Daily Hub'}</span>
             </motion.button>
+
+
+
+             
+
+            
+             
+
             {!isOnline && (
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -5724,6 +6497,7 @@ export default function App() {
                 <span className="hidden sm:inline font-bold">Offline Ready</span>
               </motion.button>
             )}
+
             <motion.button
                whileHover={{ scale: 1.1, rotate: 90 }}
                whileTap={{ scale: 0.95 }}
@@ -5739,6 +6513,7 @@ export default function App() {
              </motion.button>
             </div>
           </div>
+
           {/* Main App Container */}
           <div className="flex-1 flex flex-col relative overflow-hidden">
               <div className="relative z-10 flex-1 flex flex-col overflow-hidden">
@@ -5763,6 +6538,7 @@ export default function App() {
                         const pokemon = (inspectingOpponent && battleOpponent) ? battleOpponent : originalPokemon;
                         const isShiny = (inspectingOpponent && battleOpponent) ? isOpponentShiny : originalIsShiny;
                         const isFemale = (inspectingOpponent && battleOpponent) ? isOpponentFemale : originalIsFemale;
+
                         const performSearch = async (name: string) => {
                           if (inspectingOpponent) {
                             setLoadingPokemon(true);
@@ -5778,6 +6554,7 @@ export default function App() {
                             originalPerformSearch(name);
                           }
                         };
+
                         const setIsShiny = (val: any) => {
                           if (inspectingOpponent) {
                             setIsOpponentShiny(val);
@@ -5785,6 +6562,7 @@ export default function App() {
                             originalSetIsShiny(val);
                           }
                         };
+
                         const setIsFemale = (val: any) => {
                           if (inspectingOpponent) {
                             setIsOpponentFemale(val);
@@ -5792,6 +6570,7 @@ export default function App() {
                             originalSetIsFemale(val);
                           }
                         };
+
                         return (
                           <motion.div
                             key={pokemon.name + '-' + (inspectingOpponent ? 'opp' : 'player')}
@@ -5810,6 +6589,7 @@ export default function App() {
                            </div>
                         )}
                         <div className="absolute inset-0 bg-cyan-500/5 pointer-events-none"></div>
+                        
                         <div className="relative z-10 flex-1 flex flex-col overflow-hidden">
                           {/* Top Bar */}
                           <div className="flex justify-between items-center mb-3 mt-3 sm:mt-4 px-1 shrink-0 z-10 relative">
@@ -5856,6 +6636,7 @@ export default function App() {
                               </button>
                             </div>
                           </div>
+
                           {/* Tabs for Stats, AI & Battle - Premium segment-style HUD button bar with Daily Hub shimmer effects */}
                           <div className="w-full grid grid-cols-3 gap-1.5 sm:gap-2.5 mb-4 shrink-0 pt-1 py-1 px-0.5 sm:px-1 z-30 select-none">
                             {/* Stats Section Button */}
@@ -5877,6 +6658,7 @@ export default function App() {
                             >
                               {/* Scan Ready Shimmer Light Sweep */}
                               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-300/25 to-transparent pointer-events-none z-10 animate-scan-shimmer" />
+                              
                               {activeTab === 'data' && (
                                 <motion.div
                                   layoutId="activeTabPill"
@@ -5884,11 +6666,13 @@ export default function App() {
                                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                 />
                               )}
+                              
                               <div className="relative z-10 shrink-0">
                                 <Info className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4 filter drop-shadow-[0_0_6px_rgba(6,182,212,0.85)]", activeTab === 'data' ? "text-slate-950 font-black" : "text-cyan-400")} />
                               </div>
                               <span className="whitespace-nowrap relative z-10 uppercase">Stats</span>
                             </motion.button>
+
                             {/* Pok√©thology Section Button */}
                             <motion.button
                               type="button"
@@ -5908,6 +6692,7 @@ export default function App() {
                             >
                               {/* Scan Ready Shimmer Light Sweep */}
                               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-200/30 to-transparent pointer-events-none z-10 animate-scan-shimmer" />
+                              
                               {activeTab === 'chat' && (
                                 <motion.div
                                   layoutId="activeTabPill"
@@ -5915,11 +6700,13 @@ export default function App() {
                                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                 />
                               )}
+                              
                               <div className="relative z-10 shrink-0">
                                 <User className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4 filter drop-shadow-[0_0_6px_rgba(220,161,29,0.85)]", activeTab === 'chat' ? "text-slate-950 font-black" : "text-[#dca11d]")} />
                               </div>
                               <span className={cn("whitespace-nowrap relative z-10 uppercase text-center", activeTab === 'chat' ? "text-slate-950 font-black" : "text-[#dca11d]")}>Pok√©thology</span>
                             </motion.button>
+
                             {/* Combat Section Button */}
                             <motion.button
                               type="button"
@@ -5939,6 +6726,7 @@ export default function App() {
                             >
                               {/* Scan Ready Shimmer Light Sweep */}
                               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-red-300/25 to-transparent pointer-events-none z-10 animate-scan-shimmer" />
+                              
                               {activeTab === 'battle' && (
                                 <motion.div
                                   layoutId="activeTabPill"
@@ -5946,12 +6734,14 @@ export default function App() {
                                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                 />
                               )}
+                              
                               <div className="relative z-10 shrink-0">
                                 <Swords className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4 filter drop-shadow-[0_0_6px_rgba(239,68,68,0.85)]", activeTab === 'battle' ? "text-white font-black" : "text-red-400")} />
                               </div>
                               <span className="whitespace-nowrap relative z-10 uppercase">Combat</span>
                             </motion.button>
                           </div>
+
                           {battleOpponent && activeTab === 'data' && (
                             <div className="flex gap-2 p-1.5 bg-slate-950/50 border border-white/5 rounded-xl mb-4 shrink-0 select-none items-center justify-between">
                               <span className="text-[7.5px] font-hud text-slate-500 uppercase tracking-widest pl-2">ACTIVE TARGET INSPECTION:</span>
@@ -5989,6 +6779,7 @@ export default function App() {
                               </div>
                             </div>
                           )}
+
                           <div className={cn(
                             "flex-1 flex flex-col lg:flex-row lg:gap-6 min-h-0 h-full custom-scrollbar optimize-scrolling",
                             activeTab === 'chat' ? "overflow-hidden items-stretch pb-0 lg:pb-0" : "overflow-y-auto lg:items-start pb-8 sm:pb-12"
@@ -6015,6 +6806,7 @@ export default function App() {
                                     onClick={() => sounds.playCry(pokemon?.name, pokemon.cries?.latest, pokemon?.name?.includes('-gmax'))}
                                   />
                                 </div>
+                                
                                 {/* Left Visual Toggles (Favorite Star) */}
                                 <div className="absolute -left-4 top-0 flex flex-col gap-2 z-20">
                                   <button
@@ -6054,6 +6846,7 @@ export default function App() {
                                     />
                                   </button>
                                 </div>
+
                                 {/* Visual Toggles */}
                                 <div className="absolute -right-4 top-0 flex flex-col gap-2 z-20">
                                   {/* Shiny Toggle Button */}
@@ -6073,6 +6866,7 @@ export default function App() {
                                     <HUDCorners />
                                     <Sparkles className={cn("w-4 h-4", isShiny ? "text-yellow-400 animate-pulse" : (isLightMode ? "text-slate-400" : "text-cyan-400"))} />
                                   </button>
+
                                   {/* Compare Stats Toggle Button (below Shiny button) */}
                                   <button
                                     type="button"
@@ -6090,6 +6884,7 @@ export default function App() {
                                     <HUDCorners />
                                     <ArrowLeftRight className="w-4 h-4 text-cyan-300" />
                                   </button>
+                                  
                                   {/* Female Form Toggle Button */}
                                   {['pyroar', 'unfezant', 'frillish', 'jellicent', 'hippowdon', 'hippopotas', 'meowstic', 'indeedee', 'oinkologne', 'basculegion'].includes(pokemon?.name?.split('-')[0].toLowerCase()) && (
                                     <button
@@ -6111,6 +6906,7 @@ export default function App() {
                                   )}
                                 </div>
                               </div>
+                              
                               <div className="flex flex-col items-center gap-2 mb-4 shrink-0">
                                 <h2 className={cn(
                                   "text-2xl sm:text-3xl font-hud font-black uppercase tracking-wider text-center break-words leading-tight",
@@ -6180,6 +6976,7 @@ export default function App() {
                                   )}
                                 </div>
                               </div>
+
                               {/* Alternative Forms / Varieties (Hidden in Pokethology section for a cleaner left interface) */}
                               {activeTab !== 'chat' && !pokemon?.name?.includes('koraidon') && !pokemon?.name?.includes('miraidon') && ( (pokemon.varieties && pokemon.varieties.length > 1) || ['pyroar', 'unfezant', 'frillish', 'jellicent', 'hippowdon', 'hippopotas', 'basculegion', 'oinkologne', 'tatsugiri'].some(d => pokemon?.name?.includes(d)) ) && (
                                 <div className="w-full mb-3 shrink-0">
@@ -6192,10 +6989,13 @@ export default function App() {
                                         !v.pokemon?.name?.startsWith('koraidon-') &&
                                         !v.pokemon?.name?.startsWith('miraidon-')
                                       );
+                                    
                                     if (pokemon?.name?.includes('tatsugiri') && !varietiesList.some(v => v.pokemon?.name === 'tatsugiri-stretchy-mega')) {
                                       varietiesList.push({ pokemon: { name: 'tatsugiri-stretchy-mega', url: '' } });
                                     }
+
                                     let megas = varietiesList.filter(v => v.pokemon?.name?.includes('-mega'));
+                                    
                                     const gmax = varietiesList.filter(v => v.pokemon?.name?.includes('-gmax'));
                                     let rawOthers = varietiesList.filter(v => 
                                       !v.pokemon?.name?.includes('-mega') && 
@@ -6205,9 +7005,12 @@ export default function App() {
                                       !v.pokemon?.name?.endsWith('-m') && 
                                       !v.pokemon?.name?.endsWith('-male')
                                     );
+                                    
                                     const others = [...rawOthers];
+
                                     const renderVarietyButton = (v: any, colorMode: 'cyan' | 'amber' | 'red', index: number = 0) => {
                                       const isCurrent = v.pokemon?.name === pokemon?.name;
+                                      // Extracting suffix for display
                                       let displayName = v.pokemon?.name;
                                       const baseName = pokemon?.name?.split('-')[0];
                                       if (displayName.startsWith(baseName + '-')) {
@@ -6215,6 +7018,7 @@ export default function App() {
                                       } else {
                                         displayName = displayName.toUpperCase();
                                       }
+
                                       return (
                                         <button
                                           key={`${v.pokemon?.name || 'var'}-${colorMode}-${index}`}
@@ -6235,6 +7039,7 @@ export default function App() {
                                         </button>
                                       );
                                     };
+
                                     return (
                                       <div className="space-y-4">
                                         {others.length > 1 && (
@@ -6266,7 +7071,9 @@ export default function App() {
                                   })()}
                                 </div>
                               )}
+                              
                             </div>
+
                             <motion.div className="flex-1 flex flex-col min-w-0 w-full h-full">
                               <AnimatePresence mode="wait">
                                 {activeTab === 'data' ? (
@@ -6288,12 +7095,14 @@ export default function App() {
                                       TypewriterText={TypewriterText}
                                       onCompare={() => handleOpenComparison(pokemon)}
                                     />
+
                                      {/* Abilities Section */}
                                      <AbilitiesSection
                                        abilities={pokemon.abilities}
                                        isLightMode={isLightMode}
                                        sounds={sounds}
                                      />
+
                                      {/* Evolution Line & Methods Section (Only for standard 1025 Pok√©mon) */}
                                      {isStandard1025Pokemon(pokemon) && pokemon.evolutionChain && pokemon.evolutionChain.evolves_to && pokemon.evolutionChain.evolves_to.length > 0 && (
                                        <div className={cn(
@@ -6309,6 +7118,7 @@ export default function App() {
                                              <span>Evolution Line & Methods</span>
                                            </div>
                                          </h3>
+
                                          <div className="flex items-center justify-start min-w-max pb-1 pt-2 touch-pan-x touch-pan-y [touch-action:pan-x_pan-y]">
                                            <EvolutionNodeComponent 
                                              node={pokemon.evolutionChain}
@@ -6320,6 +7130,7 @@ export default function App() {
                                          </div>
                                        </div>
                                      )}
+
                                      {/* Type Weaknesses Matrix Section */}
                                      <TypeWeaknessesSection
                                        weaknesses={pokemon.weaknesses}
@@ -6327,6 +7138,7 @@ export default function App() {
                                        isLightMode={isLightMode}
                                        typeColors={typeColors}
                                      />
+
                                      {/* Combat Base Stats HUD Section */}
                                      <CombatStatsSection
                                        stats={pokemon.stats}
@@ -6334,6 +7146,7 @@ export default function App() {
                                        sounds={sounds}
                                        onCompare={() => handleOpenComparison(pokemon)}
                                      />
+
                                      {/* Moveset Analysis Section */}
                                      {pokemon.moves && pokemon.moves.length > 0 && (
                                        <MovesetAnalysisSection
@@ -6388,6 +7201,8 @@ export default function App() {
                                                RETRY
                                              </button>
                                           )}
+
+
                                           {showClearChatConfirm ? (
                                             <div className="flex items-center gap-1 bg-slate-900/85 px-1.5 py-0.5 rounded border border-rose-500/30">
                                               <span className="text-[6.5px] font-mono font-bold text-rose-400 uppercase">Clear?</span>
@@ -6425,6 +7240,9 @@ export default function App() {
                                           )}
                                         </div>
                                       </div>
+                                      
+
+
                                       <div 
                                         ref={chatScrollRef}
                                         onScroll={(e) => {
@@ -6442,6 +7260,7 @@ export default function App() {
                                             backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M11 18h2v2h-2v-2zm10 0h2v2h-2v-2zm-10 10h2v2h-2v-2zm10 0h2v2h-2v-2zM3 39h2v2H3v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zM3 49h2v2H3v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zM51 18h2v2h-2v-2zm10 0h2v2h-2v-2zm-10 10h2v2h-2v-2zm10 0h2v2h-2v-2zM43 39h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zM43 49h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2zm10 0h2v2h-2v-2z'/%3E%3C/g%3E%3C/svg%3E")`,
                                           }}
                                         />
+
                                         {quotaLimitReached && (
                                           <div className="bg-red-950/40 border border-red-500/30 p-2 rounded flex flex-col gap-1 mb-2 animate-in fade-in slide-in-from-top-1">
                                             <div className="flex items-center gap-2">
@@ -6461,6 +7280,7 @@ export default function App() {
                                             </button>
                                           </div>
                                         )}
+
                                         {chatMessages.map((msg, i) => (
                                           <motion.div 
                                             key={`chat-msg-${i}-${msg.role}`} 
@@ -6498,6 +7318,7 @@ export default function App() {
                                                       {chatSpeakingIndex === i ? <VolumeX className="w-2.5 h-2.5" /> : <Volume2 className="w-2.5 h-2.5 text-cyan-400" />}
                                                       <span>{chatSpeakingIndex === i ? "Stop" : "Voice"}</span>
                                                     </button>
+
                                                     <button
                                                       type="button"
                                                       onClick={() => handleChatCopy(msg.text, i)}
@@ -6568,6 +7389,7 @@ export default function App() {
                                                     <Globe className="w-2.5 h-2.5 text-cyan-500" />
                                                     Serebii
                                                   </a>
+
                                                   <a 
                                                     href={`https://www.youtube.com/results?search_query=${encodeURIComponent(pokemon.name + ' lore pok√©mon')}`} 
                                                     target="_blank" 
@@ -6590,6 +7412,7 @@ export default function App() {
                                                   ))}
                                                 </div>
                                               )}
+
                                               {msg.groundingChunks?.length > 0 && (
                                                 <div className="mt-2 text-[8px] select-all">
                                                   <div className="text-[7px] tracking-widest font-black text-slate-400/70 uppercase mb-1 flex items-center gap-1 font-hud">
@@ -6671,6 +7494,7 @@ export default function App() {
                                             key={`suggested-${s}-${idx}`} 
                                             onClick={() => {
                                               setChatInput(s);
+                                              // Auto trigger send if it feels natural
                                             }}
                                             className={cn(
                                               "px-2 py-1 rounded-full border text-[7px] font-bold tracking-wider uppercase font-hud transition-colors",
@@ -6716,9 +7540,11 @@ export default function App() {
                                     className="w-full flex-1 min-h-0 overflow-y-auto custom-scrollbar optimize-scrolling max-w-full"
                                   >
                                     {/* ‚îÄ‚îÄ‚îÄ DUAL MODEL MATCHUP PREVIEW REMOVED (THE ARENA ONLY IS SUFFICIENT) ‚îÄ‚îÄ‚îÄ */}
+
                                     <div className="w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 items-start max-w-full pb-2 sm:pb-3">
                                       {/* Left Column (Arena, Actions) */}
                                       <div className="lg:col-span-8 flex flex-col w-full min-w-0">
+                                        
                                         <div 
                                           ref={arenaRef}
                                           className="bg-slate-900/80 backdrop-blur-md rounded-2xl relative shadow-[0_8px_32px_rgba(0,0,0,0.6)] flex flex-col mb-1.5 sm:mb-2 overflow-hidden w-full max-w-full h-auto z-10 arena-container no-scrollbar"
@@ -6733,11 +7559,14 @@ export default function App() {
                                           }}
                                         />
                                       </div>
+                                      
                                       <div className="absolute inset-0 z-0 opacity-40 rounded-xl sm:rounded-2xl overflow-hidden pointer-events-none bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/70"></div>
                                       <div className="absolute inset-0 z-0 opacity-20 rounded-xl sm:rounded-2xl overflow-hidden pointer-events-none">
                                         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:40px_40px]"></div>
                                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#020617_80%)]"></div>
                                       </div>
+
+
                                       {victoryConfetti && <VictoryConfetti />}
                                       <motion.div
                                         animate={screenShake ? { x: [-10, 10, -10, 10, 0] } : {}}
@@ -6766,10 +7595,13 @@ export default function App() {
                                             </span>
                                           </div>
                                         </div>
+
                                         <div className={cn(
                                           "flex flex-nowrap items-center shrink-0 pl-1 sm:pl-2 transition-all duration-300",
                                           "gap-1 sm:gap-3 justify-end"
                                         )}>
+
+                                          
                                           {isBattling && (
                                             <div
                                               className="px-1.5 py-1 sm:px-3 sm:py-2 rounded-lg text-[6px] sm:text-[12px] font-black font-hud uppercase tracking-[0.15em] bg-slate-950/70 border border-cyan-500/30 text-cyan-400 shadow-md shrink-0 flex items-center gap-1 sm:gap-1.5"
@@ -6778,6 +7610,7 @@ export default function App() {
                                               <span>{Math.floor(battleDuration / 60).toString().padStart(2, '0')}:{Math.floor(battleDuration % 60).toString().padStart(2, '0')}</span>
                                             </div>
                                           )}
+
                                           {isBattling && (
                                             <div 
                                               className={cn(
@@ -6788,6 +7621,7 @@ export default function App() {
                                               {turn === 'player' ? 'PLAYER' : "ENEMY"}
                                             </div>
                                           )}
+
                                           <button 
                                             onClick={() => {
                                               const nextMode = arenaArtworkMode === 'home' ? '2d' : 'home';
@@ -6816,6 +7650,7 @@ export default function App() {
                                               </>
                                             )}
                                           </button>
+
                                           <button 
                                             onClick={() => setIsMusicOpen(true)}
                                             title="System Options"
@@ -6826,6 +7661,7 @@ export default function App() {
                                             )}
                                           >
                                             <Settings className={cn( "w-4 h-4")} />
+                                            
                                           </button>
                                           <button 
                                             onClick={() => setIsTypeChartOpen(true)}
@@ -6837,9 +7673,13 @@ export default function App() {
                                             )}
                                           >
                                             <Info className={cn( "w-4 h-4")} />
+                                            
                                           </button>
+                                          
+
                                         </div>
                                       </motion.div>
+                                      
                                       {/* Showdown Style Layout */}
                                       <BattleErrorBoundary>
                                       <motion.div 
@@ -6917,6 +7757,7 @@ export default function App() {
                                           }}
                                           statChange={opponentStatAnimation}
                                         />
+
                                         {/* Opponent Sprite (Top Right Area) */}
                                         <div className="absolute top-[12%] right-2 xs:top-[15%] xs:right-4 sm:top-[20%] sm:right-12 md:top-[25%] md:right-16 lg:top-[35%] xl:top-[30%] lg:-translate-y-1/2 lg:right-24 xl:right-32 lg:bottom-auto pointer-events-auto z-10">
                                           {battleOpponent && (
@@ -6925,6 +7766,7 @@ export default function App() {
                                               initial={{ opacity: 1, scale: 0.8 }}
                                               animate={getBattleSpriteAnimation(defenderAnimation, opponentStatus, opponentStatAnimation)}
                                               transition={getBattleSpriteTransition(defenderAnimation, opponentStatAnimation)}
+
                                               className="relative flex flex-col items-center justify-end   group"
                                             >
                                               <div className="relative h-28 w-28 xs:h-32 xs:w-32 sm:h-40 sm:w-40 md:h-48 md:w-48 lg:h-52 lg:w-52 xl:h-56 xl:w-56 flex items-center justify-center max-h-[35vh]">
@@ -6971,9 +7813,11 @@ export default function App() {
                                                 <StatusOverlay status={opponentStatus} />
                                               </motion.div>
                                               </div>
+                                              
                                             </motion.div>
                                           )}
                                         </div>
+
                                         {/* Bottom Right: Player Status */}
                                         <PlayerStatusBar
                                           pokemon={pokemon}
@@ -6991,8 +7835,12 @@ export default function App() {
                                           playerAvatar={currentAvatar}
                                           isShiny={isShiny}
                                         />
+                                        
                                         {/* Opponent Status Bar (implied) */}
                                         {/* OpponentStatusBar is likely already in the file... let me check*/}
+
+
+
                                         {/* Player Sprite (Bottom Left Area) */}
                                         <div className="absolute bottom-20 left-2 xs:bottom-24 xs:left-4 sm:bottom-28 sm:left-12 md:bottom-32 md:left-16 lg:top-[35%] xl:top-[30%] lg:-translate-y-1/2 lg:left-24 xl:left-32 lg:bottom-auto pointer-events-auto z-10">
                                           <motion.div
@@ -7000,6 +7848,7 @@ export default function App() {
                                             initial={{ opacity: 1, scale: 0.8 }}
                                             animate={getBattleSpriteAnimation(attackerAnimation, pokemonStatus, playerStatAnimation)}
                                             transition={getBattleSpriteTransition(attackerAnimation, playerStatAnimation)}
+
                                             className="relative flex flex-col items-center justify-end   group"
                                           >
                                             <div className="relative h-28 w-28 xs:h-32 xs:w-32 sm:h-44 sm:w-44 md:h-52 md:w-52 lg:h-60 lg:w-60 xl:h-64 xl:w-64 flex items-center justify-center max-h-[35vh]">
@@ -7043,17 +7892,22 @@ export default function App() {
                                                   }}
                                                 />
                                                 <StatusOverlay status={pokemonStatus} />
+                                                
+
                                               </motion.div>
                                               <div className="hidden xs:block absolute -bottom-6 text-[7px] text-cyan-400/50 font-hud uppercase tracking-wider whitespace-nowrap">tap Pok√©mon to play cry and rotate</div>
                                             </div>
+                                            
                                           </motion.div>
                                         </div>
+
                                         {/* Center: VS & Messages */}
                                         <div className="absolute inset-0 pointer-events-none z-30">
                                           <div className={cn(
                                             "absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 font-hud text-2xl sm:text-5xl lg:text-7xl italic font-black select-none z-0 transition-colors",
                                             isLightMode ? "text-slate-900/10" : "text-cyan-500/10"
                                           )}>VS</div>
+                                          
                                           <AnimatePresence>
                                             {battleMessage && (
                                               <BattleMessage 
@@ -7095,6 +7949,8 @@ export default function App() {
                                             ))}
         </AnimatePresence>
                                         </div>
+
+
                                         {/* Chaos Match Setup Overlay */}
                                         <AnimatePresence>
                                           {isChaosMatchSetup && battleState === 'setup' && (
@@ -7112,10 +7968,12 @@ export default function App() {
                                                 className={cn("border-2 border-amber-500 rounded-2xl p-3 sm:p-6 shadow-[0_0_50px_rgba(245,158,11,0.4)] max-w-sm w-full text-center space-y-2 sm:space-y-6 relative overflow-y-auto max-h-[98%]", isLightMode ? "bg-slate-100/90" : "bg-slate-900/90")}
                                               >
                                               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
+                                              
                                               <div className="space-y-0.5 sm:space-y-1">
                                                 <h3 className="text-amber-400 font-hud text-sm sm:text-xl font-black tracking-widest uppercase">Chaos Mode Setup</h3>
                                                 <p className="text-[8px] sm:text-[10px] text-amber-500/70 font-mono uppercase tracking-[0.2em]">Preparing Random Battle</p>
                                               </div>
+
                                               <div className="flex justify-between items-center gap-2 py-2 sm:py-4 border-y border-amber-500/10">
                                                 <div className="flex flex-col items-center gap-1">
                                                   <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-slate-950 border-2 border-cyan-500/30 flex items-center justify-center overflow-hidden">
@@ -7143,6 +8001,7 @@ export default function App() {
                                                   <span className={cn("text-[9px] font-bold uppercase truncate w-16 tracking-tighter", isLightMode ? "text-red-700" : "text-red-400")}>{battleOpponent?.name}</span>
                                                 </div>
                                               </div>
+
                                               {chaosPhase === 'selecting_pokemon' ? (
                                                 <div className="space-y-3">
                                                   <p className="text-[9px] text-slate-400 italic">Pokemon selected. Now get some random moves!</p>
@@ -7150,6 +8009,8 @@ export default function App() {
                                                     onClick={async () => {
                                                       if (!pokemon || !battleOpponent) return;
                                                       sounds.scan(); playHaptic('light');
+                                                      
+                                                      // Advanced Competitive Moveset Randomization (Offline Optimized)
                                                       setSelectedMoves(generateCompetitiveMoveset(pokemon, selectedMoves));
                                                       if (battleOpponent) {
                                                         setOpponentMoves(generateCompetitiveMoveset(battleOpponent, opponentMoves, pokemon));
@@ -7186,10 +8047,12 @@ export default function App() {
                                                           const base = stats.find((s: any) => s.stat.name === statName)?.base_stat || 50;
                                                           return isChaosModeActive ? (statName === 'hp' ? base + 75 : base + 20) : base;
                                                         };
+                                                        
                                                         const pMax = getLv50(pokemon.stats, 'hp');
                                                         const oMax = getLv50(battleOpponent.stats, 'hp');
                                                         const pSpeed = getLv50(pokemon.stats, 'speed');
                                                         const oSpeed = getLv50(battleOpponent.stats, 'speed');
+                                                        
                                                         setPokemonMaxHP(pMax);
                                                         setPokemonHP(pMax);
                                                         setOpponentMaxHP(oMax);
@@ -7215,6 +8078,7 @@ export default function App() {
                                             </motion.div>
                                           )}
         </AnimatePresence>
+
                                          {/* Centered Initiate Battle Trigger embedded on the Arena border (Responsive for Mobile, Tablet & PC) */}
                                          {!isBattling && (
                                            <div className="absolute bottom-1.5 sm:bottom-2 left-1/2 -translate-x-1/2 z-30 pointer-events-auto flex items-center justify-center max-w-[92%]">
@@ -7249,6 +8113,7 @@ export default function App() {
                                           <div className="flex justify-between items-center px-1">
                                             <span className="text-[10px] font-mono text-cyan-500/60 uppercase tracking-[0.2em] font-bold">Moveset</span>
                                             <div className="flex items-center gap-2">
+                                            
                                             <button
                                                onClick={() => { sounds.scan(); playHaptic('light'); setPendingAction('flee'); setShowExitConfirmation(true); }}
                                                onMouseEnter={() => sounds.hover()}
@@ -7262,6 +8127,7 @@ export default function App() {
                                             {selectedMoves.map((move, i) => {
                                               const opponentTypes = battleOpponent?.types?.map((t: any) => t.type.name) || [];
                                               const effectiveness = getTypeEffectiveness(move.type, opponentTypes);
+                                              
                                               let effectivenessLabel = '';
                                               let effectivenessBadgeColor = 'bg-slate-800 border-slate-700 text-slate-400';
                                               if (effectiveness > 1) {
@@ -7275,6 +8141,7 @@ export default function App() {
                                                 effectivenessBadgeColor = 'bg-slate-900 border-slate-850 text-slate-500';
                                               }
                                               const isOutOfPP = (move.currentPP ?? move.pp) === 0;
+                                              
                                               return (
                                                 <button
                                                   key={`${move.name}-${i}`}
@@ -7288,6 +8155,7 @@ export default function App() {
                                                   disabled={isOutOfPP}
                                                   className={cn(
                                                     "w-full text-left p-2 rounded-lg border transition-all relative overflow-hidden flex flex-col gap-1 cursor-pointer",
+
                                                     isOutOfPP
                                                        ? "bg-slate-950/60 text-slate-600 border-slate-900/60 cursor-not-allowed opacity-40"
                                                        : cn(
@@ -7296,6 +8164,7 @@ export default function App() {
                                                         )
                                                   )}
                                                 >
+
                                                   <div className="flex justify-between items-start w-full gap-1">
                                                     <div className="flex flex-col min-w-0">
                                                       <span className="text-[9px] sm:text-[10px] font-hud font-black uppercase tracking-wider truncate">
@@ -7333,13 +8202,17 @@ export default function App() {
                                          </motion.div>
                                        )}
         </AnimatePresence>
+
                                       </div> {/* End of arenaRef Container */}
                                      </div> {/* End of Left Column Wrapper */}
+
                                       {/* Right Column: logs, tactical advice, records, and setup */}
                                       <div className="lg:col-span-4 flex flex-col gap-4 w-full min-w-0 select-none pb-0 z-20">
                                         <AnimatePresence>
                                           {isBattling && <BattleLog log={battleLog} enableAnimations={enableAnimations} turn={turn || 'player'} isBattling={isBattling} />}
         </AnimatePresence>
+
+                                     
                                      {/* AI Coach Tactical Advice Panel - Displayed directly inside the Combat Arena */}
                                      {isBattling && (isAiSuggesting || battleSuggestion) && (
                                        <motion.div 
@@ -7362,6 +8235,7 @@ export default function App() {
                                               DISMISS
                                             </button>
                                           </div>
+                                          
                                           {isAiSuggesting ? (
                                             <div className="py-4 flex flex-col items-center justify-center gap-2">
                                               <Loader2 className="w-5 h-5 animate-spin text-purple-400" />
@@ -7399,6 +8273,7 @@ export default function App() {
                                               <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-300", isBattleHistoryExpanded ? "rotate-180" : "rotate-0")} />
                                             </div>
                                           </button>
+                                          
                                           {isBattleHistoryExpanded && (
                                             <div className="p-3 border-t border-slate-900/55 ">
                                               <BattleHistory isLightMode={isLightMode} />
@@ -7422,9 +8297,11 @@ export default function App() {
                                               onClick={async () => {
                                                 setLoadingPokemon(true);
                                                 try {
+                                                  // 1. Random Player Pokemon
                                                   const playerBaseId = Math.floor(Math.random() * 1025) + 1;
                                                   const basePlayer = await searchPokemon(playerBaseId.toString());
                                                   let finalPlayer = basePlayer;
+                                                  
                                                   if (basePlayer.varieties && basePlayer.varieties.length > 1 && Math.random() < 0.6) {
                                                     const pool = basePlayer.varieties;
                                                     const varietyIndex = Math.floor(Math.random() * pool.length);
@@ -7434,9 +8311,12 @@ export default function App() {
                                                   setIsShiny(Math.random() < 0.1); 
                                                   setIsFemale(Math.random() < 0.5);
                                                   setAttackerAnimation('none');
+                                                  
+                                                  // 2. Random Opponent Pokemon
                                                   const oppBaseId = Math.floor(Math.random() * 1025) + 1;
                                                   const baseOpponent = await searchPokemon(oppBaseId.toString());
                                                   let finalOpponent = baseOpponent;
+                                                  
                                                   if (baseOpponent.varieties && baseOpponent.varieties.length > 1 && Math.random() < 0.8) {
                                                     const interestingVarieties = baseOpponent.varieties.filter(v => 
                                                       v.pokemon?.name?.includes('-mega') || v.pokemon?.name?.includes('-gmax') || v.pokemon?.name?.includes('-alola') || v.pokemon?.name?.includes('-galar') || v.pokemon?.name?.includes('-hisui') || v.pokemon?.name?.includes('-primal')
@@ -7445,18 +8325,23 @@ export default function App() {
                                                     const varietyIndex = Math.floor(Math.random() * pool.length);
                                                     finalOpponent = await searchPokemon(pool[varietyIndex].pokemon?.name);
                                                   }
+                                                  
                                                   setBattleOpponent(finalOpponent);
                                                   setIsOpponentShiny(Math.random() < 0.1);
                                                   setIsOpponentFemale(Math.random() < 0.5);
                                                   setDefenderAnimation('none');
                                                   setIsSelectingOpponent(false);
+                                                  
+                                                  // Reset moves for manual chaos randomization later
                                                   setSelectedMoves([]);
                                                   setOpponentMoves([]);
+                                                  
                                                   setBattleState('setup');
                                                   setIsChaosMatchSetup(true);
                                                   setChaosPhase('selecting_pokemon');
                                                    setIsChaosModeActive(true);
                                                   handleTabChange('battle');
+                                                  
                                                   sounds.scan(); playHaptic('light');
                                                   setBattleLog([{ text: 'CHAOS SETUP INITIATED. SELECT MOVES.', type: 'critical' }]);
                                                 } catch (err) {
@@ -7470,20 +8355,24 @@ export default function App() {
                                               <div className="absolute inset-0 bg-gradient-to-r from-cyan-950 via-blue-900/40 to-cyan-950 border-2 border-cyan-400 group-hover:border-white transition-colors" />
                                               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
                                               <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-transparent via-cyan-400/10 to-transparent -translate-y-full group-hover:translate-y-full transition-transform duration-1000" />
+                                              
                                               <div className="relative flex items-center justify-center gap-3">
                                                 <span className="text-white font-hud text-xs sm:text-sm font-black tracking-[0.3em] uppercase drop-shadow-[0_0_5px_rgba(34,211,238,1)]">
                                                   Chaos Mode
                                                 </span>
                                               </div>
+
                                               <HUDCorners />
                                               <div className="absolute bottom-0 left-0 w-full h-[1px] bg-cyan-400/50 shadow-[0_-2px_8px_rgba(34,211,238,0.5)]" />
                                             </button>
+
                                             <button
                                               onClick={async () => {
                                                 setLoadingPokemon(true);
                                                 try {
                                                   const randomBaseId = Math.floor(Math.random() * 1025) + 1;
                                                   const baseOpponent = await searchPokemon(randomBaseId.toString());
+                                                  
                                                   let finalOpponent = baseOpponent;
                                                   if (baseOpponent.varieties && baseOpponent.varieties.length > 1 && Math.random() < 0.8) {
                                                     const pool = baseOpponent.varieties;
@@ -7494,7 +8383,11 @@ export default function App() {
                                                   setIsOpponentShiny(Math.random() < 0.05);
                                                   setDefenderAnimation('none');
                                                   setIsSelectingOpponent(false);
+
+                                                  // Randomize Opponent Moves
                                                   setOpponentMoves(generateCompetitiveMoveset(finalOpponent, [], pokemon));
+
+                                                  
                                                   sounds.scan(); playHaptic('light');
                                                   handleTabChange('battle');
                                                 } catch (err) {
@@ -7509,11 +8402,13 @@ export default function App() {
                                               <div className="absolute inset-0 bg-gradient-to-r from-purple-950 via-indigo-900/40 to-purple-950 border-2 border-purple-500 group-hover:border-white transition-colors" />
                                               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
                                               <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-r from-transparent via-purple-400/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                                              
                                               <div className="relative flex items-center justify-center gap-3">
                                                 <span className="text-white font-hud text-xs sm:text-sm font-black tracking-[0.3em] uppercase drop-shadow-[0_0_5px_rgba(168,85,247,1)]">
                                                   Random Opponent
                                                 </span>
                                               </div>
+
                                               <HUDCorners />
                                               <div className="absolute bottom-0 left-0 w-full h-[1px] bg-purple-400/50 shadow-[0_-2px_8px_rgba(168,85,247,0.5)]" />
                                             </button>
@@ -7538,6 +8433,7 @@ export default function App() {
                                                   <Swords className="w-2.5 h-2.5" />
                                                   {showCombatOptionsCompare ? "Show Moves List" : "Compare Combat Options"}
                                                 </button>
+
                                                 <button
                                                   type="button"
                                                   onClick={(e) => { e.stopPropagation();
@@ -7557,6 +8453,7 @@ export default function App() {
                                                 </div>
                                               </div>
                                             </div>
+                                            
                                             {showCombatOptionsCompare ? (
                                               /* COMBAT OPTIONS TAC-ANALYSIS MATRIX grid list */
                                               <div className="bg-slate-950/90 border border-slate-800/80 rounded-xl p-3 space-y-3 ">
@@ -7578,6 +8475,8 @@ export default function App() {
                                                        {selectedMoves.map((move, i) => {
                                                         const isStab = pokemon.types.some((t: any) => t.type.name.toLowerCase() === move.type.toLowerCase());
                                                         const oppTypes = battleOpponent.types.map((t: any) => t.type.name);
+                                                        
+                                                        // Calculate multiplier
                                                         let eff = 1;
                                                         const chart = TYPE_CHART[move.type.toLowerCase()];
                                                         if (chart) {
@@ -7588,11 +8487,13 @@ export default function App() {
                                                             }
                                                           });
                                                         }
+
                                                         const textEffectiveness = 
                                                           eff > 1 ? `text-emerald-400 font-black border-emerald-500/30 bg-emerald-950/20` :
                                                           eff === 1 ? `text-slate-400 border-slate-800 bg-slate-900/40` :
                                                           eff > 0 ? `text-amber-400 font-medium border-amber-500/30 bg-amber-950/10` :
                                                           `text-red-400 font-black border-red-500/30 bg-red-950/20`;
+
                                                         return (
                                                           <div key={`${move.name}-${i}`} className="border border-slate-900 bg-slate-950/30 rounded px-2.5 py-2 flex flex-col gap-1.5">
                                                             <div className="flex justify-between items-center">
@@ -7609,6 +8510,7 @@ export default function App() {
                                                                 </span>
                                                               </div>
                                                             </div>
+                                                            
                                                             <div className="flex justify-between items-center gap-2 pt-0.5 text-[6.5px] sm:text-[7.5px] font-mono text-slate-500">
                                                               <div className="flex gap-3">
                                                                 <span>POWER: <strong className="text-slate-300">{move.power || 'Status'}</strong></span>
@@ -7623,6 +8525,7 @@ export default function App() {
                                                         );
                                                       })}
                                                     </div>
+                                                    
                                                     {/* Speed Assessment Showdown indicator badge */}
                                                     {(() => {
                                                         const pSpeed = pokemon.stats.find((s: any) => s.stat.name === 'speed')?.base_stat || 100;
@@ -7646,6 +8549,7 @@ export default function App() {
                                               /* WINDOWED LEARNABLE MOVES LIBRARY */
                                               <div className="bg-slate-950/90 border border-cyan-500/30 rounded-2xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2.5 relative max-w-full">
                                                 <HUDCorners />
+                                                
                                                 {/* Header & Quick Filter Input */}
                                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-cyan-900/40 pb-2">
                                                   <div className="flex items-center gap-2 min-w-0">
@@ -7658,6 +8562,7 @@ export default function App() {
                                                     </span>
                                                   </div>
                                                 </div>
+
                                                 {/* Selected Moves Tray */}
                                                 <div className="flex flex-wrap gap-1.5 p-2 bg-slate-900/60 rounded-xl border border-cyan-900/30 min-h-[36px] items-center">
                                                   {selectedMoves.length === 0 ? (
@@ -7681,6 +8586,7 @@ export default function App() {
                                                     ))
                                                   )}
                                                 </div>
+
                                                 {/* Scrollable Windowed Grid */}
                                                 <div className="max-h-56 sm:max-h-64 overflow-y-auto custom-scrollbar optimize-scrolling p-1.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 border border-cyan-900/30 bg-slate-950/80 rounded-xl w-full">
                                                   {pokemon.moves
@@ -7722,6 +8628,7 @@ export default function App() {
                                               </div>
                                             )}
                                           </div>
+
                                         </motion.div>
                                       ) : (
                                         <motion.div
@@ -7732,6 +8639,8 @@ export default function App() {
                                           transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                                           className="space-y-4"
                                         >
+
+
                                           {/* AI Strategy & Run Buttons */}
                                           {/* AI Strategy & Run Buttons */}
                                           {isBattling && (
@@ -7749,6 +8658,7 @@ export default function App() {
                                               {isAiSuggesting ? <Loader2 className="w-3 h-3 animate-spin" /> : <BrainCircuit className="w-3 h-3" /> }
                                               AI Strategist
                                             </motion.button>
+                                            
                                             <motion.button
                                               whileHover={{ scale: 1.05 }}
                                               whileTap={{ scale: 0.95 }}
@@ -7764,6 +8674,9 @@ export default function App() {
                                             </motion.button>
                                           </div>
 )}
+
+
+
                                         </motion.div>
                                       )}
         </AnimatePresence>
@@ -7774,6 +8687,7 @@ export default function App() {
                                 )}
         </AnimatePresence>
                             </motion.div>
+
                             {/* Floating Scroll to Top button for details container */}
                             <button
                               type="button"
@@ -7830,7 +8744,9 @@ export default function App() {
                             </span>
                           </div>
                         </div>
+
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/5 to-transparent pointer-events-none"></div>
+                        
                         <motion.div 
                           className="relative w-52 h-52 xxs:w-60 xxs:h-60 xs:w-72 xs:h-72 sm:w-80 sm:h-80 md:w-[28rem] md:h-[28rem] lg:w-[22rem] lg:h-[22rem] xl:w-[26rem] xl:h-[26rem] flex items-center justify-center shrink-0 max-h-[35vh] sm:max-h-[45vh] lg:max-h-[35vh] xl:max-h-[40vh] -mt-8 sm:-mt-16 lg:mt-0 mb-2 sm:mb-6 lg:mb-1 xl:mb-3"
                           initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: "easeOut" }}
@@ -7838,6 +8754,7 @@ export default function App() {
                           <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 75%)' }}></div>
                           <PokethologyLogo className="w-full h-full object-contain filter drop-shadow-[0_0_30px_rgba(6,182,212,0.5)]" />
                         </motion.div>
+
                         <div className="flex flex-col gap-2 sm:gap-3 lg:gap-1 xl:gap-2 relative z-10 shrink-0 w-full max-w-4xl px-2 sm:px-4">
                           <h1 className={cn("flex flex-row flex-wrap items-center justify-center gap-1.5 sm:gap-3 lg:gap-4 text-3xl xxs:text-4xl xs:text-5xl sm:text-6xl md:text-6xl lg:text-6xl xl:text-7xl font-hud font-black tracking-normal sm:tracking-[0.05em] leading-tight text-center w-full break-words py-1 px-1 overflow-visible font-extrabold", isLightMode ? 'text-slate-900' : 'bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]')}>
                             <span className="inline-block py-0.5 whitespace-nowrap">POK√âTHOLOGY</span>
@@ -7846,6 +8763,8 @@ export default function App() {
                           <p className="font-serif italic text-xs xxs:text-sm xs:text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl text-cyan-400 select-none px-4 mt-0.5 lg:mt-0 tracking-wider whitespace-normal break-words text-center drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">
                             Where dreams and adventures begin!
                           </p>
+                          
+                          
                           <div className="flex justify-center items-center mt-3 sm:mt-5 md:mt-5 lg:mt-2 xl:mt-4 w-full max-w-md mx-auto px-4">
                             <motion.button
                               disabled={isInitializingDb}
@@ -7896,11 +8815,13 @@ export default function App() {
                               </span>
                             </motion.button>
                           </div>
+
                           {/* Home Screen Copyright & Legal Disclaimer Toggle */}
                           <div className="flex flex-col items-center justify-center mt-12 sm:mt-16 md:mt-24 lg:mt-6 xl:mt-10 mb-2 select-none px-2">
                             <DisclaimerButton onClick={() => setIsDisclaimerOpen(true)} variant="pill" />
                           </div>
                         </div>
+
                         {/* Removed decorative bottom status elements */}
                       </motion.div>
                     ) : listMode === 'types' ? (
@@ -7993,6 +8914,7 @@ export default function App() {
                                 </div>
                               </div>
                             </div>
+
                             {/* Sliding Pop-up Dual Triggers for Daily Scans & Theological Exam */}
                             <div className="flex flex-row items-center justify-center gap-2 sm:gap-3 mt-1 sm:mt-1.5 px-2 shrink-0 relative z-10">
                               {/* Daily Scans Button */}
@@ -8019,6 +8941,7 @@ export default function App() {
                                   READY
                                 </span>
                               </motion.button>
+
                               {/* Theological Exam Button */}
                               <motion.button
                                 whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(168,85,247,0.3)" }}
@@ -8044,6 +8967,7 @@ export default function App() {
                                 </span>
                               </motion.button>
                             </div>
+
                             <div className="flex flex-col gap-1 w-full mt-1.5 sm:mt-2">
                               <div className="flex items-center justify-between gap-3 px-2 w-full">
                                 <div className="flex overflow-x-auto custom-scrollbar optimize-scrolling sm:flex-wrap gap-2 sm:gap-2.5 pb-2 shrink-0 max-w-full w-full">
@@ -8093,6 +9017,7 @@ export default function App() {
                                   </button>
                                 </div>
                               </div>
+                              
                               <div className="flex flex-wrap items-center justify-between gap-2 px-1 pt-1 w-full">
                                 {/* Units Found indicator alongside Export PDF & Filters */}
                                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-cyan-500/25 bg-cyan-950/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] shrink-0">
@@ -8115,6 +9040,7 @@ export default function App() {
                                     {sortedAndFilteredList.length} Units Found
                                   </span>
                                 </div>
+
                                 <div className="flex gap-1 sm:gap-1.5 shrink-0 items-center">
                                   <button
                                     onClick={() => {
@@ -8182,6 +9108,7 @@ export default function App() {
                             </div>
                           </div>
                         </div>
+
                           {loadingList ? (
                           <div className="flex-1 flex flex-col items-center justify-center text-cyan-500/70 min-h-[300px]">
                             <div className="relative mb-6">
@@ -8235,6 +9162,7 @@ export default function App() {
                             >
                               <ArrowUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
                             </button>
+
                             <PokemonGrid
                               list={sortedAndFilteredList}
                               displayLimit={displayLimit}
@@ -8277,6 +9205,7 @@ export default function App() {
             </div>
         </div>
       </div>
+
         <TypeChartModal
           isOpen={isTypeChartOpen}
           onClose={() => {
@@ -8288,6 +9217,7 @@ export default function App() {
           isLightMode={isLightMode}
           sounds={sounds}
         />
+
         {/* Avatar Selection Modal */}
         <AnimatePresence>
           {isAvatarModalOpen && (
@@ -8316,10 +9246,12 @@ export default function App() {
                     <X className="w-5 h-5 sm:w-8 sm:h-8 group-hover:scale-110 transition-transform" />
                   </button>
                 </div>
+
                 <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
                   {/* Left Side: Avatar Details & Default Save */}
                   <div className="w-full lg:w-[300px] xl:w-[360px] 2xl:w-[400px] bg-slate-950/80 p-3 sm:p-5 lg:p-4 xl:p-6 flex flex-col border-b lg:border-b-0 lg:border-r border-cyan-900/50 shrink-0 z-10 shadow-2xl relative overflow-y-auto">
                     <div className="absolute inset-0 bg-gradient-to-b   from-cyan-900/10 to-transparent pointer-events-none" />
+                    
                     <div className="flex flex-row lg:flex-col items-center lg:items-center xl:items-stretch gap-3 lg:gap-0 h-full mb-3 lg:mb-0">
                       {/* Avatar Image */}
                       <div className="relative w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 xl:w-48 xl:h-48 mx-auto mb-0 lg:mb-3 xl:mb-5 bg-slate-900/50 rounded-full flex items-center justify-center border-4 border-cyan-500/30 shadow-[0_0_30px_rgba(34,211,238,0.15)] group shrink-0">
@@ -8330,6 +9262,7 @@ export default function App() {
                           className="w-16 h-16 sm:w-24 sm:h-24 lg:w-28 lg:h-28 xl:w-40 xl:h-40 object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform duration-300 [image-rendering:pixelated]"
                         />
                       </div>
+                      
                       {/* Avatar Details */}
                       <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling pr-1 sm:pr-2 lg:pr-4 flex flex-col max-h-[22vh] lg:max-h-[35vh] xl:max-h-none">
                         <h3 className="text-base sm:text-2xl lg:text-3xl xl:text-4xl font-hud font-black text-left lg:text-center text-cyan-300 uppercase tracking-[0.2em] mb-1 sm:mb-2 drop-shadow-lg shrink-0">
@@ -8338,11 +9271,13 @@ export default function App() {
                         <div className="text-[9px] sm:text-xs lg:text-sm xl:text-base text-emerald-400 font-bold uppercase tracking-widest text-center mb-1.5 sm:mb-4 py-0.5 sm:py-1 px-2 sm:px-4 border border-emerald-500/30 bg-emerald-950/30 rounded-full self-start lg:self-center shrink-0">
                           {currentAvatar.role}
                         </div>
+
                         <p className="text-[11px] sm:text-sm lg:text-base xl:text-lg font-serif italic text-slate-300 leading-relaxed opacity-90 text-left lg:text-center mb-1 sm:mb-6">
                           "{currentAvatar.lore}"
                         </p>
                       </div>
                     </div>
+
                     <button
                       onClick={() => {
                         try {
@@ -8357,9 +9292,11 @@ export default function App() {
                       Set as Default
                     </button>
                   </div>
+
                   {/* Right Side: Grid Selection */}
                   <div className="flex-1 flex flex-col h-full min-h-[300px] bg-slate-900/30 relative">
                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none mix-blend-overlay" />
+                    
                     <div className="p-4 sm:p-6 border-b border-cyan-900/30 bg-slate-900/80 flex gap-3 sm:gap-4 overflow-x-auto hide-scrollbar shrink-0 z-10 backdrop-blur-md">
                       {['All', 'Protagonist', 'Rival', 'Gym Leader', 'Champion', 'Trainer', 'Villain'].map(role => (
                         <button 
@@ -8376,6 +9313,7 @@ export default function App() {
                         </button>
                       ))}
                     </div>
+
                     <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-4 sm:p-6 lg:p-8 z-10">
                       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4 sm:gap-5 xl:gap-6 pb-20">
                         {TRAINER_SPRITES.filter(t => avatarFilter === 'All' || t.role === avatarFilter).map(trainer => (
@@ -8416,6 +9354,7 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
+
         {/* Move Learning Modal */}
         <AnimatePresence>
           {isMoveLearningOpen && (
@@ -8437,6 +9376,7 @@ export default function App() {
                     {isReplacingMove ? "Replace Move" : "New Moves Available"}
                   </h2>
                 </div>
+
                 <div className="p-4 sm:p-6 space-y-4">
                   {!isReplacingMove ? (
                     <>
@@ -8547,6 +9487,7 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
+
         {/* Move Detail Modal */}
         <AnimatePresence>
           {isMoveDetailOpen && selectedMoveDetail && (
@@ -8594,6 +9535,7 @@ export default function App() {
                     <X className="w-5 h-5 text-white stroke-[2.5]" />
                   </button>
                 </div>
+
                 <div className="p-4 sm:p-6 space-y-6 bg-slate-900">
                   {/* Description */}
                   {selectedMoveDetail.description && (
@@ -8604,6 +9546,7 @@ export default function App() {
                       </p>
                     </div>
                   )}
+
                   {/* Stats Grid */}
                   <div className="space-y-2">
                     <h4 className="text-[8px] font-bold tracking-wider text-cyan-600 uppercase font-hud tracking-widest border-b border-cyan-900/30 pb-1">Performance Metrics</h4>
@@ -8617,80 +9560,9 @@ export default function App() {
                         <span className="text-xl font-mono text-cyan-400">{selectedMoveDetail.accuracy ? `${selectedMoveDetail.accuracy}%` : '--'}</span>
                       </div>
                       <div className="bg-slate-950 p-3 rounded-xl border border-cyan-900/30 flex flex-col items-center justify-center gap-1 col-span-2 sm:col-span-1">
-                        <span className="text-[8px] font-bold tracking-wider text-cyan-700 uppercase font-hud">Effect Chance</span>
-                        <span className="text-xl font-mono text-cyan-400">{selectedMoveDetail.effect_chance ? `${selectedMoveDetail.effect_chance}%` : "--"}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        {/* Other Modals missing from corruption */}
-        <WelcomeModal isOpen={isWelcomeOpen} onClose={() => setIsWelcomeOpen(false)} onOpenTutorial={() => { setIsWelcomeOpen(false); setIsTutorialOpen(true); }} />
-        <Tutorial isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
-        <PokethologyMissionModal isOpen={isMissionModalOpen} onClose={() => setIsMissionModalOpen(false)} />
-        <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} isLightMode={isLightMode} />
-        <DisclaimerModal isOpen={isDisclaimerOpen} onClose={() => setIsDisclaimerOpen(false)} />
-        <PwaInstallModal isOpen={isPwaModalOpen} onClose={() => setIsPwaModalOpen(false)} />
-        <OfflineManagerModal isOpen={isOfflineManagerOpen} onClose={() => setIsOfflineManagerOpen(false)} onPlaySound={(soundType) => { try { if (soundType === "scan") { sounds.scan(); } else if (soundType === "success") { sounds.success(); } else if (soundType === "flee") { sounds.flee(); } } catch(e){} }} />
-        <PokemonComparisonSidebar isOpen={isComparisonOpen} onClose={() => setIsComparisonOpen(false)} pinnedPokemon={pokemon} onSelectMainPokemon={(p) => performSearch(p.name, false)} isLightMode={isLightMode} />
-        <FavoritesVaultModal
-          isOpen={isFavoritesModalOpen}
-          onClose={() => setIsFavoritesModalOpen(false)}
-          favorites={favorites}
-          toggleFavorite={toggleFavorite}
-          onSelectPokemon={(name) => performSearch(name, false)}
-          onStartBattleWithPokemon={(name) => {
-            setIsSelectingOpponent(true);
-            performSearch(name, false);
-          }}
-          isLightMode={isLightMode}
-          sounds={sounds}
-        />
-        <AnimatePresence>
-          {isDailyQuizOpen && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80">
-              <PokethologyQuizWidget />
-              <button onClick={() => setIsDailyQuizOpen(false)} className="absolute top-4 right-4 z-[160] p-3 text-white bg-black/40 hover:bg-black/60 rounded-full">
-                <X className="w-6 h-6 text-white" />
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <AnimatePresence>
-          {isDailyScanOpen && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80">
-              <div className="w-full max-w-2xl bg-slate-900 border border-slate-700 p-6 rounded-xl relative overflow-hidden h-[80vh] overflow-y-auto">
-                 <PokethologyCombatMissionWidget todayStr={new Date().toISOString().split("T")[0]} isCompleted={false} missionProgressCount={0} missionRequiredCount={5} dailyStreak={1} />
-              </div>
-              <button onClick={() => setIsDailyScanOpen(false)} className="absolute top-4 right-4 z-[160] p-3 text-white bg-black/40 hover:bg-black/60 rounded-full">
-                <X className="w-6 h-6 text-white" />
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <BattleResultScreen
-          isOpen={battleResult !== null}
-          battleResult={battleResult}
-          pokemon={pokemon}
-          battleOpponent={battleOpponent}
-          battleLog={battleLog}
-          turnNumber={turnNumber}
-          pokemonHP={pokemonHP}
-          opponentHP={opponentHP}
-          pokemonMaxHP={pokemonMaxHP}
-          opponentMaxHP={opponentMaxHP}
-          pokemonStatus={pokemonStatus}
-          opponentStatus={opponentStatus}
-          onRematch={() => handlePostBattleAction("rematch")}
-          onInspect={() => setInspectingOpponent(true)}
-          onNewBattle={() => handlePostBattleAction("new_battle")}
-          isLightMode={isLightMode}
-        />
-      </div>
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
+                        <span className="text-[8px] font-bold tracking-wider text-cyan-700 uppercase font-hud">Effect Chance</sxúÏWmo€6˛û_¡[aSÏlm÷uvÜælhÅ:…Íb--ùlÆ©ëTlW–ﬂ—z#miŸÄ}f¿ñx˜‹èwºsJ≈≈	È˘LuJ	9’˙í&0ÿö`ÀI,Ö	)$ŸS¬¡£…dpëk‡àÊÚ^Ç°åüB#ÈC∏¶"Ú#˘¯ÂΩ®‚´è‰)¡†òé≠}>N«ªÎfˆ≤zù‰È8ëÜIqzƒÎ„åäìÚL∞Ñ∏V†∑uq“ÚÒCre÷†»\Fîkí0≠ôXëX…ÑÑR©,µÍ…√±£=P&∞!L_• f9”Ÿ."≈.5ÃÚ·àÃ.àÛ⁄c¥#ã≥ÀwôëäQ^√Û>ÅJFçﬂså ,£(»∏¡¥Ü8∫R›zzk]≠◊Úòµ‰rµõ€PIqó‹oË’iÏŸRfÊPˇûÿØ∏a7ô~√Vk´¨|≥mΩd+å%†∂ú~´>¶;r˙ZhC9?4Äú{¢Â":ï_≈1gÊT–’Ò|nøôcúì¶◊úÓ2äh˚|∑K°JV£v¯Àb“r»l6#R1Ÿt∂t}j◊Cõ´PoßDÜ†µ'Tí˛Z.Ê Æê]ó	©	◊CÂ≈aëÿt∆ÙÖLR™òñb¡"XRÂØÂıŒ«4AKôU6fyZæXã˝Õ;ßL4‹a∫◊óÇä•J@˙úû
+ºÒø&ˇ,ó¶wX≈ÙØ4„e9Wcªµ◊¶üÉÎ⁄Ë±DΩYG0ÆA≥ºyu˘FÆVjU≥‹_˚.îÅjÉd√—'/JæCïyNç·ûôuá¶‹k(˚mñV±\•© Lu«z»~\\Qx°Ô9>SÊÔ,/ü-gÏ¥≠ÈQGkÂÌçÖù|˜K∆>€"ê°ﬂ3€ñIò`fﬂwr"S2≥{J&∂Jhi¡cúYlô9Ü;”IÃ∂°båd0!üÉõ≥«ì[Çı∏%xºâB(v‹ﬂ3mXº´óià,W¡í””¯	1á3Ä”zÏﬁﬁ≥h∆Õ˚
+∑Ãå¡ém”óÖü¸k⁄LS¶éÔt©%œ`éZî= |⁄Mú„&“‡€r‘⁄¨q+≠ªè&dç3îz⁄PŒ'DŸÑ(à3ŒèvÉ~˛ÊﬁÁdçﬂV˚†ck„roˇÍÙwriÅ◊ˆ*ó¨ª^ÙÌ!ëÑnÉMN÷(¨9∫|?ôê•T*-˝;§ßx^ı!£å‰∞; 6b.7¡öEm‹<ô‹≠o[∆.†8hu$ÖóÂÿUñ‘TìRïÓÔ››¬®Y.`C^¢+√—©ëØWHƒW:ÂÃÔ£õ…≠m∂;q¿9ﬂﬁ«òÚE9ÂbKWrÖßéÄL‡9L∆[¯#c
+¢äÒ∏ —>åäuVtÂf◊‹~_-÷âı-ñº≤QΩç}{* ——∏óà|Å√è¿]π-ƒ¯pïŒ%GÍÓWÎ®◊«»7rUÉ’kˆôóY≤LŸˆΩ√èW◊ç'ØÆΩ^YµÄˆΩC√ún%˚Uóû
+Ê-;¥·‡`2›®+ó]˙j†øˆßê∑êÿ¥. ¸wq∏ñ∫öLûÖ6iÜU¬3˛oHqqÀß§M(æ‹%lJ˝˜Ÿ≈ª‰CyzæÈ˚Áï¶.º˙üé:à◊vIôéRJ™Á∂
+©⁄Y"I≈…ü   ˇˇ è≥Nˇ

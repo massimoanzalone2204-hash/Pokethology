@@ -3,7 +3,7 @@ import {createRoot} from 'react-dom/client';
 import { BattleProvider } from './context/BattleContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import './i18n';
-import App from './App.tsx';
+import MainApp from './MainApp.tsx';
 import './index.css';
 import { registerServiceWorker } from './utils/notificationManager';
 
@@ -13,7 +13,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary onReset={() => window.location.reload()}>
       <BattleProvider>
-        <App />
+        <MainApp />
       </BattleProvider>
     </ErrorBoundary>
   </StrictMode>,
