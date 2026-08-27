@@ -7759,7 +7759,7 @@ export default function App() {
                                         />
 
                                         {/* Opponent Sprite (Top Right Area) */}
-                                        <div className="absolute top-[12%] right-2 xs:top-[15%] xs:right-4 sm:top-[20%] sm:right-12 md:top-[50%] md:-translate-y-1/2 md:right-16 lg:right-32 pointer-events-auto z-10">
+                                        <div className="absolute top-[12%] right-2 xs:top-[15%] xs:right-4 sm:top-[20%] sm:right-12 md:top-[25%] md:right-16 lg:top-[35%] xl:top-[30%] lg:-translate-y-1/2 lg:right-24 xl:right-32 lg:bottom-auto pointer-events-auto z-10">
                                           {battleOpponent && (
                                             <motion.div
                                               key={battleOpponent?.name + '-' + isBattling}
@@ -7842,7 +7842,7 @@ export default function App() {
 
 
                                         {/* Player Sprite (Bottom Left Area) */}
-                                        <div className="absolute bottom-20 left-2 xs:bottom-24 xs:left-4 sm:bottom-28 sm:left-12 md:bottom-auto md:top-[50%] md:-translate-y-1/2 md:left-16 lg:left-32 pointer-events-auto z-10">
+                                        <div className="absolute bottom-20 left-2 xs:bottom-24 xs:left-4 sm:bottom-28 sm:left-12 md:bottom-32 md:left-16 lg:top-[35%] xl:top-[30%] lg:-translate-y-1/2 lg:left-24 xl:left-32 lg:bottom-auto pointer-events-auto z-10">
                                           <motion.div
                                             key={pokemon?.name + '-' + isBattling}
                                             initial={{ opacity: 1, scale: 0.8 }}
@@ -8715,7 +8715,7 @@ export default function App() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98, y: -12 }}
                         transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-                        className="flex-1 flex flex-col items-center justify-center gap-3 sm:gap-4 md:gap-5 py-3 sm:py-5 px-3 sm:px-4 text-center relative overflow-y-auto custom-scrollbar optimize-scrolling select-none w-full h-full my-auto max-w-5xl mx-auto min-h-0"
+                        className="flex-1 flex flex-col items-center justify-center gap-3 sm:gap-4 md:gap-5 lg:gap-2 xl:gap-3 py-3 sm:py-5 px-3 sm:px-4 text-center relative overflow-y-auto lg:overflow-hidden custom-scrollbar optimize-scrolling select-none w-full h-full my-auto max-w-5xl mx-auto min-h-0"
                       >
                         {/* Top-Right Corner Avatar with Interactive Selector */}
                         <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20 flex flex-col items-end gap-1">
@@ -8732,7 +8732,7 @@ export default function App() {
                             <img 
                               src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                               alt={currentAvatar.name}
-                              className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-24 md:h-24 lg:w-28 lg:h-28 object-contain drop-shadow-[0_2px_10px_rgba(34,211,238,0.3)] [image-rendering:pixelated] relative z-10"
+                              className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-[0_2px_10px_rgba(34,211,238,0.3)] [image-rendering:pixelated] relative z-10"
                             />
                           </button>
                           <div className="text-right hidden xs:flex flex-col items-end -mt-1">
@@ -8748,24 +8748,24 @@ export default function App() {
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/5 to-transparent pointer-events-none"></div>
                         
                         <motion.div 
-                          className="relative w-48 h-48 xs:w-56 xs:h-56 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 flex items-center justify-center shrink min-h-0 max-h-[35vh] sm:max-h-[40vh] -mt-8 sm:-mt-12 mb-2 sm:mb-4"
+                          className="relative w-52 h-52 xxs:w-60 xxs:h-60 xs:w-72 xs:h-72 sm:w-80 sm:h-80 md:w-[28rem] md:h-[28rem] lg:w-[22rem] lg:h-[22rem] xl:w-[26rem] xl:h-[26rem] flex items-center justify-center shrink-0 max-h-[35vh] sm:max-h-[45vh] lg:max-h-[35vh] xl:max-h-[40vh] -mt-8 sm:-mt-16 lg:mt-0 mb-2 sm:mb-6 lg:mb-1 xl:mb-3"
                           initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: "easeOut" }}
                         >
                           <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 75%)' }}></div>
                           <PokethologyLogo className="w-full h-full object-contain filter drop-shadow-[0_0_30px_rgba(6,182,212,0.5)]" />
                         </motion.div>
 
-                        <div className="flex flex-col gap-2 sm:gap-3 relative z-10 shrink-0 w-full max-w-4xl px-2 sm:px-4">
-                          <h1 className={cn("flex flex-row flex-wrap items-center justify-center gap-1.5 sm:gap-3 lg:gap-4 text-3xl xxs:text-4xl xs:text-5xl sm:text-6xl md:text-6xl lg:text-7xl font-hud font-black tracking-normal sm:tracking-[0.05em] leading-tight text-center w-full break-words py-1 px-1 overflow-visible font-extrabold", isLightMode ? 'text-slate-900' : 'bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]')}>
+                        <div className="flex flex-col gap-2 sm:gap-3 lg:gap-1 xl:gap-2 relative z-10 shrink-0 w-full max-w-4xl px-2 sm:px-4">
+                          <h1 className={cn("flex flex-row flex-wrap items-center justify-center gap-1.5 sm:gap-3 lg:gap-4 text-3xl xxs:text-4xl xs:text-5xl sm:text-6xl md:text-6xl lg:text-6xl xl:text-7xl font-hud font-black tracking-normal sm:tracking-[0.05em] leading-tight text-center w-full break-words py-1 px-1 overflow-visible font-extrabold", isLightMode ? 'text-slate-900' : 'bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]')}>
                             <span className="inline-block py-0.5 whitespace-nowrap">POKÃ‰THOLOGY</span>
-                            <span className="text-cyan-400 text-2xl xxs:text-3xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-black text-glow inline-block py-0.5 ml-1" style={{ textShadow: isLightMode ? 'none' : '0 0 16px rgba(34,211,238,0.7)' }}>OS</span>
+                            <span className="text-cyan-400 text-2xl xxs:text-3xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-5xl xl:text-6xl font-black text-glow inline-block py-0.5 ml-1" style={{ textShadow: isLightMode ? 'none' : '0 0 16px rgba(34,211,238,0.7)' }}>OS</span>
                           </h1>
-                          <p className="font-serif italic text-xs xxs:text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl text-cyan-400 select-none px-4 mt-0.5 tracking-wider whitespace-normal break-words text-center drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">
+                          <p className="font-serif italic text-xs xxs:text-sm xs:text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl text-cyan-400 select-none px-4 mt-0.5 lg:mt-0 tracking-wider whitespace-normal break-words text-center drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">
                             Where dreams and adventures begin!
                           </p>
                           
                           
-                          <div className="flex justify-center items-center mt-3 sm:mt-5 md:mt-5 w-full max-w-md mx-auto px-4">
+                          <div className="flex justify-center items-center mt-3 sm:mt-5 md:mt-5 lg:mt-2 xl:mt-4 w-full max-w-md mx-auto px-4">
                             <motion.button
                               disabled={isInitializingDb}
                               whileHover={isInitializingDb ? {} : { scale: 1.05, boxShadow: "0 0 30px rgba(34,211,238,0.7)" }}
@@ -8817,7 +8817,7 @@ export default function App() {
                           </div>
 
                           {/* Home Screen Copyright & Legal Disclaimer Toggle */}
-                          <div className="flex flex-col items-center justify-center mt-12 sm:mt-16 md:mt-24 mb-2 select-none px-2">
+                          <div className="flex flex-col items-center justify-center mt-12 sm:mt-16 md:mt-24 lg:mt-6 xl:mt-10 mb-2 select-none px-2">
                             <DisclaimerButton onClick={() => setIsDisclaimerOpen(true)} variant="pill" />
                           </div>
                         </div>
@@ -8901,7 +8901,7 @@ export default function App() {
                                   <img 
                                     src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                                     alt={currentAvatar.name}
-                                    className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-24 md:h-24 lg:w-28 lg:h-28 object-contain drop-shadow-[0_5px_16px_rgba(34,211,238,0.5)] [image-rendering:pixelated] relative z-10"
+                                    className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-[0_5px_16px_rgba(34,211,238,0.5)] [image-rendering:pixelated] relative z-10"
                                   />
                                 </button>
                                 <div className="text-right hidden sm:flex flex-col items-end -mt-1">
@@ -9249,30 +9249,30 @@ export default function App() {
 
                 <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
                   {/* Left Side: Avatar Details & Default Save */}
-                  <div className="w-full lg:w-[350px] xl:w-[400px] bg-slate-950/80 p-3 sm:p-5 lg:p-8 flex flex-col border-b lg:border-b-0 lg:border-r border-cyan-900/50 shrink-0 z-10 shadow-2xl relative overflow-y-auto custom-scrollbar">
+                  <div className="w-full lg:w-[300px] xl:w-[360px] 2xl:w-[400px] bg-slate-950/80 p-3 sm:p-5 lg:p-4 xl:p-6 flex flex-col border-b lg:border-b-0 lg:border-r border-cyan-900/50 shrink-0 z-10 shadow-2xl relative overflow-y-auto">
                     <div className="absolute inset-0 bg-gradient-to-b   from-cyan-900/10 to-transparent pointer-events-none" />
                     
-                    <div className="flex flex-row lg:flex-col items-center lg:items-stretch gap-3 lg:gap-0 h-full mb-3 lg:mb-0">
+                    <div className="flex flex-row lg:flex-col items-center lg:items-center xl:items-stretch gap-3 lg:gap-0 h-full mb-3 lg:mb-0">
                       {/* Avatar Image */}
-                      <div className="relative w-20 h-20 sm:w-28 sm:h-28 lg:w-48 lg:h-48 mx-auto mb-0 lg:mb-4 bg-slate-900/50 rounded-full flex items-center justify-center border-4 border-cyan-500/30 shadow-[0_0_30px_rgba(34,211,238,0.15)] group shrink-0">
+                      <div className="relative w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 xl:w-48 xl:h-48 mx-auto mb-0 lg:mb-3 xl:mb-5 bg-slate-900/50 rounded-full flex items-center justify-center border-4 border-cyan-500/30 shadow-[0_0_30px_rgba(34,211,238,0.15)] group shrink-0">
                         <div className="absolute inset-0 rounded-full bg-cyan-400/5 animate-pulse" />
                         <img 
                           src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                           alt={currentAvatar.name}
-                          className="w-16 h-16 sm:w-24 sm:h-24 lg:w-40 lg:h-40 object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform duration-300 [image-rendering:pixelated]"
+                          className="w-16 h-16 sm:w-24 sm:h-24 lg:w-28 lg:h-28 xl:w-40 xl:h-40 object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform duration-300 [image-rendering:pixelated]"
                         />
                       </div>
                       
                       {/* Avatar Details */}
-                      <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling pr-1 sm:pr-2 lg:pr-4 flex flex-col max-h-[22vh] lg:max-h-none">
-                        <h3 className="text-base sm:text-2xl lg:text-5xl font-hud font-black text-left lg:text-center text-cyan-300 uppercase tracking-[0.2em] mb-1 sm:mb-2 drop-shadow-lg shrink-0">
+                      <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling pr-1 sm:pr-2 lg:pr-4 flex flex-col max-h-[22vh] lg:max-h-[35vh] xl:max-h-none">
+                        <h3 className="text-base sm:text-2xl lg:text-3xl xl:text-4xl font-hud font-black text-left lg:text-center text-cyan-300 uppercase tracking-[0.2em] mb-1 sm:mb-2 drop-shadow-lg shrink-0">
                           {currentAvatar.name}
                         </h3>
-                        <div className="text-[9px] sm:text-xs lg:text-lg text-emerald-400 font-bold uppercase tracking-widest text-center mb-1.5 sm:mb-6 py-0.5 sm:py-1 px-2 sm:px-4 border border-emerald-500/30 bg-emerald-950/30 rounded-full self-start lg:self-center shrink-0">
+                        <div className="text-[9px] sm:text-xs lg:text-sm xl:text-base text-emerald-400 font-bold uppercase tracking-widest text-center mb-1.5 sm:mb-4 py-0.5 sm:py-1 px-2 sm:px-4 border border-emerald-500/30 bg-emerald-950/30 rounded-full self-start lg:self-center shrink-0">
                           {currentAvatar.role}
                         </div>
 
-                        <p className="text-[11px] sm:text-sm lg:text-xl font-serif italic text-slate-300 leading-relaxed opacity-90 text-left lg:text-center lg:text-left mb-1 sm:mb-6">
+                        <p className="text-[11px] sm:text-sm lg:text-base xl:text-lg font-serif italic text-slate-300 leading-relaxed opacity-90 text-left lg:text-center mb-1 sm:mb-6">
                           "{currentAvatar.lore}"
                         </p>
                       </div>
@@ -9315,7 +9315,7 @@ export default function App() {
                     </div>
 
                     <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-4 sm:p-6 lg:p-8 z-10">
-                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6 pb-20">
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4 sm:gap-5 xl:gap-6 pb-20">
                         {TRAINER_SPRITES.filter(t => avatarFilter === 'All' || t.role === avatarFilter).map(trainer => (
                           <button
                             key={trainer.id}
@@ -9560,15 +9560,9 @@ export default function App() {
                         <span className="text-xl font-mono text-cyan-400">{selectedMoveDetail.accuracy ? `${selectedMoveDetail.accuracy}%` : '--'}</span>
                       </div>
                       <div className="bg-slate-950 p-3 rounded-xl border border-cyan-900/30 flex flex-col items-center justify-center gap-1 col-span-2 sm:col-span-1">
-                        <span className="text-[8px] font-bold tracking-wider text-cyan-700 uppercase font-hud">Effect Chance</span>
-                        <span className="text-xl font-mono text-cyan-400">{selectedMoveDetail.effect_chance ? `${selectedMoveDetail.effect_chance}%` : '--'}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Stat Changes */}
-                  {/* Stat Changes */}
-                  {selectedMoveDetail.stat_changes && selectedMoveDetail.stat_changes.length > 0 && (
-              xœ”SM›0½çWŒ¸Ôè6«USBÕ¯c«J{¬ª•1â®±‘mvC#ş{ÍÇ6U}ÀxfŞ¼ç™1@·’œ?Ô˜o´Ä½g*Ê4äÆKWpu%Çí`ñdÉ×quú	¦ÜõÇ“ƒ’–dJäĞ[XC%¹c¨«
-5£ÁjÊ¹,È3ÏÑØq¬s/½·ÔÂ§#•š$:ng•ü£½Ğ<‡îC˜†Ü@A«…‹ œ
-dó¯ê	?£¥\„Æ‘?°<,iµ^‡PÙl€ËO;u™¡`ŸÂz6ı¨ğ›ı¹ÇµSµYAŒ ÉÛ8ncpRA«ÚÅå)£·1ìn;<Á¯ÚX~hH†öQ·XÂPZÔ÷í%¹Ë‹ºõû@õÆ5ŠÑŠ[*øoôÒóP‚¾6¡t¨Pc%Ü ¬}âoÀ?h“¨KüÜg&—ª×-ïr ú¿RIåm^ ²‡Rˆáı˜KÔTädÇìF£ÆÁ°˜5h—ïè¦ê­ÿÊw<¾ßşím—ëõbM“ÈMØ|@Ì, g]W’]M¢RY®dxá›óL2'ÑÉK7…ß5”Ó‰kK¢ûÚT(ÍD_´Vúc÷‚¨n:cğnÕ®V   ÿÿ Æ—:¨
+                        <span className="text-[8px] font-bold tracking-wider text-cyan-700 uppercase font-hud">Effect Chance</sxœìWmoÛ6ş_Á[aSìlmÖuv†¾lh:Éêb--l®©‘TlWĞßÑz#miÙ€}fÀ–x÷Üw¼sJÅÅ	éùLuJ	9Õú’&0Øš`ËI,…	)$ÙSÂÁ£Édp‘kàˆæò^‚¡ŒŸB#éC¸¦"ò#ùøå½¨â«ä)Á ˜­}>NÇ»ëfö²zäé8‘†IqzÄëãŒŠ“òL°„¸V ·uqÒğòñCreÖ È\F”k’0­™X‘XÉ„„R©,µêÉÃ±£ğ=ğP&°!L_¥ f9ÓÙ."Å.5ÌòáˆÌ.ˆóÚc´#‹³Ëw™‘ŠQ^Ãó>JFßsŒÊ,£(È¸Á´†8ºRİzzk]­×ò˜µärµ›ÛPIq—ÜoèÕiìÙRfæPÿØ¯¸a7™~ÃVk«¬|³ğm½d+Œ% ¶œ~«>¦;rúZhC9?4€œ{¢å":•_Å1gæTĞÕñ|n¿™cœ“¦×œî2Šhû|·K¡JV£vøËbÒrÈl6#R1Ùt¶t}j×C›«Po§D† µ'T’şZ.æ ®]—	©	×CåÅa‘ØtÆô…LRª˜–bÁ"XRå¯åõÎÇ4AK™U6fyZ¾X‹ıÍ;§L4Üaº×—‚Š¥J@úœ
+¼ñ¿&ÿ,—¦wXÅô¯4ãe9Wc»µ×¦ŸƒëÚè±D½YG0®A³¼yuùF®VjU³Ü_û.”jƒdÃÑ'/J¾C•yNáğ™u‡¦Ük(ûm–V±\¥© LuÇzÈ~\\Qx¡ï9>Sæï,/Ÿ-gì´­éQGkåí…|÷KÆ>Û"¡ß3Û–I˜`fßwr"S2³{J&¶JhiÁcœYl™9†;ÓIÌ¶¡bŒd0!Ÿƒ›³Ç“[‚õ¸%x¼‰B(vÜß3mX¼«—iğˆ,WÁ’ÓğÓø	1‡3€ÓzìŞŞ³hÆÍû
+·ÌŒÁmÓ—…ŸükÚLS¦ït©%Ï`Z”= |ÚMœã&ÒàÛrÔÚ¬q+­»&d3”zÚPÎ'DÙ„(ˆ3Îvƒ~şæŞçdßVû ckãroÿêôwri×ö*—¬»^ôí!‘„nƒMğNÖ(¬9º|?™¥T*-ı;¤§x^õ!£Œä°; 6b.7ÁšEmÜ<™Ü­o[Æ. 8hu$…—åØU–ÔT“R•îïİİÂ¨Y.`C^¢+ÃÑ©‘¯WHÄW:åÌï£›É­m¶;qÀ9ßŞÇ˜òE9åbKWr…§€Là9LÆ[ø#c
+¢Šñ¸ Ñ>ŒŠuVtåf×Ü~_-Ö‰õ-–¼²Q½}{* ÑÑ¸—ˆ|ÃÀ]¹-Äøp•Î%GêîWë¨×ÇÈ7rUƒğÕkö™—Y²LÙö½ÃW×'¯®½^Yµ€ö½CÃœn%ûU—
+æ-;´áà`2İ¨+—]új ¿ö§·Ø´. üwq¸–ºšL…6i†UÂ3şoHqqË§¤M(¾Ü%lJı÷ÙÅ»äCyz¾éûç•¦.¼úŸ:ˆ×vI™RJªç¶
+©ÚY"IÅÉŸ   ÿÿ ³Nÿ
