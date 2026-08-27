@@ -44,19 +44,15 @@ const chatCache = new LRUCache<string, any>({ max: 500, ttl: 1000 * 60 * 20 }); 
 
 // Initialize Gemini
 const getApiKey = () => process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-let aiClient: any = null;
-function getAiClient() {
-  if (!aiClient) {
-    const key = getApiKey();
-    if (key) {
-      aiClient = new GoogleGenAI({
-        apiKey: key,
-        httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
-      });
+
+const ai = new GoogleGenAI({
+  apiKey: getApiKey(),
+  httpOptions: {
+    headers: {
+      'User-Agent': 'aistudio-build',
     }
   }
-  return aiClient;
-}
+});
 
 const DEFAULT_MODEL = "gemini-3.1-flash-lite";
 const LITE_MODEL = "gemini-3.1-flash-lite";
