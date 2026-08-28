@@ -45,6 +45,7 @@ import { MoveModal } from './components/MoveModal';
 import { MoveDetailModal } from './components/MoveDetailModal';
 import { DailyPokemonModal } from './components/DailyPokemonModal';
 import { PokethologyExamModal } from './components/PokethologyExamModal';
+import { SettingsModal } from './components/SettingsModal';
 import { BattleHistory } from './components/BattleHistory';
 import { PokethologyMissionModal } from './components/PokethologyMissionModal';
 import { AboutModal } from './components/AboutModal';
@@ -59,2484 +60,36 @@ import { CombatStatsSection } from './components/CombatStatsSection';
 import { MovesetAnalysisSection } from './components/MovesetAnalysisSection';
 import { FavoritesVaultModal } from './components/FavoritesVaultModal';
 import { TypeChartModal } from './components/TypeChartModal';
-
-const TRAINER_SPRITES = [
-  {
-    "name": "Brock",
-    "id": "brock",
-    "role": "Gym Leader",
-    "lore": "The Rock-Solid Pok\u00e9mon Trainer. As the Pewter City Gym Leader, he acts as a wall of defense for challengers, believing in the unbreakable spirit of Rock-type Pok\u00e9mon and their enduring fortitude against any storm."
-  },
-  {
-    "name": "Misty",
-    "id": "misty",
-    "role": "Gym Leader",
-    "lore": "The Tomboyish Mermaid of Cerulean City. A fierce Water-type specialist whose tactics flow like a raging river. She balances grace and power, demanding absolute respect for the depths of water strategy."
-  },
-  {
-    "name": "Lt. Surge",
-    "id": "ltsurge",
-    "role": "Gym Leader",
-    "lore": "The Lightning American. A veteran of a vague, historic Pok\u00e9mon war, he uses his military discipline to command Electric-type Pok\u00e9mon with shocking precision and explosive speed from his Vermilion City Gym."
-  },
-  {
-    "name": "Erika",
-    "id": "erika",
-    "role": "Gym Leader",
-    "lore": "The Nature-Loving Princess. A practitioner of traditional flower arrangement in Celadon City. She finds true elegance in Grass-type Pok\u00e9mon, preferring battles that bloom with natural beauty and tranquility."
-  },
-  {
-    "name": "Koga",
-    "id": "koga",
-    "role": "Gym Leader",
-    "lore": "The Poisonous Ninja Master. Relying on confusion, toxins, and shadows, this Fuchsia City Gym Leader treats Pok\u00e9mon battling as an extension of the ancient ninja arts, striking when his foes are least prepared."
-  },
-  {
-    "name": "Sabrina",
-    "id": "sabrina",
-    "role": "Gym Leader",
-    "lore": "The Master of Psychic Pok\u00e9mon. A psychic prodigy from Saffron City who communicates telepathically with her Pok\u00e9mon. She foresaw your arrival and believes that true power lies in the untethered mind."
-  },
-  {
-    "name": "Blaine",
-    "id": "blaine",
-    "role": "Gym Leader",
-    "lore": "The Hotheaded Quiz Master. Living on the volcanic Cinnabar Island, this eccentric Fire-type specialist combines his passion for riddles with the searing heat of his beloved fiery companions."
-  },
-  {
-    "name": "Giovanni",
-    "id": "giovanni",
-    "role": "Gym Leader",
-    "lore": "The enigmatic boss of Team Rocket and the former Viridian City Gym Leader. A ruthless mastermind who views Pok\u00e9mon primarily as tools for absolute domination and financial conquest."
-  },
-  {
-    "name": "Lance",
-    "id": "lance",
-    "role": "Champion",
-    "lore": "The venerable Dragon Master of Blackthorn City. As a member of the Elite Four and later a Champion, he unleashes the mythical, untamed fury of Dragon-type Pok\u00e9mon to uphold justice across the regions."
-  },
-  {
-    "name": "Falkner",
-    "id": "falkner",
-    "role": "Gym Leader",
-    "lore": "The Elegant Master of Flying Pok\u00e9mon. Inheriting the Violet City Gym from his father, he commands the skies and fiercely defends the honor of Flying-types against those who underestimate them."
-  },
-  {
-    "name": "Bugsy",
-    "id": "bugsy",
-    "role": "Gym Leader",
-    "lore": "The Walking Bug Pok\u00e9mon Encyclopedia. Despite his youth, this Azalea Town prodigy has dedicated his life to researching the hidden potential and evolutionary wonders of Bug-type Pok\u00e9mon."
-  },
-  {
-    "name": "Whitney",
-    "id": "whitney",
-    "role": "Gym Leader",
-    "lore": "The Incredibly Pretty Girl of Goldenrod City! Don't let her tears fool you\u2014her Normal-type Pok\u00e9mon are notoriously resilient, utilizing relentless tactics like Rollout to crush unsuspecting challengers."
-  },
-  {
-    "name": "Morty",
-    "id": "morty",
-    "role": "Gym Leader",
-    "lore": "The Mystic Seer of the Future. Stationed in Ecruteak City, he has dedicated his life to studying the legends of Ho-Oh, communicating with Ghost-types to pierce the veil between the physical and spiritual realms."
-  },
-  {
-    "name": "Chuck",
-    "id": "chuck",
-    "role": "Gym Leader",
-    "lore": "His Roaring Fists Do the Talking. Training endlessly under the crashing waterfalls of Cianwood City, this Fighting-type Gym Leader channels the raw, unyielding power of nature into his Pok\u00e9mon's strikes."
-  },
-  {
-    "name": "Jasmine",
-    "id": "jasmine",
-    "role": "Gym Leader",
-    "lore": "The Steel-Clad Defense Girl. Initially timid and caring, she hardens her resolve in battle, directing her defensively impenetrable Steel-type Pok\u00e9mon to stand firm as the lighthouse of Olivine City."
-  },
-  {
-    "name": "Pryce",
-    "id": "pryce",
-    "role": "Gym Leader",
-    "lore": "The Teacher of Winter's Harshness. A veteran who has seen many bitter winters, this Mahogany Town Gym Leader uses Ice-types to test the inner warmth and unyielding willpower of the younger generations."
-  },
-  {
-    "name": "Clair",
-    "id": "clair",
-    "role": "Gym Leader",
-    "lore": "The Blessed User of Dragon Pok\u00e9mon. Proud, fiercely competitive, and demanding, she expects perfection from her challengers, reigning over the Blackthorn Gym with the overwhelming might of her dragons."
-  },
-  {
-    "name": "Roxanne",
-    "id": "roxanne",
-    "role": "Gym Leader",
-    "lore": "The Rock-Loving Scholar. A top graduate of the Pok\u00e9mon Trainer's School, she approaches battles with academic rigor, testing her textbook strategies through her sturdy Rock-type Pok\u00e9mon."
-  },
-  {
-    "name": "Brawly",
-    "id": "brawly",
-    "role": "Gym Leader",
-    "lore": "A big wave in motion! Surfing the tides of Dewford Town, he applies the fluidity of the ocean to his martial arts, instructing his Fighting-type Pok\u00e9mon to absorb impact and counterattack."
-  },
-  {
-    "name": "Wattson",
-    "id": "wattson",
-    "role": "Gym Leader",
-    "lore": "The cheerfully electrifying man! A jovial inventor who revolutionized Mauville City, he greets every battle with a hearty laugh, sparking joy and high-voltage tactics with his Electric-type Pok\u00e9mon."
-  },
-  {
-    "name": "Flannery",
-    "id": "flannery",
-    "role": "Gym Leader",
-    "lore": "One with a fiery passion that burns! Recently inheriting the Lavaridge Gym, her inexperience is masked by her explosive enthusiasm and the intense heat radiating from her Fire-type companions."
-  },
-  {
-    "name": "Norman",
-    "id": "norman",
-    "role": "Gym Leader",
-    "lore": "A man in pursuit of ultimate power. The protagonist's strict but loving father, he commands the Petalburg Gym with disciplined Normal-type strategies, offering the ultimate test of his child's growth."
-  },
-  {
-    "name": "Winona",
-    "id": "winona",
-    "role": "Gym Leader",
-    "lore": "The bird user taking flight into the world. Graceful and deeply attuned to the winds of Fortree City, she dances with her Flying-type Pok\u00e9mon, performing aerial acrobatics that dazzle her opponents."
-  },
-  {
-    "name": "Wallace",
-    "id": "wallace",
-    "role": "Champion",
-    "lore": "Artist, and lover of water. An elegant coordinator and powerful trainer from Sootopolis City, he intertwines beauty and strength, commanding Water-type Pok\u00e9mon with the grace of a master illusionist."
-  },
-  {
-    "name": "Juan",
-    "id": "juan",
-    "role": "Gym Leader",
-    "lore": "The Gym Leader with the beauty of pure water. Wallace's sophisticated mentor, he delights in creating dazzling, aquatic spectacles, proving that true power can be a breathtaking work of art."
-  },
-  {
-    "name": "Steven",
-    "id": "steven",
-    "role": "Champion",
-    "lore": "The wandering stone collector. An heir to the Devon Corporation and the Champion of Hoenn, he traverses the globe in search of rare minerals, battling with an unshakeable, Steel-clad resolve."
-  },
-  {
-    "name": "Roark",
-    "id": "roark",
-    "role": "Gym Leader",
-    "lore": "Call him Roark the Rock! The dedicated foreman of the Oreburgh Mine, he follows in his father's footsteps, polishing the rugged potential of Rock-type Pok\u00e9mon into shining gems of strength."
-  },
-  {
-    "name": "Gardenia",
-    "id": "gardenia",
-    "role": "Gym Leader",
-    "lore": "Master of Vivid Plant Pok\u00e9mon! A deeply enthusiastic Grass-type specialist in Eterna City, she loves her botanical companions fiercely\u2014though she remains famously terrified of Ghost-types."
-  },
-  {
-    "name": "Maylene",
-    "id": "maylene",
-    "role": "Gym Leader",
-    "lore": "The Barefoot Fighting Genius! A humble prodigy from Veilstone City who sometimes doubts her own strength, yet commands her Fighting-type Pok\u00e9mon with astonishing, instinctual precision."
-  },
-  {
-    "name": "Crasher Wake",
-    "id": "crasherwake",
-    "role": "Gym Leader",
-    "lore": "The Torrential Masked Master! A larger-than-life pro wrestler from Pastoria City who loves entertaining the crowds, washing away the competition with the brute force of his Water-type Pok\u00e9mon."
-  },
-  {
-    "name": "Fantina",
-    "id": "fantina",
-    "role": "Gym Leader",
-    "lore": "The Alluring Soul Dancer! A flamboyant contest coordinator and Hearthome Gym Leader, she speaks with a foreign flair, utilizing Ghost-type Pok\u00e9mon to weave mesmerizing, unpredictable illusions."
-  },
-  {
-    "name": "Byron",
-    "id": "byron",
-    "role": "Gym Leader",
-    "lore": "The Man with the Steel Body! Roark's boisterous father and the Canalave City Gym Leader, he forged his unyielding defensive strategies deep within the Iron Island mines."
-  },
-  {
-    "name": "Candice",
-    "id": "candice",
-    "role": "Gym Leader",
-    "lore": "The Diamond Dust Girl! Despite Snowpoint City's freezing climate, her fierce, passionate spirit burns brightly, inspiring her Ice-type Pok\u00e9mon to strike with the focus of a blizzard."
-  },
-  {
-    "name": "Volkner",
-    "id": "volkner",
-    "role": "Gym Leader",
-    "lore": "The Shining, Shocking Star! Bored by weak challengers, this brilliant but melancholic Sunyshore City Gym Leader revitalizes the local technology to spark the ultimate Electric-type battle."
-  },
-  {
-    "name": "Cynthia",
-    "id": "cynthia",
-    "role": "Champion",
-    "lore": "The beloved Champion of the Sinnoh region. Deeply fascinated by Pok\u00e9mon mythology and the creation of the universe, she battles with an unparalleled, terrifyingly diverse team led by her Garchomp."
-  },
-  {
-    "name": "Cilan",
-    "id": "cilan",
-    "role": "Gym Leader",
-    "lore": "A sophisticated connoisseur of Grass-type Pok\u00e9mon. Alongside his brothers in Striaton City, he carefully analyzes the flavor of a challenger's battling style, aiming for a perfectly balanced encounter."
-  },
-  {
-    "name": "Lenora",
-    "id": "lenora",
-    "role": "Gym Leader",
-    "lore": "The Archeologist with a Backbone! Directing the Nacrene City Museum, she applies her rigorous scientific deduction to battling, using Normal-type Pok\u00e9mon to unearth her opponents' weaknesses."
-  },
-  {
-    "name": "Burgh",
-    "id": "burgh",
-    "role": "Gym Leader",
-    "lore": "The Premiere Insect Artist! A wandering bohemian soul in Castelia City, he finds profound artistic inspiration in the pure, unadulterated nature of Bug-type Pok\u00e9mon."
-  },
-  {
-    "name": "Elesa",
-    "id": "elesa",
-    "role": "Gym Leader",
-    "lore": "The Shining Beauty! A world-famous supermodel in Nimbasa City, she dazzles the runway and the battlefield alike, electrifying her audiences with a flashy, high-voltage combat style."
-  },
-  {
-    "name": "Clay",
-    "id": "clay",
-    "role": "Gym Leader",
-    "lore": "The Underground Boss! A gruff, hard-working magnate who built Driftveil City through sheer willpower, he crushes obstacles using the raw, unrefined power of his Ground-type Pok\u00e9mon."
-  },
-  {
-    "name": "Skyla",
-    "id": "skyla",
-    "role": "Gym Leader",
-    "lore": "The Highflying Girl! A cheerful cargo pilot in Mistralton City, she loves soaring through the open skies and subjects her challengers to dizzying, wind-blown aerial trials."
-  },
-  {
-    "name": "Brycen",
-    "id": "brycen",
-    "role": "Gym Leader",
-    "lore": "The legendary Ice Mask! Once a celebrated movie star, he retreated to Icirrus City to hone his martial arts in the freezing cold, mastering the silent, crystalline precision of Ice-type Pok\u00e9mon."
-  },
-  {
-    "name": "Drayden",
-    "id": "drayden",
-    "role": "Gym Leader",
-    "lore": "The Spartan Mayor! An imposing, physically powerful leader in Opelucid City, he governs with wisdom and battles with the ancient, devastating ferocity of Dragon-type Pok\u00e9mon."
-  },
-  {
-    "name": "Iris",
-    "id": "iris",
-    "role": "Champion",
-    "lore": "The Girl Who Knows the Hearts of Dragons! A wild, energetic prodigy deeply connected to nature, she embraces the untamed spirit of Dragon-types to ascend as the Champion of Unova."
-  },
-  {
-    "name": "Alder",
-    "id": "alder",
-    "role": "Champion",
-    "lore": "The wandering Champion of Unova. Carrying a heavy burden of loss, he travels the region teaching others that the bond between humans and Pok\u00e9mon is far more important than the pursuit of raw power."
-  },
-  {
-    "name": "Red",
-    "id": "red",
-    "role": "Protagonist",
-    "lore": "The legendary silent prodigy from Pallet Town. He conquered the Kanto region and retreated to Mt. Silver to await a challenger worthy of his ultimate team."
-  },
-  {
-    "name": "Blue",
-    "id": "blue",
-    "role": "Rival",
-    "lore": "Red's arrogant but brilliant rival and the former Kanto Champion. Smell ya later!"
-  },
-  {
-    "name": "Ethan",
-    "id": "ethan",
-    "role": "Protagonist",
-    "lore": "The heroic boy from New Bark Town who toppled Team Rocket and conquered two entire regions."
-  },
-  {
-    "name": "Lyra",
-    "id": "lyra",
-    "role": "Protagonist",
-    "lore": "A cheerful and energetic trainer from Johto, always ready for an adventure with her Marill."
-  },
-  {
-    "name": "Brendan",
-    "id": "brendan",
-    "role": "Protagonist",
-    "lore": "The confident son of Professor Birch, constantly exploring the vibrant, tropical Hoenn region."
-  },
-  {
-    "name": "May",
-    "id": "may",
-    "role": "Protagonist",
-    "lore": "Daughter of the Petalburg Gym Leader Norman, balancing her love for battles and Pok\u00e9mon Contests."
-  },
-  {
-    "name": "Lucas",
-    "id": "lucas",
-    "role": "Protagonist",
-    "lore": "A dedicated assistant to Professor Rowan in Sinnoh, eager to uncover the secrets of evolution."
-  },
-  {
-    "name": "Dawn",
-    "id": "dawn",
-    "role": "Protagonist",
-    "lore": "A spirited trainer from Twinleaf Town, aiming to conquer the Sinnoh league and contests alike."
-  },
-  {
-    "name": "Hilbert",
-    "id": "hilbert",
-    "role": "Protagonist",
-    "lore": "The hero of truth or ideals from Nuvema Town, destined to awaken a legendary dragon."
-  },
-  {
-    "name": "Hilda",
-    "id": "hilda",
-    "role": "Protagonist",
-    "lore": "A fierce and determined Unovan trainer, ready to take on Team Plasma and save the region."
-  },
-  {
-    "name": "Nate",
-    "id": "nate",
-    "role": "Protagonist",
-    "lore": "A rising star from Aspertia City, fighting alongside Hugh to liberate Unova from Neo Team Plasma."
-  },
-  {
-    "name": "Rosa",
-    "id": "rosa",
-    "role": "Protagonist",
-    "lore": "An energetic and talented trainer, exploring the evolving landscape of the Unova region."
-  },
-  {
-    "name": "Ace Trainer",
-    "id": "acetrainer",
-    "role": "Trainer",
-    "lore": "Elite, highly skilled trainers who use diverse and fully-evolved teams to crush unprepared opponents."
-  },
-  {
-    "name": "Bug Catcher",
-    "id": "bugcatcher",
-    "role": "Trainer",
-    "lore": "Enthusiastic kids wielding nets, constantly searching the forests for rare and fascinating Bug-type Pok\u00e9mon."
-  },
-  {
-    "name": "Lass",
-    "id": "lass",
-    "role": "Trainer",
-    "lore": "Young girls beginning their journeys, typically preferring cute Normal and Fairy-type companions."
-  },
-  {
-    "name": "Youngster",
-    "id": "youngster",
-    "role": "Trainer",
-    "lore": "Energetic boys obsessed with battling. They really like shorts because they are comfy and easy to wear!"
-  },
-  {
-    "name": "Hiker",
-    "id": "hiker",
-    "role": "Trainer",
-    "lore": "Jovial mountaineers scaling the highest peaks, relying on sturdy Rock and Ground-type Pok\u00e9mon."
-  },
-  {
-    "name": "Scientist",
-    "id": "scientist",
-    "role": "Trainer",
-    "lore": "Analytical minds experimenting with Pok\u00e9mon genetics, artificial items, and strategic battle calculations."
-  },
-  {
-    "name": "Black Belt",
-    "id": "blackbelt",
-    "role": "Trainer",
-    "lore": "Disciplined martial artists who train their bodies in tandem with their powerful Fighting-type Pok\u00e9mon."
-  },
-  {
-    "name": "Beauty",
-    "id": "beauty",
-    "role": "Trainer",
-    "lore": "Elegant trainers who believe true strength lies in a Pok\u00e9mon's grace, charm, and immaculate grooming."
-  },
-  {
-    "name": "Psychic",
-    "id": "psychic",
-    "role": "Trainer",
-    "lore": "Mystics capable of bending spoons and minds, harmonizing their brainwaves with Psychic-type Pok\u00e9mon."
-  },
-  {
-    "name": "Dragon Tamer",
-    "id": "dragontamer",
-    "role": "Trainer",
-    "lore": "Specialized experts who brave extreme conditions to tame the mythical and devastating Dragon-type Pok\u00e9mon."
-  },
-  {
-    "name": "Veteran",
-    "id": "veteran",
-    "role": "Trainer",
-    "lore": "Seasoned masters with decades of combat experience and profoundly powerful, diverse teams."
-  },
-  {
-    "name": "Rocket Grunt",
-    "id": "rocketgrunt",
-    "role": "Villain",
-    "lore": "Foot soldiers of the notorious Team Rocket, stealing Pok\u00e9mon for profit and absolute domination."
-  },
-  {
-    "name": "Magma Grunt",
-    "id": "magmagrunt",
-    "role": "Villain",
-    "lore": "Fanatical members of Team Magma, seeking to expand the landmass by awakening ancient primal forces."
-  },
-  {
-    "name": "Aqua Grunt",
-    "id": "aquagrunt",
-    "role": "Villain",
-    "lore": "Pirates of Team Aqua, fighting to flood the earth and return it to a prehistoric oceanic state."
-  },
-  {
-    "name": "Galactic Grunt",
-    "id": "galacticgrunt",
-    "role": "Villain",
-    "lore": "Emotionless operatives of Team Galactic, aiming to destroy the universe and rebuild it for their leader."
-  },
-  {
-    "name": "Plasma Grunt",
-    "id": "plasmagrunt",
-    "role": "Villain",
-    "lore": "Knights of Team Plasma, hypocritically \"liberating\" Pok\u00e9mon while seeking total control of the Unova region."
-  },
-  {
-    "name": "Maxie",
-    "id": "maxie-gen6",
-    "role": "Villain",
-    "lore": "The analytical leader of Team Magma, who wishes to expand the landmass to create more space for human progress and development."
-  },
-  {
-    "name": "Archie",
-    "id": "archie-gen6",
-    "role": "Villain",
-    "lore": "The boisterous leader of Team Aqua, who seeks to expand the sea to return the world to its primordial, natural state for Pok\u00e9mon."
-  },
-  {
-    "name": "Cyrus",
-    "id": "cyrus",
-    "role": "Villain",
-    "lore": "The emotionless boss of Team Galactic. He despises the human spirit and aims to destroy the universe to rebuild a perfect one without emotion."
-  },
-  {
-    "name": "Ghetsis",
-    "id": "ghetsis",
-    "role": "Villain",
-    "lore": "The true mastermind behind Team Plasma. A manipulative and cruel dictator who uses the ideal of Pok\u00e9mon liberation as a front for world domination."
-  },
-  {
-    "name": "N",
-    "id": "n",
-    "role": "Villain",
-    "lore": "The enigmatic King of Team Plasma. Raised alongside Pok\u00e9mon, he can hear their inner voices and seeks to separate their world from humans."
-  },
-  {
-    "name": "Lysandre",
-    "id": "lysandre",
-    "role": "Villain",
-    "lore": "The charismatic leader of Team Flare. Obsessed with preserving the world's beauty, he plans to activate the ultimate weapon to wipe out the \"ugly\" elements of society."
-  },
-  {
-    "name": "Guzma",
-    "id": "guzma",
-    "role": "Villain",
-    "lore": "The destructive boss of Team Skull. A misunderstood outcast who relies on Bug-type Pok\u00e9mon and overwhelming force to beat down his opponents."
-  },
-  {
-    "name": "Lusamine",
-    "id": "lusamine",
-    "role": "Villain",
-    "lore": "The elegant president of the Aether Foundation. Her obsessive love for Ultra Beasts drives her to terrifying extremes, disregarding the safety of everyone around her."
-  },
-  {
-    "name": "Calem",
-    "id": "calem",
-    "role": "Protagonist",
-    "lore": "The stylish hero of the Kalos region, striving to uncover the mysteries of Mega Evolution."
-  },
-  {
-    "name": "Serena",
-    "id": "serena",
-    "role": "Protagonist",
-    "lore": "A passionate and determined trainer from Kalos, seeking to become the very best."
-  },
-  {
-    "name": "Elio",
-    "id": "elio",
-    "role": "Protagonist",
-    "lore": "The bright-eyed champion of Alola, who brought the Island Challenge to new heights."
-  },
-  {
-    "name": "Selene",
-    "id": "selene",
-    "role": "Protagonist",
-    "lore": "A cheerful Alolan trainer, always ready for an adventure beneath the tropical sun."
-  },
-  {
-    "name": "Victor",
-    "id": "victor",
-    "role": "Protagonist",
-    "lore": "The determined hero of Galar, ready to conquer the Gym Challenge in packed stadiums."
-  },
-  {
-    "name": "Gloria",
-    "id": "gloria",
-    "role": "Protagonist",
-    "lore": "A spirited Galarian trainer with an unstoppable drive to become the Champion."
-  },
-  {
-    "name": "Florian",
-    "id": "florian-s",
-    "role": "Protagonist",
-    "lore": "A student of Naranja Academy in Paldea, exploring the vast region on a treasure hunt."
-  },
-  {
-    "name": "Juliana",
-    "id": "juliana-s",
-    "role": "Protagonist",
-    "lore": "A student of Uva Academy in Paldea, seeking her own unique treasure across the region."
-  },
-  {
-    "name": "Leon",
-    "id": "leon",
-    "role": "Champion",
-    "lore": "The undefeated Champion of the Galar region. Known for his incredible battle sense and terrible sense of direction."
-  },
-  {
-    "name": "Geeta",
-    "id": "geeta",
-    "role": "Champion",
-    "lore": "The Top Champion of the Paldea region. She oversees the Pokemon League with unmatched grace and authority."
-  },
-  {
-    "name": "Diantha",
-    "id": "diantha",
-    "role": "Champion",
-    "lore": "The glamorous Champion of the Kalos region and a world-renowned movie star."
-  },
-  {
-    "name": "Kukui",
-    "id": "kukui",
-    "role": "Champion",
-    "lore": "The passionate Pokemon Professor of Alola, and the founder of its first-ever Pokemon League."
-  },
-  {
-    "name": "Hop",
-    "id": "hop",
-    "role": "Rival",
-    "lore": "Leon's younger brother and a fiercely determined rival aiming to step out of his brother's shadow."
-  },
-  {
-    "name": "Nemona",
-    "id": "nemona-s",
-    "role": "Rival",
-    "lore": "A battle-obsessed Champion-ranked trainer from Paldea who loves testing new strategies."
-  },
-  {
-    "name": "Kieran",
-    "id": "kieran",
-    "role": "Rival",
-    "lore": "A quiet trainer from Kitakami whose intense determination pushed him to become the BB League Champion."
-  },
-  {
-    "name": "Carmine",
-    "id": "carmine",
-    "role": "Rival",
-    "lore": "A strong-willed student from Blueberry Academy who fiercely protects her younger brother Kieran."
-  },
-  {
-    "name": "Marnie",
-    "id": "marnie",
-    "role": "Rival",
-    "lore": "A composed trainer from Spikemuth. Her quiet strength earned her the fanatic devotion of Team Yell."
-  },
-  {
-    "name": "Bede",
-    "id": "bede",
-    "role": "Rival",
-    "lore": "A proud and arrogant trainer who eventually found his true calling as the Ballonlea Gym Leader."
-  },
-  {
-    "name": "Penny",
-    "id": "penny",
-    "role": "Trainer",
-    "lore": "A shy tech genius from Paldea who secretly led Team Star to protect her friends."
-  },
-  {
-    "name": "Arven",
-    "id": "arven-s",
-    "role": "Trainer",
-    "lore": "A culinary expert from Paldea on a quest to find the mythical Herba Mystica to heal his partner Pokemon."
-  }
-];;
-
-const getShowdownName = (name: string, isFemale: boolean = false) => {
-  if (!name) return '';
-  let slug = name.toLowerCase().trim();
-  
-  // Mega/Gmax/Form/Paradox handling
-  const specialForms: Record<string, string> = {
-    'ho-oh': 'hooh',
-    'kommo-o': 'kommoo',
-    'hakamo-o': 'hakamoo',
-    'jangmo-o': 'jangmoo',
-    'porygon-z': 'porygonz',
-    'sirfetchd': 'sirfetchd',
-    'farfetchd': 'farfetchd',
-    'mr-mime': 'mrmime',
-    'mr-rime': 'mrrime',
-    'mime-jr': 'mimejr',
-    'type-null': 'typenull',
-    'wo-chien': 'wochien',
-    'chien-pao': 'chienpao',
-    'ting-lu': 'tinglu',
-    'chi-yu': 'chiyu',
-    'great-tusk': 'greattusk',
-    'scream-tail': 'screamtail',
-    'brute-bonnet': 'brutebonnet',
-    'flutter-mane': 'fluttermane',
-    'slither-wing': 'slitherwing',
-    'sandy-shocks': 'sandyshocks',
-    'iron-treads': 'irontreads',
-    'iron-bundle': 'ironbundle',
-    'iron-hands': 'ironhands',
-    'iron-jugulis': 'ironjugulis',
-    'iron-moth': 'ironmoth',
-    'iron-thorns': 'ironthorns',
-    'iron-valiant': 'ironvaliant',
-    'iron-leaves': 'ironleaves',
-    'walking-wake': 'walkingwake',
-    'iron-boulder': 'ironboulder',
-    'iron-crown': 'ironcrown',
-    'raging-bolt': 'ragingbolt',
-    'gouging-fire': 'gougingfire',
-    'flabebe': 'flabebe',
-    'meowscarada': 'meowscarada',
-    'skeledirge': 'skeledirge',
-    'quaquaval': 'quaquaval',
-    'oricorio-baile': 'oricorio',
-    'oricorio-pom-pom': 'oricorio-pompom',
-    'oricorio-pa-u': 'oricorio-pau',
-    'oricorio-sensu': 'oricorio-sensu',
-    'lycanroc-midday': 'lycanroc',
-    'lycanroc-midnight': 'lycanroc-midnight',
-    'lycanroc-dusk': 'lycanroc-dusk',
-    'minior-red-meteor': 'minior',
-    'minior-red': 'minior',
-    'minior-orange-meteor': 'minior',
-    'minior-orange': 'minior-orange',
-    'minior-yellow-meteor': 'minior',
-    'minior-yellow': 'minior-yellow',
-    'minior-green-meteor': 'minior',
-    'minior-green': 'minior-green',
-    'minior-blue-meteor': 'minior',
-    'minior-blue': 'minior-blue',
-    'minior-indigo-meteor': 'minior',
-    'minior-indigo': 'minior-indigo',
-    'minior-violet-meteor': 'minior',
-    'minior-violet': 'minior-violet',
-    'mimikyu-disguised': 'mimikyu',
-    'mimikyu-busted': 'mimikyu-busted',
-    'zygarde-10': 'zygarde10',
-    'zygarde-50': 'zygarde',
-    'basculin-red-striped': 'basculin',
-    'basculin-blue-striped': 'basculin-blue',
-    'basculin-white-striped': 'basculin-white',
-    'keldeo-ordinary': 'keldeo',
-    'keldeo-resolute': 'keldeo-resolute',
-    'meloetta-aria': 'meloetta',
-    'meloetta-pirouette': 'meloetta-pirouette',
-    'thundurus-incarnate': 'thundurus',
-    'thundurus-therian': 'thundurus-therian',
-    'tornadus-incarnate': 'tornadus',
-    'tornadus-therian': 'tornadus-therian',
-    'landorus-incarnate': 'landorus',
-    'landorus-therian': 'landorus-therian',
-    'enamorus-incarnate': 'enamorus',
-    'enamorus-therian': 'enamorus-therian',
-    'gourgeist-average': 'gourgeist',
-    'gourgeist-small': 'gourgeist-small',
-    'gourgeist-large': 'gourgeist-large',
-    'gourgeist-super': 'gourgeist-super',
-    'pumpkaboo-average': 'pumpkaboo',
-    'pumpkaboo-small': 'pumpkaboo-small',
-    'pumpkaboo-large': 'pumpkaboo-large',
-    'pumpkaboo-super': 'pumpkaboo-super',
-    'toxtricity-amped': 'toxtricity',
-    'toxtricity-low-key': 'toxtricity-lowkey',
-    'urshifu-single-strike': 'urshifu',
-    'urshifu-rapid-strike': 'urshifu-rapidstrike',
-    'deoxys-normal': 'deoxys',
-    'deoxys-attack': 'deoxys-attack',
-    'deoxys-defense': 'deoxys-defense',
-    'deoxys-speed': 'deoxys-speed',
-    'wormadam-plant': 'wormadam',
-    'wormadam-sandy': 'wormadam-sandy',
-    'wormadam-trash': 'wormadam-trash',
-    'giratina-altered': 'giratina',
-    'giratina-origin': 'giratina-origin',
-    'shaymin-land': 'shaymin',
-    'shaymin-sky': 'shaymin-sky',
-    'aegislash-shield': 'aegislash',
-    'aegislash-blade': 'aegislash-blade',
-    'basculegion-male': 'basculegion',
-    'basculegion-female': 'basculegion-f',
-    'meowstic-male': 'meowstic',
-    'meowstic-female': 'meowstic-f',
-    'indeedee-male': 'indeedee',
-    'indeedee-female': 'indeedee-f',
-    'oinkologne-male': 'oinkologne',
-    'oinkologne-female': 'oinkologne-f',
-    'pyroar-male': 'pyroar',
-    'pyroar-female': 'pyroar-f',
-    'unfezant-male': 'unfezant',
-    'unfezant-female': 'unfezant-f',
-    'frillish-male': 'frillish',
-    'frillish-female': 'frillish-f',
-    'jellicent-male': 'jellicent',
-    'jellicent-female': 'jellicent-f',
-    'meowstic': 'meowstic',
-    'indeedee': 'indeedee',
-    'oinkologne': 'oinkologne',
-    'pyroar': 'pyroar',
-    'unfezant': 'unfezant',
-    'frillish': 'frillish',
-    'jellicent': 'jellicent',
-    'hippowdon': 'hippowdon',
-    'hippopotas': 'hippopotas',
-    'basculegion': 'basculegion',
-    'nidoran-m': 'nidoranm',
-    'nidoran-f': 'nidoranf',
-    'hippowdon-male': 'hippowdon',
-    'hippowdon-female': 'hippowdon-f',
-    'hippopotas-male': 'hippopotas',
-    'hippopotas-female': 'hippopotas-f',
-    'darmanitan-standard': 'darmanitan',
-    'darmanitan-zen': 'darmanitan-zen',
-    'darmanitan-galar-standard': 'darmanitan-galar',
-    'darmanitan-galar-zen': 'darmanitan-galar-zen',
-    'wishiwashi-solo': 'wishiwashi',
-    'wishiwashi-school': 'wishiwashi-school',
-    'zygarde-10-power-construct': 'zygarde10',
-    'zygarde-50-power-construct': 'zygarde',
-    'zygarde-complete': 'zygarde-complete',
-    'greninja-ash': 'greninja-ash',
-    'necrozma-dusk': 'necrozma-duskmane',
-    'necrozma-dawn': 'necrozma-dawnwings',
-    'necrozma-ultra': 'necrozma-ultra',
-    'calyrex-ice': 'calyrex-ice',
-    'calyrex-shadow': 'calyrex-shadow',
-    'palafin-zero': 'palafin',
-    'palafin-hero': 'palafin-hero',
-    'maushold-family-of-three': 'maushold',
-    'maushold-family-of-four': 'maushold',
-    'dudunsparce-two-segment': 'dudunsparce',
-    'dudunsparce-three-segment': 'dudunsparce-threesegment',
-    'ogerpon-teal-mask': 'ogerpon',
-    'ogerpon-wellspring-mask': 'ogerpon-wellspring',
-    'ogerpon-hearthflame-mask': 'ogerpon-hearthflame',
-    'ogerpon-cornerstone-mask': 'ogerpon-cornerstone',
-    'terapagos-normal': 'terapagos',
-    'terapagos-terastal': 'terapagos-terastal',
-    'terapagos-stellar': 'terapagos-stellar',
-  };
-
-  if (specialForms[slug] || slug === 'pyroar' || slug === 'meowstic') {
-    let result = specialForms[slug] || slug;
-    if (isFemale && !result.endsWith('f')) {
-      const dashFemale = ['meowstic', 'indeedee', 'basculegion', 'oinkologne', 'pyroar', 'unfezant', 'frillish', 'jellicent', 'hippowdon', 'hippopotas'];
-      if (dashFemale.includes(result)) {
-        result += '-f';
-      } else {
-        result += 'f';
-      }
-    }
-    return result;
-  }
-
-  // Default stripping logic for species that doesn't have a special form mapping
-  let processed = slug.toLowerCase().replace(/[^a-z0-9]/g, '');
-  
-  if (isFemale) {
-    if (processed === 'nidoranm') return 'nidoranf';
-    if (!processed.endsWith('f')) {
-      processed += 'f'; // Showdown uses pikachuf, wobbuffetf, etc without dash
-    }
-  }
-
-  return processed;
-};
-
-// Custom Typewriter component for typewriter visual text effects on both PC and mobile devices
-const TypewriterText = memo(({ text, delay = 12, onComplete }: { text: string; delay?: number; onComplete?: () => void }) => {
-  const [displayedText, setDisplayedText] = useState('');
-
-  useEffect(() => {
-    let currentText = '';
-    setDisplayedText(currentText);
-    let index = 0;
-    let timer: any = null;
-    
-    const run = () => {
-      if (index < text.length) {
-        currentText += text.charAt(index);
-        setDisplayedText(currentText);
-        index++;
-        if (Math.random() > 0.45) {
-          try {
-            sounds.typing?.();
-          } catch (_) {}
-        }
-        timer = setTimeout(run, delay);
-      } else {
-        onComplete?.();
-      }
-    };
-    
-    timer = setTimeout(run, delay);
-    return () => clearTimeout(timer);
-  }, [text, delay, onComplete]);
-
-  return <span>{displayedText}</span>;
-});
-TypewriterText.displayName = "TypewriterText";
-
-// Custom Sprite Component for perfect Battle Arena sizing and Showdown fallbacks
-const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, className, onClick, arenaMode = false, flip, scaleMultiplier = 1, isPlayer = false, use2dSprite = false }: any) => {
-  const [fallbackLevel, setFallbackLevel] = useState(0);
-  const [imageLoaded, setImageLoaded] = useState(false);
-
-  useEffect(() => {
-    setFallbackLevel(0);
-    setImageLoaded(false);
-  }, [pokemon?.name, isShiny, isFemale, use2dSprite]);
-
-  const generateSrc = (level: number) => {
-    if (!pokemon) return '';
-    const cleanName = getShowdownName(pokemon?.name, isFemale);
-    const effectiveLevel = level;
-    const idNum = pokemon.id || pokemon.url?.split('/').filter(Boolean).pop() || pokemon.name;
-    const shinyPath = isShiny ? 'shiny/' : '';
-
-    if (use2dSprite) {
-      // 2D PIXEL ART SPRITE MODE (PokeAPI 2D pixel art for every Pokemon: base, mega, gmax, regional, alternative forms)
-      if (effectiveLevel === 0 && pokemon.sprites) {
-        if (isFemale) {
-          const fem = isBack 
-            ? (isShiny ? (pokemon.sprites.back_shiny_female || pokemon.sprites.back_female || pokemon.sprites.back_default) : (pokemon.sprites.back_female || pokemon.sprites.back_default))
-            : (isShiny ? (pokemon.sprites.front_shiny_female || pokemon.sprites.front_female || pokemon.sprites.front_default) : (pokemon.sprites.front_female || pokemon.sprites.front_default));
-          if (fem) return fem;
-        }
-        const spr = isBack 
-          ? (isShiny ? (pokemon.sprites.back_shiny || pokemon.sprites.back_default || pokemon.sprites.front_default) : (pokemon.sprites.back_default || pokemon.sprites.front_default))
-          : (isShiny ? (pokemon.sprites.front_shiny || pokemon.sprites.front_default) : pokemon.sprites.front_default);
-        if (spr) return spr;
-      }
-
-      // Level 1: Direct PokeAPI raw 2D pixel art sprite URL (covers 10000+ IDs for megas, gmax, regional forms!)
-      if (effectiveLevel <= 1) {
-        if (isFemale) {
-          return isBack 
-            ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/female/${shinyPath}${idNum}.png`
-            : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/${shinyPath}${idNum}.png`;
-        }
-        return isBack 
-          ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${shinyPath}${idNum}.png`
-          : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyPath}${idNum}.png`;
-      }
-
-      // Level 2: Showdown static 2D sprite
-      if (effectiveLevel === 2) {
-        const basePath = isBack ? `gen5-back${isShiny ? '-shiny' : ''}` : `gen5${isShiny ? '-shiny' : ''}`;
-        return `https://play.pokemonshowdown.com/sprites/${basePath}/${cleanName}.png`;
-      }
-
-      // Level 3: Showdown animated 2D sprite
-      if (effectiveLevel === 3) {
-        const basePath = isBack ? `ani-back${isShiny ? '-shiny' : ''}` : `ani${isShiny ? '-shiny' : ''}`;
-        return `https://play.pokemonshowdown.com/sprites/${basePath}/${cleanName}.gif`;
-      }
-
-      // Level 4: PokeAPI front 2D sprite fallback if back was requested but missing
-      if (effectiveLevel === 4) {
-        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyPath}${idNum}.png`;
-      }
-
-      // Level 5: Official artwork fallback
-      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shinyPath}${idNum}.png`;
-    }
-
-    // HOME 3D ARTWORK MODE (Default)
-    if (effectiveLevel === 0 && pokemon.sprites) {
-      if (arenaMode && pokemon.sprites.other?.home) {
-        const home = pokemon.sprites.other.home;
-        if (isFemale && (home.front_female || home.front_shiny_female)) {
-          return isShiny 
-            ? (home.front_shiny_female || home.front_female) 
-            : home.front_female;
-        } else {
-          return isShiny 
-            ? (home.front_shiny || home.front_default) 
-            : home.front_default;
-        }
-      }
-      if (isFemale) {
-        if (pokemon.sprites.other?.home?.front_female) {
-          return isShiny 
-            ? (pokemon.sprites.other.home.front_shiny_female || pokemon.sprites.other.home.front_female) 
-            : pokemon.sprites.other.home.front_female;
-        }
-        if (pokemon.sprites.other?.['official-artwork']?.front_female) {
-          const offArt = pokemon.sprites.other['official-artwork'];
-          return isShiny ? (offArt.front_shiny_female || offArt.front_female) : offArt.front_female;
-        }
-        // If female is requested, but official arts lack it, we skip returning here 
-        // to let it fall through to Showdown (Level 1) which often has the female sprite.
-      } else {
-        const offArt = pokemon.sprites.other?.['official-artwork'];
-        const homeArt = pokemon.sprites.other?.home;
-        if (offArt && (offArt.front_default || offArt.front_shiny)) {
-          return isShiny ? (offArt.front_shiny || offArt.front_default) : offArt.front_default;
-        } else if (homeArt && (homeArt.front_default || homeArt.front_shiny)) {
-          return isShiny ? (homeArt.front_shiny || homeArt.front_default) : homeArt.front_default;
-        }
-      }
-    }
-    
-    // Level 1: Showdown animated gif
-    if (effectiveLevel <= 1) {
-      const basePath = isBack ? `ani-back${isShiny ? '-shiny' : ''}` : `ani${isShiny ? '-shiny' : ''}`;
-      return `https://play.pokemonshowdown.com/sprites/${basePath}/${cleanName}.gif`;
-    }
-    
-    // Level 2: Showdown static 2D
-    if (effectiveLevel === 2) {
-      const basePath = isBack ? `gen5-back${isShiny ? '-shiny' : ''}` : `gen5${isShiny ? '-shiny' : ''}`;
-      return `https://play.pokemonshowdown.com/sprites/${basePath}/${cleanName}.png`;
-    }
-
-    // Level 3: Pokemon object regular sprite
-    if (effectiveLevel === 3 && pokemon.sprites) {
-      if (isFemale) {
-        return isBack 
-          ? (isShiny ? (pokemon.sprites.back_shiny_female || pokemon.sprites.back_female || pokemon.sprites.back_default) : (pokemon.sprites.back_female || pokemon.sprites.back_default))
-          : (isShiny ? (pokemon.sprites.front_shiny_female || pokemon.sprites.front_female || pokemon.sprites.front_default) : (pokemon.sprites.front_female || pokemon.sprites.front_default));
-      }
-      return isBack 
-        ? (isShiny ? (pokemon.sprites.back_shiny || pokemon.sprites.back_default) : pokemon.sprites.back_default)
-        : (isShiny ? (pokemon.sprites.front_shiny || pokemon.sprites.front_default) : pokemon.sprites.front_default);
-    }
-
-    // Fallback URL generation
-    
-    if (effectiveLevel === 4) {
-      let spriteId = idNum;
-      if (isShiny && (idNum === '10309' || idNum === 10309 || pokemon.name?.includes('garchomp-mega-z'))) {
-        spriteId = '10058';
-      }
-      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${shinyPath}${spriteId}.png`;
-    }
-    
-    return isBack 
-      ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${shinyPath}${idNum}.png`
-      : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyPath}${idNum}.png`;
-  };
-
-  const currentSrc = generateSrc(fallbackLevel);
-  const autoShouldFlip = isBack && (currentSrc.includes('official-artwork') || (!currentSrc.includes('back') && !currentSrc.includes('ani-back') && !currentSrc.includes('gen5-back')));
-  const finalFlip = flip !== undefined ? flip : autoShouldFlip;
-  
-  const isMega = pokemon?.name ? pokemon.name.includes('-mega') : false;
-  const isGmax = pokemon?.name ? pokemon.name.includes('-gmax') : false;
-  const isMegaOrGmax = isMega || isGmax;
-  
-  const scaleFactor = useMemo(() => {
-    if (!pokemon) return 1;
-    if (!arenaMode) {
-      // In database details view, keep a consistent beautiful size that never clips
-      return use2dSprite ? (isMegaOrGmax ? 1.05 : 1.1) : (isMegaOrGmax ? 0.92 : 0.95);
-    }
-    const h = pokemon.height || 10; // default 1.0m
-    let baseScale = 1.35;
-    if (h <= 3) baseScale = 1.25;        // Tiny scale (e.g. Joltik) is boosted so it remains visible
-    else if (h <= 10) baseScale = 1.35;   // Small-Medium (e.g. Pikachu, Eevee)
-    else if (h <= 20) baseScale = 1.50;   // Normal-Large (e.g. Charizard)
-    else if (h <= 60) baseScale = 1.65;   // Huge
-    else baseScale = 1.75;                // Giant (e.g. Steelix, Wailord) is clamped to fit perfectly
-    
-    if (use2dSprite) {
-      // Improved dimensions for 2D pixel sprites in combat arena so they are larger and crisp
-      if (h <= 4) {
-        baseScale = 2.45; // Extra boost for tiny 2D pixel sprites (e.g. Joltik, Flabebe, Cosmog)
-      } else if (h <= 9) {
-        baseScale = 2.25; // Boost for small 2D pixel sprites (e.g. Pikachu, Eevee, Diglett)
-      } else if (h <= 20) {
-        baseScale = 2.05; // Medium 2D pixel sprites
-      } else {
-        baseScale = 2.15; // Large/giant 2D pixel sprites
-      }
-      baseScale *= (isMegaOrGmax ? 1.20 : 1.35);
-    } else {
-      if (isMegaOrGmax) {
-        baseScale *= 1.15; // Megas and G-Max forms share the exact same grand dimension
-      }
-    }
-    return baseScale * scaleMultiplier;
-  }, [pokemon?.height, pokemon?.name, isMega, isGmax, isMegaOrGmax, arenaMode, scaleMultiplier, use2dSprite]);
-
-  
-  const [clickAura, setClickAura] = useState(false);
-
-
-  const handleClick = (e: any) => {
-    if (isMegaOrGmax) {
-      setClickAura(true);
-      setTimeout(() => setClickAura(false), 500);
-    }
-    if (onClick) onClick(e);
-  };
-
-  // Preloading image in background to support progressive load
-  useEffect(() => {
-    setImageLoaded(false);
-    if (!currentSrc || fallbackLevel >= 5) return;
-
-    const img = new window.Image();
-    img.src = currentSrc;
-    img.referrerPolicy = "no-referrer";
-    img.onload = () => {
-      setImageLoaded(true);
-    };
-  }, [currentSrc, fallbackLevel]);
-
-  if (!pokemon) return null;
-
-  const idNum = pokemon.id || pokemon.url?.split('/').filter(Boolean).pop() || pokemon.name;
-  const shinyPath = isShiny ? 'shiny/' : '';
-  const silhouetteUrl = isBack
-    ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${shinyPath}${idNum}.png`
-    : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyPath}${idNum}.png`;
-
-  return (
-    <div 
-      className={cn(
-        "relative flex items-center justify-center w-full h-full transition-all duration-700",
-        className
-      )}
-      onClick={handleClick}
-    >
-      {clickAura && isMegaOrGmax && (
-        <motion.div 
-          className={cn("absolute inset-0 rounded-full blur-xl mix-blend-screen pointer-events-none -inset-4", pokemon?.name?.includes('-mega') ? "bg-cyan-500" : "bg-red-500")}
-          initial={{ opacity: 1, scale: 0.8 }}
-          animate={{ opacity: 0, scale: 1.6 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-        />
-      )}
-
-      <div className={cn("absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300", fallbackLevel >= 5 ? "opacity-100" : "opacity-0")}>
-        <div className="text-[10px] font-mono text-cyan-500/60 uppercase tracking-widest p-4 border border-cyan-500/20 bg-cyan-950/40 rounded-xl whitespace-nowrap">
-          artwork invisible
-        </div>
-      </div>
-
-      <div className="relative w-full h-full flex items-center justify-center">
-        {/* Silhouette low-resolution placeholder */}
-        <motion.img
-          src={silhouetteUrl}
-          alt="Silhouette Loading..."
-          initial={{ 
-            scaleX: finalFlip ? -scaleFactor * 0.95 : scaleFactor * 0.95, 
-            scaleY: scaleFactor * 0.95, 
-            opacity: 0.7 
-          }}
-          animate={{ 
-            scaleX: finalFlip ? -scaleFactor : scaleFactor, 
-            scaleY: scaleFactor, 
-            opacity: (!imageLoaded && fallbackLevel < 5) ? 0.6 : 0,
-            y: arenaMode ? [0, -10, 0] : 0 
-          }}
-          transition={{ 
-            opacity: { duration: 0.5, ease: "easeInOut" },
-            y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
-            scaleX: { type: "spring", stiffness: 300, damping: 15 }
-          }}
-          className={cn(
-            "absolute object-contain pointer-events-none select-none transition-transform duration-500",
-            "max-w-[85vw] sm:max-w-[90%] max-h-[90%]"
-          )}
-          style={{
-            filter: isPlayer 
-              ? 'brightness(0) contrast(0) opacity(0.4) drop-shadow(0 0 8px rgba(6,182,212,0.8))'
-              : 'brightness(0) contrast(0) opacity(0.4) drop-shadow(0 0 8px rgba(239,68,68,0.8))'
-          }}
-          referrerPolicy="no-referrer"
-        />
-
-        {/* Full high-resolution / animated sprite */}
-        <motion.img
-          src={fallbackLevel >= 5 ? undefined : currentSrc}
-          alt={fallbackLevel >= 5 ? "" : pokemon?.name}
-          onError={(e) => {
-            if (fallbackLevel < 5) {
-              setFallbackLevel(prev => prev + 1);
-            } else {
-              e.currentTarget.style.display = 'none';
-            }
-          }}
-          initial={{ 
-            scaleX: finalFlip ? -scaleFactor * 0.9 : scaleFactor * 0.9, 
-            scaleY: scaleFactor * 0.9, 
-            opacity: 0 
-          }}
-          animate={{ 
-            scaleX: finalFlip ? -scaleFactor : scaleFactor, 
-            scaleY: scaleFactor, 
-            opacity: imageLoaded && fallbackLevel < 5 ? 1 : 0, 
-            y: arenaMode ? [0, -10, 0] : 0 
-          }}
-          transition={{ 
-            opacity: { duration: 0.4, ease: "easeOut" },
-            y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
-            scaleX: { type: "spring", stiffness: 300, damping: 15 }
-          }}
-          className={cn(
-            "object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]",
-            use2dSprite ? "[image-rendering:pixelated]" : "",
-            "max-w-[85vw] sm:max-w-[90%] max-h-[90%]"
-          )}
-          style={{
-            filter: isShiny && fallbackLevel > 0 ? 'hue-rotate(60deg) saturate(1.5)' : 'none'
-          }}
-          referrerPolicy="no-referrer"
-        />
-      </div>
-    </div>
-  );
-});
-
-const getOpponentMoveQuote = (pokeName: string, moveName: string) => {
-  const lowerMove = moveName.toLowerCase();
-  
-  const translations: Record<string, Record<string, string>> = {
-    it: {
-      default: `Ecco il potere di ${pokeName}!`,
-      fire: "Che le fiamme ti brucino!",
-      water: "Travolto dalla corrente d'acqua!",
-      electric: "Scossa ad alta tensione fulminea!",
-      grass: "La natura reclama il suo regno!",
-      ice: "Congelati sotto il gelo assoluto!",
-      psychic: "La forza della mente supera la gravita!",
-      dragon: "La rabbia del drago imperversera!",
-      boost: "Ogni molecola del mio essere si sta ricaricando!",
-      protect: "Scudo d'energia inattaccabile!",
-      healing: "Rigenerazione cellulare avviata!"
-    },
-    es: {
-      default: `!Aqui esta el poder de ${pokeName}!`,
-      fire: "!Que la llama eterna te consuma!",
-      water: "!Arrastrado por las corrientes del oceano!",
-      electric: "!Relampago de alta tension electrica!",
-      grass: "!La naturaleza reclama su poder!",
-      ice: "!Siente el frio absoluto!",
-      psychic: "!Mi mentalidad supera cualquier fuerza fisica!",
-      dragon: "!La ira del dragon se desata!",
-      boost: "!Sintiendo la maxima energia competitiva!",
-      protect: "!Escudo de energia impenetrable!",
-      healing: "!Restauracion vital iniciada!"
-    },
-    fr: {
-      default: `Voici le pouvoir de ${pokeName}!`,
-      fire: "Que les flammes te consument !",
-      water: "Emporte par le courant marin !",
-      electric: "Decharge haute tension foudroyante !",
-      grass: "La nature reprend ses droits !",
-      ice: "Ressens le froid absolu !",
-      psychic: "La force de l'esprit transcende la matiere !",
-      dragon: "La colere du dragon fait rage !",
-      boost: "Mon energie atteint son paroxysme !",
-      protect: "Bouclier d'energie impenetrable !",
-      healing: "Regeneration d'energie entamee !"
-    },
-    de: {
-      default: `Sieh die wahre Macht von ${pokeName}!`,
-      fire: "Lass die Flammen dich verzehren!",
-      water: "Weggespult von der Flut!",
-      electric: "Hochspannungsschock aktiv!",
-      grass: "Die Kraft der Natur holt sich den Sieg!",
-      ice: "Erfriere im absoluten Nullpunkt!",
-      psychic: "Die Kraft des Geistes uberwindet alles!",
-      dragon: "Die Wut des Drachen bricht los!",
-      boost: "Meine Energie steigt ins Unermessliche!",
-      protect: "Undurchdringlicher Energieschild!",
-      healing: "Heilungszellen aktiviert!"
-    },
-    en: {
-      default: `${pokeName} unleashes pure power!`,
-      fire: "Let the raging flames burn through your defenses!",
-      water: "Get swept away by the hydro tidal currents!",
-      electric: "Maximum high-voltage shock discharge!",
-      grass: "The power of wild nature reclaims its hold!",
-      ice: "Freeze under the weight of absolute zero!",
-      psychic: "The power of the mind transcends physical force!",
-      dragon: "The dragon's true wrath is unleashed!",
-      boost: "My energy reserves are expanding to their absolute maximum!",
-      protect: "Laying down impenetrable energy shields!",
-      healing: "Cellular reconstruction process initialized!"
-    }
-  };
-
-  const pool = translations['en'];
-  
-  if (lowerMove.includes('protect') || lowerMove.includes('detect') || lowerMove.includes('substitute')) return pool.protect;
-  if (lowerMove.includes('recover') || lowerMove.includes('heal') || lowerMove.includes('roost') || lowerMove.includes('rest')) return pool.healing;
-  if (lowerMove.includes('dance') || lowerMove.includes('calm') || lowerMove.includes('nasty') || lowerMove.includes('swords') || lowerMove.includes('charge')) return pool.boost;
-  
-  // check category or type
-  if (lowerMove.includes('fire') || lowerMove.includes('burn') || lowerMove.includes('flame')) return pool.fire;
-  if (lowerMove.includes('water') || lowerMove.includes('wave') || lowerMove.includes('surf') || lowerMove.includes('hydro')) return pool.water;
-  if (lowerMove.includes('bolt') || lowerMove.includes('thunder') || lowerMove.includes('spark') || lowerMove.includes('shock')) return pool.electric;
-  if (lowerMove.includes('leaf') || lowerMove.includes('giga') || lowerMove.includes('seed') || lowerMove.includes('grass')) return pool.grass;
-  if (lowerMove.includes('ice') || lowerMove.includes('freeze') || lowerMove.includes('blizzard') || lowerMove.includes('chill')) return pool.ice;
-  if (lowerMove.includes('psych') || lowerMove.includes('mind') || lowerMove.includes('zen') || lowerMove.includes('teleport')) return pool.psychic;
-  if (lowerMove.includes('dragon') || lowerMove.includes('draco') || lowerMove.includes('claw') || lowerMove.includes('outrage')) return pool.dragon;
-  
-  return pool.default;
-};
-
-const getMoveButtonClasses = (type: string) => {
-  const map: Record<string, string> = {
-    normal: 'border-stone-500/50 text-stone-400',
-    fire: 'border-red-500/50 text-red-400',
-    water: 'border-blue-500/50 text-blue-400',
-    electric: 'border-yellow-400/50 text-yellow-400',
-    grass: 'border-emerald-500/50 text-emerald-400',
-    ice: 'border-cyan-300/50 text-cyan-300',
-    fighting: 'border-orange-700/50 text-orange-500',
-    poison: 'border-purple-500/50 text-purple-400',
-    ground: 'border-amber-600/50 text-amber-500',
-    flying: 'border-sky-400/50 text-sky-400',
-    psychic: 'border-pink-500/50 text-pink-400',
-    bug: 'border-lime-500/50 text-lime-400',
-    rock: 'border-yellow-800/50 text-yellow-600',
-    ghost: 'border-indigo-600/50 text-indigo-400',
-    dragon: 'border-violet-700/50 text-violet-400',
-    dark: 'border-zinc-800/50 text-zinc-400',
-    steel: 'border-zinc-500/50 text-zinc-400',
-    fairy: 'border-rose-400/50 text-rose-400',
-  };
-  return map[type] ? `bg-slate-950 border ${map[type]} hover:bg-slate-900` : "bg-slate-900 border border-cyan-900/40 hover:border-cyan-500/60 text-cyan-300 hover:text-white";
-};
-
-const typeBaseColors: Record<string, string> = {
-  normal: 'bg-[#A8A77A]',
-  fire: 'bg-[#EE8130]',
-  water: 'bg-[#6390F0]',
-  electric: 'bg-[#F7D02C]',
-  grass: 'bg-[#7AC74C]',
-  ice: 'bg-[#96D9D6]',
-  fighting: 'bg-[#C22E28]',
-  poison: 'bg-[#A33EA1]',
-  ground: 'bg-[#E2BF65]',
-  flying: 'bg-[#A98FF3]',
-  psychic: 'bg-[#F95587]',
-  bug: 'bg-[#A6B91A]',
-  rock: 'bg-[#B6A136]',
-  ghost: 'bg-[#735797]',
-  dragon: 'bg-[#6F35FC]',
-  dark: 'bg-[#705746]',
-  steel: 'bg-[#B7B7CE]',
-  fairy: 'bg-[#D685AD]',
-};
-
-const typeHeaderGradients: Record<string, string> = {
-  normal: 'bg-gradient-to-r from-[#8A8A68] via-[#686848] to-slate-900',
-  fire: 'bg-gradient-to-r from-[#D06010] via-[#9C3800] to-slate-900',
-  water: 'bg-gradient-to-r from-[#4870D0] via-[#2048B0] to-slate-900',
-  electric: 'bg-gradient-to-r from-[#D8B010] via-[#A88800] to-slate-900',
-  grass: 'bg-gradient-to-r from-[#58A830] via-[#387818] to-slate-900',
-  ice: 'bg-gradient-to-r from-[#60B8B8] via-[#409090] to-slate-900',
-  fighting: 'bg-gradient-to-r from-[#A82820] via-[#781008] to-slate-900',
-  poison: 'bg-gradient-to-r from-[#883088] via-[#581858] to-slate-900',
-  ground: 'bg-gradient-to-r from-[#C0A040] via-[#886818] to-slate-900',
-  flying: 'bg-gradient-to-r from-[#8870D0] via-[#5838B8] to-slate-900',
-  psychic: 'bg-gradient-to-r from-[#D03060] via-[#A01040] to-slate-900',
-  bug: 'bg-gradient-to-r from-[#889810] via-[#586800] to-slate-900',
-  rock: 'bg-gradient-to-r from-[#988010] via-[#605008] to-slate-900',
-  ghost: 'bg-gradient-to-r from-[#584080] via-[#382858] to-slate-900',
-  dragon: 'bg-gradient-to-r from-[#5020C0] via-[#3800A0] to-slate-900',
-  dark: 'bg-gradient-to-r from-[#504030] via-[#382818] to-slate-900',
-  steel: 'bg-gradient-to-r from-[#9090A8] via-[#606080] to-slate-900',
-  fairy: 'bg-gradient-to-r from-[#C87088] via-[#984860] to-slate-900',
-  stellar: 'bg-gradient-to-r from-[#2080D0] via-[#1040A0] to-slate-900',
-};
-
-const baseBadge = "relative overflow-hidden inline-flex items-center justify-center font-hud font-black uppercase tracking-widest text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4),inset_0_-3px_6px_rgba(0,0,0,0.3),0_2px_8px_rgba(0,0,0,0.5)] border border-white/20 rounded-md transition-all before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/20 before:to-transparent before:pointer-events-none";
-
-const typeColors: Record<string, string> = {
-  normal: `${baseBadge} bg-gradient-to-br from-[#A8A878] to-[#787848] ring-1 ring-[#A8A878]/50`,
-  fire: `${baseBadge} bg-gradient-to-br from-[#F08030] to-[#C04000] ring-1 ring-[#F08030]/50`,
-  water: `${baseBadge} bg-gradient-to-br from-[#6890F0] to-[#2050C0] ring-1 ring-[#6890F0]/50`,
-  electric: `${baseBadge} bg-gradient-to-br from-[#F8D030] to-[#B89000] ring-1 ring-[#F8D030]/50`,
-  grass: `${baseBadge} bg-gradient-to-br from-[#78C850] to-[#489820] ring-1 ring-[#78C850]/50`,
-  ice: `${baseBadge} bg-gradient-to-br from-[#98D8D8] to-[#58A8A8] ring-1 ring-[#98D8D8]/50`,
-  fighting: `${baseBadge} bg-gradient-to-br from-[#C03028] to-[#801010] ring-1 ring-[#C03028]/50`,
-  poison: `${baseBadge} bg-gradient-to-br from-[#A040A0] to-[#601060] ring-1 ring-[#A040A0]/50`,
-  ground: `${baseBadge} bg-gradient-to-br from-[#E0C068] to-[#A08028] ring-1 ring-[#E0C068]/50`,
-  flying: `${baseBadge} bg-gradient-to-br from-[#A890F0] to-[#7860C0] ring-1 ring-[#A890F0]/50`,
-  psychic: `${baseBadge} bg-gradient-to-br from-[#F85888] to-[#C82858] ring-1 ring-[#F85888]/50`,
-  bug: `${baseBadge} bg-gradient-to-br from-[#A8B820] to-[#788800] ring-1 ring-[#A8B820]/50`,
-  rock: `${baseBadge} bg-gradient-to-br from-[#B8A038] to-[#887018] ring-1 ring-[#B8A038]/50`,
-  ghost: `${baseBadge} bg-gradient-to-br from-[#705898] to-[#402868] ring-1 ring-[#705898]/50`,
-  dragon: `${baseBadge} bg-gradient-to-br from-[#7038F8] to-[#4008C8] ring-1 ring-[#7038F8]/50`,
-  dark: `${baseBadge} bg-gradient-to-br from-[#705848] to-[#402818] ring-1 ring-[#705848]/50`,
-  steel: `${baseBadge} bg-gradient-to-br from-[#B8B8D0] to-[#8888A0] ring-1 ring-[#B8B8D0]/50`,
-  fairy: `${baseBadge} bg-gradient-to-br from-[#EE99AC] to-[#BD687B] ring-1 ring-[#EE99AC]/50`,
-  stellar: `${baseBadge} bg-gradient-to-br from-[#40A8FF] to-[#1068C0] ring-1 ring-[#40A8FF]/50`,
-};
-
-const statExplanations: Record<string, string> = {
-  hp: "Hit Points: Determines how much damage a Pokemon can take before fainting.",
-  attack: "Physical Attack: Affects the damage dealt by physical moves.",
-  defense: "Physical Defense: Reduces the damage taken from physical moves.",
-  "special-attack": "Special Attack: Affects the damage dealt by special moves.",
-  "special-defense": "Special Defense: Reduces the damage taken from special moves.",
-  speed: "Speed: Determines which Pokemon moves first in battle.",
-};
-
-const NATURES = [
-  { name: 'Hardy', plus: null, minus: null },
-  { name: 'Lonely', plus: 'attack', minus: 'defense' },
-  { name: 'Brave', plus: 'attack', minus: 'speed' },
-  { name: 'Adamant', plus: 'attack', minus: 'special-attack' },
-  { name: 'Naughty', plus: 'attack', minus: 'special-defense' },
-  { name: 'Bold', plus: 'defense', minus: 'attack' },
-  { name: 'Docile', plus: null, minus: null },
-  { name: 'Relaxed', plus: 'defense', minus: 'speed' },
-  { name: 'Impish', plus: 'defense', minus: 'special-attack' },
-  { name: 'Lax', plus: 'defense', minus: 'special-defense' },
-  { name: 'Timid', plus: 'speed', minus: 'attack' },
-  { name: 'Hasty', plus: 'speed', minus: 'defense' },
-  { name: 'Serious', plus: null, minus: null },
-  { name: 'Jolly', plus: 'speed', minus: 'special-attack' },
-  { name: 'Naive', plus: 'speed', minus: 'special-defense' },
-  { name: 'Modest', plus: 'special-attack', minus: 'attack' },
-  { name: 'Mild', plus: 'special-attack', minus: 'defense' },
-  { name: 'Quiet', plus: 'special-attack', minus: 'speed' },
-  { name: 'Bashful', plus: null, minus: null },
-  { name: 'Rash', plus: 'special-attack', minus: 'special-defense' },
-  { name: 'Calm', plus: 'special-defense', minus: 'attack' },
-  { name: 'Gentle', plus: 'special-defense', minus: 'defense' },
-  { name: 'Sassy', plus: 'special-defense', minus: 'speed' },
-  { name: 'Careful', plus: 'special-defense', minus: 'special-attack' },
-  { name: 'Quirky', plus: null, minus: null },
-];
-
-const TYPE_CHART: Record<string, Record<string, number>> = {
-  normal: { rock: 0.5, ghost: 0, steel: 0.5 },
-  fire: { fire: 0.5, water: 0.5, grass: 2, ice: 2, bug: 2, rock: 0.5, dragon: 0.5, steel: 2 },
-  water: { fire: 2, water: 0.5, grass: 0.5, ground: 2, rock: 2, dragon: 0.5 },
-  electric: { water: 2, electric: 0.5, grass: 0.5, ground: 0, flying: 2, dragon: 0.5 },
-  grass: { fire: 0.5, water: 2, grass: 0.5, poison: 0.5, ground: 2, flying: 0.5, bug: 0.5, rock: 2, dragon: 0.5, steel: 0.5 },
-  ice: { fire: 0.5, water: 0.5, grass: 2, ice: 0.5, ground: 2, flying: 2, dragon: 2, steel: 0.5 },
-  fighting: { normal: 2, ice: 2, poison: 0.5, flying: 0.5, psychic: 0.5, bug: 0.5, rock: 2, ghost: 0, dark: 2, steel: 2, fairy: 0.5 },
-  poison: { grass: 2, poison: 0.5, ground: 0.5, rock: 0.5, ghost: 0.5, steel: 0, fairy: 2 },
-  ground: { fire: 2, electric: 2, grass: 0.5, poison: 2, bug: 0.5, rock: 2, steel: 2 },
-  flying: { electric: 0.5, grass: 2, fighting: 2, bug: 2, rock: 0.5, steel: 0.5 },
-  psychic: { fighting: 2, poison: 2, psychic: 0.5, dark: 0, steel: 0.5 },
-  bug: { fire: 0.5, grass: 2, fighting: 0.5, poison: 0.5, flying: 0.5, psychic: 2, ghost: 0.5, dark: 2, steel: 0.5, fairy: 0.5 },
-  rock: { fire: 2, ice: 2, fighting: 0.5, ground: 0.5, flying: 2, bug: 2, steel: 0.5 },
-  ghost: { normal: 0, psychic: 2, ghost: 2, dark: 0.5 },
-  dragon: { dragon: 2, steel: 0.5, fairy: 0 },
-  dark: { fighting: 0.5, psychic: 2, ghost: 2, dark: 0.5, fairy: 0.5 },
-  steel: { fire: 0.5, water: 0.5, electric: 0.5, ice: 2, rock: 2, steel: 0.5, fairy: 2 },
-  fairy: { fire: 0.5, fighting: 2, poison: 0.5, dragon: 2, dark: 2, steel: 0.5 },
-};
-
-
-const getBattleBackground = (playerType?: string, opponentType?: string) => {
-  const map: Record<string, string> = {
-    normal: 'grassy meadow with wild daisies and soft rustic plains', 
-    grass: 'mystical deep forest filled with lush bioluminescent ferns and ancient moss-covered trees', 
-    bug: 'vibrant retro overgrown jungle canopy with glowing fireflies and twisted hanging vines',
-    fire: 'epic dynamic volcanic crater with bubbling hot neon orange flowing lava rivers',
-    water: 'crashing ocean shore waves under a dark marine crest with spray and sea foam', 
-    ice: 'crystal glacier ice cavern glittering with sapphire icicles and frozen walls',
-    rock: 'sharp dramatic mountain peak summit with crumbling stones and high thin atmosphere', 
-    ground: 'sandy desert canyons with windblown sand dunes and dry cracked earth', 
-    fighting: 'legendary martial arts temple dojo with sacred tatami mats and stone lanterns',
-    electric: 'high-tech high-voltage electrical power plant grid with blue sparks and generator coils', 
-    steel: 'brutal industrial mechanical gear factory with turning steel cogs and steam escape vents',
-    psychic: 'mystical abstract celestial galaxy warp with cosmic nebulas, purple star clusters, and space dimensional rifts', 
-    ghost: 'spooky gothic haunted cemetery path lined with tombstones under an ethereal low-hanging violet fog', 
-    dark: 'cool low-key retro moonlit city rooftops at midnight under a purple starry night sky', 
-    poison: 'toxic glowing acid swamp pools with bubbling purple sludge and mossy tree trunks',
-    dragon: 'ancient misty mountain valley ruins of a forgotten dragon temple with stone runic pillars', 
-    flying: 'soaring high-altitude sky filled with epic turbulent thunderstorm clouds and sky ribbons', 
-    fairy: 'magical glowing fantasy dreamscape meadow with pastel crystal spires and sparkling glitter dust'
-  };
-
-  const pType = playerType || 'normal';
-  const oType = opponentType || 'normal';
-
-  const pDesc = map[pType] || `${pType} wilderness`;
-  const oDesc = map[oType] || `${oType} sanctuary`;
-
-  let keyword = '';
-  if (pType === oType) {
-    keyword = `pure majestic landscape of a ${pDesc}`;
-  } else {
-    keyword = `epic symmetric split-screen Pokemon stadium battleground arena: on the left side is a gorgeous ${pDesc} fading into a stunning ${oDesc} on the right side, seamlessly merged at the vertical center line`;
-  }
-
-  const basePrompt = `16-bit vintage retro pixel art aesthetic pokemon showdown battle stadium arena background, high detail pixel texture, beautiful scenic landscape environment, ${keyword}, epic cinematic mood, high-contrast, beautiful rich colors, native game screen capture`;
-  const prompt = encodeURIComponent(basePrompt);
-  
-  const textSeed = `${pType}-${oType}-clear`;
-  let seedVal = 42;
-  for (let i = 0; i < textSeed.length; i++) {
-    seedVal = (seedVal * 31 + textSeed.charCodeAt(i)) % 1000;
-  }
-  
-  return `https://image.pollinations.ai/prompt/${prompt}?width=1024&height=576&nologo=true&seed=${seedVal || 42}`;
-};
-
-const getBattleFallbackGradient = (playerType?: string, opponentType?: string) => {
-  const pType = playerType || 'normal';
-  const oType = opponentType || 'normal';
-  
-  const colors: Record<string, string> = {
-    normal: '#4b5563', grass: '#047857', bug: '#4d7c0f',
-    fire: '#b91c1c', water: '#1d4ed8', ice: '#0369a1',
-    rock: '#78350f', ground: '#a16207', fighting: '#991b1b',
-    electric: '#5f3e09', steel: '#475569', psychic: '#be185d',
-    ghost: '#6d28d9', dark: '#111827', poison: '#7e22ce',
-    dragon: '#4338ca', flying: '#0284c7', fairy: '#9d174d'
-  };
-
-  const color1 = colors[pType] || colors.normal;
-  const color2 = colors[oType] || colors.normal;
-  
-  return `linear-gradient(135deg, ${color1}cc 0%, ${color1}cc 40%, #020617 40%, #020617 60%, ${color2}cc 60%, ${color2}cc 100%)`;
-};
-
-const HUDCorners = memo(({ className }: { className?: string }) => null);
-
-interface PokethologyRadarScannerProps {
-  onAbort: () => void;
-  targetName?: string;
-}
-
-const PokethologyRadarScanner = memo(({ onAbort, targetName }: PokethologyRadarScannerProps) => {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const progressTimer = setInterval(() => {
-      setProgress(prev => {
-        if (prev < 96) {
-          return prev + Math.floor(Math.random() * 3) + 2; // Smooth 4s steady progression
-        }
-        return prev;
-      });
-    }, 80);
-
-    const watchdog = setTimeout(onAbort, 4000); // 4s buffer auto-bypass for smooth data pre-caching
-
-    return () => {
-      clearInterval(progressTimer);
-      clearTimeout(watchdog);
-    };
-  }, [onAbort]);
-
-  const formattedName = targetName ? targetName.replace(/-/g, ' ').toUpperCase() : "POKEMON";
-
-  return (
-    <div className="flex-1 flex flex-col items-center justify-center min-h-[300px] w-full max-w-sm mx-auto p-6 text-center select-none relative overflow-hidden my-auto">
-      {/* Sleek Glowing Pokeball Spinner */}
-      <div className="relative w-24 h-24 mb-5 flex items-center justify-center shrink-0">
-        <div className="absolute inset-0 rounded-full bg-cyan-500/15 blur-xl animate-pulse" />
-        
-        {/* Modern Pokeball vector spinner */}
-        <div className="relative w-16 h-16 rounded-full border-3 border-slate-950 bg-white overflow-hidden shadow-[0_0_20px_rgba(34,211,238,0.3)] animate-spin" style={{ animationDuration: '1.6s' }}>
-          <div className="absolute top-0 inset-x-0 h-8 bg-gradient-to-b from-red-500 to-rose-600 border-b-3 border-slate-950" />
-          <div className="absolute top-1/2 left-1/2 -ml-3 -mt-3 w-6 h-6 bg-white border-3 border-slate-950 rounded-full flex items-center justify-center z-10 shadow-sm">
-            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
-          </div>
-        </div>
-      </div>
-
-      {/* Clean Status Text */}
-      <div className="space-y-1 mb-5 z-10">
-        <h2 className="font-hud text-base sm:text-lg font-black tracking-wider text-slate-100 uppercase">
-          SCANNING {formattedName}...
-        </h2>
-        <p className="text-[11px] font-mono text-cyan-400/90 tracking-widest uppercase animate-pulse">
-          Syncing Pokedex Registry
-        </p>
-      </div>
-
-      {/* Minimalist Progress Line */}
-      <div className="w-full max-w-xs flex flex-col items-center gap-3 z-10">
-        <div className="w-full h-1.5 bg-slate-900/90 rounded-full overflow-hidden border border-slate-800/80 relative">
-          <div 
-            style={{ width: `${Math.min(100, progress)}%` }}
-            className="absolute top-0 left-0 h-full bg-gradient-to-r from-cyan-500 to-blue-500 shadow-[0_0_10px_rgba(34,211,238,0.7)] transition-all duration-200"
-          />
-        </div>
-        
-        <button
-          onClick={onAbort}
-          className="text-[11px] font-mono text-slate-400 hover:text-cyan-300 transition-colors uppercase tracking-wider underline cursor-pointer py-1 px-3"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  );
-});
-
-PokethologyRadarScanner.displayName = "PokethologyRadarScanner";
-
-
-const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: string; opponentType?: string }) => {
-  // Determine ambient effect based on primary pokemon types
-  const effectType = useMemo(() => {
-    if (playerType === 'fire' || opponentType === 'fire') return 'fire';
-    if (playerType === 'water' || opponentType === 'water') return 'water';
-    if (playerType === 'electric' || opponentType === 'electric') return 'electric-ambient';
-    if (playerType === 'ice' || opponentType === 'ice') return 'ice';
-    if (playerType === 'ghost' || opponentType === 'ghost' || playerType === 'dark' || opponentType === 'dark') return 'shadow';
-    return null;
-  }, [playerType, opponentType]);
-
-  if (!effectType) return null;
-
-  return (
-    <div className="absolute inset-0 z-[1] overflow-hidden pointer-events-none select-none rounded-xl sm:rounded-2xl ">
-      {/* Electric ambient overlay */}
-      {effectType === 'electric-ambient' && (
-        <div className="absolute inset-0 bg-yellow-950/15">
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(234,179,8,0.03)_1px,transparent_1px),linear-gradient(to_right,rgba(234,179,8,0.03)_1px,transparent_1px)] bg-[size:30px_30px] opacity-75" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(234,179,8,0.15)_0%,transparent_80%)] animate-pulse" style={{ animationDuration: '3s' }} />
-          <div className="absolute inset-0 overflow-hidden">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute bg-yellow-400/45 rounded-full "
-                style={{
-                  width: '2px',
-                  height: `${12 + (i % 3) * 15}px`,
-                  left: `${15 + i * 14}%`,
-                  bottom: `${10 + (i * 20) % 70}%`,
-                  boxShadow: '0 0 6px rgba(234,179,8,0.6)',
-                  animation: `sparkleVertical ${1.5 + (i % 2) * 0.8}s ease-in-out infinite`,
-                  animationDelay: `${i * 0.25}s`
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Fire weather effect */}
-      {effectType === 'fire' && (
-        <div className="absolute inset-0 bg-red-950/20">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(239,68,68,0.15)_0%,transparent_75%)] animate-pulse" style={{ animationDuration: '2.5s' }} />
-          <div className="absolute inset-0">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute bg-orange-500/50 rounded-full "
-                style={{
-                  width: `${3 + (i % 3) * 2}px`,
-                  height: `${3 + (i % 3) * 2}px`,
-                  left: `${10 + i * 11}%`,
-                  bottom: `-10px`,
-                  boxShadow: '0 0 6px rgba(249,115,22,0.6)',
-                  animation: `emberRise ${3 + (i % 3) * 1.5}s ease-out infinite`,
-                  animationDelay: `${i * 0.3}s`
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Water weather effect */}
-      {effectType === 'water' && (
-        <div className="absolute inset-0 bg-blue-950/15">
-          <div className="absolute inset-0 bg-slate-900/5 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.1)_0%,transparent_80%)]" />
-          <div className="absolute inset-0">
-            {[...Array(10)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute bg-blue-400/25 rounded "
-                style={{
-                  width: '1px',
-                  height: `${20 + (i % 4) * 15}px`,
-                  left: `${5 + i * 9}%`,
-                  top: `-50px`,
-                  transform: 'rotate(15deg)',
-                  animation: `rainFall ${0.8 + (i % 3) * 0.2}s linear infinite`,
-                  animationDelay: `${i * 0.1}s`
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Ice weather effect */}
-      {effectType === 'ice' && (
-        <div className="absolute inset-0 bg-cyan-950/20">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.1)_0%,transparent_80%)] animate-pulse" style={{ animationDuration: '6s' }} />
-          <div className="absolute inset-0">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute bg-white/40 rounded-full "
-                style={{
-                  width: `${4 + (i % 3) * 2}px`,
-                  height: `${4 + (i % 3) * 2}px`,
-                  left: `${8 + i * 11}%`,
-                  top: `-10px`,
-                  animation: `fallAndSway ${5 + (i % 3) * 2}s linear infinite`,
-                  animationDelay: `${i * 0.25}s`
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Shadow / Twilight ambient effect */}
-      {effectType === 'shadow' && (
-        <div className="absolute inset-0 bg-purple-950/15">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(147,51,234,0.08)_0%,transparent_85%)] animate-pulse" style={{ animationDuration: '7s' }} />
-          <div className="absolute inset-0">
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute bg-purple-900/15 rounded-full blur-xl"
-                style={{
-                  width: `${80 + (i % 3) * 40}px`,
-                  height: `${80 + (i % 3) * 40}px`,
-                  left: `${15 + i * 18}%`,
-                  top: `${20 + (i * 12) % 50}%`,
-                  animation: `shadowDrift ${10 + i * 3}s ease-in-out infinite alternate`,
-                  animationDelay: `${i * 1.5}s`
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-});
-
-TerrainEffect.displayName = "TerrainEffect";
-
-const PokemonTcgCard = memo(({ displayId, pokemonName, className }: { displayId: string; pokemonName: string; className?: string }) => {
-  const [error, setError] = useState(false);
-  const artworkUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${displayId}.png`;
-
-  if (error) {
-    return (
-      <div className={cn(className, "border border-slate-700 bg-slate-900/50 flex justify-center items-center rounded text-[8px] text-slate-400 font-mono text-center p-2")}>
-        {pokemonName}
-      </div>
-    );
-  }
-
-  return (
-    <img
-      src={artworkUrl}
-      alt={pokemonName}
-      className={cn(className, "object-contain rounded filter drop-shadow-[0_0_12px_rgba(34,211,238,0.3)]")}
-      referrerPolicy="no-referrer"
-      draggable={false}
-      onError={() => setError(true)}
-    />
-  );
-});
-
-const PokemonCardSprite = memo(({ pokemonName, id, className, isShiny, use2dSprite }: { pokemonName: string; id: string | undefined; className: string; isShiny?: boolean; use2dSprite?: boolean }) => {
-    const [fallbackLvl, setFallbackLvl] = useState(0);
-
-  useEffect(() => {
-    setFallbackLvl(0);
-  }, [pokemonName, isShiny, use2dSprite]);
-
-  const getSrcAtLevel = (lvl: number): string => {
-    const cleanName = getShowdownName(pokemonName);
-    const parsedId = id && !isNaN(parseInt(id, 10)) ? parseInt(id, 10) : undefined;
-    const normName = pokemonName?.toLowerCase()?.trim() || '';
-    const formId = POKEMON_FORM_IDS[normName] || (parsedId && parsedId > 1025 ? parsedId : undefined);
-
-    if (use2dSprite) {
-      if (lvl === 0) {
-        return getPokemonSpriteUrl({ name: pokemonName, formId, displayId: parsedId }, { isShiny, use2d: true });
-      }
-      if (lvl === 1) {
-        return `https://play.pokemonshowdown.com/sprites/gen5${isShiny ? '-shiny' : ''}/${cleanName}.png`;
-      }
-      if (lvl === 2) {
-        return `https://play.pokemonshowdown.com/sprites/ani${isShiny ? '-shiny' : ''}/${cleanName}.gif`;
-      }
-      return getPokemonArtworkUrl({ name: pokemonName, formId, displayId: parsedId }, { isShiny });
-    }
-    
-    if (lvl === 0) {
-      return getPokemonArtworkUrl({ name: pokemonName, formId, displayId: parsedId }, { isShiny });
-    }
-    if (lvl === 1) {
-      // Showdown 2D png fallback (good for megas and gmax)
-      return `https://play.pokemonshowdown.com/sprites/gen5${isShiny ? '-shiny' : ''}/${cleanName}.png`;
-    }
-    if (lvl === 2) {
-      // Showdown Animated gif fallback
-      return `https://play.pokemonshowdown.com/sprites/ani${isShiny ? '-shiny' : ''}/${cleanName}.gif`;
-    }
-    // Final fallback to raw PokeAPI sprite
-    return getPokemonSpriteUrl({ name: pokemonName, formId, displayId: parsedId }, { isShiny });
-  };
-
-  const currentSrc = getSrcAtLevel(fallbackLvl);
-
-  return (
-    <img
-      src={currentSrc}
-      alt={pokemonName}
-      referrerPolicy="no-referrer"
-      draggable={false}
-      className={cn(className, use2dSprite ? "[image-rendering:pixelated]" : "", "w-full h-full object-contain scale-[1.1] group-hover:scale-[1.3] drop-shadow-[0_10px_15px_rgba(34,211,238,0.2)]")}
-      loading="lazy"
-      onError={(e) => {
-        if (fallbackLvl < 3) {
-          setFallbackLvl(l => l + 1);
-        } else {
-          e.currentTarget.style.display = 'none';
-        }
-      }}
-    />
-  );
-});
-
-const PokemonCard = memo(({ p, isSelected, isOpponentSelected, enableAnimations, onClick, isShiny, isCardView, isLightMode, use2dSprite, isFav, onToggleFavorite }: any) => {
-    const id = p.url.split('/').filter(Boolean).pop();
-  const displayId = p.displayId || p.baseId || id;
-  const isSpecial = parseInt(id || "0") > 1025 && !p.displayId;
-  const isMega = p.name.includes('-mega');
-  const isGmax = p.name.includes('-gmax');
-
-  const [clickAura, setClickAura] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [cardType, setCardType] = useState<string | null>(null);
-
-  useEffect(() => {
-    if ((isHovered || isSelected || isOpponentSelected) && !cardType && p.url) {
-      let isMounted = true;
-      fetch(p.url)
-        .then(res => res.json())
-        .then(data => {
-          if (isMounted && data.types && data.types[0]) {
-            setCardType(data.types[0].type.name);
-          }
-        })
-        .catch(err => console.error("Failed to fetch card type", err));
-      return () => { isMounted = false; };
-    }
-  }, [isHovered, isSelected, isOpponentSelected, cardType, p.url]);
-
-
-  // Framer Motion spring-bound coordinates for hyper-optimized 3D Tilt hover effect (Zero React Re-renders)
-  const mouseX = useMotionValue(0.5);
-  const mouseY = useMotionValue(0.5);
-
-  const springConfig = { damping: 20, stiffness: 240, mass: 0.5 };
-  const rotateX = useSpring(useTransform(mouseY, [0, 1], [10, -10]), springConfig);
-  const rotateY = useSpring(useTransform(mouseX, [0, 1], [-10, 10]), springConfig);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!enableAnimations) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const valX = (e.clientX - rect.left) / width;
-    const valY = (e.clientY - rect.top) / height;
-    mouseX.set(valX);
-    mouseY.set(valY);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    mouseX.set(0.5);
-    mouseY.set(0.5);
-  };
-
-  const handleClick = () => {
-    if (isMega || isGmax) {
-      setClickAura(true);
-      setTimeout(() => setClickAura(false), 500);
-    }
-    onClick(p.name);
-  };
-  
-  const spriteClasses = cn(
-    "transition-transform duration-500  select-none max-w-[150%] max-h-[150%]",
-    (isSelected || isOpponentSelected) 
-      ? "!scale-[1.6]" 
-      : "opacity-90 group-hover:opacity-100"
-  );
-  
-  return (
-    <motion.div
-      layout={enableAnimations}
-      role="button"
-      tabIndex={0}
-      initial={enableAnimations ? { opacity: 0, scale: 0.95 } : undefined}
-      animate={enableAnimations ? { opacity: 1, scale: 1 } : undefined}
-      exit={enableAnimations ? { opacity: 0, scale: 0.95 } : undefined}
-      whileHover={enableAnimations ? { scale: 1.04, y: -5, boxShadow: "0 20px 35px -5px rgba(6,182,212,0.22)" } : undefined}
-      whileTap={enableAnimations ? { scale: 0.97, y: 0 } : undefined}
-      transition={{ duration: 0.25, ease: "easeOut" }}
-      style={enableAnimations ? { 
-        rotateX, 
-        rotateY, 
-        transformStyle: "preserve-3d",
-        perspective: 605
-      } : undefined}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      onClick={handleClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleClick();
-        }
-      }}
-      onMouseEnter={() => {
-        setIsHovered(true);
-        sounds.hover();
-      }}
-      className={cn(
-        "border rounded-xl p-3 flex flex-col items-center transition-all group cursor-pointer relative overflow-hidden h-32 sm:h-36 justify-center  shadow-lg",
-        isLightMode
-          ? "bg-white border-slate-200 hover:bg-cyan-50/20 hover:border-cyan-400"
-          : "bg-slate-950/40 border-slate-800/50 hover:bg-cyan-950/20 hover:border-cyan-500/40",
-        isSelected && (
-          isLightMode
-            ? "bg-cyan-50 border-cyan-500 ring-1 ring-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.15)] z-10"
-            : "bg-cyan-900/40 border-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.25)] ring-1 ring-cyan-400/50 z-10"
-        ),
-        isOpponentSelected && (
-          isLightMode
-            ? "bg-rose-50 border-rose-500 ring-1 ring-rose-500 shadow-[0_0_15px_rgba(239,68,68,0.15)] z-10"
-            : "bg-red-900/40 border-red-400 shadow-[0_0_25px_rgba(239,68,68,0.25)] ring-1 ring-red-400/50 z-10"
-        ),
-        isCardView && (isLightMode ? "p-1 bg-slate-100" : "p-1 bg-slate-900")
-      )}
-    >
-      {clickAura && (isMega || isGmax) && (
-        <motion.div 
-          className={cn("absolute inset-0 z-0 blur-md mix-blend-screen pointer-events-none -inset-2", isMega ? "bg-cyan-500/50" : "bg-red-500/50")}
-          initial={{ opacity: 1, scale: 0.8 }}
-          animate={{ opacity: 0, scale: 1.5 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-        />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-b  r from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-      {/* Type-based Particle Aura */}
-      <AnimatePresence>
-        {(isHovered || isSelected || isOpponentSelected) && cardType && typeBaseColors[cardType] && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="absolute inset-0 overflow-hidden pointer-events-none rounded-xl"
-          >
-            {[...Array(12)].map((_, i) => (
-              <motion.div
-                key={i}
-                className={`absolute w-1.5 h-1.5 rounded-full blur-[1px] ${typeBaseColors[cardType]}`}
-                initial={{
-                  x: Math.random() * 100 + "%",
-                  y: "110%",
-                  scale: Math.random() * 0.5 + 0.5,
-                  opacity: Math.random() * 0.5 + 0.2
-                }}
-                animate={{
-                  y: "-10%",
-                  x: `${Math.random() * 100}%`,
-                  opacity: [0, Math.random() * 0.5 + 0.2, 0],
-                  scale: [Math.random() * 0.5 + 0.5, Math.random() * 1.5 + 0.5, 0]
-                }}
-                transition={{
-                  duration: Math.random() * 2 + 2,
-                  repeat: Infinity,
-                  ease: "easeOut",
-                  delay: Math.random() * 2
-                }}
-              />
-            ))}
-            <div className={`absolute inset-0 opacity-20 blur-xl ${typeBaseColors[cardType]}`} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-      {!isCardView && <HUDCorners />}
-      
-      {/* ID Badge */}
-      {!isCardView && (
-        <div className="absolute top-2 left-2.5 px-1.5 py-0.5 rounded bg-slate-950/80 border border-slate-800 text-[7px] font-bold font-mono text-cyan-600 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all flex items-center gap-1 z-20">
-          {isSpecial && !isMega && !isGmax
-            ? "SPECIAL" 
-            : `#${String(displayId || "0").padStart(4, '0')}`}
-        </div>
-      )}
-
-      {/* Favorite Star Toggle (Opposite side of ID badge) */}
-      {!isCardView && onToggleFavorite && (
-        <button 
-          type="button"
-          className="absolute top-2 right-2.5 z-30 p-1 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-yellow-500/60 transition-all cursor-pointer shadow-sm group/star"
-          onClick={(e) => {
-            e.stopPropagation();
-            try { sounds.hover(); } catch (_) {}
-            const numId = id && !isNaN(parseInt(id, 10)) ? parseInt(id, 10) : undefined;
-            const normName = p.name?.toLowerCase()?.trim() || '';
-            const formId = p.formId || POKEMON_FORM_IDS[normName] || (numId && numId > 1025 ? numId : undefined);
-            onToggleFavorite({
-              name: p.name,
-              url: p.url,
-              displayId: p.displayId || p.baseId || numId,
-              formId,
-              baseId: p.baseId || p.displayId,
-              artwork: p.artwork
-            });
-          }}
-          title={isFav ? "Remove from Favorites" : "Add to Favorites"}
-        >
-          <Star 
-            className={cn(
-              "w-3.5 h-3.5 transition-transform duration-200 group-hover/star:scale-110", 
-              isFav ? "fill-yellow-400 text-yellow-400 filter drop-shadow-[0_0_6px_rgba(250,204,21,0.6)]" : "text-slate-500 group-hover/star:text-yellow-300"
-            )} 
-          />
-        </button>
-      )}
-
-      {/* Scanline Effect */}
-      {!isCardView && <div className="absolute inset-0 pointer-events-none opacity-[0.03] group-hover:opacity-[0.07] transition-opacity z-30 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]"></div>}
-
-      <div className={cn("relative z-10 flex items-center justify-center", isCardView ? "w-full h-full" : "w-20 h-20 sm:w-24 sm:h-24")}>
-        {/* Sprite Glow */}
-        <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.05) 0%, transparent 70%)' }}></div>
-        
-        {enableAnimations && (isSelected || isOpponentSelected) && (
-          <motion.div 
-            className={cn(
-              "absolute inset-0 rounded-full opacity-20",
-              isSelected ? "bg-[radial-gradient(circle,rgba(34,211,238,1)_0%,transparent_70%)]" : "bg-[radial-gradient(circle,rgba(248,113,113,1)_0%,transparent_70%)]"
-            )}
-            animate={{ opacity: [0.1, 0.3, 0.1], scale: [1, 1.3, 1] }}
-            transition={{ duration: 3, repeat: Infinity }}
-          />
-        )}
-        
-        {isCardView ? (
-          <PokemonTcgCard displayId={String(displayId)} pokemonName={p.name} className="w-full h-full" />
-        ) : (
-          <PokemonCardSprite
-            pokemonName={p.name}
-            id={id}
-            isShiny={isShiny}
-            use2dSprite={use2dSprite}
-            className={spriteClasses}
-          />
-        )}
-      </div>
-
-      {!isCardView && (
-        <span className={cn(
-          "font-hud text-[9px] sm:text-[10px] md:text-[11px] font-bold tracking-wider uppercase tracking-[0.1em] sm:tracking-[0.2em] mt-2 relative z-20 transition-colors break-words whitespace-normal leading-tight w-full text-center px-1",
-          isSelected ? "text-cyan-300" : isOpponentSelected ? "text-red-300" : "text-slate-400 group-hover:text-cyan-300"
-        )}>
-          {p.name.replace(/-/g, ' ')}
-        </span>
-      )}
-    </motion.div>
-  );
-});
-
-interface QuizQuestion {
-  question: string;
-  options: string[];
-  answerIndex: number;
-  explanation: string;
-}
-
-interface QuizData {
-  date: string;
-  questions: QuizQuestion[];
-  isFallback?: boolean;
-}
-
-const OFFLINE_QUIZ_FALLBACK = {
-  date: new Date().toISOString().split('T')[0],
-  isFallback: true,
-  questions: [
-    {
-      question: "Who is considered the 'Renegade Pokemon' in Sinnoh cosmology, banished due to its violent nature?",
-      options: ["Kyurem", "Giratina", "Necrozma", "Darkrai"],
-      answerIndex: 1,
-      explanation: "Giratina was created alongside Dialga and Palkia but was banished to the Distortion World by Arceus due to its exceptionally violent and destructive nature. It represents antimatter and gravity."
-    },
-    {
-      question: "According to ancient legends, Mew is the genetic ancestor of all Pokemon, but why does Arceus precede Mew in mythology?",
-      options: [
-        "Mew was created by human scientists to clone Arceus",
-        "Arceus is the creator deity who hatched from an egg in nothingness, and Mew represents the ancestor of all common mortal species",
-        "Mew and Arceus fought in a primordial war, and Mew lost",
-        "Arceus is actually an evolved form of Mew"
-      ],
-      answerIndex: 1,
-      explanation: "Arceus is the divine prime creator who hatched from the cosmic egg in a void of nothingness, whereas Mew acts as the biological stem-ancestor containing the DNA of all non-deity Pokemon."
-    },
-    {
-      question: "The Lake Guardians (Uxie, Mesprit, and Azelf) were birthed from a single egg. What core philosophical aspects of the human spirit do they govern?",
-      options: ["Body, Mind, and Soul", "Time, Space, and Matter", "Knowledge, Emotion, and Willpower", "Truth, Ideals, and Void"],
-      answerIndex: 2,
-      explanation: "Created by Arceus, Uxie governs Knowledge (giving humans mind), Mesprit governs Emotion (giving humans heart), and Azelf governs Willpower (giving humans resolve)."
-    }
-  ]
-};
-
-let globalPrefetchedQuiz: any = null;
-
-if (typeof window !== 'undefined') {
-  fetch('/api/quiz')
-    .then(r => {
-      if (r.ok) return r.json();
-      throw new Error();
-    })
-    .then(d => {
-      globalPrefetchedQuiz = d;
-    })
-    .catch(() => {});
-}
-
-// PokethologyQuizWidget is imported from ./components/PokethologyQuizWidget
-
-
-const PokemonGrid = memo(({ list, displayLimit, selectedName, opponentName, enableAnimations, onClick, isShiny, isCardView, isLightMode, use2dSprite, isFavorite, onToggleFavorite }: any) => {
-  return (
-    <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-4 py-2 px-1">
-      {list.slice(0, displayLimit).map((p: any, i: number) => (
-        <PokemonCard
-          key={`${p.name || 'poke'}-${p.id || i}-${i}`}
-          p={p}
-          isSelected={p.name === selectedName}
-          isOpponentSelected={p.name === opponentName}
-          enableAnimations={enableAnimations}
-          onClick={onClick}
-          isShiny={isShiny}
-          isCardView={isCardView}
-          isLightMode={isLightMode}
-          use2dSprite={use2dSprite}
-          isFav={isFavorite ? isFavorite(p.name) : false}
-          onToggleFavorite={onToggleFavorite}
-        />
-      ))}
-    </div>
-  );
-});
-
-const BattleLog = memo(({ log, enableAnimations, turn, isBattling }: { log: (LogEntry & { turn?: number })[]; enableAnimations: boolean; turn: string; isBattling: boolean }) => {
-    const logRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (logRef.current) {
-      logRef.current.scrollTop = logRef.current.scrollHeight;
-    }
-  }, [log.length, isBattling, turn]);
-
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 10, scale: 0.98 }}
-      transition={{ duration: 0.3 }}
-      ref={logRef} 
-      className="bg-slate-900/30 backdrop-blur-md rounded-xl p-3 sm:p-4 h-32 sm:h-40 md:h-48 overflow-y-auto custom-scrollbar optimize-scrolling font-mono text-[10px] sm:text-[11px] sm:leading-relaxed font-bold tracking-wider space-y-1 sm:space-y-1.5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_32px_rgba(0,0,0,0.5)] shrink-0 pointer-events-auto scroll-smooth" 
-      style={{ overflowAnchor: 'none' }}
-    >
-      {log.slice(-50).map((entry, i) => {
-        const isLatest = i === log.length - 1;
-        let colorClass = "text-slate-400 border-slate-800 bg-slate-900/40";
-        let Icon = Info;
-
-        if (entry.type === 'player') { 
-          colorClass = "text-cyan-400 border-cyan-500/30 bg-cyan-950/40 shadow-[0_0_10px_rgba(34,211,238,0.1)]"; 
-          Icon = Swords; 
-        }
-        else if (entry.type === 'opponent') { 
-          colorClass = "text-red-400 border-red-500/30 bg-red-950/40 shadow-[0_0_10px_rgba(248,113,113,0.1)]"; 
-          Icon = Swords; 
-        }
-        else if (entry.type === 'critical') { 
-          colorClass = "text-yellow-400 border-yellow-500/50 bg-yellow-950/40 font-bold italic"; 
-          Icon = Zap; 
-        }
-        else if (entry.type === 'effective') { 
-          colorClass = "text-green-400 border-green-500/30 bg-green-950/40"; 
-          Icon = Target; 
-        }
-        else if (entry.type === 'not-effective') { 
-          colorClass = "text-slate-400 border-slate-500/30 bg-slate-900/60"; 
-          Icon = Shield; 
-        }
-        else if (entry.type === 'stat-boost') { 
-          colorClass = "text-blue-400 border-blue-500/30 bg-blue-950/40"; 
-          Icon = TrendingUp; 
-        }
-        else if (entry.type === 'stat-lower') { 
-          colorClass = "text-purple-400 border-purple-500/30 bg-purple-950/40"; 
-          Icon = TrendingDown; 
-        }
-        else if (entry.type === 'status-effect') { 
-          colorClass = "text-orange-400 border-orange-500/30 bg-orange-950/40"; 
-          Icon = AlertTriangle; 
-        }
-        else if (entry.type === 'faint') { 
-          colorClass = "text-red-500 border-red-600/50 bg-red-950/60 font-bold uppercase tracking-tighter"; 
-          Icon = Skull; 
-        }
-        else if (entry.type === 'system') { 
-          colorClass = "text-white border-white/20 bg-white/5 font-bold"; 
-          Icon = Activity; 
-        }
-        else if (entry.type === 'normal') {
-          if (entry.text.includes('Damage:')) { 
-            colorClass = "text-slate-400 border-slate-700/30 italic bg-slate-900/20"; 
-            Icon = Crosshair; 
-          }
-          else if (entry.text.includes('DEFENSE') || entry.text.includes('PROTECT')) {
-            Icon = Shield;
-          }
-        }
-
-        return (
-          <div 
-            key={`battle-log-${entry.turn || turn}-${entry.type || ''}-${i}`} 
-            className={cn(
-              "border rounded-lg px-2 py-1.5 flex items-center gap-2 transition-all duration-300",
-              enableAnimations && !isLatest && "animate-in fade-in slide-in-from-left-1",
-              isLatest && "ring-1 ring-white/20 scale-[1.01] bg-white/5 shadow-lg animate-pulse",
-              colorClass
-            )}
-          >
-            {entry.turn && (
-              <span className="text-[7px] opacity-40 font-mono mr-1">T{entry.turn}</span>
-            )}
-            <div className="flex-shrink-0 p-1 rounded bg-black/30 border border-white/5">
-              <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            </div>
-            <span className="flex-1 leading-tight">{entry.text}</span>
-          </div>
-        );
-      })}
-      {isBattling && turn === 'opponent' && (
-        <div className="text-red-500 font-hud animate-pulse py-1.5 px-2 tracking-widest flex items-center gap-2 text-[8px] sm:text-[10px]">
-          <Loader2 className="w-3 h-3 animate-spin" /> Opponent is thinking...
-        </div>
-      )}
-    </motion.div>
-  );
-});
-
-const StatusOverlay = memo(({ status }: { status: string | null }) => {
-  if (!status) return null;
-
-  return (
-    <div className="absolute inset-0 pointer-events-none touch-none select-none z-20 flex items-center justify-center overflow-visible ">
-      {/* BRN - Burn */}
-      {(status === 'BRN' || status === 'BUR') && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none touch-none">
-          <motion.div
-            className="absolute inset-2 sm:inset-3 rounded-full border-2 border-orange-500/60 bg-orange-600/10 pointer-events-none touch-none"
-            animate={{ scale: [0.96, 1.02, 0.96], opacity: [0.7, 0.9, 0.7] }}
-            transition={{ repeat: Infinity, duration: 2.0, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute inset-1 flex items-center justify-center pointer-events-none touch-none"
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 6, ease: "linear" }}
-          >
-            <Flame className="absolute -top-1 w-3.5 h-3.5 text-orange-400" />
-            <div className="absolute -bottom-1 w-2 h-2 rounded-full bg-orange-500" />
-            <div className="absolute -left-1 w-2 h-2 rounded-full bg-amber-400" />
-            <Flame className="absolute -right-1 w-3 h-3 text-red-400" />
-          </motion.div>
-        </div>
-      )}
-
-      {/* PSN - Poison */}
-      {(status === 'PSN' || status === 'POI') && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none touch-none">
-          <motion.div
-            className="absolute inset-2 sm:inset-3 rounded-full border-2 border-purple-500/60 bg-purple-900/15 pointer-events-none touch-none"
-            animate={{ scale: [0.96, 1.02, 0.96], opacity: [0.7, 0.9, 0.7] }}
-            transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute inset-1 flex items-center justify-center pointer-events-none touch-none"
-            animate={{ rotate: -360 }}
-            transition={{ repeat: Infinity, duration: 7, ease: "linear" }}
-          >
-            <div className="absolute -top-1 w-2.5 h-2.5 rounded-full bg-purple-400 border border-purple-200/50" />
-            <div className="absolute -bottom-1 w-3 h-3 rounded-full bg-fuchsia-500 border border-purple-200/50" />
-            <div className="absolute -left-1 w-2 h-2 rounded-full bg-indigo-500" />
-            <div className="absolute -right-1 w-2.5 h-2.5 rounded-full bg-purple-500" />
-          </motion.div>
-        </div>
-      )}
-
-      {/* PAR - Paralysis */}
-      {status === 'PAR' && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none touch-none">
-          <motion.div
-            className="absolute inset-2 sm:inset-3 rounded-full border-2 border-dashed border-yellow-400/80 pointer-events-none touch-none"
-            animate={{ scale: [0.97, 1.02, 0.97] }}
-            transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
-          />
-          <div className="absolute inset-1 flex items-center justify-center pointer-events-none touch-none">
-            <motion.div
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}
-              className="absolute -top-1.5 text-yellow-300"
-            >
-              <Zap className="w-3.5 h-3.5 fill-yellow-300" />
-            </motion.div>
-            <motion.div
-              animate={{ opacity: [1, 0.5, 1] }}
-              transition={{ repeat: Infinity, duration: 0.9, delay: 0.2, ease: "easeInOut" }}
-              className="absolute -bottom-1.5 text-yellow-400"
-            >
-              <Zap className="w-3.5 h-3.5 fill-yellow-400" />
-            </motion.div>
-            <motion.div
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ repeat: Infinity, duration: 0.85, delay: 0.4, ease: "easeInOut" }}
-              className="absolute -left-1.5 text-amber-300"
-            >
-              <Zap className="w-3 h-3 fill-amber-300" />
-            </motion.div>
-            <motion.div
-              animate={{ opacity: [1, 0.5, 1] }}
-              transition={{ repeat: Infinity, duration: 0.8, delay: 0.15, ease: "easeInOut" }}
-              className="absolute -right-1.5 text-yellow-300"
-            >
-              <Zap className="w-3.5 h-3.5 fill-yellow-300" />
-            </motion.div>
-          </div>
-        </div>
-      )}
-
-      {/* FRZ - Freeze */}
-      {status === 'FRZ' && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none touch-none">
-          <motion.div
-            className="absolute inset-2 sm:inset-3 rounded-full border-2 border-cyan-300/80 bg-cyan-400/10 pointer-events-none touch-none"
-            animate={{ scale: [0.97, 1.03, 0.97], opacity: [0.7, 1, 0.7] }}
-            transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute inset-1 flex items-center justify-center pointer-events-none touch-none"
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
-          >
-            <Sparkles className="absolute -top-1 w-3.5 h-3.5 text-cyan-200" />
-            <Sparkles className="absolute -bottom-1 w-3.5 h-3.5 text-cyan-300" />
-            <div className="absolute -left-1 w-2 h-2 rounded-full bg-cyan-200" />
-            <div className="absolute -right-1 w-2 h-2 rounded-full bg-white" />
-          </motion.div>
-        </div>
-      )}
-
-      {/* SLP - Sleep */}
-      {(status === 'SLP' || status === 'SLE') && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none touch-none">
-          <motion.div
-            className="absolute inset-2 sm:inset-3 rounded-full border border-indigo-400/50 bg-indigo-950/20 pointer-events-none touch-none"
-            animate={{ scale: [0.96, 1.02, 0.96], opacity: [0.4, 0.8, 0.4] }}
-            transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-          />
-          <div className="absolute top-1 right-2 sm:top-2 sm:right-3 flex flex-col items-center pointer-events-none touch-none z-10">
-            <motion.span
-              animate={{ y: [1, -8], x: [0, 3], opacity: [0, 1, 0] }}
-              transition={{ repeat: Infinity, duration: 2.2, delay: 0 }}
-              className="text-xs sm:text-sm font-bold text-slate-200"
-            >
-              Z
-            </motion.span>
-            <motion.span
-              animate={{ y: [1, -10], x: [0, 5], opacity: [0, 1, 0] }}
-              transition={{ repeat: Infinity, duration: 2.4, delay: 0.6 }}
-              className="text-[10px] sm:text-xs font-bold text-slate-300"
-            >
-              z
-            </motion.span>
-          </div>
-        </div>
-      )}
-
-      {/* CON - Confusion */}
-      {status === 'CON' && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none touch-none">
-          <motion.div
-            className="absolute inset-x-0 top-1 h-8 flex items-center justify-center pointer-events-none touch-none"
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 3.5, ease: "linear" }}
-          >
-            <Star className="absolute -left-1 w-3.5 h-3.5 text-yellow-300 fill-yellow-300" />
-            <Star className="absolute -right-1 w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-          </motion.div>
-        </div>
-      )}
-    </div>
-  );
-});
-
-const HPBar = memo(({ current, max, enableAnimations }: { current: number; max: number; enableAnimations: boolean }) => {
-  const percent = max > 0 ? Math.max(0, Math.min(1, current / max)) : 0;
-  const color = percent > 0.5 ? "#4ade80" : percent > 0.2 ? "#facc15" : "#f87171";
-  
-  const prevPercentRef = useRef(percent);
-  const [isDamaged, setIsDamaged] = useState(false);
-  const [glowTrigger, setGlowTrigger] = useState(0);
-  
-  useEffect(() => {
-    if (percent < prevPercentRef.current) {
-      setIsDamaged(true);
-      setGlowTrigger(prev => prev + 1);
-      const timer = setTimeout(() => setIsDamaged(false), 900);
-      prevPercentRef.current = percent;
-      return () => clearTimeout(timer);
-    } else {
-      setIsDamaged(false);
-    }
-    prevPercentRef.current = percent;
-  }, [percent]);
-
-  return (
-    <motion.div 
-      className="relative h-2.5 sm:h-3.5 bg-slate-950/90 rounded-full overflow-hidden mb-1 mt-1 shadow-inner"
-      animate={glowTrigger > 0 ? {
-        boxShadow: [
-          "0 0 0px rgba(0, 0, 0, 0)",
-          "0 0 16px rgba(239, 68, 68, 0.9)",
-          "0 0 0px rgba(0, 0, 0, 0)"
-        ],
-        borderColor: [
-          "rgba(255, 255, 255, 0.1)",
-          "rgba(239, 68, 68, 0.8)",
-          "rgba(255, 255, 255, 0.1)"
-        ]
-      } : {}}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      key={`app-hp-bar-glow-${glowTrigger}`}
-    >
-      {/* Secondary delay translucent red catch-up bar (staggered trailing damage) */}
-      <motion.div 
-        className="absolute top-0 left-0 h-full w-full bg-red-500/60 origin-left z-0"
-        initial={{ scaleX: percent }}
-        animate={{ scaleX: percent }}
-        transition={{ 
-          delay: enableAnimations && isDamaged ? 0.35 : 0,
-          duration: enableAnimations ? (isDamaged ? 0.85 : 0.35) : 0,
-          ease: [0.16, 1, 0.3, 1]
-        }}
-        style={{ transformOrigin: 'left' }}
-      />
-      {/* Primary HP color bar - drains smoothly and swiftly first */}
-      <motion.div 
-        className="h-full w-full relative z-10 origin-left"
-        initial={{ scaleX: percent }}
-        animate={{ scaleX: percent }}
-        transition={{ 
-          duration: enableAnimations ? (isDamaged ? 0.6 : 0.35) : 0, 
-          ease: [0.25, 1, 0.5, 1] 
-        }}
-        style={{ 
-          transformOrigin: 'left',
-          backgroundColor: color
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b   from-white/30 via-transparent to-black/20"></div>
-        <div className="absolute top-0 bottom-0 right-0 w-[2px] bg-white/70 shadow-[0_0_6px_#fff]"></div>
-      </motion.div>
-    </motion.div>
-  );
-});
-
-
-const VictoryConfetti = () => {
-  return (
-    <div className="absolute inset-0 z-[100] pointer-events-none">
-      {[...Array(30)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-2 h-2 rounded-full"
-          style={{
-            backgroundColor: `hsl(${Math.random() * 360}, 100%, 50%)`,
-            left: `${Math.random() * 100}%`,
-            top: -10,
-          }}
-          initial={{ opacity: 1 }}
-          animate={{ y: '100vh', opacity: 0, rotate: 720 }}
-          transition={{ duration: 2 + Math.random() * 2, ease: 'easeOut' }}
-        />
-      ))}
-    </div>
-  );
-};
-
-
-const statNameMap: Record<string, string> = {
-  'hp': 'HP',
-  'attack': 'Attack',
-  'defense': 'Defense',
-  'special-attack': 'Special Attack',
-  'special-defense': 'Special Defense',
-  'speed': 'Speed'
-};
-
-const getEvolutionLineInfo = (node: any): { names: string[], stagesCount: number } => {
-  if (!node) return { names: [], stagesCount: 0 };
-  const names: string[] = [];
-  
-  const traverse = (n: any) => {
-    if (n && n.name) {
-      names.push(n.name);
-    }
-    if (n && n.evolves_to && n.evolves_to.length > 0) {
-      n.evolves_to.forEach(traverse);
-    }
-  };
-  
-  traverse(node);
-  
-  const getDepth = (n: any): number => {
-    if (!n || !n.evolves_to || n.evolves_to.length === 0) return 1;
-    return 1 + Math.max(...n.evolves_to.map((child: any) => getDepth(child)));
-  };
-  
-  const stagesCount = getDepth(node);
-  return { names, stagesCount };
-};
-
+import { AvatarSelectionModal } from './components/AvatarSelectionModal';
+import { DailyHubModal } from './components/DailyHubModal';
+import { BattleExitConfirmationModal } from './components/BattleExitConfirmationModal';
+import { BattleHelpModal } from './components/BattleHelpModal';
+import { InfoModal } from './components/InfoModal';
+import { MusicConfigModal } from './components/MusicConfigModal';
+import { MissionCelebrationOverlay } from './components/MissionCelebrationOverlay';
+
+import { TRAINER_SPRITES, TrainerSprite } from './data/trainerSprites';
+import { getShowdownName } from './utils/showdownName';
+import { TypewriterText } from './components/TypewriterText';
+import { PokemonBattleSprite } from './components/PokemonBattleSprite';
+import { 
+  getOpponentMoveQuote, 
+  getMoveButtonClasses, 
+  typeBaseColors, 
+  typeHeaderGradients, 
+  baseBadge, 
+  typeColors, 
+  statExplanations, 
+  NATURES, 
+  TYPE_CHART, 
+  getBattleBackground, 
+  getBattleFallbackGradient 
+} from './utils/battleQuotesAndColors';
+import { PokemonTcgCard, PokemonCardSprite, PokemonCard } from './components/PokemonCard';
+import { PokemonGrid } from './components/PokemonGrid';
+import { BattleLog } from './components/BattleLog';
+import { HUDCorners, PokethologyRadarScanner, TerrainEffect, StatusOverlay, HPBar, VictoryConfetti } from './components/BattleComponents';
+import { OFFLINE_QUIZ_FALLBACK, statNameMap, getEvolutionLineInfo } from './utils/pokemonHelpers';
 
 export default function App() {
   
@@ -9219,143 +6772,13 @@ export default function App() {
         />
 
         {/* Avatar Selection Modal */}
-        <AnimatePresence>
-          {isAvatarModalOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[120] flex bg-black/90 backdrop-blur-md"
-            >
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 40 }}
-                transition={{ type: "spring", damping: 25, stiffness: 250 }}
-                className="w-full h-full bg-slate-950 flex flex-col overflow-hidden border-t-2 border-cyan-500/30"
-              >
-                <div className="flex items-center justify-between p-3 sm:p-5 lg:p-6 border-b border-cyan-900/50 bg-slate-900/80 shrink-0">
-                  <div className="flex items-center gap-2 sm:gap-4">
-                    <User className="w-5 h-5 sm:w-8 sm:h-8 text-cyan-400" />
-                    <h2 className="font-hud text-lg sm:text-2xl lg:text-3xl font-black text-cyan-300 tracking-widest">SELECT AVATAR</h2>
-                  </div>
-                  <button
-                    onClick={() => { setIsAvatarModalOpen(false); try { sounds.scan(); playHaptic('light'); } catch(e){} }}
-                    className="p-2 sm:p-3 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-full transition-colors group cursor-pointer"
-                  >
-                    <X className="w-5 h-5 sm:w-8 sm:h-8 group-hover:scale-110 transition-transform" />
-                  </button>
-                </div>
+        <AvatarSelectionModal
+          isOpen={isAvatarModalOpen}
+          onClose={() => setIsAvatarModalOpen(false)}
+          currentAvatar={currentAvatar}
+          setCurrentAvatar={setCurrentAvatar}
+        />
 
-                <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
-                  {/* Left Side: Avatar Details & Default Save */}
-                  <div className="w-full lg:w-[360px] xl:w-[400px] bg-slate-950/80 p-3 sm:p-5 lg:p-6 xl:p-8 flex flex-col border-b lg:border-b-0 lg:border-r border-cyan-900/50 shrink-0 z-10 shadow-2xl relative">
-                    <div className="absolute inset-0 bg-gradient-to-b from-cyan-900/10 to-transparent pointer-events-none" />
-                    
-                    <div className="flex flex-row lg:flex-col items-center lg:items-stretch gap-3 lg:gap-0 h-full mb-3 lg:mb-0">
-                      {/* Avatar Image Container - Adjusted sizing & cutting for PC */}
-                      <div className="relative w-20 h-20 sm:w-28 sm:h-28 lg:w-44 lg:h-44 xl:w-48 xl:h-48 mx-auto mb-0 lg:mb-4 bg-slate-900/60 rounded-3xl flex items-center justify-center border-2 border-cyan-500/40 shadow-[0_0_30px_rgba(34,211,238,0.2)] group shrink-0 p-2 overflow-visible">
-                        <div className="absolute inset-0 rounded-3xl bg-cyan-400/5 animate-pulse" />
-                        <img 
-                          src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
-                          alt={currentAvatar.name}
-                          className="w-16 h-16 sm:w-24 sm:h-24 lg:w-36 lg:h-36 xl:w-40 xl:h-40 object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform duration-300 [image-rendering:pixelated]"
-                        />
-                      </div>
-                      
-                      {/* Avatar Details */}
-                      <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling pr-1 sm:pr-2 lg:pr-3 flex flex-col max-h-[22vh] lg:max-h-none">
-                        <h3 className="text-base sm:text-2xl lg:text-3xl xl:text-4xl font-hud font-black text-left lg:text-center text-cyan-300 uppercase tracking-[0.15em] mb-1 sm:mb-2 drop-shadow-lg shrink-0">
-                          {currentAvatar.name}
-                        </h3>
-                        <div className="text-[9px] sm:text-xs lg:text-sm text-emerald-400 font-bold uppercase tracking-widest text-center mb-1.5 sm:mb-4 py-0.5 sm:py-1 px-2 sm:px-3 border border-emerald-500/30 bg-emerald-950/30 rounded-full self-start lg:self-center shrink-0">
-                          {currentAvatar.role}
-                        </div>
-
-                        <p className="text-[11px] sm:text-sm lg:text-base font-serif italic text-slate-300 leading-relaxed opacity-90 text-left lg:text-center mb-1 sm:mb-4">
-                          "{currentAvatar.lore}"
-                        </p>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        try {
-                          localStorage.setItem('pokethology_user_avatar', currentAvatar.id);
-                          sounds.scan(); playHaptic('light');
-                          setIsAvatarModalOpen(false);
-                        } catch(e) {}
-                      }}
-                      className="w-full mt-1 lg:mt-auto py-2.5 sm:py-3.5 lg:py-4 px-4 sm:px-6 bg-emerald-600 hover:bg-emerald-500 text-emerald-50 rounded-lg sm:rounded-xl lg:rounded-2xl font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 sm:gap-3 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:-translate-y-0.5 lg:hover:-translate-y-1 text-xs sm:text-sm lg:text-base shrink-0 cursor-pointer"
-                    >
-                      <Bookmark className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5" />
-                      Set as Default
-                    </button>
-                  </div>
-
-                  {/* Right Side: Grid Selection */}
-                  <div className="flex-1 flex flex-col h-full min-h-[300px] bg-slate-900/30 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none mix-blend-overlay" />
-                    
-                    <div className="p-3 sm:p-5 lg:p-5 border-b border-cyan-900/30 bg-slate-900/80 flex gap-2 sm:gap-3 overflow-x-auto hide-scrollbar shrink-0 z-10 backdrop-blur-md">
-                      {['All', 'Protagonist', 'Rival', 'Gym Leader', 'Champion', 'Trainer', 'Villain'].map(role => (
-                        <button 
-                          key={role}
-                          onClick={() => { setAvatarFilter(role as any); try { sounds.scan() } catch(e){} }}
-                          className={cn(
-                            "px-4 py-2 sm:px-5 sm:py-2.5 lg:px-6 lg:py-2.5 rounded-xl border-2 whitespace-nowrap transition-all text-xs sm:text-sm lg:text-sm font-bold tracking-widest uppercase cursor-pointer", 
-                            avatarFilter === role 
-                              ? "bg-cyan-950 border-cyan-400 text-cyan-100 shadow-[0_0_20px_rgba(34,211,238,0.3)]" 
-                              : "bg-slate-900/50 border-slate-700/50 text-slate-400 hover:text-slate-200 hover:border-cyan-500/50"
-                          )}
-                        >
-                          {role}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-3 sm:p-5 lg:p-6 z-10">
-                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 lg:gap-4 pb-16">
-                        {TRAINER_SPRITES.filter(t => avatarFilter === 'All' || t.role === avatarFilter).map(trainer => (
-                          <button
-                            key={trainer.id}
-                            onClick={() => { setCurrentAvatar(trainer); try { sounds.scan() } catch(e){} }}
-                            className={cn(
-                              "relative aspect-[4/4.8] rounded-xl lg:rounded-2xl border-2 transition-all duration-300 group overflow-hidden flex flex-col items-center justify-between p-2 sm:p-2.5 lg:p-3 cursor-pointer",
-                              "[content-visibility:auto] contain-intrinsic-size-[110px]",
-                              currentAvatar.id === trainer.id 
-                                ? "border-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.5)] bg-cyan-900/60 ring-1 ring-cyan-400/50" 
-                                : "border-slate-700/40 hover:border-cyan-500/60 hover:bg-slate-800/80 hover:shadow-[0_0_20px_rgba(34,211,238,0.3)] bg-slate-900/40"
-                            )}
-                          >
-                            <div className="w-full flex-1 flex items-center justify-center min-h-0 pt-0.5 pb-1">
-                              <img 
-                                src={`https://play.pokemonshowdown.com/sprites/trainers/${trainer.id}.png`} 
-                                alt={trainer.name}
-                                className={cn(
-                                  "w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 object-contain transition-all duration-300 drop-shadow-md [image-rendering:pixelated]",
-                                  currentAvatar.id === trainer.id ? "scale-105 drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]" : "group-hover:scale-105 opacity-80 group-hover:opacity-100 group-hover:drop-shadow-[0_0_15px_rgba(34,211,238,0.4)]"
-                                )}
-                              />
-                            </div>
-                            <div className={cn(
-                              "w-full bg-slate-950/90 py-1 px-1 rounded-lg transition-opacity duration-300 border border-cyan-500/20 shrink-0",
-                              currentAvatar.id === trainer.id ? "opacity-100 border-cyan-400/50 bg-cyan-950/80" : "opacity-80 group-hover:opacity-100"
-                            )}>
-                              <span className="block w-full text-center text-[10px] sm:text-xs font-bold text-cyan-100 truncate tracking-wider uppercase">
-                                {trainer.name}
-                              </span>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
         {/* Move Learning Modal */}
         <AnimatePresence>
           {isMoveLearningOpen && (
@@ -9519,61 +6942,15 @@ export default function App() {
         />
 
         {/* Daily Hub Fullscreen Modal */}
-        <AnimatePresence>
-          {isDailyHubOpen && (
-            <motion.div
-              key="daily-hub-modal"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 250 }}
-              className="fixed inset-0  z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
-            >
-              {/* Ambient Glows */}
-              <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-
-              {/* Top System Header Bar */}
-              <div className="shrink-0 border-b border-cyan-500/30 bg-slate-900/90 px-4 sm:px-8 py-3 flex items-center justify-between gap-3 z-20 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)] shrink-0">
-                    <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 filter drop-shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
-                  </div>
-                  <div className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
-                    <h2 className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-widest leading-none whitespace-nowrap">
-                      DAILY HUB
-                    </h2>
-                    <span className="px-2 py-0.5 rounded-full bg-cyan-950/90 border border-cyan-500/40 text-cyan-300 text-[10px] sm:text-xs font-mono font-bold whitespace-nowrap shadow-sm">
-                      {today}
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => {
-                    setIsDailyHubOpen(false);
-                    try { sounds.scan(); playHaptic('light'); } catch (_) {}
-                  }}
-                  className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm shrink-0"
-                  title="Close (Esc)"
-                >
-                  <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
-                  <span className="hidden sm:inline">CLOSE</span>
-                </button>
-              </div>
-              
-              <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-3.5 sm:p-6 md:p-8 max-w-5xl mx-auto w-full flex flex-col">
-                <PokethologyCombatMissionWidget 
-                  todayStr={today} 
-                  isCompleted={isMissionCompleted} 
-                  missionProgressCount={missionProgressCount}
-                  missionRequiredCount={missionRequiredCount}
-                  dailyStreak={dailyStreak}
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <DailyHubModal
+          isOpen={isDailyHubOpen}
+          onClose={() => setIsDailyHubOpen(false)}
+          today={today}
+          isMissionCompleted={isMissionCompleted}
+          missionProgressCount={missionProgressCount}
+          missionRequiredCount={missionRequiredCount}
+          dailyStreak={dailyStreak}
+        />
 
         {/* Daily Featured Cosmic Scans Fullscreen Modal */}
         <DailyPokemonModal
@@ -9599,43 +6976,356 @@ export default function App() {
                 {/* Battle Result Modal */}
         <BattleResultScreen
           isOpen={battleState === 'finished'}
- xœì=kWÛH–ßçWT|¦3Û`B ÆI¼˜ÁNÏdsrÒ²\Øšèµ’Œq³ü÷½·J’T%ÉéNï¶gšØR©TuëÖ}Õ}~&Z˜ô–ú38y=ı…Ä×ùB-Ç>y¿ˆ÷ø3C×uljÇ}D¿ó-/YÔ¾Š÷ƒ…g_/¬	õN“ï’q¼»‰GòîF¼ï„oÅÉwIWÚƒĞ	û%ë'l–ú)émhÁÂ»ã?eıEÓ¿Å–†iÌæÁ•3¥'Â±eø¾áØ×N`èĞÊÔüàœÁóJ¼‘z¿}K--Ğç'õmrrJ…›„øÎÂúM¾(0&/¨oÿ¸¦¶z§¹ĞW}kNµûÕÖößÓÑ`à³7ö¬~§™>Í·8:h}~/\I7cÃ¢Î"¨ËGˆ·°y/õÌ“O;¤İj¥.>¥§=°}—êbÚ0~~Æ!l=ğ’iœA£{:Ö&õ­©h’9Tšh	¼R?vw	ìD3Úá¸’íğ&Úu—ó/Æ»¡Âæ|Ë‰ëöÂ4Õ½6
-;z³ÕçtªB¨¯²v7€ÔÃ7Â3ê×	€RÓ¿‘Ö™Ò;jû”}ßÂ554³Áïo¥/†-ùU¸H§ì½×pï°ïš®/<M_ÁòT<ûß{,ç!­üT„Lá÷uÍÎîmiÌVÑ.º¦Kşù>òKG†µ0µ †]Wuµ{ú—ø{øåqœ-¦†óŞ3É?’z|ÿxjÜ?Xá;ÉÔğqÄG¤fäkĞé©ğŠÇ[ªéAS÷(ì½¾I-ÜÆìÇ¢ùD³W;™a/<óˆ$ïßIİÄ×Á.="3Ó™hæÕÂ7ôcÛ@,è‡ºbC“ôs÷¹°(öû3û–¾k:{DÂ¤¯/i0‡ÙµjéësŠkÃnˆ İN`z¼€Š€×ã»## ió	pÍ$Û;³àôÏÖ©ÏãáİlFz¥Ù€Üø]Ô~£añ;oÕ€i]j#¿J?‰WŸ z¦ãÇ¸Ã¨`¾]¸í±9v„øzò¢íÜ¹A …@ğ²hzøx{Ø,,±±	ğÉğ6?|8œC¦‰alPÄ=ÇÕt#àûï)ÓLã@L5kç›Ñ#(ë*ğ4Û7pÄØ2X¹€D5ßõ`Œ5 )šå2tìtPÆİM}JºÒA"ğ¯5‹ÔîŒ@WhLĞhòkãc§ÕúDîLúÀş4tÇ$“YÃ‡­K¯º­İW‡ §é_¦ã6&æÂktL‚à¿3ecnL§ÔNCë4ózÄ¼3kbÀ.$oá!?…xáâàöÆ©M|Ø.%¼¶ELz4Ú»ûdÙxu@æø©¯4»ÑmµvÛ-â!bĞiãXaãÜƒqºa€—ô^î78±ØÍPùò‰ï÷pÛåà.<×¤›A¤±ã’wT›…:×¼
-Pòç€_`|Çƒ§“èK™½–°šğûU‹¸}â[Gğï!qW=¾úF@-¿¡S,ù÷qjÕ˜Ğ`Ia3Í4ÚıÚè´ˆ?×¦°ğæ¬–c~|ùYG’'óÏ.atsøFºl táßyC€òƒ™BN„öáìõÃŸá¤>¶>·>·»îÃgo6Ñê;íÃÎN§İÙi5÷¶?‘ÜÒñÃbòššÆ>LcŸO£ËgÑ%}âFT£áÃ–†µr–µ„Óñ{@.€ëLØj·ü-ØåyDf£Àú‹ÓQMnŞI=ìØAc¾˜öeb…à“šh>ÅY²°FÉL÷`¦×¥M€¼é_ X`uÔ`‡kSüÉö‡|„ŒúãñàúíH>Âİyg€„—ó×'Øô6‘ô„ŒËĞ¿ÄBg]"×‰dÕ*â® ä%a5Âº×d¨»µ“Ù |kò­ÍØâQ|õ%@œÁŸÿÄà-ØÅåÜ`$NÜ4Âs1ûih@Î@æô¯3É†BÜi7CÌ~ğIAsªZ|x¦äF{Ğ·’}&O` ØYc©÷}};ßJŠÿ’íJöæŠçœJŠsg_ïÏ"ÓpÿlIx{‡ïj¶øÎqåÅ›Úiïr8êïbCJrÜËñ')ª2N÷ÓÔ&&% ŒÈaÏéªë`Ì¾0òUC[¬³ÏgıN€	9€´–ñ+/Á¢7äbMáŸCbi%¬ŞÏ’sÁ´\8Ò•ln&  ÔM~$?şöP"ªæ§¢ e©×ì‡#³šì:1¤ıØn¹Ÿ²ˆ›P¶˜\«‰ØÄt µ5i´$ììıÅ`³¼Œn.Ï>Şğz|;¼”4’Ñ8fà‹af¡µ¨æH'2a#úxºˆ³ Ğˆš Ì82¹£æ€ì»ç,«H*&Sø¾
-!Ã9
-†Jv!_ç˜Å+-,¨H½ÑÊ,qít€ï¿ÓtÊ¡§^&õDL³Û‰4 Xí4\‘©æ}!»„1ŒHåek[ôR%ÿO4 NeC¶`Ò±æ¢ğìËD³EóU7¯UDŸ˜+Î5{
-"TøTOğğ(Úî)l×6’ä—)ZĞDT¬j÷0E±SWHÙ‘³˜~ŠRE†‡É˜‹œuˆ CU4”D&¨fŸÒD/yM:‡Dª&ŸbÅPĞA,Å½ÂN“%yÔíº²!iÍ¬MP¨E‰6µl¥ò6×ç"–oM3fXS ªNhx€b¿¸s Ej »ZŒ3ñ}&éÈ×?Û*°¨Ä1vZ¼Ø ì!é…_9ìvjğ\¨ ª¡ï&¨Ú÷©İı’0rˆ[:3üÀ[Ïz& ı?Æ’oûo£ñí˜aoxuõşz0ş@Ş—ƒñ ÿõŒ¹,¦L$bğ7üíZ(àåZÂ[ªvi?,¢Y•§`›ròøæŸgÙÃ™ôg=ûsúS‰IôÛ¬,â2½*²" ±ë@Ğ¡øEÎ_$¦….7-„ÍÓ6QGË(R\×	Åã´<Rn„èt·?UbcE´«¢@‰–a/ÎÒ6m*5vDv©ô.µ-†v[¡mE&‘	 R—ÙìJg”åÄ°—,	ŠÉ§E¯Er§H™Š”[ @Œû@ß:Š!KOsQ†d›„œ¹.©ÃVÙ.–"ãã9Lë•D°Œ-a‡­”™…XA£…Ëè‚9ÈO³²	—V@ ÈÊYxdJï½DÚe£T‹ŸUnÌQ6«½V	†– ìífdGKh;Ú·ªı¾¯2ıñOÇ‚Éê
-å<}¢“zxsÑ¾€şW¦şJCXñãè› 1³'$çì©6fÊémÆ,’£‘ƒœÅ˜HÙÅ+†>vò‘Šã«t˜ª„?M6
-PşøÜq¾°Ó¶oÁ
-©şsĞüßâ‹¤5Âú
-ÄtS’ÛäÿíÂ@*·ÔÌ/ÁÖc6'ÎÑ¡Ï1}„ß½¿ wTõË†YHÒ‹o®Ií»2j_~¶P€ˆ»Ê‘ÙX2¤ZŞJSt=÷èİIm®´»»\.›r™§YMİ±v?nº	¾4?~mÌüùÉ‡ÿ—Gÿm.®.¦İé;çW•èhŞŒ'µÏ )Ù_T­<jÔlÇÀÎ·õ<µ@™á)rü¼à0ÅÃâFà4<rç9VtĞŠäˆè½¡5\¤-áoh—ß˜È¦l	Ô:i.îYÇáÑiŠZ³û¼£uäûè¹ß†vQëA„eåä:ôŸä:†Ú7¤×Ü@Äv_*(öÇ4%ùi€<˜Ûğ	·	ûø» ØRJît6$Ø?€vQlíë¨ôÌæ‹	#ÏLß°ÍşU3a:Ö~c®ùó]kş¯ÒæßUøM’¿;9}ËPâOÑ·„–˜Ş˜n©ëÀ4oõûÉ½ı	$nO§ ğN)ĞÌ©£/ĞE”ïÄóI»_E<•³•İ)·F¬i‹È2V>lÖ[˜®æò'¦†fó)z¡ŞÒ‰ã mBŞt3RèÁB’×!»Æ‰]š
-7RT¯W$‚€ÄxVG¡ë(<œ\)¢íø˜³¯œH®q¯¶à4ŠLÇ·Ì¹¦§/3'É¬ía™ğ¬£&zÅÕ¶Şn¬ói;IÚd'‰8E^“­Ûşùpˆ®iäføSÿ¢ÿ¯f³¹EğÆh|v;.“Ñ‡Ñ¸µ¥>æÛì`¿:iÁ•:Q¼±aaA)Š!«¦Sjì”ÎVrQu0šr‰Ïù¶Ç÷ğŒ“‡2şƒ ÕáqË5½äı¹³ÄNR}¬á†şÛû˜:†·÷#Çğ¢“üÈG¶1Ğ?¶£v»—qkº‰£Y±W¹)H&¼¥³CRRO¦ámÖZê3A¶Z×ŒEOìˆ1tH†Öt¨E_îaç[YÏûÔ¡á~+:4ìì½Ú98Äÿ‡‡†.÷=FŸ=‰O‰İp¬pyB?¾,ÃûîqŸ=r¦#Nì¢‹?™Ğ¹aS²Ô<É¤¡Ãv¨â: ÷ıï.3 >°ËF™Gg?bÇJGüê~øeâuŞ›=å—–uÄ„àûîØ\ÇlìS/¤²Dh JÍ´'>>3©Œ=C³ÑÁLânq]waúªsWµ‹yÚIœ‹äVÌ{™oxš9‡Ã-áÇ[Ív—ZŸPRºVÏWï/ÏÆƒáõkéÀ.ân~Ø±&‘a RqBåÚ¬+—Hÿ_½Ë÷#+¿»íŸÉEÜïûÒ¡»kø°g0*«¸#µİÈ%u‡¡c€ÛWòÈW2Ò´† ağòa§J'ê×ÊY~Yjv ;QUF/xÔ1Ñ0Èõ5ù€‡Ï ÅzèÛ¬;Ü%®çÌ€ûÉ¨¨ßñ¼tgaûÚ=Œ…Å8Ğ%K‰UÈJ)<ô©e¤õÜÚ)|±4ò4WÄ]x3
-ª˜Bw(â47^›™gL	şAòâ?àDE‰éÇJUÅóÚÍR1ì–Ú¸ÜÿìØ²HßTë‘D&*<Vè"y\ñóú‡4‹Û1Ùí¼ÿÜğ4™o¯°‹;"pÑUDWˆòİcphzÕ­®¡qz×ÿ×`,¥^€Ï€@,,Hew¤îŠØCNNNÈ–·°·¶|¸Æ»°ÕeO„Â‹KûxcÒ\Ê ¡“gÀùï{#qa¿%J‡r«EŠJ´ÃöÊ]ÖDé³ÒçÆHŞ^¿Ü^­æ
-õQåDû|Zä;jºë*OAñÙuc—¿7¥qoc¥±•QEeçwS™fw°S‘ıq§Ü2]²â7Ç-ü:j·@G5g…:jW®£‘X[õÌëMûrı‹ëJ+³ÖÜ–Šb²\r—)8ÙˆW¹‚£>2DìÚé;Ğœ¨Ô•8F5{îç“‰IIœEA®ßte
-ÎÆK²(Úîéš$W¾J¡%"»½æ/[÷óO•"ùAÓª¢^µ–ÇŸãâîÉƒÅ5sø%0íœ“)Ç?3Ù<ñ¡k"€Ç ê„<c¤{€‹°Ú{Š©§
-5¬vÊ4§0ç1|ôäEõ
-Í)LGÂÔ¦ÖJ¸Éò4ÉO”ºĞ†ĞîÌ©fs Ñÿ‚îˆw=£?}–ú‡˜Æ˜×ÂäÄ·¾cïÀ.ãêZH~Ä†1#šCÇ†Gl˜VSªß˜¾ÑzóÈ¢çYğ$J‰¯ø?ç ¥‚ÎÅÔŞ©óº`Áf…æ× ûAqäü±iœâ9Aà9öìô.3òĞ^ùrtVÑ‚=‰+Ã³5ÉÍGÊ­õ} ÏR¿¼8Ş…+½3ê¢çÔ^<Ö\Ä±Ÿ0ÀÑÄ1 Êy€:>Ñ½U³ú‹ÎLš–¼„‘I²·F°njÚB…$¶@hSôoÇ‘ Ôç°1&ŒD;0sZ0†ãİ…¹æé3 kèÜö<Øšä2	Ñµ7×–)ˆ~e
-•˜uÏ¸»…M@˜™:[úòøÊã‰·{ÚÀ˜[2ƒ—Ô'ÁÒ‰Ñ'oˆ’ãe¨pËŸº‚eö·pŒ‘ıïıÂ^XB<F¹y	‰©O) dÎö_¬GËÖà›©pØ”<
-ªBbùQOhA’9g]ôğ2o´Z;nmïf‘©m?¾uØ«/¾'l`ß9ë«bøÔ]	ë¬¯„¥]¸¾¿Ó»î·;½+êZ¦fmq5kë¹Ô,´È§!ZÄfú³ÁÄ*Vk‡ı¯y°½“>ƒ
-™…&}È
-â¯ZS”ÄŸA1_æô3¦qìvÓIªö[ñd%Á>s`È“uµ l{Œ³îlœ+L<r\±#ÇÌ$èIëœ…ÁÚÉÅÒÃ¯}Åg´¿b¬uRka §vÏğôÈâyÅ.ñ£òµAÚ96ôØ[×9d“;©(#äZ3€c/<
-ì„Ñİ)È€à‚.~ÜCŒŒ0±æ¡³1£ƒ4ã,Œ]…Gº¢ë`y–\FÂİê-vÚÌlÄ*tv-Õ·(¿’\†¥ò¸ıµRå‡¿l´YÂaÇ›ØšlBüœMœE Æ¶*$x¥Œ[t˜º_r˜Ñ·D¶Í²_d„aRÒµ âêéàW´š†G–h3Ö$Î*a¡¾Ia#L=ªY>RAÇècL¨53ÃV	ªùw‹¢|r<ÑašE6wÈÅÀ-Í[¡hÏzœ»Tp1Èı¨cêËÄJæ@°A©dä—ìP3Z$Â ¤­tÓqéÔĞØ<Âc`Ÿg˜u¼&¹ ¾1³1¤ÍP '0³@UFµ@ÔCÕíFwÌjéx_˜iÂ_Ù:.€€à Ïnä^óô©ô	‹Ìb§¾xFm³L¸ƒL~ˆ†€N…#x 	x†ÎN«]Œ2¹¾æç«,EnÏaùÃï|AA­¼÷C.ıu÷~Ú“X\*o’'İõÈE‘MGá¢ËÜ¢#HËAÚ@*f¬à’fÀrù%ù.9?í,*kÄ· •Æ©cĞ¹ÁOl1l‹¢Ï2 ’†‚4¹ĞØ_Kñ#é?hĞ,mÉ·
-c±íç{ÂheÁ–R@®ĞN°p	¨œ÷]
-À`1@!tif{ò6¸Æ2½ÿÁÁpéø>PRŸô xš¿sGó¦YŒXÙ@œõ0avŒüŸüˆz÷èAbL)yKùäl@zs-˜8€ó°b¡|À­ÍÈx¸˜› M’´²³½Ğ‚IC_§‰ih1uı¯08¹0´™í SÎÌ5X8éŸ€'ã1ÙtFÉ=Ê>¡ˆOtÀ¬
-@(1Øæo¬Áj÷‰$G‘A†¶¯“ú°(EÍ*k0^.ËXÈÔ×äå•/ÖÔX_óóá]+PÄNªÈ=bíŸçXm„]3|-')"g^vYĞI‚i·ÛæñI9¦‘ÿ^8v	šW€eæ@™y£ÈÛ6Ì;+ĞÛO§ëG¹±©Åg“µòÁwËßÍ¾[mğe÷C¹KØÅ*dUŠ^Ò-Ç)Ér[º½…- 7§úuâ01\,ÕçÈ›È<¾XgYxR•x¤ÌY$6;&‘a2ç÷â”‹9´&Y¬C#[ö]02´(ík^ø1¯£à™Âij[ğeã.‚OCòL*ğ·K’Ù+ß® (M¢-ìF@±ÆHÔSe?…¡dÒ]<æ*e³ÙdîÛ©¦ +Ê¥>¬ì—,M`[YCRÎèrHP‘Ò&±¬OÊ²"0ß“$ˆ]‡kef„à:µßÿhØû©?&7ƒ›şåàZ™ò[õNÆÔ‡ºH3€,}^p‰9ÒÖô¨Mñ‡5´Ñp*Ùm€SÒ§Ñ¢?â¡£¼ãÓˆÅìØÇ‚¡ıÒ^_³8òWhÔˆÒ ¹Ò/uñÂÓö/øÚÚÓ/eƒ;\¿¶ËÅ`¿E¹YÊøXq8wµ;DB¢ry’¨bÄşÖÚ¾½` é_¿İ C+ûG1\-Á•1£ ·zİK
-¡?Êø{9ì]’á›7¸“HoxÛgkü¶5¸T8Ş\Şı¹ÎRBÔ¿ı¹K®úWÃÛÏ¶È-­E-Ç[½£šûŞgRè/dî?]“]¢j1™Ö„&ŒD¯fŒú½÷€¢šE”rx=ÚDò•èq<˜Ëá‚pó‰œÁˆ†ões±%Ç¸úóËÁèp‘ëáÅ7Yõ"q	L.go¯‡£ñ 7BÀ†—}Eñh_—Éyÿó?d*¨(l .¹]%ÙsµTô¢ÉN\?®0¼ÔM%y¶Æœ *&aİûå‰2a¬&Ù“G\fÃcEYáÁmçk‹ãkÛaäµ·ĞAË0c˜5YÓÄ!İ.O	–hŒéÂ9YV{È6ààzÜ¿¼¼í_%—Ã·›fŞ‘ÑšÚéc‚º7aDæÓ_•?G©óóı½EQMxIÎr™¯&‘±©´sx„ëV–»ÊVÄOzGHÆÇÚpÉ°§ÆÌá¾ùüÌ®°ï¸TXX4©la~)Ú±øyÆ‚ƒâ§(‘U}Å®ù¥3óÑi—jÖZKcÛ‘3S›ë¬i.\Ì­0â(š–æÖë¦3Ûê:¥Ì²Èä³~ğ”¿à}dı?Áx[Ó_Lğ@ÙÕ[XŞxûé—âuTÿ‡#Ò(¨ã}äÿ¡„kğOe{ÿàü[7Sê×kGï{½şhô©¶-Õ`cyÄÿu»şçÙíµØ¯ÄÑƒ^‡?‰}&şS‘¶œøE”ô\`eÂOšâ¥¸‡ò"á@
-FR’û¬ìÒ+—+dg*Üé+s°’ŠÈ.ÈÖ‘öUÃ\>¼Õ ´;W{N'’ÔåOÜkÄ`¬íµrgTÍ°™ø!ßlz‘tä.}PUXJ´#”Ó8hekitÅš[ë&ãeDeò¾ûğ¹;¹î´÷»;í—`¸ÿ5QÈ¡o»t5¿wwV’:ôw?3Ãm&ñœV³õ=áY‡ß¿+üoQ(ùÏ:É…//«“ïyŞ*ÉáùâfÅ’Ës%’‘®”XÎé¼ë·­—\&[
-[Œ—6="{J.½‹¦q±á6u©š?°ÜŞ«BBÃ.CC­æ)mysY\h©°¦R6/FI…¤½ıN»½ÓÙ;äuš×Èr)¯Ø,q‰O\ZTl½Xú9V™Šsf»+.öe•{Ü±hè2s›Â¶IqåÜåÊµ•™3 84Mò`ÉşÖKşÿ\ ùJ3ì°
-2 æÌ£Úæµ…Ì¹¸‹Èß·ÙÍxüòYãd‹|VZ·W+pT¸×¾PTY<‚¤".)>W™HTõóCEfé|˜D•†™è	I}Ä„ƒFß„TÖN¶î@ À}Ó`_ÌºÆJ•°TËv\\@®(·"ßlqBnş8¾°À]…ò˜ù”P$ÃbÊÛ¯†¡òÿÀ5&ı‡¹(§³ÛÔ|+‰‰¢›¢R‰qß2e«ÆÂàCK <tŒp·6%¡Ñà›<À ¥M§¼l³´ëœò£âÏg7ƒÏ?õ? ™9ÑùZÃÍH`—-j/H†É²DwxæÒmòã,ø;o®{4à­aSNV.L8—‰»E>Îá§Œ¸)dÑ'Ï&ÿ‘İ¤…J;ÿkÄ,*©…JŸöæN¢Œ5,Z-!za^»	Ç’¤¬W›ÀŠÖüÂğ-ÃÇÈ½[<, l‘ãS!â*@%—ƒÖ/´.5eä¬X± Ü)H£^˜šV¬Á·¬;³$q;h˜Ç¾0”-ñä+aÙC±gƒó°ŒÁvÍºí8/³¡ŒAŸ¯$Ä¼Œb§âİ® ƒ—Õr‡Úâ“9!+LítŒ3©ß=ÏÍ(rÀbÉ\VqşÔæ×RûOÜµÊ¹Ì_TC8z„C—Ù·ªT’,, œµkDvMQHQ `1?FÂ™VR.³b	•Óì^ÎÏ$i™­,‘ì—°àŒ<U#ZH»‡; ?3İYRÀe#²}CAÿ±5Óø•~’½n¨ä·­&İB…½	oá(C ½©­Ö(" Ï'¿À©¨»o}µv'Éx!©²¢8ô‹ÒiT±Ì¿à9²FJl„…Õ+’HÆgûiËdú m¹j#K¸µ:1ËÄz&¹7¥W–¥¾e)«·Bïù&‹L‡a?üZLŞùÏv³¥7LˆÄıXænç%/™ëîcÑğ¶VŸãÏ¬¬	û}é,)¼áE®šÉ·)ÓñÆt4dÅIÇğ2r}Æ‘_—\Ií³¬$Âğ.´U„¶êÄ¿nŞ¶Ï½İe9AâR@L_u~øD¬éZ»k, PÔM\#5#À›İü¡é:î¥<;kxd}…¾ì»”‘š4’#{èİNN ;òfêòóííOµ,ãÄ¾#0iÜuú°[Ö~f:Ëó†püĞ•¶eK9Àâ',ÁÈß³B4æfSoâáNä MM–7Z!r
-‡ª¤Å¹±¢ °|ãâÄ©’†âüÇ¬<`¶M˜ŞZ¡ë É­ˆÈ¡¢mD
-:¯Ö‚†à¬Qq¥PaBøP	K¬•”UATjwªÂ$‰¡(H2„2x¤M9°d·GLÇ™g}E9¸B‡$Xc*“—Õ^FİV˜QkG¬‘#—º¼¢Êj!?2A~Ùªğòâ£c1¡NI8J–wWÁù©–á(Ì®+qOÜ}%©¡”WÍQag|‹³+•O¬"ÖOØ
-’ûR³HŞşÄÓ¯»½Ç+øoóÎ@ÿƒz€}˜á’ÌÃH&Ê3ëØè«	ª= “ƒA‹“ìˆ?UÉãcÛ9‡Tfâj¬ú–¬4èª)ÜV‰äeĞš±Ìe`™˜…)ïµ 9¡àEğ ºD{ÜÕ£À@UnIq’>ÓDÕ3«Ø¶ØüøÉV>Z5u>~ˆó0POvœĞ¾Ì‹–ı&ÖÂ_è,!¾êjeŠ£¸=åÖ€çŒ™áÂ#–Êğ«8'$ÉÔgê8Bu¢¹ĞtÁO²2G©óã4ˆBZC~Œ7©tXÁĞ!ZjY¢M¶ıPRmÆë”‡6£iê«J¨“²‡~]Y«¢ç“]æxíø[`Ï¬S,½%Ë!Ö’äHJ°Ì³4³¤‚~Bí[÷æ¶ òº™xÕN™~ªfÊR¤%X¹7×L“Ú3šÄ46F@¼¯¥”ZÔu+Ûæ‹IÜqÔïü§Á{¾Ş|´B÷ñ”TUÙŒT&ÇÉd8|]'õ:‰Ôµ© wPÁ@…¢Â;ê‡/‡‘Ì%ıëDVƒ¬¡Š¥zÈzÏ`­Êå‰Á‡F7òTSÇÊ=öÕÑSq’Ù0]\^r,À2Á5¾7¼º¹ìûµmÉş{Mj9a7¯¤5±½®T;İÃôµ9íSòÒ#åKc¡NùFÑF’¼06T±¯ÁÎ·x¸‰§ ¯aÀntUHS‰›Ÿ°WÃğŸZ»ÕúAá’'lÏ¨µ²­Ê!ğ°š÷_](ï?n²9H8r•å?‘Å5'ïøÇä{ÌÆU¾q¤êGŒçbŞ¯ŠN$ºP…š¤
-b†.¼VÎ¥¦È®’ØÃQùgûëœå§ÓÊnü}¾SZé<N\$ôíÌ¸+µ‚\-â¥Ò	ÃääX.=Bæ¦‘ĞKWù mÃ,=–0[©ïjç"	êUBI›ÊCw:Ë°sÈ]¾ÎÁªÜû©<‹¶èº"d«UÉ—,‹³ÁåÙÎÉğü?û<hıª?f§5D¼ŸÉÍíğím4R¯VƒÏÂ$ Ôº]T6c§×\Š)æx•PG	“Ğ•NéäÊ[8}ª|†ÕÕßUZ¸t¥±ÖMèqé[jwè¨¾&l&Xßb³EÑËÃÔ
-“…ç¯+]#PH=©ñÛ2ªVÉeŞ0ƒhàcÃ¢Î"¸¥wÍ°Tî6 ˜sx£¤­\w=øHê*˜%â Z‡RÁ\iU0çpÎìÅ5«'¬Ko´BœÔ"?2[Ğ®¾ÂqZJSKÜ—Ó—¾ú<”gÍ}÷C&IzïNq¬¥=bq®°ş8>jã#ò°‰óS<“6¹_¦Ş}¿êd«ì<@ªNvö#}²sXP×tËÔ-¿ÖáA¥ïäKÒ‰*#sƒµ –4Ğ#*s'
-u³‚Ó{Fs…À~8¢Š’Ë2¡ãÑ2>®å‚RÅòLåiTRŒ¤Èo6Æ§¸€d…Ÿˆ<ÄÖ&¾Ã§kp:¥¢%ÈÊªå@_,>†h=Xİà‰ìÆ7né/NÃ?k¦±î¿­›W9õíQ“N¼M=¿ú+ö¤VÒiô¢ï: ·ĞÕ«Û­V›*[”*šåŞè}ÃİB!F5ô‡¯Gyîˆ:KÎ”?qÔV´J¤iî|¦òmšÛ
-êºáˆöY>ó9ïäZÛŸ[?ì‡ŒŸ_¶~ÀHv‘jÅ¿|8€ÌYJèXvÄë–ßbt¯õÖA®øÆÍ¢¿Û‡ÕtuóuWÃÍ+!(œpÑ¼˜Î“-OgZ§Ñ6Í9EÂp*Ôèé®çx6f˜—p=©ıR8]Ø±Êj¹Şù{»âé{RQ5}ö.aãÒ	ˆtõŞÀZ¦Gl»m©yè®Í„“9âUšWzŠ(pFy7£ı‘â´†“‡µı–(cÎñOÖ¹<w+fRWØ‰d¯/ô’†„¼w ´ÍøsÜ¸Ï. (.
-—’(§š?gŞ¡ÙX—nr¥29ÿÈ}A6 Àl‡¬¶ö³ƒ4–9şÉ€Í	‚l¢¿!Ô* ;VĞ),SŸ¬ŞAf™H¢tI=¹Ò“"Î ô¨l”2£¨°rÅ
-²~³ûéyò±DhÙSu6´L­¼êzJ¶NŸX)¢—ŠH@ÿJ˜UìSi)ƒÑ‡iÀŞ¼¿\O?‘dR˜à;#ãaGQt1ƒÊ$‹‘¢àp‰¦ÙJäYƒÉ$ş¯²ç-7_/QÈÏ˜Ñ3€´(Æ~vy¯AlÀÆÔ¦ÜÊ}!ŠÄÁ¢i#øøéÂŒX¶¥&ËR­¬¹(¯&Õ¼6¯6Ú	:ªi>ÜVÇoa,üôÃøİŒÿ%Ç‚Ì²'(«4¨¨Ö°NƒµÃ<ğïašbêw•+Û‡üLã|xı¾ ¡ğZUuª—	M¬ÆÊTë“ò©p·{2œü›²a>-,¬`(K¨¦”&¥Šñ¤£Š$çI6å$â/O€|{!¯û	{,g,Pûá©Š¯T$M±Ë Ü™+Ê…{sE	q³™”’”,ª3&É¬J|¿_Mfİ1S”Yv¬æªÍ`ea¼bv†^ï¶1Ÿ±,ı½áEÿh­ÁLøÁéÍğ§~ãñŞÔ´e}»8#Xt»é›†Nëƒí§µwqµ-&ûv{ú]ÀSÈ	}iÁÑ(AÕ¸ŞmÉ·ùŒˆ0	 Î|=¬:v˜Ñ ô¹¥!éàeÕÂ"|È« åÂ„±Ï5Ô|Lg6c6}–CÑ+°¥
-•‚ªLyB
-PQ	 œLY‘Ræ÷£UrgÈ$KÜÑ£cAOb˜9·Fjv®!+(8Sm•OHÁö‡\I+ï­Ãáå‡÷kdT¹ğú4IM£%âXzRíì#õ›¾®¡;0qAé§5Ñë[&¢Å–²ß'V WHıó6y”kPåŠU7,ÌÊÜeáå¢Ä—€íLÊÌ‘o&ZL„bHİ\¬¹<N¼#×‚˜\Aå)P	^~ÊäÀª•­wy6¸"çgoAøü‘°ŒQRrô»æŞŒn±ĞT,<Ò1:—$©aqì»âyd$Ù7“–ì¦ğfÃÇ<¼™˜hVD+Ü=O‹ÒÒfÁ‚\2
-€ˆ‰¤£ÉfZ(O.3CÁˆXöKVªûÇ(½#Fƒ’]r¾˜‘[ê:ŠìõÙí*cJòçş%."Ö£Á>ãÒ‰ß,µV6Mõ° Me(ŠmË (bâíŞñ0›¹ÒlmF-´”ş¬+“Á1nÍZ¨G·«<şüßENã¯âı 8®I£®02QüÂˆ¥[CÄ¶Ğ.V·äJXLX|D5OŸóF"ÍÊtŠÑ7çZ ÒÌ?`÷®aùp¢z‡¶ÔŒ@ò¦Â@°C¶&¬Ë,»™ƒbÒ±†ş7öŒÖ¥ÍÖÃÑˆé<ò%H”¢œÇ»£¨é¶R»ãİ¾ç9Ş9>º^„á<ıå/ÿ  ÿÿ R‰G
+          battleResult={battleResult}
+          pokemon={pokemon}
+          battleOpponent={battleOpponent}
+          battleLog={battleLog}
+          turnNumber={turnNumber}
+          pokemonHP={pokemonHP}
+          opponentHP={opponentHP}
+          pokemonMaxHP={pokemonMaxHP}
+          opponentMaxHP={opponentMaxHP}
+          pokemonStatus={pokemonStatus}
+          opponentStatus={opponentStatus}
+          isLightMode={isLightMode}
+          missionNotice={lastBattleMissionNotice}
+          onRematch={() => {
+            sounds.battleStart(); playHaptic('heavy');
+            setIsBattling(false);
+            setBattleState('setup');
+            setTimeout(() => {
+              runBattle();
+            }, 100);
+          }}
+          onInspect={() => {
+            setInspectingOpponent(true);
+            setActiveTab('data');
+            setBattleState('setup');
+            setIsBattling(false);
+            
+            // Reset Arena Status
+            setPokemonHP(pokemonMaxHP);
+            setOpponentHP(opponentMaxHP);
+            setPokemonStatus(null);
+            setOpponentStatus(null);
+            setPokemonFlinched(false);
+            setOpponentFlinched(false);
+            setPlayerStatStages({ attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0, evasion: 0, accuracy: 0 });
+            setOpponentStatStages({ attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0, evasion: 0, accuracy: 0 });
+            setBattleLog([]);
+            
+            sounds.scan(); playHaptic('light');
+          }}
+          onNewBattle={() => {
+            resetSimulation();
+          }}
+        />
+
+        
+      {ytAudioUrl && (
+        <div style={{ display: "none" }}>
+          {React.createElement(ReactPlayer as any, {
+            url: ytAudioUrl,
+            playing: globalMusicConnected && ytPlaying,
+            volume: ytVolume,
+            loop: true,
+            width: "0",
+            height: "0"
+          })}
+        </div>
+      )}
+
+        {/* Offline Manager Modal */}
+        <AnimatePresence>
+          <OfflineManagerModal key="offline-manager-modal" isOpen={isOfflineManagerOpen} onClose={() => setIsOfflineManagerOpen(false)} onPlaySound={sounds.hover} />
+        </AnimatePresence>
+
+        {/* Settings Modal */}
+        <SettingsModal
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          isLightMode={isLightMode}
+          handleThemeToggle={handleThemeToggle}
+          deferredPrompt={deferredPrompt}
+          isInstallable={isInstallable}
+          handleInstallPWA={handleInstallPWA}
+          setIsTutorialOpen={setIsTutorialOpen}
+          handleSystemRestart={handleSystemRestart}
+          isRebooting={isRebooting}
+        />
+
+        {/* Battle Exit Confirmation Modal */}
+        <BattleExitConfirmationModal
+          isOpen={showExitConfirmation}
+          onCancel={() => setShowExitConfirmation(false)}
+          onConfirm={() => {
+            setShowExitConfirmation(false);
+            setIsBattling(false);
+            setActiveTab('data');
+            setBattleLog([]);
+          }}
+        />
+
+        {/* Battle Help Modal */}
+        <BattleHelpModal
+          isOpen={isBattleHelpOpen}
+          onClose={() => setIsBattleHelpOpen(false)}
+        />
+
+        {/* Info Modal */}
+        <InfoModal
+          isOpen={isInfoOpen}
+          onClose={() => setIsInfoOpen(false)}
+        />
+
+        {/* Music Modal Alternative: Config Modal */}
+        <MusicConfigModal
+          isOpen={isMusicOpen}
+          onClose={() => setIsMusicOpen(false)}
+        />
+
+        {/* Stat Animation Overlay */}
+        <AnimatePresence>
+          {statAnimation !== 'none' && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="fixed inset-0  z-[130] flex items-center justify-center pointer-events-none"
+            >
+              <div className={cn(
+                "px-8 py-4 rounded-full font-hud text-2xl uppercase tracking-widest shadow-2xl border-4",
+                statAnimation === 'boost' ? "bg-green-900/90 border-green-400 text-green-100" : "bg-red-900/90 border-red-400 text-red-100"
+              )}>
+                {statAnimation === 'boost' ? 'Stat Boost!' : 'Stat Lowered!'}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Floating HUD Toast Notification List */}
+        <div className="fixed bottom-6 right-6 z-[500] flex flex-col gap-3 pointer-events-none max-w-sm w-[92%] md:w-96" id="hud-toast-container">
+          <AnimatePresence mode="popLayout">
+            {toasts.map((toast) => {
+              let borderColor = "border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)]";
+              let titleColor = "text-cyan-400";
+              let glowBg = "bg-cyan-500/5";
+              let ToastIcon = Info;
+
+              if (toast.type === "combat") {
+                borderColor = "border-red-500/40 shadow-[0_0_18px_rgba(239,68,68,0.15)]";
+                titleColor = "text-red-400";
+                glowBg = "bg-red-500/5";
+                ToastIcon = Target;
+              } else if (toast.type === "success") {
+                borderColor = "border-emerald-500/40 shadow-[0_0_18px_rgba(16,185,129,0.15)]";
+                titleColor = "text-emerald-400";
+                glowBg = "bg-emerald-500/5";
+                ToastIcon = Trophy;
+              } else if (toast.type === "warning") {
+                borderColor = "border-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.12)]";
+                titleColor = "text-amber-400";
+                glowBg = "bg-amber-500/5";
+                ToastIcon = AlertTriangle;
+              }
+
+              return (
+                <motion.div
+                  key={toast.id}
+                  initial={{ opacity: 0, x: 50, y: 15, scale: 0.92 }}
+                  animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: 70, scale: 0.92 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                  className={cn(
+                    "pointer-events-auto w-full bg-slate-950/95 backdrop-blur-md rounded-xl border p-4 flex gap-3 relative overflow-hidden",
+                    borderColor
+                  )}
+                  onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}
+                >
+                  {/* Diagnostic cyber background lines */}
+                  <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent" />
+                  <div className={cn("absolute inset-0 pointer-events-none opacity-30", glowBg)} />
+
+                  {/* Left Decorative Icon */}
+                  <div className="flex-shrink-0 flex items-start mt-0.5">
+                    <div className={cn("p-1.5 rounded-lg border bg-slate-900/80", borderColor)}>
+                      <ToastIcon className={cn("w-4.5 h-4.5", titleColor)} />
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-grow space-y-0.5">
+                    <div className="flex justify-between items-start gap-1">
+                      <span className={cn("font-hud font-black uppercase text-[10.5px] tracking-wider leading-none", titleColor)}>
+                        {toast.title}
+                      </span>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setToasts(prev => prev.filter(t => t.id !== toast.id));
+                        }}
+                        className="text-slate-500 hover:text-slate-350 transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-slate-400 leading-normal font-sans">
+                      {toast.description}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
+        </AnimatePresence>
+        </div>
+
+        {/* Hub Challenge Progress 8-Second Notification HUD */}
+        <AnimatePresence>
+          {hubChallengeProgressMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 350, damping: 26 }}
+              className="fixed top-6 sm:top-8 left-0 right-0 z-[700] flex justify-center px-4 pointer-events-auto"
+            >
+              <div className={cn(
+                "backdrop-blur-xl border px-5 py-3.5 rounded-2xl flex items-center gap-4 relative overflow-hidden max-w-lg w-full",
+                hubChallengeProgressMessage.includes("COMPLETE")
+                  ? "bg-slate-950/95 border-emerald-500/60 shadow-[0_0_35px_rgba(16,185,129,0.35)] text-emerald-400"
+                  : "bg-slate-950/95 border-cyan-500/60 shadow-[0_0_35px_rgba(6,182,212,0.35)] text-cyan-400"
+              )}>
+                {/* 8-Second Animated Depletion Bar */}
+                <motion.div 
+                  initial={{ width: "100%" }}
+                  animate={{ width: "0%" }}
+                  transition={{ duration: 8, ease: "linear" }}
+                  className={cn(
+                    "absolute bottom-0 left-0 h-1",
+                    hubChallengeProgressMessage.includes("COMPLETE")
+                      ? "bg-gradient-to-r from-emerald-500 to-teal-400"
+                      : "bg-gradient-to-r from-cyan-500 to-blue-400"
+                  )}
+                />
+
+                <div className={cn(
+                  "w-10 h-10 rounded-xl flex items-center justify-center border shrink-0",
+                  hubChallengeProgressMessage.includes("COMPLETE")
+                    ? "bg-emerald-500/20 border-emerald-400/60 text-emerald-300"
+                    : "bg-cyan-500/20 border-cyan-400/60 text-cyan-300"
+                )}>
+                  {hubChallengeProgressMessage.includes("COMPLETE") ? (
+                    <Trophy className="w-5 h-5 animate-bounce" />
+                  ) : (
+                    <Swords className="w-5 h-5 animate-pulse" />
+                  )}
+                </div>
+
+                <div className="flex flex-col flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-hud font-black uppercase tracking-widest text-slate-400">
+                      {hubChallengeProgressMessage.includes("COMPLETE") ? "  DAILY HUB OBJECTIVE MET" : "   DAILY HUB COMBAT PROGRESS"}
+                    </span>
+                    <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
+                      8s
+                    </span>
+                  </div>
+                  <span className="text-xs sm:text-sm font-hud font-black text-white truncate mt-0.5">
+                    {hubChallengeProgressMessage}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (hubProgressTimeoutRef.current) clearTimeout(hubProgressTimeoutRef.current);
+                    setHubChallengeProgressMessage(null);
+                  }}
+                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+                  title="Dismiss notification"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Daily Combat Mission Status Update HUD */}
+        <AnimatePresence>
+          {showMissionUpdateHUD && !isMissionCompleted && (
+            <motion.div
+              initial={{ opacity: 0, y: -40, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="fixed top-24 sm:top-28 left-1/2 -translate-x-1/2 z-[600] pointer-events-none"
+            >
+              <div className="bg-slate-950/95 border-2 border-cyan-500 rounded-2xl p-4 shadow-[0_0_30px_rgba(34,211,238,0.4)] backdrop-blur-md flex items-center gap-4">
+                <div className="bg-cyan-500/20 p-2 rounded-full border border-cyan-500/50">
+                  <Trophy className="w-6 h-6 text-cyan-400 animate-pulse" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-hud font-black text-cyan-400 uppercase tracking-widest leading-none">
+                    Mission Progress Updated
+                  </span>
+                  <span className="text-sm font-bold mt-1">
+                    {missionProgressCount} / {missionRequiredCount} Validated
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Daily Combat Mission Celebration Overlay */}
+        <MissionCelebrationOverlay
+          isOpen={showMissionCelebration}
+          onClose={() => setShowMissionCelebration(false)}
+          dailyStreak={dailyStreak}
+          missionName={celebratedMission?.title}
+          missionRequirementText={celebratedMission?.desc}
+        />
+
+        {/* Full-Screen Disclaimer & Copyright Modal */}
+        <DisclaimerModal
+          isOpen={isDisclaimerOpen}
+          onClose={() => setIsDisclaimerOpen(false)}
+        />
+        
+        <PokethologyMissionModal
+          isOpen={isMissionModalOpen}
+          onClose={() => setIsMissionModalOpen(false)}
+        />
+        {/* About & System Info / Bug Report Modal */}
+        <AboutModal
+          isOpen={isAboutOpen}
+          onClose={() => setIsAboutOpen(false)}
+          isLightMode={isLightMode}
+        />
+        <PwaInstallModal
+          isOpen={isPwaModalOpen}
+          onClose={() => setIsPwaModalOpen(false)}
+        />
+        {/* Full-Screen Favorites Management Vault Modal */}
+        <FavoritesVaultModal
+          isOpen={isFavoritesModalOpen}
+          onClose={() => setIsFavoritesModalOpen(false)}
+          favorites={favorites}
+          toggleFavorite={toggleFavorite}
+          onSelectPokemon={(name) => {
+            performSearch(name);
+          }}
+          onStartBattleWithPokemon={async (name) => {
+            await performSearch(name, false, 'battle');
+            handleTabChange('battle');
+          }}
+          isLightMode={isLightMode}
+          sounds={sounds}
+        />
+      </div>
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
