@@ -918,7 +918,7 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
     const shinyPath = isShiny ? 'shiny/' : '';
 
     if (use2dSprite) {
-      // 2D PIXEL ART SPRITE MODE (PokÃ©API 2D pixel art for every PokÃ©mon: base, mega, gmax, regional, alternative forms)
+      // 2D PIXEL ART SPRITE MODE (PokeAPI 2D pixel art for every Pokemon: base, mega, gmax, regional, alternative forms)
       if (effectiveLevel === 0 && pokemon.sprites) {
         if (isFemale) {
           const fem = isBack 
@@ -932,7 +932,7 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
         if (spr) return spr;
       }
 
-      // Level 1: Direct PokÃ©API raw 2D pixel art sprite URL (covers 10000+ IDs for megas, gmax, regional forms!)
+      // Level 1: Direct PokeAPI raw 2D pixel art sprite URL (covers 10000+ IDs for megas, gmax, regional forms!)
       if (effectiveLevel <= 1) {
         if (isFemale) {
           return isBack 
@@ -956,7 +956,7 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
         return `https://play.pokemonshowdown.com/sprites/${basePath}/${cleanName}.gif`;
       }
 
-      // Level 4: PokÃ©API front 2D sprite fallback if back was requested but missing
+      // Level 4: PokeAPI front 2D sprite fallback if back was requested but missing
       if (effectiveLevel === 4) {
         return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shinyPath}${idNum}.png`;
       }
@@ -1066,7 +1066,7 @@ const PokemonBattleSprite = memo(({ pokemon, isBack, isShiny, isFemale, classNam
     if (use2dSprite) {
       // Improved dimensions for 2D pixel sprites in combat arena so they are larger and crisp
       if (h <= 4) {
-        baseScale = 2.45; // Extra boost for tiny 2D pixel sprites (e.g. Joltik, FlabÃ©bÃ©, Cosmog)
+        baseScale = 2.45; // Extra boost for tiny 2D pixel sprites (e.g. Joltik, Flabebe, Cosmog)
       } else if (h <= 9) {
         baseScale = 2.25; // Boost for small 2D pixel sprites (e.g. Pikachu, Eevee, Diglett)
       } else if (h <= 20) {
@@ -1225,46 +1225,46 @@ const getOpponentMoveQuote = (pokeName: string, moveName: string) => {
       electric: "Scossa ad alta tensione fulminea!",
       grass: "La natura reclama il suo regno!",
       ice: "Congelati sotto il gelo assoluto!",
-      psychic: "La forza della mente supera la gravitÃ !",
-      dragon: "La rabbia del drago imperverserÃ !",
+      psychic: "La forza della mente supera la gravita!",
+      dragon: "La rabbia del drago imperversera!",
       boost: "Ogni molecola del mio essere si sta ricaricando!",
       protect: "Scudo d'energia inattaccabile!",
       healing: "Rigenerazione cellulare avviata!"
     },
     es: {
-      default: `Â¡AquÃ­ estÃ¡ el poder de ${pokeName}!`,
-      fire: "Â¡Que la llama eterna te consuma!",
-      water: "Â¡Arrastrado por las corrientes del ocÃ©ano!",
-      electric: "Â¡RelÃ¡mpago de alta tensiÃ³n elÃ©ctrica!",
-      grass: "Â¡La naturaleza reclama su poder!",
-      ice: "Â¡Siente el frÃ­o absoluto!",
-      psychic: "Â¡Mi mentalidad supera cualquier fuerza fÃ­sica!",
-      dragon: "Â¡La ira del dragÃ³n se desata!",
-      boost: "Â¡Sintiendo la mÃ¡xima energÃ­a competitiva!",
-      protect: "Â¡Escudo de energÃ­a impenetrable!",
-      healing: "Â¡RestauraciÃ³n vital iniciada!"
+      default: `!Aqui esta el poder de ${pokeName}!`,
+      fire: "!Que la llama eterna te consuma!",
+      water: "!Arrastrado por las corrientes del oceano!",
+      electric: "!Relampago de alta tension electrica!",
+      grass: "!La naturaleza reclama su poder!",
+      ice: "!Siente el frio absoluto!",
+      psychic: "!Mi mentalidad supera cualquier fuerza fisica!",
+      dragon: "!La ira del dragon se desata!",
+      boost: "!Sintiendo la maxima energia competitiva!",
+      protect: "!Escudo de energia impenetrable!",
+      healing: "!Restauracion vital iniciada!"
     },
     fr: {
       default: `Voici le pouvoir de ${pokeName}!`,
       fire: "Que les flammes te consument !",
-      water: "EmportÃ© par le courant marin !",
-      electric: "DÃ©charge haute tension foudroyante !",
+      water: "Emporte par le courant marin !",
+      electric: "Decharge haute tension foudroyante !",
       grass: "La nature reprend ses droits !",
       ice: "Ressens le froid absolu !",
-      psychic: "La force de l'esprit transcende la matiÃ¨re !",
-      dragon: "La colÃ¨re du dragon fait rage !",
-      boost: "Mon Ã©nergie atteint son paroxysme !",
-      protect: "Bouclier d'Ã©nergie impÃ©nÃ©trable !",
-      healing: "RÃ©gÃ©nÃ©ration d'Ã©nergie entamÃ©e !"
+      psychic: "La force de l'esprit transcende la matiere !",
+      dragon: "La colere du dragon fait rage !",
+      boost: "Mon energie atteint son paroxysme !",
+      protect: "Bouclier d'energie impenetrable !",
+      healing: "Regeneration d'energie entamee !"
     },
     de: {
       default: `Sieh die wahre Macht von ${pokeName}!`,
       fire: "Lass die Flammen dich verzehren!",
-      water: "WeggespÃ¼lt von der Flut!",
+      water: "Weggespult von der Flut!",
       electric: "Hochspannungsschock aktiv!",
       grass: "Die Kraft der Natur holt sich den Sieg!",
       ice: "Erfriere im absoluten Nullpunkt!",
-      psychic: "Die Kraft des Geistes Ã¼berwindet alles!",
+      psychic: "Die Kraft des Geistes uberwindet alles!",
       dragon: "Die Wut des Drachen bricht los!",
       boost: "Meine Energie steigt ins Unermessliche!",
       protect: "Undurchdringlicher Energieschild!",
@@ -1395,12 +1395,12 @@ const typeColors: Record<string, string> = {
 };
 
 const statExplanations: Record<string, string> = {
-  hp: "Hit Points: Determines how much damage a PokÃ©mon can take before fainting.",
+  hp: "Hit Points: Determines how much damage a Pokemon can take before fainting.",
   attack: "Physical Attack: Affects the damage dealt by physical moves.",
   defense: "Physical Defense: Reduces the damage taken from physical moves.",
   "special-attack": "Special Attack: Affects the damage dealt by special moves.",
   "special-defense": "Special Defense: Reduces the damage taken from special moves.",
-  speed: "Speed: Determines which PokÃ©mon moves first in battle.",
+  speed: "Speed: Determines which Pokemon moves first in battle.",
 };
 
 const NATURES = [
@@ -1485,7 +1485,7 @@ const getBattleBackground = (playerType?: string, opponentType?: string) => {
   if (pType === oType) {
     keyword = `pure majestic landscape of a ${pDesc}`;
   } else {
-    keyword = `epic symmetric split-screen PokÃ©mon stadium battleground arena: on the left side is a gorgeous ${pDesc} fading into a stunning ${oDesc} on the right side, seamlessly merged at the vertical center line`;
+    keyword = `epic symmetric split-screen Pokemon stadium battleground arena: on the left side is a gorgeous ${pDesc} fading into a stunning ${oDesc} on the right side, seamlessly merged at the vertical center line`;
   }
 
   const basePrompt = `16-bit vintage retro pixel art aesthetic pokemon showdown battle stadium arena background, high detail pixel texture, beautiful scenic landscape environment, ${keyword}, epic cinematic mood, high-contrast, beautiful rich colors, native game screen capture`;
@@ -1547,11 +1547,11 @@ const PokethologyRadarScanner = memo(({ onAbort, targetName }: PokethologyRadarS
     };
   }, [onAbort]);
 
-  const formattedName = targetName ? targetName.replace(/-/g, ' ').toUpperCase() : "POKÃ‰MON";
+  const formattedName = targetName ? targetName.replace(/-/g, ' ').toUpperCase() : "POKEMON";
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center min-h-[300px] w-full max-w-sm mx-auto p-6 text-center select-none relative overflow-hidden my-auto">
-      {/* Sleek Glowing PokÃ©ball Spinner */}
+      {/* Sleek Glowing Pokeball Spinner */}
       <div className="relative w-24 h-24 mb-5 flex items-center justify-center shrink-0">
         <div className="absolute inset-0 rounded-full bg-cyan-500/15 blur-xl animate-pulse" />
         
@@ -1570,7 +1570,7 @@ const PokethologyRadarScanner = memo(({ onAbort, targetName }: PokethologyRadarS
           SCANNING {formattedName}...
         </h2>
         <p className="text-[11px] font-mono text-cyan-400/90 tracking-widest uppercase animate-pulse">
-          Syncing PokÃ©dex Registry
+          Syncing Pokedex Registry
         </p>
       </div>
 
@@ -2088,13 +2088,13 @@ const OFFLINE_QUIZ_FALLBACK = {
   isFallback: true,
   questions: [
     {
-      question: "Who is considered the 'Renegade PokÃ©mon' in Sinnoh cosmology, banished due to its violent nature?",
+      question: "Who is considered the 'Renegade Pokemon' in Sinnoh cosmology, banished due to its violent nature?",
       options: ["Kyurem", "Giratina", "Necrozma", "Darkrai"],
       answerIndex: 1,
       explanation: "Giratina was created alongside Dialga and Palkia but was banished to the Distortion World by Arceus due to its exceptionally violent and destructive nature. It represents antimatter and gravity."
     },
     {
-      question: "According to ancient legends, Mew is the genetic ancestor of all PokÃ©mon, but why does Arceus precede Mew in mythology?",
+      question: "According to ancient legends, Mew is the genetic ancestor of all Pokemon, but why does Arceus precede Mew in mythology?",
       options: [
         "Mew was created by human scientists to clone Arceus",
         "Arceus is the creator deity who hatched from an egg in nothingness, and Mew represents the ancestor of all common mortal species",
@@ -2102,7 +2102,7 @@ const OFFLINE_QUIZ_FALLBACK = {
         "Arceus is actually an evolved form of Mew"
       ],
       answerIndex: 1,
-      explanation: "Arceus is the divine prime creator who hatched from the cosmic egg in a void of nothingness, whereas Mew acts as the biological stem-ancestor containing the DNA of all non-deity PokÃ©mon."
+      explanation: "Arceus is the divine prime creator who hatched from the cosmic egg in a void of nothingness, whereas Mew acts as the biological stem-ancestor containing the DNA of all non-deity Pokemon."
     },
     {
       question: "The Lake Guardians (Uxie, Mesprit, and Azelf) were birthed from a single egg. What core philosophical aspects of the human spirit do they govern?",
@@ -2836,7 +2836,7 @@ export default function App() {
 // Helper function to build standard welcome message for Chatbot
   const getChatWelcomeMessage = useCallback((pokemonName?: string) => {
     const nameUpper = pokemonName ? pokemonName.toUpperCase() : null;
-    return `Hello! I am PokÃ©thology AI. I can assist you with PokÃ©mon strategies, biology, stats, and canonical lore. ${nameUpper ? `I see you have selected **${nameUpper}**. ` : ""}How can I assist you today?`;
+    return `Hello! I am Pokethology AI. I can assist you with Pokemon strategies, biology, stats, and canonical lore. ${nameUpper ? `I see you have selected **${nameUpper}**. ` : ""}How can I assist you today?`;
   }, []);
 
   const [chatInput, setChatInput] = useState('');
@@ -3351,8 +3351,8 @@ export default function App() {
     } else {
       // Fallback to offline local simulation
       const logSteps = [
-        { text: "[DATABASE] Loading PokÃ©dex data... Loaded 1025 PokÃ©mon.", delay: 400, progress: 20 },
-        { text: "[CONNECTIONS] Connecting to PokÃ©mon endpoints... Successful.", delay: 850, progress: 45 },
+        { text: "[DATABASE] Loading Pokedex data... Loaded 1025 Pokemon.", delay: 400, progress: 20 },
+        { text: "[CONNECTIONS] Connecting to Pokemon endpoints... Successful.", delay: 850, progress: 45 },
         { 
           text: quotaLimitReached 
             ? "[WARN] [AI CHATBOT] Quota limit reached. Offline mode active."
@@ -3362,7 +3362,7 @@ export default function App() {
         },
         { text: "[AUDIO] Sound effects loaded successfully.", delay: 1850, progress: 85 },
         { text: "[MISSIONS] Daily missions and activities loaded.", delay: 2200, progress: 95 },
-        { text: "[SUCCESS] Setup complete! Welcome to PokÃ©thology.", delay: 2600, progress: 100 }
+        { text: "[SUCCESS] Setup complete! Welcome to Pokethology.", delay: 2600, progress: 100 }
       ];
 
       logSteps.forEach((step) => {
@@ -3855,16 +3855,16 @@ export default function App() {
       try { data = JSON.parse(responseText); } catch (_) { data = { strategy: null }; }
 
       const resultStrategy = data?.strategy || (bestMove 
-        ? `â€¢ ğŸ”® **ANALYSIS**: Opponent ${battleOpponent?.name} is vulnerable to optimal type matchups.\nâ€¢ âš”ï¸ **COMMAND**: Execute ${bestMove.toUpperCase()} immediately for maximum damage.`
-        : `â€¢ ğŸ”® **ANALYSIS**: Maintain tactical momentum against ${battleOpponent?.name}.\nâ€¢ âš”ï¸ **COMMAND**: Focus on high-power moves and HP preservation.`);
+        ? `*   **ANALYSIS**: Opponent ${battleOpponent?.name} is vulnerable to optimal type matchups.\n*    **COMMAND**: Execute ${bestMove.toUpperCase()} immediately for maximum damage.`
+        : `*   **ANALYSIS**: Maintain tactical momentum against ${battleOpponent?.name}.\n*    **COMMAND**: Focus on high-power moves and HP preservation.`);
 
       aiCache.current[battleKey] = resultStrategy;
       setBattleSuggestion(resultStrategy);
     } catch (err: any) {
       console.error("Strategy error:", err);
       const fallbackStr = bestMove 
-        ? `â€¢ ğŸ”® **ANALYSIS**: Type advantage identified against ${battleOpponent?.name}.\nâ€¢ âš”ï¸ **COMMAND**: Strike with ${bestMove.toUpperCase()}!`
-        : `â€¢ ğŸ”® **ANALYSIS**: Target opponent weaknesses.\nâ€¢ âš”ï¸ **COMMAND**: Protect HP and use highest power move.`;
+        ? `*   **ANALYSIS**: Type advantage identified against ${battleOpponent?.name}.\n*    **COMMAND**: Strike with ${bestMove.toUpperCase()}!`
+        : `*   **ANALYSIS**: Target opponent weaknesses.\n*    **COMMAND**: Protect HP and use highest power move.`;
       setBattleSuggestion(fallbackStr);
     } finally {
       setIsAiSuggesting(false);
@@ -3893,7 +3893,7 @@ export default function App() {
     const stages = isPlayer ? playerStatStages : opponentStatStages;
     const stage = stages[statName] || 0;
     
-    // Stage multipliers in PokÃ©mon: 2/2, 3/2, 4/2... or 2/3, 2/4...
+    // Stage multipliers in Pokemon: 2/2, 3/2, 4/2... or 2/3, 2/4...
     const stageMultiplier = Math.max(2, 2 + stage) / Math.max(2, 2 - stage);
     
     // Status effects
@@ -4657,7 +4657,7 @@ export default function App() {
     }
     
     if (turnOutcomeMessages.length > 0) {
-      setBattleMessage({ text: turnOutcomeMessages.join(' â€¢ '), type: highestMsgType });
+      setBattleMessage({ text: turnOutcomeMessages.join(' * '), type: highestMsgType });
       await battleDelay(1250);
       setBattleMessage(null);
     }
@@ -4948,7 +4948,7 @@ export default function App() {
                     sounds.success();
                   } catch (_) {}
                   addToast(
-                    "âœ¨ MISSION FULLY COMPLETE", 
+                    "  MISSION FULLY COMPLETE", 
                     "You have successfully validated today's daily combat protocol! Open the congratulations interface.", 
                     "success"
                   );
@@ -4966,13 +4966,13 @@ export default function App() {
                 
                 if (nextCount === required - 1) {
                   addToast(
-                    "ğŸ¯ DAILY MISSION FOCUS", 
+                    "  DAILY MISSION FOCUS", 
                     `Almost there! Progress: ${nextCount}/${required}. Just 1 more win to complete the mission!`, 
                     "combat"
                   );
                 } else {
                   addToast(
-                    "âš”ï¸ DAILY MISSION PROGRESS", 
+                    "   DAILY MISSION PROGRESS", 
                     `Progress updated: ${nextCount}/${required} defeats recorded. Keep going!`, 
                     "info"
                   );
@@ -5065,7 +5065,7 @@ export default function App() {
                       isComplete: true
                     };
                     addToast(
-                      "ğŸ‰ DAILY HUB MISSION COMPLETED",
+                      "  DAILY HUB MISSION COMPLETED",
                       `Activity Complete: ${challenge.title} (${newProgress}/${challenge.required})! Your Daily Hub progress & rank have increased.`,
                       "success"
                     );
@@ -5082,7 +5082,7 @@ export default function App() {
                       }
                     }
                     addToast(
-                      "âš”ï¸ DAILY HUB COMBAT PROGRESS",
+                      "   DAILY HUB COMBAT PROGRESS",
                       `Combat Goal Advanced: ${challenge.title} (${newProgress}/${challenge.required})!`,
                       "combat"
                     );
@@ -5562,7 +5562,7 @@ export default function App() {
     }
   }, [chatMessages, isChatLoading]);
 
-  // Instantly show the last message when opening or switching to the PokÃ©thology chat tab
+  // Instantly show the last message when opening or switching to the Pokethology chat tab
   useEffect(() => {
     if (activeTab === 'chat' && chatScrollRef.current) {
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
@@ -5659,7 +5659,7 @@ export default function App() {
       if (err.message !== "QUOTA_LIMIT" && !err.message?.includes("Quota")) {
         console.error(err);
       }
-      setChatMessages(prev => [...prev, { role: 'model', text: `âš ï¸ **SYSTEM ERROR**: ${err.message}` }]);
+      setChatMessages(prev => [...prev, { role: 'model', text: `   **SYSTEM ERROR**: ${err.message}` }]);
     } finally {
       setIsAiAnalyzing(false);
       setIsChatLoading(false);
@@ -5677,7 +5677,7 @@ export default function App() {
         { role: 'user' as const, text: userMessage },
         { 
           role: 'model' as const, 
-          text: `ğŸŒ **OFFLINE MODE ACTIVE**: The live AI Chatbot requires an active internet connection to query online AI models.\n\nâš¡ **ALL OTHER FEATURES ARE 100% PLAYABLE OFFLINE**:\n- PokÃ©dex Browsing & Search (IndexedDB storage)\n- Real-Time Battle Combat Simulator\n- Daily Encounters & Quizzes\n- Type Weaknesses & Move Stats`
+          text: `  **OFFLINE MODE ACTIVE**: The live AI Chatbot requires an active internet connection to query online AI models.\n\n  **ALL OTHER FEATURES ARE 100% PLAYABLE OFFLINE**:\n- Pokedex Browsing & Search (IndexedDB storage)\n- Real-Time Battle Combat Simulator\n- Daily Encounters & Quizzes\n- Type Weaknesses & Move Stats`
         }
       ]);
       sounds.error();
@@ -6177,7 +6177,7 @@ export default function App() {
               </div>
             </div>
             <div className="flex flex-col items-center gap-2">
-              <h2 className="text-red-400 font-hud text-xl font-bold tracking-[0.3em] uppercase">PokÃ©dex Syncing</h2>
+              <h2 className="text-red-400 font-hud text-xl font-bold tracking-[0.3em] uppercase">Pokedex Syncing</h2>
               <div className="flex gap-1">
                 {[0, 1, 2].map(i => (
                   <motion.div 
@@ -6391,7 +6391,7 @@ export default function App() {
                     onChange={handleTyping}
                     onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                     onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
-                    placeholder="SEARCH POKÃ‰MON..."
+                    placeholder="SEARCH POKEMON..."
                     aria-label="Search Pokemon"
                     className={cn(
                       "w-full border-2 rounded-lg py-2.5 px-10 sm:px-14 focus:outline-none transition-all font-hud text-[11px] sm:text-sm uppercase tracking-[0.2em]",
@@ -6494,7 +6494,7 @@ export default function App() {
                   sounds.hover();
                 }}
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-950/80 border border-amber-500/60 text-amber-300 text-[9px] font-hud uppercase tracking-wider cursor-pointer hover:bg-amber-900 transition-all shadow-[0_0_10px_rgba(245,158,11,0.3)] shrink-0"
-                title="Offline Mode Active - PokÃ©dex, Battles & Games 100% playable offline"
+                title="Offline Mode Active - Pokedex, Battles & Games 100% playable offline"
               >
                 <WifiOff className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 <span className="hidden sm:inline font-bold">Offline Ready</span>
@@ -6676,7 +6676,7 @@ export default function App() {
                               <span className="whitespace-nowrap relative z-10 uppercase">Stats</span>
                             </motion.button>
 
-                            {/* PokÃ©thology Section Button */}
+                            {/* Pokethology Section Button */}
                             <motion.button
                               type="button"
                               onClick={() => {
@@ -6707,7 +6707,7 @@ export default function App() {
                               <div className="relative z-10 shrink-0">
                                 <User className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4 filter drop-shadow-[0_0_6px_rgba(220,161,29,0.85)]", activeTab === 'chat' ? "text-slate-950 font-black" : "text-[#dca11d]")} />
                               </div>
-                              <span className={cn("whitespace-nowrap relative z-10 uppercase text-center", activeTab === 'chat' ? "text-slate-950 font-black" : "text-[#dca11d]")}>PokÃ©thology</span>
+                              <span className={cn("whitespace-nowrap relative z-10 uppercase text-center", activeTab === 'chat' ? "text-slate-950 font-black" : "text-[#dca11d]")}>Pokethology</span>
                             </motion.button>
 
                             {/* Combat Section Button */}
@@ -6904,7 +6904,7 @@ export default function App() {
                                       title={isFemale ? "Show Male" : "Show Female"}
                                     >
                                       <HUDCorners />
-                                      <span className={cn("text-xs font-black w-4 h-4 leading-none text-center flex items-center justify-center", isFemale ? "text-pink-400" : "text-blue-400")}>{isFemale ? 'â™€' : 'â™‚'}</span>
+                                      <span className={cn("text-xs font-black w-4 h-4 leading-none text-center flex items-center justify-center", isFemale ? "text-pink-400" : "text-blue-400")}>{isFemale ? 'F' : 'M'}</span>
                                     </button>
                                   )}
                                 </div>
@@ -7106,7 +7106,7 @@ export default function App() {
                                        sounds={sounds}
                                      />
 
-                                     {/* Evolution Line & Methods Section (Only for standard 1025 PokÃ©mon) */}
+                                     {/* Evolution Line & Methods Section (Only for standard 1025 Pokemon) */}
                                      {isStandard1025Pokemon(pokemon) && pokemon.evolutionChain && pokemon.evolutionChain.evolves_to && pokemon.evolutionChain.evolves_to.length > 0 && (
                                        <div className={cn(
                                          "rounded-xl p-4 sm:p-5 border-2 shadow-[0_4px_22px_rgba(0,0,0,0.03)] overflow-x-auto custom-scrollbar optimize-scrolling relative mb-4 touch-pan-x touch-pan-y [touch-action:pan-x_pan-y]",
@@ -7186,9 +7186,9 @@ export default function App() {
                                           <div className="flex flex-col">
                                             <div className="flex items-center gap-2">
                                               <span className={cn("text-[9px] font-black tracking-wider font-hud uppercase tracking-[0.15em] leading-tight", quotaLimitReached ? "text-red-500" : "text-cyan-300")}>
-                                                {quotaLimitReached ? "AI OFFLINE" : "PokÃ©thology AI"}
+                                                {quotaLimitReached ? "AI OFFLINE" : "Pokethology AI"}
                                               </span>
-                                              {/* <span className="text-[5px] text-slate-600 font-mono">Sign: {(import.meta as any).env.VITE_POKETHOLOGY || "PokÃ©dex"}</span> */}
+                                              {/* <span className="text-[5px] text-slate-600 font-mono">Sign: {(import.meta as any).env.VITE_POKETHOLOGY || "Pokedex"}</span> */}
                                             </div>
                                             <span className={cn("text-[6px] font-hud font-bold uppercase tracking-widest", quotaLimitReached ? "text-red-400/80" : "text-cyan-500/60")}>
                                               STATUS: {quotaLimitReached ? "WAITING FOR COOLDOWN..." : "ACTIVE"} // SIGN: {(import.meta as any).env.VITE_POKETHOLOGY || "POKEDEX"}
@@ -7273,7 +7273,7 @@ export default function App() {
                                               </span>
                                             </div>
                                             <p className="text-[6px] text-red-300 font-mono ml-5 leading-relaxed">
-                                              Enjoy <b>unlimited questions & answers</b> all day for free with our offline neural fallback engine â€” no payment required ever!
+                                              Enjoy <b>unlimited questions & answers</b> all day for free with our offline neural fallback engine - no payment required ever!
                                             </p>
                                             <button 
                                               onClick={() => setQuotaLimitReached(false)}
@@ -7302,7 +7302,7 @@ export default function App() {
                                               {msg.role === 'model' ? (
                                                 <div className="flex items-center gap-2 mb-1 flex-wrap">
                                                   <span className={cn("text-[8px] font-hud font-bold uppercase tracking-widest", isLightMode ? "text-cyan-800" : "text-cyan-400/90")}>
-                                                    PokÃ©thology AI
+                                                    Pokethology AI
                                                   </span>
                                                   <div className="flex items-center gap-1.5 ml-0.5">
                                                     <button
@@ -7375,7 +7375,7 @@ export default function App() {
                                                 <div className="mt-2.5 pt-2 border-t border-cyan-500/10 flex flex-wrap gap-1.5 align-middle items-center">
                                                   <span className="text-[7.5px] text-slate-500 font-hud tracking-widest uppercase block w-full mb-0.5">Verified Knowledge Sources:</span>
                                                   <a 
-                                                    href={`https://bulbapedia.bulbagarden.net/wiki/${encodeURIComponent(pokemon.name)}_(PokÃ©mon)`} 
+                                                    href={`https://bulbapedia.bulbagarden.net/wiki/${encodeURIComponent(pokemon.name)}_(Pokemon)`} 
                                                     target="_blank" 
                                                     rel="noopener noreferrer" 
                                                     className="inline-flex items-center gap-1 text-[7.5px] font-hud font-black uppercase tracking-wider text-cyan-400 hover:text-cyan-200 bg-slate-950/40 hover:bg-cyan-500/15 border border-cyan-500/20 px-2 py-0.5 rounded transition-colors"
@@ -7394,7 +7394,7 @@ export default function App() {
                                                   </a>
 
                                                   <a 
-                                                    href={`https://www.youtube.com/results?search_query=${encodeURIComponent(pokemon.name + ' lore pokÃ©mon')}`} 
+                                                    href={`https://www.youtube.com/results?search_query=${encodeURIComponent(pokemon.name + ' lore pokemon')}`} 
                                                     target="_blank" 
                                                     rel="noopener noreferrer" 
                                                     className="inline-flex items-center gap-1 text-[7.5px] font-hud font-black uppercase tracking-wider text-red-400 hover:text-red-200 bg-slate-950/40 hover:bg-red-500/15 border border-red-500/20 px-2 py-0.5 rounded transition-colors"
@@ -7518,7 +7518,7 @@ export default function App() {
                                           type="text"
                                           value={chatInput}
                                           onChange={(e) => setChatInput(e.target.value)}
-                                          placeholder={"ASK POKÃ‰THEOLOGY CORE..."}
+                                          placeholder={"ASK POKETHEOLOGY CORE..."}
                                           className={cn(
                                             "flex-1 border rounded px-2.5 py-2 text-[10px] font-bold tracking-wider uppercase tracking-widest focus:outline-none shadow-inner",
                                             isLightMode 
@@ -7542,7 +7542,7 @@ export default function App() {
                                     transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                                     className="w-full flex-1 min-h-0 overflow-y-auto custom-scrollbar optimize-scrolling max-w-full"
                                   >
-                                    {/* â”€â”€â”€ DUAL MODEL MATCHUP PREVIEW REMOVED (THE ARENA ONLY IS SUFFICIENT) â”€â”€â”€ */}
+                                    {/*     DUAL MODEL MATCHUP PREVIEW REMOVED (THE ARENA ONLY IS SUFFICIENT)     */}
 
                                     <div className="w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 items-start max-w-full pb-2 sm:pb-3">
                                       {/* Left Column (Arena, Actions) */}
@@ -7554,7 +7554,7 @@ export default function App() {
                                         >
                                       {/* Battle Background / Field */}
                                       <div className="absolute inset-0 z-0 rounded-xl sm:rounded-2xl overflow-hidden pointer-events-none">
-                                        {/* Dynamic CSS split-gradient representing the clashing PokÃ©mon types */}
+                                        {/* Dynamic CSS split-gradient representing the clashing Pokemon types */}
                                         <div 
                                           className="absolute inset-0 z-0"
                                           style={{
@@ -7898,7 +7898,7 @@ export default function App() {
                                                 
 
                                               </motion.div>
-                                              <div className="hidden xs:block absolute -bottom-6 text-[7px] text-cyan-400/50 font-hud uppercase tracking-wider whitespace-nowrap">tap PokÃ©mon to play cry and rotate</div>
+                                              <div className="hidden xs:block absolute -bottom-6 text-[7px] text-cyan-400/50 font-hud uppercase tracking-wider whitespace-nowrap">tap Pokemon to play cry and rotate</div>
                                             </div>
                                             
                                           </motion.div>
@@ -8462,11 +8462,11 @@ export default function App() {
                                               <div className="bg-slate-950/90 border border-slate-800/80 rounded-xl p-3 space-y-3 ">
                                                 {!battleOpponent ? (
                                                   <div className="text-center py-6 text-slate-500 text-[10px] uppercase font-mono tracking-wider animate-pulse">
-                                                    âš ï¸ Select a battle opponent to enable tactical combat options comparison.
+                                                       Select a battle opponent to enable tactical combat options comparison.
                                                   </div>
                                                 ) : selectedMoves.length === 0 ? (
                                                   <div className="text-center py-6 text-slate-500 text-[10px] uppercase font-mono tracking-wider animate-pulse">
-                                                    âš”ï¸ Select at least one active move to compare combat options against {battleOpponent?.name?.toUpperCase()}.
+                                                       Select at least one active move to compare combat options against {battleOpponent?.name?.toUpperCase()}.
                                                   </div>
                                                 ) : (
                                                   <div className="space-y-3">
@@ -8583,7 +8583,7 @@ export default function App() {
                                                           className="text-cyan-500 hover:text-red-400 transition-colors cursor-pointer text-xs"
                                                           title="Remove move"
                                                         >
-                                                          âœ•
+                                                           
                                                         </button>
                                                       </span>
                                                     ))
@@ -8760,7 +8760,7 @@ export default function App() {
 
                         <div className="flex flex-col gap-1 sm:gap-2 md:gap-1.5 relative z-10 shrink-0 w-full max-w-4xl px-2 sm:px-4">
                           <h1 className={cn("flex flex-row flex-wrap items-center justify-center gap-1.5 sm:gap-3 lg:gap-4 text-3xl xxs:text-4xl xs:text-5xl sm:text-6xl md:text-5xl lg:text-6xl font-hud font-black tracking-normal sm:tracking-[0.05em] leading-tight text-center w-full break-words py-0.5 px-1 overflow-visible font-extrabold", isLightMode ? 'text-slate-900' : 'bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]')}>
-                            <span className="inline-block py-0.5 whitespace-nowrap">POKÃ‰THOLOGY</span>
+                            <span className="inline-block py-0.5 whitespace-nowrap">POKETHOLOGY</span>
                             <span className="text-cyan-400 text-2xl xxs:text-3xl xs:text-4xl sm:text-5xl md:text-4xl lg:text-5xl font-black text-glow inline-block py-0.5 ml-1" style={{ textShadow: isLightMode ? 'none' : '0 0 16px rgba(34,211,238,0.7)' }}>OS</span>
                           </h1>
                           <p className="font-serif italic text-xs xxs:text-sm xs:text-base sm:text-lg md:text-base lg:text-lg text-cyan-400 select-none px-4 mt-0.5 tracking-wider whitespace-normal break-words text-center drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">
@@ -8813,7 +8813,7 @@ export default function App() {
                                 <span className="text-cyan-100 drop-shadow-[0_0_10px_rgba(34,211,238,0.6)]">{isInitializingDb ? "STARTING SYSTEM..." : "START APP"}</span>
                               </div>
                               <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-cyan-300/80 z-10 font-normal uppercase">
-                                {isInitializingDb ? "Loading Dex Registry & Generation I" : "Enter into PokÃ©thology World"}
+                                {isInitializingDb ? "Loading Dex Registry & Generation I" : "Enter into Pokethology World"}
                               </span>
                             </motion.button>
                           </div>
@@ -8884,7 +8884,7 @@ export default function App() {
                                 </div>
                                 <div className="flex flex-col min-w-0">
                                   <h1 className="text-base xxs:text-lg xs:text-xl sm:text-2xl md:text-3xl font-hud font-black bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_10px_rgba(6,182,212,0.4)] tracking-[0.12em] xs:tracking-[0.15em] sm:tracking-[0.2em] leading-none">
-                                    POKÃ‰THOLOGY
+                                    POKETHOLOGY
                                   </h1>
                                   <span className="font-serif italic text-xs xs:text-sm sm:text-base text-cyan-400/90 tracking-wider mt-2 leading-none">
                                     Where dreams and adventures begin!
@@ -9187,7 +9187,7 @@ export default function App() {
                                   className={cn(hudButtonClass(false, 'cyan'), "px-6 py-2 !text-[10px] font-bold tracking-wider")}
                                 >
                                   <HUDCorners />
-                                  LOAD MORE POKÃ‰MON ({sortedAndFilteredList.length - displayLimit} REMAINING)
+                                  LOAD MORE POKEMON ({sortedAndFilteredList.length - displayLimit} REMAINING)
                                 </button>
                               </div>
                             )}
@@ -9591,52 +9591,51 @@ export default function App() {
         {/* Theological Exam Fullscreen Modal */}
         <PokethologyExamModal
           isOpen={isDailyQuizOpen}
-          onClose={() => setIsDailxœì}ÛrÛH–à{E£«DMˆI‰²¬–T#Q´Í-IT‹tu{*.L‘hã6 (ŠÖèæeçe#6b_öyÿ`ßçOæf>aÎÉÄ%dâBËU®™bwÉ$Hd<yny.ë?/õOC‡Zõ;ÍğèöÓHôñí™¶>ydÿÄ×wOÿ}óÏãîß‘sÍ÷Jn©·4|rOäïvãy~4u)µ„~tGsò8aF¾æSrrrB¶îtK÷t¶%q"t>Ã‰­û#5mè4ø’íaè8¶E­¨ğw¶å¥=Á×¸–®u½4'Ô˜Eß%ãxsäÍxßŞŠâï’®´¡öKÖOĞ,ñSÒyéEİñŸ²şÂ†ÉßO‰Õ»Ôç<
-?Ä6¦îyºm]Û¾>…V†æù#®Ä‰÷[·ÔÔüéâä±¾MNNÉcñ<{iÍ¼f„1®_ßşqmıFs ¯úÖ‚j÷ë­í?%£şÀcoÖ­y€ş™ç1Ö·à÷Ò‘t3ÖMj/ıºlp„¸K‹÷RO=ù´CÚ­VââSrÚËsèÔWLÆÏïÃøC„­ûîR23htOÇÚ¤¾5Ó|M2‡R-€WâÇî.’ ê“3—Zá¸’îğ&Üu—³/F»¡ÀælË‰ëÖÒ0Ô½å6
-:z³ÙQ!HØWQ»@Gêâá¿9õê@©M?‘Ö™Ñ;jy”}ßÂ5Õ5£Áïo%/-ùU¸Hgì½×pï°ïÚtºtµé~§üÙÿÚc9	iı§÷yÈlqoªYé½m ÙÊÛE×tÅß#ßG.béH7—†æÃ°ëª®$ŒïqíŸ-gºıÖ5Èwß‘zÌãfú=ñü5¾ó‘ÌtG|Dj@¾
-¯x¼¥ÚÔo#„½×7¨‰Û˜]ã8C4hÖz'5ì¥k‘øı;‰›ø:Ø¥GdnØÍ¸Zzú´g[:Ã¡®YçĞ$ùÜ½m,MŠışÈ¾%ï¶í¤0Éë+}æ/`v­Zòú‚âÚ°"H!ãx ®G7PQI›'“!Î,8½ÁÅ³¦T„çñğî6#½Ò,@n—?ü‘®Oj6¿Ñ0ù†‰·j‘Èÿ&Ä«O€?=Ãö"ÜaT0Û.Ÿ 9v„øzò íÂ¾A @ğ²pzøx{Ø,L±±	ğIñ6/x8˜Cª	ˆJ>lPÄ=ÛÑ¦ºÏ÷ßSª™Æ˜hÖÎ6£º_Ô•ïj–§ãˆ±¥¿v ‰jãÂk@R4ÓaèØé¡ğõ»;‹zş”t5‰À»ÖLzR»Ó ]u 1~£EÈ§ÆOVë=¹3èûÓ˜Ú™Ìl]ÚxÙmí¾<9múqæÚNcb,İFçÁ ş;Ã^5úlF­$´NS¯GÌ;3':ìBòòˆ,noaœÚÄƒí’ª¯mƒŞùöî>Y5^şAN×šÕè¶Z»íq1è¬q¬‡°qîÁ8[·|ÀKz/÷œXì¦¨|ùÄö}Û„÷»¸í²p–®cĞÍ† ÒØvÈªÍ€Bkn	(y@‡0¾‰íÂSIø%‚Ì^KXMøı²Eœ‡Æ>ñÌ#ø÷8ëÆ_}İ§¦×˜R,ùÛqjİ˜PÚ™k´ûÔè´ˆ·Ğf°ğÆ¼–cv|ÙYG’'³Ï®`tøFºj táßEC€òƒ‘@N„öáìõƒŸÁ¤~j}h}hw‡î|¢ÕvÚ‡N»³Ójîm¿'!¸¥ã‡Dä51}˜Æ>ŸF—Ï¢K|úàG#©FÃƒ-ke¯j1§ã÷€
-\ ×÷™°Õny[°Ë³ˆÌF!2€ê‹ÓQMnÑI<l[~c±œöeb …à“šhÅY²°FñL÷`¦KÇ¡î› y›~`5€ÕQÏ‡®Íğ'Ûò!2êÇƒë×#ùw
- 	.g¯O–°é­¬&NãÒ§#¡‡³.‘ë„²jñ
-WPòÈ°ÁFİk2ÔİÚIm ¾µùÖflñ(ºú ÎàÏâğìâj¡3'ná¹ˆı44 g sz¶Ûˆ™dC!î´›f?x$… ¶1S-><SrÂ=è™ñ>“€Ç×Qì¬1	‚ÔûŞt;ÛJŠ•íJöæŠkûœJŠsg_ïl×$³`ÿlIx{‡çh–øÎqåtÅ›Úiïr8êïbCJrÜËğ')ª2nêÚ†¡MJ@õ‘ÃÛ³u	ÖÁ˜};fäë†¶ômXg9Çú ²iMı.Á¢'àbÎàŸCbjÌŞÏŠsÁ¤\8Ò•ln&  ÔM¾#?êŞöP,ªf§¢ e‰×ì#³šô:1¤ı©İrŞ§7¦l¹V±‰aCksÒh+HØÙÛ‹Áfy1İ\½#½áõøvx)#h*$‘ØQzGğE03ÑZTót¤™°}¼ İÄùhDPfl™ÜQsÀöİµWe$	“É}_…€aC%»¯sÄŒ¢•T¤^Œh¥–¸v:À÷ßiSÊ¡§^&õDL3mË‰4 Xí4X‘™æ~$»„1ŒPåek›÷R%ÿ5 NeC¶`Ğ±æ ğìË@³Eóe7«U„Ÿˆ+.4k"TøTOğp)Úî)l×6’ä))ZĞDT¬j÷0A±SlWHÙ‘½ô™~ŠREŠ‡É˜‹œuˆ CU4”D&¨fŸĞD/ùt‰TŒ?ùŠ¡ ‚X,(Š{¹ÆKò8µêÊf„$5³6A¡%ÚÄ²ÊÛ\ŸY¾9K™9R`M ¨8¡á9 ŠıâÎ©ìjÎD÷™¤#_oül«À¢BflÇt<ZZIñb€²‡¤Ft|eÛ²Û‰Ás¡‚¨†r¼# jß'v÷3HÂÈ!né\÷|w<ë­¯€vô¿K¾í¿ŒÆ·ï`†½áÕÕÛëÁøy;\Æƒşç3æB°tš2‘ˆÁ_÷–çk€—1h	o)CØU¤ı0.¤UœmÊÉ0â›¿œ¥g’Ÿjöçä§“è·iYÄazUhE@c× Cñ‹œ¿HL]nZš'm¢–R¤¸®ˆÇIy¤ØÑén¿/ÅÆòhWI;€-ƒ^.ì•eØÚLjìíRÉ]*j[ÿí¶BÛ
-M" äTf³+œQRlÌ•ƒ^Ò$(";œ½DRÊ"eÊSn1î}OQY¹šƒ2$Û$äÌqH¶Êv¾©ÈabX/%‚ed	;l%Ì,Äô-\æp87öÇış¨ùš İ„kk  dm/]2£÷ú´@ÜeÃTËŸençLR6­½Z	– lîflGSh;Ü¸ª¿¯²ıñO ÈœÉç*Å<y¤“xxsÙ>‡”&ÿJKXşã%(œ 2³'$í‰6æÊémÆ-â³‘ƒŒÉ˜HùÅK†>~0’’,ã³”˜²”?I7rPşøÜ¶?²ã¶/ÁrÉşsı_ä'hkˆö%¨é¦D?²&ÈIşë¥dn¥ı,È|Aì;2…>\Ûğ@~óö‚ÜQÍ_ºÔ+f.MÏ¿Y‘Üweä¾øt!	y•#Ï³²¤hµ¼•¦èzáÒ»“ÚÂ÷ïhwwµZ5udsW3›SÛÜığ¡‰î;¾4?|ø^Ÿ{‹“wû—şÍX^]Ìº³7ö'•ğçkîœú'µ +YU­\jœÔ,ÛÀÖ·lu]µH™b	zü¼à0Ããâ†o7\rçÚfxÔŠô¨è½®5$.ÁohÓßˆÊ&l	ä:n.ïYÇÁái‚\³û¼£*~øÜ/C¼óÈõ Ä²bzúwzM"°}A‚ÍàTl÷…‚d¿²Ã^‘¿ÏĞèÉ…ÉÍ ¡‘r°‘¿
-Š-Å øNgCŠı£x·ÉÖ>LÏu±œ0úlÂôuÓÖ¬OškÔé´öÍ[ìŞÄ+ó_•8ÿªâoR”üÕéék†¿¿ÄÀôÀtK¦i»ë_Oğí?8H qƒ¸S
-ïŒÍœÙÓ%z‰²ş¯‚x~!q÷³ˆ§r¶²;ÅöˆŠÖˆÔ9ãhíÁf½…éj®/b¦{h9Ÿ¡#ê-Ø6Z'äM7#….,$y²kœØ%É p#AñzI"HÜ‰fuxÂÃñµ€"Z¶Ù+ĞñŠ‰d…Ãxµµ §‘g,8¾eş5½é*uØ’ÌÚ–	;j¢c\m[áğÆ:ß˜–±Ã¤Mv’ˆSä{²uÛ?Ñ;Üø×¾èÿµÙln‘#¼3Ÿİ£ëdôn4î_m©Ïú6;İ/O\p­d´olFZXdŠbÈªé<¥³•\T&üâ3îÑ=!Æ®ÿ ûèJu§»Üí²¢«ü£·°WØI¢
-¾è¿¼£y®wx{?ôÏ;Îa#d{j÷°›ò7g›x›å»–«á˜€dÌ]:;!%ug`<Ğf­¥!dËu-ÀXtÇYC‡¤x``@¯º@øånv™v¿Oœî·Â“ÃÎŞËƒCüprèpdtÜ“8æ‘ÈÇ–'pæK³¹wÜ#gSÄ‰]ôó'ºĞ- ÁJVšk!¡Ô§°ÊøÈ :„È€ìÂªÑAöÑÙ²Ò¿¼3~‘€uiO8§¥½ñC18¿3FWÆ;û$©4Ø¨3-Á‹ÏêúcW×,ô2“øÜ‡|×YêğUígôçB¹q_æ dÏÁp8òO­f»KÍ÷()ı+Ï‡ÀhGƒ«·—gãÁğú{éÀ~âNvØ‘.‘b RBåß¬+—Hÿ¯½Ë·#+¿¹íŸÉEÜïûÒ¡;ÙS•Vİ‘Z‹¾äïºÃÀ»NÀí”?yè0êZHC‡0xy°S¥“?lm/‰·¾¬4Ë‡Î¨*£<ô˜héú=y‡Ğ Çºèà<µM¸K×ö0"’Q-P|¾íùxèÎÒò´{t&¥KV:ª•xèQSOjºµSøbjéi¬‰³tç”±)ˆİˆÓÜxmæ®>#øÉ‹ü€%¦ç¨U%Ïl7?NÅØ[járc´mÉÂ}­G™(÷|X¡ŠäqÍÏì’H,nÇxw¶³NdpÃÕd¾Â.VìˆdÔEWb!6ÊF]¤´;ÁAèe·¼Æé]ÿ¯ƒ±”Zä¸>m°° •İ‘º#bÏEá.­­íÿ®óß.-µWÙ¡ğâÂ>^4“7@èäpşkÄŞP\Øo‰RÅ¡Ün‘ †í0…½r¿5Qúl£ô¹1’÷†×¯·WÕÑ\¡>ª<iŸO‹|C§ªâ¨óLŸ­Àüµ){+­”Ò(*;¿šÒxÈ4»ƒ\ˆäè;¹à–é’%ß¸YŒ8nágĞQ»9:ª1ÏÕQ»rˆDeÕ3«7íËõ/®+1¬LÛsX*ŠÉrÉ]¦à¤Ã^å
-úĞD±k§o@wpz RW¢@ÕôÉ_”T&"%Q*¹~Ó•I(,84ÉB=j»§I®|•KDz{#-?½hİ/Ş—
-GäGMë’zuØZ„‹»'‹ÔÔñ—À´3¦ÿŒxóDÇ: ƒªğ·V{O1°<õT¡†ÕN™æ$Ş!º‡Ş¼¨^¡9…éHøƒZÔ\7Y²ƒ&ùRÚº¦áÕ$Úõ¾!ƒ;¢E]Ï©ïÁOåÿ!†şæµt9ñíºg[;°Ë¸ú…R€±`ÌˆæĞ±î¦Õ”ê·9¦†/´Ş<¼èy<Uâ+ş—h© s1µwfŸ³àK£ÄŠ‡óë Ğ=??|şØĞOÿíÿh¿¾k[óÓW¸ĞÈ!@åWÈPXGv%®ORÔ$¯4ic¸ÚK4õ<·	ÈıÿÍñ.t]ò­a'=W§ğê±æ Å8…‘ĞÎôñÈÔ]7«¼êlÀD1 lñk±$[pk«ç³ø¦-TK";„6COwÂé‚¶Ç„jfOsFq¼»4*•>Ê^nÏƒ³qZ“ i{ÍfIƒèçĞ§@•ÉĞ¨ñ€«#ù¸[ZDš™m²ÅÿFjy<qwO~Kæğ2âÀ‚zÄ_Ùá³eÍ1ÂÓ@a¼nùSW°ÌŞ.03²à¾—ÛËÇH#72!Iõ(Ä±ØYŞ7Õ(Zî™ˆŒMH5 ¦*ä–Ïğ¤ä™sÖE/óF; »ÓÙÖö©aB™ÚöÓékÛ‡İúÍ×¤—¬;»ºB†OıÖU±NuU,éÊõõáu¿Ü^^×2ek‹+[[Ï¥l¡]>	qĞ%6Ó²˜%æ R´Z;ìÍƒíä)¡_Èì4É£®@Ùš¡<şêYpù"£¥1½c·›ÌWµßŠ%K‰÷©cC·«`Ûë`Èugã´aâÁãš<¦"A[ªr"k'SÀ:xÔ~ÂŒXU²laÈ«éVOw§KÈ³ê]*öGåsƒ´1toè±·V9j“»ª(ƒäº3€c/8ìŞ	È€à‚®~ÜSŒŒ0Çæ>ecFGiÆXD»:!tE«`yš\†Âİê$-rŞLmÄ2t¶’œ_J.ÂRy¥¬cÙá¯m–;AØÇÑ&6g9›?g{é'Â\"¼RÈÍ;Sİ/8S	\@£uËb™0RÒ°
-	ñZ÷s§É8X4'—.¨3æ$Ê0a¢ÚIa'Ì\ª™“RAÉğctè5sİRIªÙw‹²||JÑaªE:ÆÀ MÍ]£lÏÏ{ì»d 1Hş¨iN}––•,€dƒjÉ0?2Ø! l¸H†AL[OÛ¡3]c	ƒ=nÖv›ä‚zúÜÂè6İG‘œ,ÀÍvL Yİa•´İ¹0­•í~d&
-omMÑ€$Õˆ³›¹×\½+=Â‚´Øé/U[,-î¡“ Â¡ø UaÇˆ.È®>e§ÖõuF›_	óóT<÷Šç0†üæ÷¾ ¢–ŞıˆÉ~ÕÍŸ4ÈÄ–—Ò;‚déE·½È³í(œu™ƒti9HÛHÅô\ÖôYb¿8ù%2ãá§¥EeØC*ğäÒ(:9x±5†mQô^TÒP”&šû£*¾#ıÍ¢¥­øVáoÌ·ÿ|­@­MØò@
-ÈZ
-–¥ó^§+,:H$.mÂ,p@?Â×XÚ÷ß8.mÏJê‘àÏùwnkî,kˆó4ÈÅ%ÿÆ'?¢î=z’è3J^S`>:9ŞBó'¶/ k?¬YP°k£R.æá&@£$†¯ìDl/°aÒÀçiábZM}ú[‡Wœ\èÚÜ²©gæºF,œôÀ“ñ¸l6§ä…Ÿ@È'SÀ¬@(0ÙfoT`µûÄñã#I?EÛ«äAÌIQ³…ÇŒ—Ë’!æ2õŠ¼\¢ôEºëkÑ`¾¼•BÖXøHä¬ŠÜ#ÒÿyÂÕFĞ5ÃÇÀv’ÀÑ0†æE—…ŸÄ˜v»´,Ù'œcúğùÇ¥ík— {ùXS`”™7
-½nƒ$t‘
-½ıtZ=ŞM-‚8›ÄøC¨¾[<ønjğİrƒ/ºÈ]Â.V!«Rô’n9öHAÊ³ÈÖí.-a ½~TgÇ2P}$ŠÌó‹es–*•‰LŠĞÀ˜‡bc¾Sa#&s‚ÏÏ¿˜ANk’Æ:4³¥CÑ#E‹’>ç¹/“<
-*œ¦¶Ÿ6îÊ ø6ÄÏ$Bğx»8³½òíÊPj€Ò(ÚÒjø4@=Uö“T&İÅc®R6›M¶Aá°jê@²¼LRêÉÒşÉÒl¶¥Õ¹ Ä!á”.×€)iK{ò$L+òXó=I¶Ø*\+å8#Ù©ıÿGÃŞı1¹Üô/×Êüßªw2^ >ÖEš`åñêKÌ¡¶6kÓÔXC@Kg’İ8%}mŠÑã	8ÌÛY\Î}ÌÚÏ½áõ5‹w „v@­(+ı\/<mÿŒ¯­=ı\4Ø ÃÁõëp»\FÑ[”›¥ˆåvgP»C$$*“!ŞÉGì/ ½áëëÌşõë0´´ŸÃÕ\3
-ê»ëï›A}!4ã‡é/‡½³K2|õ
-wéoûl_÷¯×‚
-Ç«Ë³Ñ›ß×YJˆú·?öoÉUÿjxûîÙy£¥5©i»ë7TsŞzL
-ıùbƒÔı§«s²KT-Æ ÓĞ„‘ˆá5ÃŒQ¿÷pãw4Pó£R¯G›á‚ÈQ>B"Gs\n>‘3ñ°¾l#¶ä`~9½.r=¼ø"«'.¡‹ÉÅàìõõp4ôFØÑğ²¯¨¤ íë29ïŸş‰ÌÅÆêÀ%·Ëd~.——^t$Ù‰ŠÉå&†—:ªÄÏÖ˜@ÉŒÌ‘›¿<EP*œÕÀJ#{òÈËt¸a¤(+ü!¸í¼²8^Ù#/Ä….ZÎ„ÃÌIE‡@t»<9X¬1&«è¤Yí!Û€ƒëqÿòrğº=P”\_ošƒGFkj§1êŞ‘™Oß~V&¥ÎÏ÷[øE©4á%Ëe¶´DÊ¦ÒÎà®[QFì2[?É!ÉulÃ%İšés›ûèó3»Ü¾£ºaAI ¤²…ù9oÇâç«ŠŸ¼”V9ô?¸æ—öÜC·]ª™•–<4Æ¶Cw¦6×Y“\8Ÿ[Å`ÄQ4MÍ©×{¾ÔuF˜'eÉ§~ğ‚”?ã|dı?Áx[Ó[Nğ@Ùš×[XëxûéçüuTÿ‡#ÒÈ)ê~äÿ¡€kğOi{ÿàütkj,gÔ«×~½íõú£ÑûÚ¶Tƒäÿ«vı—³Ûk±_‰Ãÿ½ûŒ=¨Bm9vŒ(è9ÇÊ„Ÿ<4Å"J~ÅÕD‚äŒ¤ ZÑ¤=—®]ÈÎT¸ÛWê`%™“µ#é«:‡¹Ğ=x«hw®öÅiÌŸ¸×ˆåÃXu Ú•rh”Í°™x…Ğo6½Ğ:t
-—>(*¨+Újk´Ò…5ºb®ªi¹DQŒ¼ï<|èDn®‡;íıîNûîN4ràİ.]Í¯ÇáÕ§<ŞÏÀp‹ÉÇG<·Õ¼º/<ëğëw†ÿ%ª&ÿ^49÷åEE“á=Ï[298_Ü¬rrq@p¦^2ÒµœzËı‚×fı²Å“‹dKa‹ñ:§Gdï@)Â%wÑ,ª<ÜÁÑ¥Õ@ó¶€Û{½C(PhØeh¨Õ\¥- k.‹ª.åXJçÇ((—´·¿Ói·w:{‡¼hs…|—òòÍ§øØ¥EÅÖó¥Ÿcµ‘)?w°»üZhÏPc¹Ç‹†3·)La›TZÎ\.]h™‰!Š‚Ó$¦ì¿añäÿÎÕ¯4İ
-J"`Î\ªm^YÈP‰¼ı}›İ”Ç/¿6N¦°ÈcuvxµH|í–eá#H*¢ø’üy•‰ä@UŒ0ë8”g–ÎÆI”Éd˜
-ŸKŒ9høMHùhNàùğdPáü×3tö¥Á¬k¬niŞ	K¹¼ÇùÕäòr,òÍ%éfãs«İ•¨•™MåJ2-&¼ıj,ÿg\cÒXh€òQZ»MÍ·’°‘0¾)Ì$÷MP¶l0~0¶PÀEÇèwkÃP¾ÉC¼RÚlÆKØÙ+¸Î)?*şpv3øğCÿ™Sí™¯5Ü… vÙ¤Ö’Ôa˜,K¦6Ï`ºM¾›ûâÍ§.õykØ”“µÇeànQsø)CnrÙcøÉ²É?§7i®ÒÎ?Â1‹Jb¡’§½™S‡0s‹WcKÈ‚^˜×nÌ±$ÉëÕ&°¼5¿Ğ=S÷0vïÏs ›çø”‹¸
-PÉå êU×¥¦¬ƒŒ+€;9	ÕsSÔŠÙ‘ãÕdg–$n2ÚçÆ²Å|9#,c ölp–2ØV,â¾ó2ÊÔùÅZBÌ‹(v2àí
-PXÏñY-ö¨Í?šÒÃÔNÇ8õ€üİ£õÜCL–Óe%Rm~.¹/pÅ­TL˜È…ş¼ŠÂá#ºÌÀU¦¬dn9á´aó 4lŠRŠó2RÎ¤–ğ™+J¨¼f÷2&qËt‘‰xÃµgä9ÑDÚ=Üš)Ï’Z.Ñí
+          onClose={() => setIsDailyQuizOpen(false)}
+          today={today}
+        />
 
-¥ú'ú%hvÕXÉ/[V ¼…	º)ŞãQ† zC[W¨& ÏÇƒ™RQyßúl#ìNœôBRpEqêfÔ(cšÍÁs¤”	s-ª)^$=’Œ/ö“¦ÉäIsÕV–`ku"‰¥M2oJ®,ËËrWoîósÌÚƒ~øµˆ¼óŸí8h#Ìs?Êû‘ĞİÎŠ^2ßİÇ¼ám1¬>ÇŸß°'ì÷¥½¢ğ†o2eM¾L½W†­±(k,T:¶—‘kè3
-ıºÔáJbŸ¥E†w±ú 0V şu³Æ}îî.KÕd bú²óí{bÎĞÜ]c€2 oÂàÂ¨ééŞôædHÇv.5àÙiÁ#ë+p>`ß¥ŒÔ ¡ ÙC÷vrØ‘µS—›oo¿¯¥'öíë¾A£®“§İ²ösÃ^ÏÙ0„ó‡®´-[ÊV‰8a9Fş”–¢14›zOwBp”hj²Òr8é`8Te/ÎŒ•È F€e'@eP•4ç?f•Óm‚<×28xËé$¹
-€=*rÑF¤ É ó²4o"ˆˆÃ(„
-“Â+@%¨=R*	9ª„¨Ôî”…IDQ ‘xEğHXš2`Io—ú˜—3ËúòÒpI°úL&/«İŒº­ ©ÖX,G.uç¸…©”ÕB~d‚<ı¢UâåùgÇbN/œ’p–,ï®„÷S-ÅQ˜aWâŸ¸ûRRL)«›£ÆÎøgW*§XE°Ÿ°$÷¥v‘¬Š!¦Ww\zWğßæu/ ú096Ä%™‹‘L”g.Ö‘™®'¨ö LæMN²3rü”9'ÎmX'RQ„šaˆ£±2$X‚Z0Ó ¯¦p[u&’•AkBÈ2—ebF§¼×Tä„‚×ÃS€êrtj»ªºKŠ‘äù¸˜ ,¤YÆ¸ÅæÇ¶²áª‰òCœ—€ê€²ã˜ö¥^´jì7ñ´şBg1ñU,RÀí,‡(Psf‡ÎXJÃ¯–ãggPf¨	Õ¹æÓ?ÊJ!$“ Î‰iø16Ş¤äa	SxL‡h¡e‰6=Øö7@Iµ9/X’kÚŒ¦©{,)¡ÎÎœøueQ¬ŠsLv©cà=¶àoA³TP±ô–,‹XK’$)Æ2×ÔŒ‚RRø	0´ï©«3¿9«&ãU{q¤ø©œE(MU–`]äŞB3jÍiÔpØñ¾–PjQ×-m;Z,'QÇa¿WğŸïù|óÑıÇRUi3R‘'“áğuÄë$R×¦ÜA	Š
-ì¬¾†2C˜_ô,­iCËõôÁZ•I
-‚nèª&f•Ÿ{ì«Ã§¢<³A¾¸¬ä˜ƒe‚o|oxusÙ÷kÛ’ı÷=©e„İ¬vzÔÄöºRít3Øf´OÉK”/„:åEIüÂÈRÆ¾;?ÚâÁ&¼†¸ÑU1M~~Â^âjíVë[…O°=ÃÖÊ¶*ÀÃrîet¡¬i°É áÈU–g@>ü„×Œ¼/à“ï1WNüÆ‘ª1 ‹¹¿*:‘èB%Š“*@Š)ºğZŸš<»z@B"GäŸîßg,?Vzãïóm˜ØĞJïdæ"¡·pgF]©½ä‚l/•N&'Çré2w1}€&°XS•Ğ6ÌRÑóh³•:¯–ñ.’ ^Ù0”¤©<ğ§3u8‡Ü7àó<¬ŠİŸŠi‹¾+B¾Z•|¹Áò×şãÿşÏ&gƒËw ¶“áùÿèóÀõ«ş˜ØüÛÿù_ÿşÿÿEhÏŸŸÉÍíğõm4R±çV‡OƒT¾Ô9#ç×Lª)æ€ŸS‡‰“Ğ¥NéìÊ[ä8ª|‡ÕÕàUÊ¸tÁ±öMàyé™j·è°Ş&ì)Xæ|ëEŞ:ËÃÕrÓ†g¯+=$PV=©ñÛ2âVÊsmß0ƒpàcİ¤öÒ¿¥wÍ tî6 xtp£ ­\…uøHêª˜R‰A]I0ãxÌğÅ5­ÇLo4FœÔB2KP²>ÃZJZÜ˜“—>ûX”gÏ|øW$KzëÌpTR"±XWĞŸíñ=t´‰òT<“R¹_¤å}½Ze«èX@ªUvöCµ²s˜SçTÌT1?×ïA¥ödKÔ‰š#s‡•¡–4à#+3
-­³„ó{Jœs„ ~F¢Š’‹2ÙãÒR¾®ÅòRÉBMÅéTÂŒ¤èo:Ö'¿ d‰XŸ<DF'¾Ãg8ÒÑä	es /&C8„¬®ÿDv£·ô—ºKgÁ5C¯:Æ/ëíUL}{Ô wS°˜şŠı ©?é,|ÑW˜›ëñÕí–«R•.O•=MsotÂáŞ! £Ó›¯Gq(îˆ:KÒ”=xÔÖ´LÄiæ˜¦òš
-4#2Ô§º"ÚÍÿÀç¼“õ5hlh}»#œ5~xÑú#ÚEªıò`à 2{%¡céW-ÄÅè^ë¬‹\ò›E·Ë—êêfë"Ç‡›WF>Pøâ¢•1™/[Ö"0R£‰šsŠ˜á”¨ÖÒ]Ïv-Ì4/ázR3¦pÈ²c•ñ²Ú1|»ä!|\a5y/aãÒ	ˆtõ^ÇÊ¦Gl»m¥¹èµÍ„ƒùã•šWrò(pFy<7£ş‘â´†“‡Ên+”1ø'íc¿G„3ª+ÌE²×ç:ICĞ‚¼w ´¿b:nÜgˆC •‡KH”3Í[0'ÑtÌK7	¹B™œä.!€`¶Cªƒ­ıì`eR`³}?›(ÁoµÈ•trËÖÇ«wG*¢(Y\O®ô$ˆ3(=*S¥Lãh#ªÁ¬`ñ‘‚¬ßì¾ü@,!Z6äB-U5¯¼’®Ø'VŒèF%#bĞ¿”çfµûTZÊ`4ÂÄÄA:°Wo/«é'’Œ
-|gh<ì(Ê/¦°B™l1T´|<
-.Ğ´B[‰<{"©‚Ämâe:ò¼åd+'
-ySºa
-ğA¡ÅØÏ./£5ˆŒØ˜â”»/¤S‘øYä!m/Y¢Ë·”ÂdYÊ•ƒ
-ŒBk\Õkóº£À/ £JõäÃmuÆÄ?@?Ì€ßMğ_p,H-{Œ²Jã€ŠZa5ë$X;Ì!ÿŞé†!¦€WyÔ±}ÈÏ4Î‡×osWª®S¾`hl5V¦ÌàX§ú“O…{ß“áäo”å
-óÈhib)CYb@õ4¥4)Q”'\$9×ˆ³*ÇYäYKyPØccÚOU„¥$iŠ<å>]aNŒÈ©+LŒ›Î¨§f9P1IfUà¦p Ûèˆ2í•™ Ì²c5Gm+Šæ³4ôz·ı‹ÁøŒeëï/úG•NSQ§7ÃúÇxSÓ²Wõí¦ox‚Ñí¦gèSZol?UŞÅyÔ~´œ0ìÛíÙèw>O5 'ô…•GÃDjTãz·)ßæï00ÚÇd€SæjèbíĞ…¿ÃŒğ¨?]˜’^^-(Æ‡¼
-Z.ûBCÍ1À°çsfÓg¹$M°[¢`)¨Ê”'¦ • ÀÉŒ+eî?Z¹`w†L²=êâ1ô”7çæHÍòƒEd•å|{¦­³™)Ø‘kÉA	¾*ü0^~ˆ_!¥Ê•×£şHj-ˆÇ”j÷`¬×ô¦º´ş7“i}Ë@¼ØRöûÒ
- ©Ø&rªX³
-á†Z™Û ,Ì\ùb	°Ê™#óÍE“‰P©›‰9—Ç‹wäjs„Ë)A:ÁËÃ÷©dXåÓ³õ.ÏWäüìâ5HŸß–:JJ~Õ$œá-¢Š•GSŒÒ%qX»í¬yBIÎ¸%»)¼Y÷0Ÿ¯I&fœÑ
-wíÑ¼ü´éŒ0‚$kDL¨ M:ãBÑx2rFÄÒ`²ªİß…y1*”ì’óåœÜRÇv¥PdÏ¨‡Ìn—kÔP’HG÷.q±0öıNäøf¥°|´a¨‡mJCQl[A_i÷¶‹YÈ•fisj¢©ôGx™QkÖB=ò¨]éñgŸ€ø.ltò}ïûÀrv…ŠâïäF,ï"¶‰†±º$WÂb‚
-á#ª¹Óo$Òü§T§…s®ù ÎüE÷QïÖ'ªwh+M÷%oÚ!;dkÂºL³›È kè€cÍi]Úì©†Lïä‘ÿ+A¢å<Ş-AO·¼€Úïö]×vÏñaPğ"çéøO   ÿÿ 0
+        
+                {/* Battle Result Modal */}
+        <BattleResultScreen
+          isOpen={battleState === 'finished'}
+ xœì=kWÛH–ßçWT|¦3Û`B ÆI¼˜ÁNÏdsrÒ²\Øšèµ’Œq³ü÷½·J’T%ÉéNï¶gšØR©TuëÖ}Õ}~&Z˜ô–ú38y=ı…Ä×ùB-Ç>y¿ˆ÷ø3C×uljÇ}D¿ó-/YÔ¾Š÷ƒ…g_/¬	õN“ï’q¼»‰GòîF¼ï„oÅÉwIWÚƒĞ	û%ë'l–ú)émhÁÂ»ã?eıEÓ¿Å–†iÌæÁ•3¥'Â±eø¾áØ×N`èĞÊÔüàœÁóJ¼‘z¿}K--Ğç'õmrrJ…›„øÎÂúM¾(0&/¨oÿ¸¦¶z§¹ĞW}kNµûÕÖößÓÑ`à³7ö¬~§™>Í·8:h}~/\I7cÃ¢Î"¨ËGˆ·°y/õÌ“O;¤İj¥.>¥§=°}—êbÚ0~~Æ!l=ğ’iœA£{:Ö&õ­©h’9Tšh	¼R?vw	ìD3Úá¸’íğ&Úu—ó/Æ»¡Âæ|Ë‰ëöÂ4Õ½6
+;z³ÕçtªB¨¯²v7€ÔÃ7Â3ê×	€RÓ¿‘Ö™Ò;jû”}ßÂ554³Áïo¥/†-ùU¸H§ì½×pï°ïš®/<M_ÁòT<ûß{,ç!­üT„Lá÷uÍÎîmiÌVÑ.º¦Kşù>òKG†µ0µ †]Wuµ{ú—ø{øåqœ-¦†óŞ3É?’z|ÿxjÜ?Xá;ÉÔğqÄG¤fäkĞé©ğŠÇ[ªéAS÷(ì½¾I-ÜÆìÇ¢ùD³W;™a/<óˆ$ïßIİÄ×Á.="3Ó™hæÕÂ7ôcÛ@,è‡ºbC“ôs÷¹°(öû3û–¾k:{DÂ¤¯/i0‡ÙµjéësŠkÃnˆ İN`z¼€Š€×ã»## ió	pÍ$Û;³àôÏÖ©ÏãáİlFz¥Ù€Üø]Ô~£añ;oÕ€i]j#¿J?‰WŸ z¦ãÇ¸Ã¨`¾]¸í±9v„øzò¢íÜ¹A …@ğ²hzøx{Ø,,±±	ğÉğ6?|8œC¦‰alPÄ=ÇÕt#àûï)ÓLã@L5kç›Ñ#(ë*ğ4Û7pÄØ2X¹€D5ßõ`Œ5 )šå2tìtPÆİM}JºÒA"ğ¯5‹ÔîŒ@WhLĞhòkãc§ÕúDîLúÀş4tÇ$“YÃ‡­K¯º­İW‡ §é_¦ã6&æÂktL‚à¿3ecnL§ÔNCë4ózÄ¼3kbÀ.$oá!?…xáâàöÆ©M|Ø.%¼¶ELz4Ú»ûdÙxu@æø©¯4»ÑmµvÛ-â!bĞiãXaãÜƒqºa€—ô^î78±ØÍPùò‰ï÷pÛåà.<×¤›A¤±ã’wT›…:×¼
+Pòç€_`|Çƒ§“èK™½–°šğûU‹¸}â[Gğï!qW=¾úF@-¿¡S,ù÷qjÕ˜Ğ`Ia3Í4ÚıÚè´ˆ?×¦°ğæ¬–c~|ùYG’'óÏ.atsøFºl táßyC€òƒ™BN„öáìõÃŸá¤>¶>·>·»îÃgo6Ñê;íÃÎN§İÙi5÷¶?‘ÜÒñÃbòššÆ>LcŸO£ËgÑ%}âFT£áÃ–†µr–µ„Óñ{@.€ëLØj·ü-ØåyDf£Àú‹ÓQMnŞI=ìØAc¾˜öeb…à“šh>ÅY²°FÉL÷`¦×¥M€¼é_ X`uÔ`‡kSüÉö‡|„ŒúãñàúíH>Âİyg€„—ó×'Øô6‘ô„ŒËĞ¿ÄBg]"×‰dÕ*â® ä%a5Âº×d¨»µ“Ù |kò­ÍØâQ|õ%@œÁŸÿÄà-ØÅåÜ`$NÜ4Âs1ûih@Î@æô¯3É†BÜi7CÌ~ğIAsªZ|x¦äF{Ğ·’}&O` ØYc©÷}};ßJŠÿ’íJöæŠçœJŠsg_ïÏ"ÓpÿlIx{‡ïj¶øÎqåÅ›Úiïr8êïbCJrÜËñ')ª2N÷ÓÔ&&% ŒÈaÏéªë`Ì¾0òUC[¬³ÏgıN€	9€´–ñ+/Á¢7äbMáŸCbi%¬ŞÏ’sÁ´\8Ò•ln&  ÔM~$?şöP"ªæ§¢ e©×ì‡#³šì:1¤ıØn¹Ÿ²ˆ›P¶˜\«‰ØÄt µ5i´$ììıÅ`³¼Œn.Ï>Şğz|;¼”4’Ñ8fà‹af¡µ¨æH'2a#úxºˆ³ Ğˆš Ì82¹£æ€ì»ç,«H*&Sø¾
+!Ã9
+†Jv!_ç˜Å+-,¨H½ÑÊ,qít€ï¿ÓtÊ¡§^&õDL³Û‰4 Xí4\‘©æ}!»„1ŒHåek[ôR%ÿO4 NeC¶`Ò±æ¢ğìËD³EóU7¯UDŸ˜+Î5{
+"TøTOğğ(Úî)l×6’ä—)ZĞDT¬j÷0E±SWHÙ‘³˜~ŠRE†‡É˜‹œuˆ CU4”D&¨fŸÒD/yM:‡Dª&ŸbÅPĞA,Å½ÂN“%yÔíº²!iÍ¬MP¨E‰6µl¥ò6×ç"–oM3fXS ªNhx€b¿¸s Ej »ZŒ3ñ}&éÈ×?Û*°¨Ä1vZ¼Ø ì!é…_9ìvjğ\¨ ª¡ï&¨Ú÷©İı’0rˆ[:3üÀ[Ïz& ı?Æ’oûo£ñí˜aoxuõşz0ş@Ş—ƒñ ÿõŒ¹,¦L$bğ7üíZ(àåZÂ[ªvi?,¢Y•§`›ròøæŸgÙÃ™ôg=ûsúS‰IôÛ¬,â2½*²" ±ë@Ğ¡øEÎ_$¦….7-„ÍÓ6QGË(R\×	Åã´<Rn„èt·?UbcE´«¢@‰–a/ÎÒ6m*5vDv©ô.µ-†v[¡mE&‘	 R—ÙìJg”åÄ°—,	ŠÉ§E¯Er§H™Š”[ @Œû@ß:Š!KOsQ†d›„œ¹.©ÃVÙ.–"ãã9Lë•D°Œ-a‡­”™…XA£…Ëè‚9ÈO³²	—V@ ÈÊYxdJï½DÚe£T‹ŸUnÌQ6«½V	†– ìífdGKh;Ú·ªı¾¯2ıñOÇ‚Éê
+å<}¢“zxsÑ¾€şW¦şJCXñãè› 1³'$çì©6fÊémÆ,’£‘ƒœÅ˜HÙÅ+†>vò‘Šã«t˜ª„?M6
+PşøÜq¾°Ó¶oÁ
+©şsĞüßâ‹¤5Âú
+ÄtS’ÛäÿíÂ@*·ÔÌ/ÁÖc6'ÎÑ¡Ï1}„ß½¿ wTõË†YHÒ‹o®Ií»2j_~¶P€ˆ»Ê‘ÙX2¤ZŞJSt=÷èİIm®´»»\.›r™§YMİ±v?nº	¾4?~mÌüùÉ‡ÿ—Gÿm.®.¦İé;çW•èhŞŒ'µÏ )Ù_T­<jÔlÇÀÎ·õ<µ@™á)rü¼à0ÅÃâFà4<rç9VtĞŠäˆè½¡5\¤-áoh—ß˜È¦l	Ô:i.îYÇáÑiŠZ³û¼£uäûè¹ß†vQëA„eåä:ôŸä:†Ú7¤×Ü@Äv_*(öÇ4%ùi€<˜Ûğ	·	ûø» ØRJît6$Ø?€vQlíë¨ôÌæ‹	#ÏLß°ÍşU3a:Ö~c®ùó]kş¯ÒæßUøM’¿;9}ËPâOÑ·„–˜Ş˜n©ëÀ4oõûÉ½ı	$nO§ ğN)ĞÌ©£/ĞE”ïÄóI»_E<•³•İ)·F¬i‹È2V>lÖ[˜®æò'¦†fó)z¡ŞÒ‰ã mBŞt3RèÁB’×!»Æ‰]š
+7RT¯W$‚€ÄxVG¡ë(<œ\)¢íø˜³¯œH®q¯¶à4ŠLÇ·Ì¹¦§/3'É¬ía™ğ¬£&zÅÕ¶Şn¬ói;IÚd'‰8E^“­Ûşùpˆ®iäføSÿ¢ÿ¯f³¹EğÆh|v;.“Ñ‡Ñ¸µ¥>æÛì`¿:iÁ•:Q¼±aaA)Š!«¦Sjì”ÎVrQu0šr‰Ïù¶Ç÷ğŒ“‡2şƒ ÕáqË5½äı¹³ÄNR}¬á†şÛû˜:†·÷#Çğ¢“üÈG¶1Ğ?¶£v»—qkº‰£Y±W¹)H&¼¥³CRRO¦ámÖZê3A¶Z×ŒEOìˆ1tH†Öt¨E_îaç[YÏûÔ¡á~+:4ìì½Ú98Äÿ‡‡†.÷=FŸ=‰O‰İp¬pyB?¾,ÃûîqŸ=r¦#Nì¢‹?™Ğ¹aS²Ô<É¤¡Ãv¨â: ÷ıï.3 >°ËF™Gg?bÇJGüê~øeâuŞ›=å—–uÄ„àûîØ\ÇlìS/¤²Dh JÍ´'>>3©Œ=C³ÑÁLânq]waúªsWµ‹yÚIœ‹äVÌ{™oxš9‡Ã-áÇ[Ív—ZŸPRºVÏWï/ÏÆƒáõkéÀ.ân~Ø±&‘a RqBåÚ¬+—Hÿ_½Ë÷#+¿»íŸÉEÜïûÒ¡»kø°g0*«¸#µİÈ%u‡¡c€ÛWòÈW2Ò´† ağòa§J'ê×ÊY~Yjv ;QUF/xÔ1Ñ0Èõ5ù€‡Ï ÅzèÛ¬;Ü%®çÌ€ûÉ¨¨ßñ¼tgaûÚ=Œ…Å8Ğ%K‰UÈJ)<ô©e¤õÜÚ)|±4ò4WÄ]x3
+ª˜Bw(â47^›™gL	şAòâ?àDE‰éÇJUÅóÚÍR1ì–Ú¸ÜÿìØ²HßTë‘D&*<Vè"y\ñóú‡4‹Û1Ùí¼ÿÜğ4™o¯°‹;"pÑUDWˆòİcphzÕ­®¡qz×ÿ×`,¥^€Ï€@,,Hew¤îŠØCNNNÈ–·°·¶|¸Æ»°ÕeO„Â‹KûxcÒ\Ê ¡“gÀùï{#qa¿%J‡r«EŠJ´ÃöÊ]ÖDé³ÒçÆHŞ^¿Ü^­æ
+õQåDû|Zä;jºë*OAñÙuc—¿7¥qoc¥±•QEeçwS™fw°S‘ıq§Ü2]²â7Ç-ü:j·@G5g…:jW®£‘X[õÌëMûrı‹ëJ+³ÖÜ–Šb²\r—)8ÙˆW¹‚£>2DìÚé;Ğœ¨Ô•8F5{îç“‰IIœEA®ßte
+ÎÆK²(Úîéš$W¾J¡%"»½æ/[÷óO•"ùAÓª¢^µ–ÇŸãâîÉƒÅ5sø%0íœ“)Ç?3Ù<ñ¡k"€Ç ê„<c¤{€‹°Ú{Š©§
+5¬vÊ4§0ç1|ôäEõ
+Í)LGÂÔ¦ÖJ¸Éò4ÉO”ºĞ†ĞîÌ©fs Ñÿ‚îˆw=£?}–ú‡˜Æ˜×ÂäÄ·¾cïÀ.ãêZH~Ä†1#šCÇ†Gl˜VSªß˜¾ÑzóÈ¢çYğ$J‰¯ø?ç ¥‚ÎÅÔŞ©óº`Áf…æ× ûAqäü±iœâ9Aà9öìô.3òĞ^ùrtVÑ‚=‰+Ã³5ÉÍGÊ­õ} ÏR¿¼8Ş…+½3ê¢çÔ^<Ö\Ä±Ÿ0ÀÑÄ1 Êy€:>Ñ½U³ú‹ÎLš–¼„‘I²·F°njÚB…$¶@hSôoÇ‘ Ôç°1&ŒD;0sZ0†ãİ…¹æé3 kèÜö<Øšä2	Ñµ7×–)ˆ~e
+•˜uÏ¸»…M@˜™:[úòøÊã‰·{ÚÀ˜[2ƒ—Ô'ÁÒ‰Ñ'oˆ’ãe¨pËŸº‚eö·pŒ‘ıïıÂ^XB<F¹y	‰©O) dÎö_¬GËÖà›©pØ”<
+ªBbùQOhA’9g]ôğ2o´Z;nmïf‘©m?¾uØ«/¾'l`ß9ë«bøÔ]	ë¬¯„¥]¸¾¿Ó»î·;½+êZ¦fmq5kë¹Ô,´È§!ZÄfú³ÁÄ*Vk‡ı¯y°½“>ƒ
+™…&}È
+â¯ZS”ÄŸA1_æô3¦qìvÓIªö[ñd%Á>s`È“uµ l{Œ³îlœ+L<r\±#ÇÌ$èIëœ…ÁÚÉÅÒÃ¯}Åg´¿b¬uRka §vÏğôÈâyÅ.ñ£òµAÚ96ôØ[×9d“;©(#äZ3€c/<
+ì„Ñİ)È€à‚.~ÜCŒŒ0±æ¡³1£ƒ4ã,Œ]…Gº¢ë`y–\FÂİê-vÚÌlÄ*tv-Õ·(¿’\†¥ò¸ıµRå‡¿l´YÂaÇ›ØšlBüœMœE Æ¶*$x¥Œ[t˜º_r˜Ñ·D¶Í²_d„aRÒµ âêéàW´š†G–h3Ö$Î*a¡¾Ia#L=ªY>RAÇècL¨53ÃV	ªùw‹¢|r<ÑašE6wÈÅÀ-Í[¡hÏzœ»Tp1Èı¨cêËÄJæ@°A©dä—ìP3Z$Â ¤­tÓqéÔĞØ<Âc`Ÿg˜u¼&¹ ¾1³1¤ÍP '0³@UFµ@ÔCÕíFwÌjéx_˜iÂ_Ù:.€€à Ïnä^óô©ô	‹Ìb§¾xFm³L¸ƒL~ˆ†€N…#x 	x†ÎN«]Œ2¹¾æç«,EnÏaùÃï|AA­¼÷C.ıu÷~Ú“X\*o’'İõÈE‘MGá¢ËÜ¢#HËAÚ@*f¬à’fÀrù%ù.9?í,*kÄ· •Æ©cĞ¹ÁOl1l‹¢Ï2 ’†‚4¹ĞØ_Kñ#é?hĞ,mÉ·
+c±íç{ÂheÁ–R@®ĞN°p	¨œ÷]
+À`1@!tif{ò6¸Æ2½ÿÁÁpéø>PRŸô xš¿sGó¦YŒXÙ@œõ0avŒüŸüˆz÷èAbL)yKùäl@zs-˜8€ó°b¡|À­ÍÈx¸˜› M’´²³½Ğ‚IC_§‰ih1uı¯08¹0´™í SÎÌ5X8éŸ€'ã1ÙtFÉ=Ê>¡ˆOtÀ¬
+@(1Øæo¬Áj÷‰$G‘A†¶¯“ú°(EÍ*k0^.ËXÈÔ×äå•/ÖÔX_óóá]+PÄNªÈ=bíŸçXm„]3|-')"g^vYĞI‚i·ÛæñI9¦‘ÿ^8v	šW€eæ@™y£ÈÛ6Ì;+ĞÛO§ëG¹±©Åg“µòÁwËßÍ¾[mğe÷C¹KØÅ*dUŠ^Ò-Ç)Ér[º½…- 7§úuâ01\,ÕçÈ›È<¾XgYxR•x¤ÌY$6;&‘a2ç÷â”‹9´&Y¬C#[ö]02´(ík^ø1¯£à™Âij[ğeã.‚OCòL*ğ·K’Ù+ß® (M¢-ìF@±ÆHÔSe?…¡dÒ]<æ*e³ÙdîÛ©¦ +Ê¥>¬ì—,M`[YCRÎèrHP‘Ò&±¬OÊ²"0ß“$ˆ]‡kef„à:µßÿhØû©?&7ƒ›şåàZ™ò[õNÆÔ‡ºH3€,}^p‰9ÒÖô¨Mñ‡5´Ñp*Ùm€SÒ§Ñ¢?â¡£¼ãÓˆÅìØÇ‚¡ıÒ^_³8òWhÔˆÒ ¹Ò/uñÂÓö/øÚÚÓ/eƒ;\¿¶ËÅ`¿E¹YÊøXq8wµ;DB¢ry’¨bÄşÖÚ¾½` é_¿İ C+ûG1\-Á•1£ ·zİK
+¡?Êø{9ì]’á›7¸“HoxÛgkü¶5¸T8Ş\Şı¹ÎRBÔ¿ı¹K®úWÃÛÏ¶È-­E-Ç[½£šûŞgRè/dî?]“]¢j1™Ö„&ŒD¯fŒú½÷€¢šE”rx=ÚDò•èq<˜Ëá‚pó‰œÁˆ†ões±%Ç¸úóËÁèp‘ëáÅ7Yõ"q	L.go¯‡£ñ 7BÀ†—}Eñh_—Éyÿó?d*¨(l .¹]%ÙsµTô¢ÉN\?®0¼ÔM%y¶Æœ *&aİûå‰2a¬&Ù“G\fÃcEYáÁmçk‹ãkÛaäµ·ĞAË0c˜5YÓÄ!İ.O	–hŒéÂ9YV{È6ààzÜ¿¼¼í_%—Ã·›fŞ‘ÑšÚéc‚º7aDæÓ_•?G©óóı½EQMxIÎr™¯&‘±©´sx„ëV–»ÊVÄOzGHÆÇÚpÉ°§ÆÌá¾ùüÌ®°ï¸TXX4©la~)Ú±øyÆ‚ƒâ§(‘U}Å®ù¥3óÑi—jÖZKcÛ‘3S›ë¬i.\Ì­0â(š–æÖë¦3Ûê:¥Ì²Èä³~ğ”¿à}dı?Áx[Ó_Lğ@ÙÕ[XŞxûé—âuTÿ‡#Ò(¨ã}äÿ¡„kğOe{ÿàü[7Sê×kGï{½şhô©¶-Õ`cyÄÿu»şçÙíµØ¯ÄÑƒ^‡?‰}&şS‘¶œøE”ô\`eÂOšâ¥¸‡ò"á@
+FR’û¬ìÒ+—+dg*Üé+s°’ŠÈ.ÈÖ‘öUÃ\>¼Õ ´;W{N'’ÔåOÜkÄ`¬íµrgTÍ°™ø!ßlz‘tä.}PUXJ´#”Ó8hekitÅš[ë&ãeDeò¾ûğ¹;¹î´÷»;í—`¸ÿ5QÈ¡o»t5¿wwV’:ôw?3Ãm&ñœV³õ=áY‡ß¿+üoQ(ùÏ:É…//«“ïyŞ*ÉáùâfÅ’Ës%’‘®”XÎé¼ë·­—\&[
+[Œ—6="{J.½‹¦q±á6u©š?°ÜŞ«BBÃ.CC­æ)mysY\h©°¦R6/FI…¤½ıN»½ÓÙ;äuš×Èr)¯Ø,q‰O\ZTl½Xú9V™Šsf»+.öe•{Ü±hè2s›Â¶IqåÜåÊµ•™3 84Mò`ÉşÖKşÿ\ ùJ3ì°
+2 æÌ£Úæµ…Ì¹¸‹Èß·ÙÍxüòYãd‹|VZ·W+pT¸×¾PTY<‚¤".)>W™HTõóCEfé|˜D•†™è	I}Ä„ƒFß„TÖN¶î@ À}Ó`_ÌºÆJ•°TËv\\@®(·"ßlqBnş8¾°À]…ò˜ù”P$ÃbÊÛ¯†¡òÿÀ5&ı‡¹(§³ÛÔ|+‰‰¢›¢R‰qß2e«ÆÂàCK <tŒp·6%¡Ñà›<À ¥M§¼l³´ëœò£âÏg7ƒÏ?õ? ™9ÑùZÃÍH`—-j/H†É²DwxæÒmòã,ø;o®{4à­aSNV.L8—‰»E>Îá§Œ¸)dÑ'Ï&ÿ‘İ¤…J;ÿkÄ,*©…JŸöæN¢Œ5,Z-!za^»	Ç’¤¬W›ÀŠÖüÂğ-ÃÇÈ½[<, l‘ãS!â*@%—ƒÖ/´.5eä¬X± Ü)H£^˜šV¬Á·¬;³$q;h˜Ç¾0”-ñä+aÙC±gƒó°ŒÁvÍºí8/³¡ŒAŸ¯$Ä¼Œb§âİ® ƒ—Õr‡Úâ“9!+LítŒ3©ß=ÏÍ(rÀbÉ\VqşÔæ×RûOÜµÊ¹Ì_TC8z„C—Ù·ªT’,, œµkDvMQHQ `1?FÂ™VR.³b	•Óì^ÎÏ$i™­,‘ì—°àŒ<U#ZH»‡; ?3İYRÀe#²}CAÿ±5Óø•~’½n¨ä·­&İB…½	oá(C ½©­Ö(" Ï'¿À©¨»o}µv'Éx!©²¢8ô‹ÒiT±Ì¿à9²FJl„…Õ+’HÆgûiËdú m¹j#K¸µ:1ËÄz&¹7¥W–¥¾e)«·Bïù&‹L‡a?üZLŞùÏv³¥7LˆÄıXænç%/™ëîcÑğ¶VŸãÏ¬¬	û}é,)¼áE®šÉ·)ÓñÆt4dÅIÇğ2r}Æ‘_—\Ií³¬$Âğ.´U„¶êÄ¿nŞ¶Ï½İe9AâR@L_u~øD¬éZ»k, PÔM\#5#À›İü¡é:î¥<;kxd}…¾ì»”‘š4’#{èİNN ;òfêòóííOµ,ãÄ¾#0iÜuú°[Ö~f:Ëó†püĞ•¶eK9Àâ',ÁÈß³B4æfSoâáNä MM–7Z!r
+‡ª¤Å¹±¢ °|ãâÄ©’†âüÇ¬<`¶M˜ŞZ¡ë É­ˆÈ¡¢mD
+:¯Ö‚†à¬Qq¥PaBøP	K¬•”UATjwªÂ$‰¡(H2„2x¤M9°d·GLÇ™g}E9¸B‡$Xc*“—Õ^FİV˜QkG¬‘#—º¼¢Êj!?2A~Ùªğòâ£c1¡NI8J–wWÁù©–á(Ì®+qOÜ}%©¡”WÍQag|‹³+•O¬"ÖOØ
+’ûR³HŞşÄÓ¯»½Ç+øoóÎ@ÿƒz€}˜á’ÌÃH&Ê3ëØè«	ª= “ƒA‹“ìˆ?UÉãcÛ9‡Tfâj¬ú–¬4èª)ÜV‰äeĞš±Ìe`™˜…)ïµ 9¡àEğ ºD{ÜÕ£À@UnIq’>ÓDÕ3«Ø¶ØüøÉV>Z5u>~ˆó0POvœĞ¾Ì‹–ı&ÖÂ_è,!¾êjeŠ£¸=åÖ€çŒ™áÂ#–Êğ«8'$ÉÔgê8Bu¢¹ĞtÁO²2G©óã4ˆBZC~Œ7©tXÁĞ!ZjY¢M¶ıPRmÆë”‡6£iê«J¨“²‡~]Y«¢ç“]æxíø[`Ï¬S,½%Ë!Ö’äHJ°Ì³4³¤‚~Bí[÷æ¶ òº™xÕN™~ªfÊR¤%X¹7×L“Ú3šÄ46F@¼¯¥”ZÔu+Ûæ‹IÜqÔïü§Á{¾Ş|´B÷ñ”TUÙŒT&ÇÉd8|]'õ:‰Ôµ© wPÁ@…¢Â;ê‡/‡‘Ì%ıëDVƒ¬¡Š¥zÈzÏ`­Êå‰Á‡F7òTSÇÊ=öÕÑSq’Ù0]\^r,À2Á5¾7¼º¹ìûµmÉş{Mj9a7¯¤5±½®T;İÃôµ9íSòÒ#åKc¡NùFÑF’¼06T±¯ÁÎ·x¸‰§ ¯aÀntUHS‰›Ÿ°WÃğŸZ»ÕúAá’'lÏ¨µ²­Ê!ğ°š÷_](ï?n²9H8r•å?‘Å5'ïøÇä{ÌÆU¾q¤êGŒçbŞ¯ŠN$ºP…š¤
+b†.¼VÎ¥¦È®’ØÃQùgûëœå§ÓÊnü}¾SZé<N\$ôíÌ¸+µ‚\-â¥Ò	ÃääX.=Bæ¦‘ĞKWù mÃ,=–0[©ïjç"	êUBI›ÊCw:Ë°sÈ]¾ÎÁªÜû©<‹¶èº"d«UÉ—,‹³ÁåÙÎÉğü?û<hıª?f§5D¼ŸÉÍíğím4R¯VƒÏÂ$ Ôº]T6c§×\Š)æx•PG	“Ğ•NéäÊ[8}ª|†ÕÕßUZ¸t¥±ÖMèqé[jwè¨¾&l&Xßb³EÑËÃÔ
+“…ç¯+]#PH=©ñÛ2ªVÉeŞ0ƒhàcÃ¢Î"¸¥wÍ°Tî6 ˜sx£¤­\w=øHê*˜%â Z‡RÁ\iU0çpÎìÅ5«'¬Ko´BœÔ"?2[Ğ®¾ÂqZJSKÜ—Ó—¾ú<”gÍ}÷C&IzïNq¬¥=bq®°ş8>jã#ò°‰óS<“6¹_¦Ş}¿êd«ì<@ªNvö#}²sXP×tËÔ-¿ÖáA¥ïäKÒ‰*#sƒµ –4Ğ#*s'
+u³‚Ó{Fs…À~8¢Š’Ë2¡ãÑ2>®å‚RÅòLåiTRŒ¤Èo6Æ§¸€d…Ÿˆ<ÄÖ&¾Ã§kp:¥¢%ÈÊªå@_,>†h=Xİà‰ìÆ7né/NÃ?k¦±î¿­›W9õíQ“N¼M=¿ú+ö¤VÒiô¢ï: ·ĞÕ«Û­V›*[”*šåŞè}ÃİB!F5ô‡¯Gyîˆ:KÎ”?qÔV´J¤iî|¦òmšÛ
+êºáˆöY>ó9ïäZÛŸ[?ì‡ŒŸ_¶~ÀHv‘jÅ¿|8€ÌYJèXvÄë–ßbt¯õÖA®øÆÍ¢¿Û‡ÕtuóuWÃÍ+!(œpÑ¼˜Î“-OgZ§Ñ6Í9EÂp*Ôèé®çx6f˜—p=©ıR8]Ø±Êj¹Şù{»âé{RQ5}ö.aãÒ	ˆtõŞÀZ¦Gl»m©yè®Í„“9âUšWzŠ(pFy7£ı‘â´†“‡µı–(cÎñOÖ¹<w+fRWØ‰d¯/ô’†„¼w ´ÍøsÜ¸Ï. (.
+—’(§š?gŞ¡ÙX—nr¥29ÿÈ}A6 Àl‡¬¶ö³ƒ4–9şÉ€Í	‚l¢¿!Ô* ;VĞ),SŸ¬ŞAf™H¢tI=¹Ò“"Î ô¨l”2£¨°rÅ
+²~³ûéyò±DhÙSu6´L­¼êzJ¶NŸX)¢—ŠH@ÿJ˜UìSi)ƒÑ‡iÀŞ¼¿\O?‘dR˜à;#ãaGQt1ƒÊ$‹‘¢àp‰¦ÙJäYƒÉ$ş¯²ç-7_/QÈÏ˜Ñ3€´(Æ~vy¯AlÀÆÔ¦ÜÊ}!ŠÄÁ¢i#øøéÂŒX¶¥&ËR­¬¹(¯&Õ¼6¯6Ú	:ªi>ÜVÇoa,üôÃøİŒÿ%Ç‚Ì²'(«4¨¨Ö°NƒµÃ<ğïašbêw•+Û‡üLã|xı¾ ¡ğZUuª—	M¬ÆÊTë“ò©p·{2œü›²a>-,¬`(K¨¦”&¥Šñ¤£Š$çI6å$â/O€|{!¯û	{,g,Pûá©Š¯T$M±Ë Ü™+Ê…{sE	q³™”’”,ª3&É¬J|¿_Mfİ1S”Yv¬æªÍ`ea¼bv†^ï¶1Ÿ±,ı½áEÿh­ÁLøÁéÍğ§~ãñŞÔ´e}»8#Xt»é›†Nëƒí§µwqµ-&ûv{ú]ÀSÈ	}iÁÑ(AÕ¸ŞmÉ·ùŒˆ0	 Î|=¬:v˜Ñ ô¹¥!éàeÕÂ"|È« åÂ„±Ï5Ô|Lg6c6}–CÑ+°¥
+•‚ªLyB
+PQ	 œLY‘Ræ÷£UrgÈ$KÜÑ£cAOb˜9·Fjv®!+(8Sm•OHÁö‡\I+ï­Ãáå‡÷kdT¹ğú4IM£%âXzRíì#õ›¾®¡;0qAé§5Ñë[&¢Å–²ß'V WHıó6y”kPåŠU7,ÌÊÜeáå¢Ä—€íLÊÌ‘o&ZL„bHİ\¬¹<N¼#×‚˜\Aå)P	^~ÊäÀª•­wy6¸"çgoAøü‘°ŒQRrô»æŞŒn±ĞT,<Ò1:—$©aqì»âyd$Ù7“–ì¦ğfÃÇ<¼™˜hVD+Ü=O‹ÒÒfÁ‚\2
+€ˆ‰¤£ÉfZ(O.3CÁˆXöKVªûÇ(½#Fƒ’]r¾˜‘[ê:ŠìõÙí*cJòçş%."Ö£Á>ãÒ‰ß,µV6Mõ° Me(ŠmË (bâíŞñ0›¹ÒlmF-´”ş¬+“Á1nÍZ¨G·«<şüßENã¯âı 8®I£®02QüÂˆ¥[CÄ¶Ğ.V·äJXLX|D5OŸóF"ÍÊtŠÑ7çZ ÒÌ?`÷®aùp¢z‡¶ÔŒ@ò¦Â@°C¶&¬Ë,»™ƒbÒ±†ş7öŒÖ¥ÍÖÃÑˆé<ò%H”¢œÇ»£¨é¶R»ãİ¾ç9Ş9>º^„á<ıå/ÿ  ÿÿ R‰G
