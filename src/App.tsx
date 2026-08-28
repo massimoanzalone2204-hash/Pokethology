@@ -8711,14 +8711,14 @@ export default function App() {
                 ) : listMode === 'home' ? (
                       <motion.div
                         key="home"
-                        initial={{ opacity: 0, scale: 0.98, y: 12 }}
+                        initial={{ opacity: 0, scale: 0.98, y: 8 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.98, y: -12 }}
+                        exit={{ opacity: 0, scale: 0.98, y: -8 }}
                         transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-                        className="flex-1 flex flex-col items-center justify-center gap-3 sm:gap-4 md:gap-5 py-3 sm:py-5 px-3 sm:px-4 text-center relative overflow-y-auto custom-scrollbar optimize-scrolling select-none w-full h-full my-auto max-w-5xl mx-auto min-h-0"
+                        className="flex-1 flex flex-col items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 md:py-4 px-3 sm:px-4 text-center relative overflow-hidden select-none w-full h-full my-auto max-w-4xl mx-auto min-h-0"
                       >
                         {/* Top-Right Corner Avatar with Interactive Selector */}
-                        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20 flex flex-col items-end gap-1">
+                        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-20 flex flex-col items-end gap-0.5">
                           <button
                             type="button"
                             onClick={() => {
@@ -8732,10 +8732,10 @@ export default function App() {
                             <img 
                               src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                               alt={currentAvatar.name}
-                              className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain drop-shadow-[0_2px_10px_rgba(34,211,238,0.3)] [image-rendering:pixelated] relative z-10"
+                              className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain drop-shadow-[0_2px_10px_rgba(34,211,238,0.3)] [image-rendering:pixelated] relative z-10"
                             />
                           </button>
-                          <div className="text-right hidden xs:flex flex-col items-end -mt-1">
+                          <div className="text-right hidden xs:flex flex-col items-end -mt-0.5">
                             <span className="font-hud font-bold text-[9px] sm:text-[10px] text-cyan-300 uppercase tracking-widest leading-none drop-shadow">
                               {currentAvatar.name}
                             </span>
@@ -8748,27 +8748,26 @@ export default function App() {
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/5 to-transparent pointer-events-none"></div>
                         
                         <motion.div 
-                          className="relative w-52 h-52 xxs:w-60 xxs:h-60 xs:w-72 xs:h-72 sm:w-80 sm:h-80 md:w-[28rem] md:h-[28rem] lg:w-[32rem] lg:h-[32rem] flex items-center justify-center shrink max-h-[35vh] sm:max-h-[45vh] -mt-8 sm:-mt-16 mb-2 sm:mb-6"
+                          className="relative w-40 h-40 xxs:w-48 xxs:h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 flex items-center justify-center shrink max-h-[26vh] sm:max-h-[30vh] my-1 sm:my-2"
                           initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: "easeOut" }}
                         >
                           <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 75%)' }}></div>
                           <PokethologyLogo className="w-full h-full object-contain filter drop-shadow-[0_0_30px_rgba(6,182,212,0.5)]" />
                         </motion.div>
 
-                        <div className="flex flex-col gap-2 sm:gap-3 relative z-10 shrink-0 w-full max-w-4xl px-2 sm:px-4">
-                          <h1 className={cn("flex flex-row flex-wrap items-center justify-center gap-1.5 sm:gap-3 lg:gap-4 text-3xl xxs:text-4xl xs:text-5xl sm:text-6xl md:text-6xl lg:text-7xl font-hud font-black tracking-normal sm:tracking-[0.05em] leading-tight text-center w-full break-words py-1 px-1 overflow-visible font-extrabold", isLightMode ? 'text-slate-900' : 'bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]')}>
+                        <div className="flex flex-col gap-1.5 sm:gap-2.5 relative z-10 shrink-0 w-full max-w-4xl px-2 sm:px-4">
+                          <h1 className={cn("flex flex-row flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 text-2xl xxs:text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-hud font-black tracking-tight sm:tracking-[0.04em] leading-tight text-center w-full break-words py-0.5 px-1 overflow-visible font-extrabold", isLightMode ? 'text-slate-900' : 'bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]')}>
                             <span className="inline-block py-0.5 whitespace-nowrap">POKÃ‰THOLOGY</span>
-                            <span className="text-cyan-400 text-2xl xxs:text-3xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-black text-glow inline-block py-0.5 ml-1" style={{ textShadow: isLightMode ? 'none' : '0 0 16px rgba(34,211,238,0.7)' }}>OS</span>
+                            <span className="text-cyan-400 text-xl xxs:text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-black text-glow inline-block py-0.5 ml-1" style={{ textShadow: isLightMode ? 'none' : '0 0 16px rgba(34,211,238,0.7)' }}>OS</span>
                           </h1>
-                          <p className="font-serif italic text-xs xxs:text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl text-cyan-400 select-none px-4 mt-0.5 tracking-wider whitespace-normal break-words text-center drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">
+                          <p className="font-serif italic text-xs xxs:text-sm xs:text-base sm:text-lg md:text-xl text-cyan-400 select-none px-4 mt-0.5 tracking-wider whitespace-normal break-words text-center drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">
                             Where dreams and adventures begin!
                           </p>
                           
-                          
-                          <div className="flex justify-center items-center mt-3 sm:mt-5 md:mt-5 w-full max-w-md mx-auto px-4">
+                          <div className="flex justify-center items-center mt-2 sm:mt-3.5 w-full max-w-md mx-auto px-4">
                             <motion.button
                               disabled={isInitializingDb}
-                              whileHover={isInitializingDb ? {} : { scale: 1.05, boxShadow: "0 0 30px rgba(34,211,238,0.7)" }}
+                              whileHover={isInitializingDb ? {} : { scale: 1.04, boxShadow: "0 0 30px rgba(34,211,238,0.7)" }}
                               whileTap={isInitializingDb ? {} : { scale: 0.96 }}
                               transition={{ type: "spring", stiffness: 220, damping: 14 }}
                               onClick={async () => {
@@ -8791,7 +8790,7 @@ export default function App() {
                                   setIsInitializingDb(false);
                                 }
                               }}
-                              className={cn(hudButtonClass(false, 'cyan'), "animate-btn-entrance w-full px-6 py-4 sm:px-8 sm:py-5 !text-[14px] sm:!text-[16px] md:!text-[18px] !rounded-2xl border-2 border-cyan-400/80 shadow-[0_0_25px_rgba(34,211,238,0.45)] font-black tracking-[0.2em] group/init relative overflow-hidden flex flex-col items-center justify-center gap-1.5", isInitializingDb && "opacity-95 cursor-wait")}
+                              className={cn(hudButtonClass(false, 'cyan'), "animate-btn-entrance w-full px-5 py-3 sm:px-7 sm:py-3.5 !text-[13px] sm:!text-[15px] md:!text-[16px] !rounded-xl border-2 border-cyan-400/80 shadow-[0_0_25px_rgba(34,211,238,0.45)] font-black tracking-[0.2em] group/init relative overflow-hidden flex flex-col items-center justify-center gap-1", isInitializingDb && "opacity-95 cursor-wait")}
                             >
                               {isInitializingDb && (
                                 <motion.div 
@@ -8802,22 +8801,22 @@ export default function App() {
                                 />
                               )}
                               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/init:translate-x-full transition-transform duration-1000 ease-in-out" />
-                              <div className="flex items-center justify-center gap-3 z-10">
+                              <div className="flex items-center justify-center gap-2.5 z-10">
                                 {isInitializingDb ? (
-                                  <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 animate-spin text-cyan-200 shrink-0" />
+                                  <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-cyan-200 shrink-0" />
                                 ) : (
-                                  <Cpu className="w-6 h-6 sm:w-7 sm:h-7 group-hover/init:rotate-12 transition-transform shrink-0 text-cyan-300 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
+                                  <Cpu className="w-5 h-5 sm:w-6 sm:h-6 group-hover/init:rotate-12 transition-transform shrink-0 text-cyan-300 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
                                 )}
                                 <span className="text-cyan-100 drop-shadow-[0_0_10px_rgba(34,211,238,0.6)]">{isInitializingDb ? "STARTING SYSTEM..." : "START APP"}</span>
                               </div>
-                              <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-cyan-300/80 z-10 font-normal uppercase">
+                              <span className="text-[9px] sm:text-[10px] font-mono tracking-widest text-cyan-300/80 z-10 font-normal uppercase">
                                 {isInitializingDb ? "Loading Dex Registry & Generation I" : "Enter into PokÃ©thology World"}
                               </span>
                             </motion.button>
                           </div>
 
                           {/* Home Screen Copyright & Legal Disclaimer Toggle */}
-                          <div className="flex flex-col items-center justify-center mt-12 sm:mt-16 md:mt-24 mb-2 select-none px-2">
+                          <div className="flex flex-col items-center justify-center mt-3 sm:mt-4 md:mt-5 mb-1 select-none px-2">
                             <DisclaimerButton onClick={() => setIsDisclaimerOpen(true)} variant="pill" />
                           </div>
                         </div>
@@ -9570,1423 +9569,57 @@ export default function App() {
                   {selectedMoveDetail.stat_changes && selectedMoveDetail.stat_changes.length > 0 && (
                     <div className="space-y-2">
                       <h4 className="text-[8px] font-bold tracking-wider text-cyan-600 uppercase font-hud tracking-widest border-b border-cyan-900/30 pb-1">Modifier Effects</h4>
-                      <div className="grid grid-cols-1 gap-2">
-                        {selectedMoveDetail.stat_changes.map((sc, i) => (
-                          <div key={`sc-${sc.stat?.name || i}-${i}`} className="bg-slate-950/50 p-2 rounded border border-cyan-900/20 flex justify-between items-center">
-                            <span className="text-cyan-400 text-[10px] font-bold tracking-wider font-hud uppercase">{sc.stat.name.replace('-', ' ')}</span>
-                            <span className={cn(
-                              "text-[10px] font-bold tracking-wider font-mono",
-                              sc.change > 0 ? "text-green-400" : "text-red-400"
-                            )}>
-                              {sc.change > 0 ? `+${sc.change}` : sc.change} STAGE
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Additional Meta */}
-                  {selectedMoveDetail.meta && (
-                    <div className="space-y-2">
-                      <h4 className="text-[8px] font-bold tracking-wider text-cyan-600 uppercase font-hud tracking-widest border-b border-cyan-900/30 pb-1">Additional Data</h4>
-                      <div className="grid grid-cols-2 gap-2 text-[9px] font-bold tracking-wider font-mono text-slate-400">
-                        {selectedMoveDetail.meta.ailment && selectedMoveDetail.meta.ailment.name !== 'none' && (
-                          <div className="flex justify-between border-b border-slate-800 pb-1">
-                            <span>AILMENT:</span>
-                            <span className="text-red-400 uppercase">{selectedMoveDetail.meta.ailment.name}</span>
-                          </div>
-                        )}
-                        {selectedMoveDetail.priority !== undefined && (
-                          <div className="flex justify-between border-b border-slate-800 pb-1">
-                            <span>PRIORITY:</span>
-                            <span className="text-cyan-400">{selectedMoveDetail.priority}</span>
-                          </div>
-                        )}
-                        {selectedMoveDetail.target && (
-                          <div className="flex justify-between border-b border-slate-800 pb-1 col-span-2">
-                            <span>TARGET:</span>
-                            <span className="text-slate-200 uppercase">{selectedMoveDetail.target.replace('-', ' ')}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="pt-4 flex justify-center">
-                    <button 
-                      onClick={() => setIsMoveDetailOpen(false)}
-                      className="px-8 py-2 bg-cyan-600 hover:bg-cyan-500 font-hud text-[10px] font-bold tracking-wider uppercase tracking-widest rounded-full transition-all shadow-[0_0_15px_rgba(34,211,238,0.4)]"
-                    >
-                      Close Analysis
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <WelcomeModal 
-          isOpen={isWelcomeOpen} 
-          onClose={() => setIsWelcomeOpen(false)} 
-          onOpenTutorial={() => setIsTutorialOpen(true)} 
-        />
-        <Tutorial isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
-
-        <PokemonComparisonSidebar
-          isOpen={isComparisonOpen}
-          onClose={() => setIsComparisonOpen(false)}
-          pinnedPokemon={pinnedComparisonPokemon || pokemon}
-          onSelectMainPokemon={(p) => {
-            setPokemon(p);
-            setIsComparisonOpen(false);
-            if (sounds?.scan) sounds.scan(); playHaptic('light');
-          }}
-          isLightMode={isLightMode}
-        />
-
-        {/* Daily Hub Fullscreen Modal */}
-        <AnimatePresence>
-          {isDailyHubOpen && (
-            <motion.div
-              key="daily-hub-modal"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 250 }}
-              className="fixed inset-0  z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
-            >
-              {/* Ambient Glows */}
-              <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-
-              {/* Top System Header Bar */}
-              <div className="shrink-0 border-b border-cyan-500/30 bg-slate-900/90 px-4 sm:px-8 py-3 flex items-center justify-between gap-3 z-20 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)] shrink-0">
-                    <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 filter drop-shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
-                  </div>
-                  <div className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
-                    <h2 className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-widest leading-none whitespace-nowrap">
-                      DAILY HUB
-                    </h2>
-                    <span className="px-2 py-0.5 rounded-full bg-cyan-950/90 border border-cyan-500/40 text-cyan-300 text-[10px] sm:text-xs font-mono font-bold whitespace-nowrap shadow-sm">
-                      {today}
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => {
-                    setIsDailyHubOpen(false);
-                    try { sounds.scan(); playHaptic('light'); } catch (_) {}
-                  }}
-                  className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm shrink-0"
-                  title="Close (Esc)"
-                >
-                  <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
-                  <span className="hidden sm:inline">CLOSE</span>
-                </button>
-              </div>
-              
-              <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-3.5 sm:p-6 md:p-8 max-w-5xl mx-auto w-full flex flex-col">
-                <PokethologyCombatMissionWidget 
-                  todayStr={today} 
-                  isCompleted={isMissionCompleted} 
-                  missionProgressCount={missionProgressCount}
-                  missionRequiredCount={missionRequiredCount}
-                  dailyStreak={dailyStreak}
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Daily Featured Cosmic Scans Fullscreen Modal */}
-        <AnimatePresence>
-          {isDailyScanOpen && dailyPokemon && (() => {
-            const activePokemonData = (dailyGender === 'female' && dailyFemalePokemon) ? dailyFemalePokemon : dailyPokemon;
-            const hp = activePokemonData.stats?.find((s: any) => s.stat.name === 'hp')?.base_stat || 50;
-            const attack = activePokemonData.stats?.find((s: any) => s.stat.name === 'attack')?.base_stat || 50;
-            const defense = activePokemonData.stats?.find((s: any) => s.stat.name === 'defense')?.base_stat || 50;
-            const spAtk = activePokemonData.stats?.find((s: any) => s.stat.name === 'special-attack')?.base_stat || 50;
-            const spDef = activePokemonData.stats?.find((s: any) => s.stat.name === 'special-defense')?.base_stat || 50;
-            const speed = activePokemonData.stats?.find((s: any) => s.stat.name === 'speed')?.base_stat || 50;
-
-            const heightM = (activePokemonData.height / 10).toFixed(1);
-            const heightFeet = Math.floor((activePokemonData.height / 10) * 3.28084);
-            const heightInches = Math.round(((activePokemonData.height / 10) * 3.28084 - heightFeet) * 12);
-            const weightKg = (activePokemonData.weight / 10).toFixed(1);
-            const weightLbs = ((activePokemonData.weight / 10) * 2.20462).toFixed(1);
-            const abilitiesStr = activePokemonData.abilities?.map((a: any) => (a.ability?.name || a.name || '').replace(/-/g, ' ')).join(', ') || 'None';
-
-            const preferHome = activePokemonData?.id >= 10000 || activePokemonData?.name?.includes('mega') || activePokemonData?.name?.includes('tatsugiri');
-            const artworkUrl = (isShiny ? (activePokemonData?.sprites?.other?.['official-artwork']?.front_shiny || activePokemonData?.sprites?.other?.home?.front_shiny) : null)
-              || (preferHome ? (activePokemonData?.sprites?.other?.home?.front_default || activePokemonData?.sprites?.other?.['official-artwork']?.front_default) : activePokemonData?.sprites?.other?.['official-artwork']?.front_default)
-              || activePokemonData?.sprites?.other?.['official-artwork']?.front_default 
-              || activePokemonData?.sprites?.other?.home?.front_default 
-              || activePokemonData?.sprites?.front_default 
-              || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${isShiny ? 'shiny/' : ''}${activePokemonData?.id}.png`;
-
-            const getStatPercent = (val: number) => Math.min(100, Math.round((val / 160) * 100));
-
-            return (
-              <motion.div
-                key="daily-scan-modal"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ type: "spring", damping: 25, stiffness: 250 }}
-                className="fixed inset-0  z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
-              >
-                {/* Ambient Glows */}
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
-
-                {/* Top System bar with high contrast banner */}
-                <div className="shrink-0 border-b border-amber-500/30 bg-slate-900/90 px-4 sm:px-8 py-3 flex items-center justify-between gap-3 z-20 shadow-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
-                      <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 animate-pulse" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="font-hud font-black text-base sm:text-xl text-amber-300 uppercase tracking-widest leading-none">
-                        {'DAILY SCAN'}
-                      </h2>
-                    </div>
-                  </div>
-
-                  <button 
-                    onClick={() => { setIsDailyScanOpen(false); sounds.scan(); playHaptic('light'); }} 
-                    className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm shrink-0"
-                    title="Close (Esc)"
-                  >
-                    <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
-                    <span className="hidden sm:inline">CLOSE</span>
-                  </button>
-                </div>
-
-                {/* Scrollable Content Body Container */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-                    {/* Left Column - Holographic Specimen Container & Metrics */}
-                    <div className="w-full shrink-0 bg-slate-900/95 border-2 border-amber-500/30 rounded-2xl p-4 sm:p-6 flex flex-col items-center gap-4 relative shadow-xl text-center">
-                      <HUDCorners />
-
-                      {/* Explicit Inner Card Header */}
-                      <div className="w-full flex items-center justify-between border-b border-amber-500/25 pb-2 mb-0.5 shrink-0">
-                        <span className="text-[10px] sm:text-xs font-hud font-black text-amber-400 tracking-wider uppercase flex items-center gap-1.5">
-                          <Eye className="w-3.5 h-3.5 text-amber-400 shrink-0" /> SPECIMEN SCANNER
-                        </span>
-                        <span className="text-[10px] font-mono text-amber-400/80 font-bold">
-                          #{String(activePokemonData.baseId || activePokemonData.id).padStart(3, '0')}
-                        </span>
-                      </div>
-
-                      {/* Top Action Bar (Gender Toggles & Cry Sound) */}
-                      <div className="flex items-center justify-between w-full gap-2 z-20">
-                        {dailyFemalePokemon ? (
-                          <div className="flex items-center gap-1 bg-slate-950/90 p-1 rounded-lg border border-slate-800/80 text-[9px] font-black uppercase tracking-wider">
-                            <button 
-                              onClick={() => { setDailyGender('male'); sounds.scan(); playHaptic('light'); }}
-                              className={cn("px-2 py-1 rounded transition-colors cursor-pointer", dailyGender === 'male' ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" : "text-slate-400 hover:text-white")}
-                            >
-                              MALE
-                            </button>
-                            <button 
-                              onClick={() => { setDailyGender('female'); sounds.scan(); playHaptic('light'); }}
-                              className={cn("px-2 py-1 rounded transition-colors cursor-pointer", dailyGender === 'female' ? "bg-pink-500/20 text-pink-400 border border-pink-500/30" : "text-slate-400 hover:text-white")}
-                            >
-                              FEMALE
-                            </button>
-                          </div>
-                        ) : <div /> }
-
-                        {activePokemonData.cries?.latest && (
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            transition={{ type: "spring", damping: 25, stiffness: 250 }}
-                            type="button"
-                            onClick={() => sounds.playCry(activePokemonData.name, activePokemonData.cries?.latest, activePokemonData.name.includes('-gmax'))}
-                            className="p-1.5 sm:p-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-cyan-500/40 text-slate-300 hover:text-cyan-300 hover:bg-cyan-950/40 transition-colors font-mono text-[9px] font-bold tracking-widest flex items-center gap-1.5 cursor-pointer shrink-0 ml-auto group"
-                          >
-                            <motion.div whileHover={{ rotate: [0, -10, 10, 0] }} transition={{ duration: 0.5 }}>
-                              <Volume2 className="w-3.5 h-3.5 animate-pulse text-cyan-400 group-hover:text-cyan-300" />
-                            </motion.div>
-                            PLAY CRY
-                          </motion.button>
-                        )}
-                      </div>
-
-                      {/* High-Fidelity Artwork Showcase */}
-                      <div className="relative w-40 h-40 sm:w-56 sm:h-56 flex items-center justify-center bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-amber-500/15 via-slate-950 to-slate-950 rounded-full border-2 border-amber-500/40 p-4 shrink-0 overflow-hidden my-1 shadow-[inset_0_0_35px_rgba(245,158,11,0.25)]">
-                        <div className="absolute inset-0 bg-gradient-to-t from-amber-500/15 to-transparent pointer-events-none rounded-full animate-pulse" />
-                        
-                        <img 
-                          src={artworkUrl} 
-                          alt={activePokemonData.name} 
-                          className="max-w-full max-h-full object-contain filter drop-shadow-[0_0_25px_rgba(245,158,11,0.55)] z-10 select-none pointer-events-none transition-transform duration-300 hover:scale-105"
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-
-                      {/* Pokemon Name & types */}
-                      <div className="text-center w-full bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
-                        <h3 className="text-xl sm:text-2xl font-hud font-black text-amber-300 uppercase tracking-wider mb-1 flex items-center justify-center gap-2">
-                          {activePokemonData.name.replace(/-/g, ' ')}
-                        </h3>
-                        <div className="flex flex-wrap gap-1.5 justify-center mt-1.5">
-                          {activePokemonData.types.map((t: any, i: number) => (
-                            <TypeBadge key={`${t.type.name}-${i}`} type={t.type.name} label={t.type.localized_name || t.type.name} size="sm" />
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Metrology & Physical metrics grid */}
-                      <div className="grid grid-cols-2 gap-2.5 w-full font-mono">
-                        <div className="bg-slate-950/90 p-2.5 rounded-xl border border-slate-800 text-center">
-                          <span className="text-[9px] text-amber-500/90 block uppercase tracking-wider font-bold mb-0.5 font-hud">HEIGHT</span>
-                          <span className="text-xs font-black text-cyan-300">{heightM} m / {heightFeet}'{heightInches}"</span>
-                        </div>
-                        <div className="bg-slate-950/90 p-2.5 rounded-xl border border-slate-800 text-center">
-                          <span className="text-[9px] text-amber-500/90 block uppercase tracking-wider font-bold mb-0.5 font-hud">WEIGHT</span>
-                          <span className="text-xs font-black text-purple-300">{weightKg} kg / {weightLbs} lbs</span>
-                        </div>
-                      </div>
-
-                      {/* Primary Abilities */}
-                      <div className="w-full bg-slate-950/90 p-3 rounded-xl border border-slate-800 text-center font-mono">
-                        <span className="text-[9px] text-slate-400 block uppercase tracking-wider font-bold mb-0.5 font-hud font-black">PRIMARY ABILITIES</span>
-                        <span className="text-xs font-bold text-amber-300 uppercase">{abilitiesStr}</span>
-                      </div>
-                    </div>
-
-                    {/* Right Column - Base Stats & Lore */}
-                    <div className="flex flex-col gap-4 font-mono w-full min-w-0">
-                      {/* Technical Stats visual indicator segment */}
-                      <div className="bg-slate-900/95 border-2 border-slate-800/90 rounded-2xl p-4 sm:p-5 flex flex-col gap-3 relative shadow-xl text-left max-w-full">
-                        <HUDCorners />
-                        <div className="flex items-center gap-1.5 border-b border-slate-800/80 pb-2 mb-0.5 justify-between">
-                          <div className="flex items-center gap-1.5">
-                            <BarChart className="w-4 h-4 text-amber-400 shrink-0" />
-                            <span className="text-xs font-hud font-black text-amber-400 tracking-wider uppercase">BASE STATS ANALYTICS</span>
-                          </div>
-                        </div>
-
-                        {/* Stat Bars Grid */}
-                        <div className="flex flex-col gap-2.5 text-left w-full">
-                          {/* HP */}
-                          <div className="flex flex-col gap-0.5 w-full text-left">
-                            <div className="flex justify-between items-center text-[10px] sm:text-xs font-bold text-slate-300">
-                              <span>HEALTH POINTS (HP)</span>
-                              <span className="text-cyan-400 font-bold">{hp}</span>
-                            </div>
-                            <div className="w-full h-2.5 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
-                              <div className="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 rounded-full transition-all duration-1000" style={{ width: `${getStatPercent(hp)}%` }} />
-                            </div>
-                          </div>
-                          
-                          {/* Atk */}
-                          <div className="flex flex-col gap-0.5 w-full text-left">
-                            <div className="flex justify-between items-center text-[10px] sm:text-xs font-bold text-slate-300">
-                              <span>PHYSICAL ATTACK</span>
-                              <span className="text-amber-400 font-bold">{attack}</span>
-                            </div>
-                            <div className="w-full h-2.5 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
-                              <div className="h-full bg-gradient-to-r from-amber-500 to-orange-400 rounded-full transition-all duration-1000" style={{ width: `${getStatPercent(attack)}%` }} />
-                            </div>
-                          </div>
-
-                          {/* Def */}
-                          <div className="flex flex-col gap-0.5 w-full text-left">
-                            <div className="flex justify-between items-center text-[10px] sm:text-xs font-bold text-slate-300">
-                              <span>PHYSICAL DEFENSE</span>
-                              <span className="text-blue-400 font-bold">{defense}</span>
-                            </div>
-                            <div className="w-full h-2.5 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
-                              <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full transition-all duration-1000" style={{ width: `${getStatPercent(defense)}%` }} />
-                            </div>
-                          </div>
-
-                          {/* Sp Atk */}
-                          <div className="flex flex-col gap-0.5 w-full text-left">
-                            <div className="flex justify-between items-center text-[10px] sm:text-xs font-bold text-slate-300">
-                              <span>SPECIAL ATTACK</span>
-                              <span className="text-pink-400 font-bold">{spAtk}</span>
-                            </div>
-                            <div className="w-full h-2.5 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
-                              <div className="h-full bg-gradient-to-r from-pink-500 to-purple-400 rounded-full transition-all duration-1000" style={{ width: `${getStatPercent(spAtk)}%` }} />
-                            </div>
-                          </div>
-
-                          {/* Sp Def */}
-                          <div className="flex flex-col gap-0.5 w-full text-left">
-                            <div className="flex justify-between items-center text-[10px] sm:text-xs font-bold text-slate-300">
-                              <span>SPECIAL DEFENSE</span>
-                              <span className="text-purple-400 font-bold">{spDef}</span>
-                            </div>
-                            <div className="w-full h-2.5 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
-                              <div className="h-full bg-gradient-to-r from-purple-500 to-indigo-400 rounded-full transition-all duration-1000" style={{ width: `${getStatPercent(spDef)}%` }} />
-                            </div>
-                          </div>
-
-                          {/* Speed */}
-                          <div className="flex flex-col gap-0.5 w-full text-left">
-                            <div className="flex justify-between items-center text-[10px] sm:text-xs font-bold text-slate-300">
-                              <span>KINETIC SPEED</span>
-                              <span className="text-emerald-400 font-bold">{speed}</span>
-                            </div>
-                            <div className="w-full h-2.5 rounded-full bg-slate-950 border border-slate-800/80 overflow-hidden">
-                              <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-1000" style={{ width: `${getStatPercent(speed)}%` }} />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Academic lore analyzer segment */}
-                      <div className="bg-slate-900/95 border-2 border-slate-800/90 rounded-2xl p-4 sm:p-5 flex flex-col gap-3 relative shadow-xl text-left max-w-full">
-                        <HUDCorners />
-                        <div className="flex items-center gap-1.5 text-xs font-hud font-black text-amber-400 tracking-wider border-b border-slate-800/80 pb-2 uppercase">
-                          <Info className="w-4 h-4 shrink-0 animate-pulse text-amber-400" /> Lore Analysis
-                        </div>
-                        <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
-                          <strong className="text-cyan-300 block mb-1 font-hud uppercase tracking-widest text-[9px] sm:text-[10px]">PokÃ©dex Entry</strong>
-                          <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans font-medium break-words whitespace-pre-line" style={{ overflowWrap: 'anywhere' }}>
-                            {activePokemonData.description}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Action Desk buttons */}
-                      <div className="flex justify-end items-center gap-3 w-full mt-2">
-                        <button 
-                          onClick={() => {
-                            handlePokemonClick(activePokemonData.name);
-                            setIsDailyScanOpen(false);
-                          }}
-                          className={cn(hudButtonClass(false, 'amber'), "w-full font-hud font-black px-6 py-4 !text-xs uppercase tracking-widest flex items-center justify-center gap-2 relative shadow-xl cursor-pointer group overflow-hidden rounded-xl")}
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-300/20 to-transparent pointer-events-none z-10 animate-scan-shimmer" />
-                          <HUDCorners />
-                          <BrainCircuit className="w-4 h-4 shrink-0 text-amber-300 relative z-10" />
-                          <span className="relative z-10">VIEW FULL SPECIMEN ARCHIVE</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })()}
-        </AnimatePresence>
-
-        {/* Theological Exam Fullscreen Modal */}
-        <AnimatePresence>
-          {isDailyQuizOpen && (
-            <motion.div
-              key="daily-quiz-modal"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 250 }}
-              className="fixed inset-0  z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
-            >
-              {/* Ambient Glows */}
-              <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-
-              {/* Top Header Bar */}
-              <div className="shrink-0 border-b border-cyan-500/30 bg-slate-900/90 px-4 sm:px-8 py-3 flex items-center justify-between gap-3 z-20 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)] shrink-0">
-                    <BrainCircuit className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 animate-pulse" />
-                  </div>
-                  <div className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
-                    <h2 className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-widest leading-none whitespace-nowrap">
-                      THEORY EXAM
-                    </h2>
-                    <span className="px-2 py-0.5 rounded-full bg-cyan-950/90 border border-cyan-500/40 text-cyan-300 text-[10px] sm:text-xs font-mono font-bold whitespace-nowrap shadow-sm">
-                      {today}
-                    </span>
-                  </div>
-                </div>
-
-                <button 
-                  onClick={() => { setIsDailyQuizOpen(false); sounds.scan(); playHaptic('light'); }} 
-                  className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm shrink-0"
-                  title="Close (Esc)"
-                >
-                  <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
-                  <span className="hidden sm:inline">CLOSE</span>
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-3.5 sm:p-6 md:p-8 max-w-4xl mx-auto w-full flex flex-col">
-                <PokethologyQuizWidget />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        
-                {/* Battle Result Modal */}
-        <BattleResultScreen
-          isOpen={battleState === 'finished'}
-          battleResult={battleResult}
-          pokemon={pokemon}
-          battleOpponent={battleOpponent}
-          battleLog={battleLog}
-          turnNumber={turnNumber}
-          pokemonHP={pokemonHP}
-          opponentHP={opponentHP}
-          pokemonMaxHP={pokemonMaxHP}
-          opponentMaxHP={opponentMaxHP}
-          pokemonStatus={pokemonStatus}
-          opponentStatus={opponentStatus}
-          isLightMode={isLightMode}
-          missionNotice={lastBattleMissionNotice}
-          onRematch={() => {
-            sounds.battleStart(); playHaptic('heavy');
-            setIsBattling(false);
-            setBattleState('setup');
-            setTimeout(() => {
-              runBattle();
-            }, 100);
-          }}
-          onInspect={() => {
-            setInspectingOpponent(true);
-            setActiveTab('data');
-            setBattleState('setup');
-            setIsBattling(false);
-            
-            // Reset Arena Status
-            setPokemonHP(pokemonMaxHP);
-            setOpponentHP(opponentMaxHP);
-            setPokemonStatus(null);
-            setOpponentStatus(null);
-            setPokemonFlinched(false);
-            setOpponentFlinched(false);
-            setPlayerStatStages({ attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0, evasion: 0, accuracy: 0 });
-            setOpponentStatStages({ attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0, evasion: 0, accuracy: 0 });
-            setBattleLog([]);
-            
-            sounds.scan(); playHaptic('light');
-          }}
-          onNewBattle={() => {
-            resetSimulation();
-          }}
-        />
-
-        
-      {ytAudioUrl && (
-        <div style={{ display: "none" }}>
-          {React.createElement(ReactPlayer as any, {
-            url: ytAudioUrl,
-            playing: globalMusicConnected && ytPlaying,
-            volume: ytVolume,
-            loop: true,
-            width: "0",
-            height: "0"
-          })}
-        </div>
-      )}
-
-        {/* Settings Modal */}
-        <AnimatePresence>
-          <OfflineManagerModal key="offline-manager-modal" isOpen={isOfflineManagerOpen} onClose={() => setIsOfflineManagerOpen(false)} onPlaySound={sounds.hover} />
-
-        {isSettingsOpen && (
-            <motion.div
-              key="settings-modal"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 250 }}
-              className="fixed inset-0  z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
-            >
-              {/* Ambient Glows */}
-              <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-
-              {/* Top Header Bar */}
-              <div className="shrink-0 border-b border-cyan-500/30 bg-slate-900/90 px-4 sm:px-8 py-3 flex items-center justify-between gap-3 z-20 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)] shrink-0">
-                    <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 animate-spin-slow" style={{ animationDuration: '10s' }} />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-widest leading-none">
-                      SETTINGS
-                    </h2>
-                  </div>
-                </div>
-
-                <button 
-                  onClick={() => { setIsSettingsOpen(false); sounds.scan(); playHaptic('light'); }} 
-                  className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm shrink-0"
-                  title="Close (Esc)"
-                >
-                  <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
-                  <span className="hidden sm:inline">CLOSE</span>
-                </button>
-              </div>
-
-              {/* Scrollable Content Body */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-4 sm:p-6 md:p-8 max-w-2xl mx-auto w-full flex flex-col gap-5">
-                {/* Audio & Visuals Settings */}
-                <div className="flex flex-col gap-4 w-full">
-                  <span className="text-[10px] font-hud font-black text-cyan-400 uppercase tracking-widest block mb-1">
-                    AUDIO & DISPLAY CONTROLS
-                  </span>
-                  
-                  <AudioSettings mode="simple" />
-
-                  {/* Theme Toggle Selector */}
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 ">
-                    <div className="flex flex-col text-center sm:text-left">
-                      <span className="text-cyan-300 font-hud uppercase text-xs font-bold tracking-widest">Interface Theme</span>
-                      <span className="text-[10px] font-mono text-slate-400">Toggle dark / light display mode</span>
-                    </div>
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      onClick={handleThemeToggle}
-                      className="relative w-14 h-7 rounded-full bg-slate-950 border border-slate-700/80 transition-colors focus:outline-none cursor-pointer"
-                    >
-                      <motion.div 
-                        initial={false}
-                        animate={{ x: isLightMode ? 28 : 0 }}
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                        className={cn(
-                          "absolute top-1 w-5 h-5 rounded-full flex items-center justify-center left-1 shadow-md",
-                          isLightMode ? "bg-amber-500 text-slate-950" : "bg-slate-500 text-white"
-                        )}
-                      >
-                        {isLightMode ? <Sun className="w-3 h-3" /> : <Moon className="w-3 h-3 text-slate-900" /> }
-                      </motion.div>
-                    </motion.button>
-                  </div>
-                </div>
-
-                {/* Registry & Utilities */}
-                <div className="flex flex-col gap-4 w-full">
-                  <span className="text-[10px] font-hud font-black text-cyan-400 uppercase tracking-widest block mb-1">
-                    REGISTRY & COMMUNITY UTILITIES
-                  </span>
-                  
-                  <div className="flex flex-col gap-2.5">
-                    {isInstallable && (
-                      <motion.button
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          handleInstallPWA();
-                          sounds.scan(); playHaptic('light');
-                        }}
-                        className="flex items-center justify-between p-3.5 bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/50 hover:border-cyan-400 rounded-xl transition-all group w-full text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.25)] cursor-pointer"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <Download className="w-4 h-4 shrink-0 text-cyan-400 group-hover:scale-110 transition-transform animate-bounce" />
-                          <div className="flex flex-col text-left">
-                            <span className="font-hud text-[9px] sm:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Install App (PWA)</span>
-                            <span className="text-[8px] sm:text-[9px] font-mono text-cyan-400/80 leading-none mt-0.5">Install PokÃ©thology locally on your device</span>
-                          </div>
-                        </div>
-                        <span className="text-[8px] font-mono text-cyan-300 group-hover:text-white uppercase tracking-widest bg-cyan-900/60 px-2.5 py-1 rounded border border-cyan-500/40">
-                          Install
-                        </span>
-                      </motion.button>
-                    )}
-
-                    <motion.button
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        setIsSettingsOpen(false);
-                        setIsTutorialOpen(true);
-                        sounds.scan(); playHaptic('light');
-                      }}
-                      className="flex items-center justify-between p-3.5 bg-slate-950/60 hover:bg-slate-950/90 border border-cyan-900/40 hover:border-cyan-500/50 rounded-xl transition-all group w-full cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2.5 text-cyan-400">
-                        <BookOpen className="w-4 h-4 shrink-0 text-cyan-400 group-hover:scale-110 transition-transform" />
-                        <div className="flex flex-col text-left">
-                          <span className="font-hud text-[9px] sm:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">PokÃ©thology Tutorial</span>
-                          <span className="text-[8px] sm:text-[9px] font-mono text-slate-400 leading-none mt-0.5">Guided walkthrough of controls & HUD features</span>
-                        </div>
-                      </div>
-                      <span className="text-[8px] font-mono text-cyan-500 group-hover:text-cyan-300 uppercase tracking-widest">
-                        Open
-                      </span>
-                    </motion.button>
-
-                    <a
-                      href="https://www.instagram.com/__.pokethology.__?igsh=YjZrejluMDd5dHoz"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => sounds.scan()}
-                      className="flex items-center justify-between p-3.5 bg-gradient-to-r from-purple-950/40 via-pink-950/40 to-slate-950/40 hover:from-purple-900/60 hover:to-slate-900/80 border border-pink-500/30 hover:border-pink-400/60 rounded-xl transition-all group w-full text-pink-400 cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <Instagram className="w-4 h-4 shrink-0 text-pink-400 group-hover:scale-110 transition-transform" />
-                        <div className="flex flex-col text-left">
-                          <span className="font-hud text-[9px] sm:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">PokÃ©thology Instagram</span>
-                          <span className="text-[8px] sm:text-[9px] font-mono text-pink-300/70 leading-none mt-0.5">Follow @__.pokethology.__ for updates & lore</span>
-                        </div>
-                      </div>
-                      <span className="text-[8px] font-mono text-pink-400 group-hover:text-pink-200 uppercase tracking-widest">
-                        Visit
-                      </span>
-                    </a>
-
-                    <a
-                      href="https://github.com/massimoanzalone2204-hash/Pokethology"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => sounds.scan()}
-                      className="flex items-center justify-between p-3.5 bg-slate-950/60 hover:bg-slate-950/90 border border-cyan-900/40 hover:border-cyan-500/50 rounded-xl transition-all group w-full text-cyan-400 cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <Github className="w-4 h-4 shrink-0 text-cyan-400 group-hover:scale-110 transition-transform" />
-                        <div className="flex flex-col text-left">
-                          <span className="font-hud text-[9px] sm:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">GitHub Repository</span>
-                          <span className="text-[8px] sm:text-[9px] font-mono text-slate-400 leading-none mt-0.5">Explore source code & documentation</span>
-                        </div>
-                      </div>
-                      <span className="text-[8px] font-mono text-cyan-500 group-hover:text-cyan-300 uppercase tracking-widest">
-                        Visit
-                      </span>
-                    </a>
-                  </div>
-
-                  <motion.button
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleSystemRestart}
-                    disabled={isRebooting}
-                    className="flex items-center justify-between p-3.5 bg-red-950/20 hover:bg-red-900/40 border border-red-900/40 hover:border-red-500/50 rounded-xl transition-all group mt-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2.5 text-red-400">
-                      <RotateCcw className={cn("w-4 h-4", isRebooting && "animate-spin")} />
-                      <span className="font-hud text-[9px] sm:text-[10px] font-black uppercase tracking-widest">
-                        {isRebooting ? 'REBOOTING POKÃ‰DEX...' : 'RESTART POKÃ‰DEX SYSTEM'}
-                      </span>
-                    </div>
-                    <span className="text-[8px] font-mono text-red-600 group-hover:text-red-300 uppercase tracking-widest">
-                      Reset
-                    </span>
-                  </motion.button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Battle Exit Confirmation Modal */}
-        <AnimatePresence>
-          {showExitConfirmation && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0  z-[140] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto custom-scrollbar optimize-scrolling"
-            >
-              <motion.div
-                initial={{ scale: 0.92, y: 15 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.92, y: 15 }}
-                className="bg-slate-900 border-2 border-red-500/60 rounded-2xl w-full max-w-sm overflow-hidden shadow-[0_0_40px_rgba(239,68,68,0.25)] p-5 sm:p-6 flex flex-col gap-5 relative my-auto mx-auto"
-              >
-                {/* Visual Accent/Glow behind the warning icon */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-24 bg-red-500/10 rounded-full blur-xl pointer-events-none" />
-
-                <div className="flex flex-col items-center gap-3 text-center border-b border-red-950/40 pb-4">
-                  <div className="p-3 bg-red-950/40 border border-red-500/30 rounded-full text-red-400">
-                    <AlertTriangle className="w-8 h-8 animate-pulse" />
-                  </div>
-                  <h2 className="text-sm sm:text-base font-hud text-red-400 font-black uppercase tracking-[0.15em] mt-1">
-                    ABORT SIMULATION?
-                  </h2>
-                  <p className="text-slate-400 font-mono text-[9px] sm:text-[10px] uppercase tracking-wider">
-                    SYSTEM EXCLUSION THREAT DETECTED
-                  </p>
-                </div>
-
-                <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 text-center text-slate-300 text-xs leading-relaxed font-sans">
-                  Are you sure you want to exit the battle arena? Your current combat progress, active stat boosts, and unsaved match data will be <span className="text-red-400 font-semibold uppercase">permanently purge-cycled</span>.
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 mt-1">
-                  <button
-                    onClick={() => {
-                      sounds.scan(); playHaptic('light');
-                      setPendingAction(null);
-                      setShowExitConfirmation(false);
-                    }}
-                    className="py-2.5 px-4 rounded-xl text-[10px] sm:text-[11px] font-hud font-extrabold tracking-widest uppercase border border-slate-800 bg-slate-800/50 text-slate-300 hover:bg-slate-800 hover:text-white transition-all active:scale-95"
-                  >
-                    ABORT EXIT
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowExitConfirmation(false);
-                      if (pendingAction === 'run') {
-                        handleRun();
-                      } else {
-                        handleFlee();
-                      }
-                      setPendingAction(null);
-                    }}
-                    className="py-2.5 px-4 rounded-xl text-[10px] sm:text-[11px] font-hud font-extrabold tracking-widest uppercase border border-red-500/40 bg-red-950/80 hover:bg-red-900/40 text-red-400 hover:text-red-300 transition-all shadow-[0_0_15px_rgba(239,68,68,0.15)] active:scale-95"
-                  >
-                    CONFIRM EXIT
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Battle Help Modal */}
-        <AnimatePresence>
-          {isBattleHelpOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0  z-[130] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto custom-scrollbar optimize-scrolling"
-            >
-              <motion.div
-                initial={{ scale: 0.98, y: 6, opacity: 0 }}
-                animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.98, y: 6, opacity: 0 }}
-                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="bg-slate-900 border-2 border-red-500/50 rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_0_50px_rgba(239,68,68,0.2)] my-auto mx-auto"
-              >
-                <div className="p-4 border-b border-red-900/30 flex justify-between items-center bg-slate-950">
-                   <h2 className="text-base sm:text-xl font-hud text-red-400 uppercase tracking-widest text-center">How to Battle</h2>
-                   <button onClick={() => setIsBattleHelpOpen(false)} className="text-slate-500 hover:text-white p-2"><X className="w-5 h-5"/></button>
-                </div>
-                <div className="p-4 sm:p-6 overflow-y-auto max-h-[70vh] custom-scrollbar optimize-scrolling space-y-4">
-                  <div className="space-y-3">
-                    <h3 className="text-cyan-400 font-bold uppercase text-[10px] tracking-widest border-l-2 border-cyan-500 pl-2">The Battle Screen</h3>
-                    <p className="text-slate-400 text-xs leading-relaxed">Your Pokemon is on the left and the enemy is on the right. Keep an eye on the health bars! If a Pokemon gets a status like Burn or Poison, it will show up next to their name.</p>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <h3 className="text-amber-400 font-bold uppercase text-[10px] tracking-widest border-l-2 border-amber-500 pl-2">What can you do?</h3>
-                    <ul className="text-slate-400 text-xs space-y-2 list-none">
-                      <li>â— <strong>Fighting:</strong> Pick a move to attack. Faster Pokemon usually go first!</li>
-                      <li>â— <strong>Pokemon Cries:</strong> Tap on a Pokemon model to hear its cry.</li>
-                      <li>â— <strong>AI Helper:</strong> Click 'AI Strategist' if you want advice on which move is best to use.</li>
-                    </ul>
-                  </div>
-
-                  <div className="space-y-3">
-                    <h3 className="text-purple-400 font-bold uppercase text-[10px] tracking-widest border-l-2 border-purple-500 pl-2">Chaos Mode</h3>
-                    <p className="text-slate-400 text-[11px] leading-relaxed">This is a fun random mode! 
-                    <br/>- The game picks two random Pokemon.
-                    <br/>- You click 'Random Moves' to get 4 attacks.
-                    <br/>- Start the match and see who wins!</p>
-                  </div>
-                </div>
-                <div className="p-4 bg-slate-950 flex justify-end">
-                   <button onClick={() => setIsBattleHelpOpen(false)} className={cn(hudButtonClass(false, 'red'), "px-8")}>Got it!</button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Info Modal */}
-        <AnimatePresence>
-          {isInfoOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0  z-[120] flex items-center justify-center p-2 sm:p-4 bg-slate-950/90 backdrop-blur-md overflow-y-auto custom-scrollbar optimize-scrolling"
-            >
-              <motion.div
-                initial={{ scale: 0.95, y: 15 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.95, y: 15 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                className="bg-slate-900/60 backdrop-blur-xl rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_15px_60px_rgba(0,0,0,0.6),0_0_40px_rgba(6,182,212,0.15)] flex flex-col max-h-[90dvh] my-auto mx-auto"
-              >
-                <div className="p-5 sm:p-7 border-b border-white/5 bg-slate-900/40 relative">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
-                  <h2 className="text-lg sm:text-xl font-hud font-black uppercase tracking-[0.2em] relative z-10 flex items-center gap-3">
-                    <BrainCircuit className="w-5 h-5 text-cyan-400" />
-                    Information Center
-                  </h2>
-                  <span className="text-[9px] font-mono text-cyan-600 uppercase tracking-[0.3em] mt-2 block relative z-10">Core System Specifications & Modalities</span>
-                </div>
-                
-                <div className="p-5 sm:p-7 overflow-y-auto space-y-6 text-slate-300 text-xs text-left flex flex-col custom-scrollbar optimize-scrolling">
-                  <div className="space-y-3 w-full">
-                    <h3 className="text-cyan-400 font-black uppercase tracking-[0.2em] text-[10px] font-hud flex items-center gap-2">
-                      <div className="w-1 h-3 bg-cyan-500 rounded-md"></div>
-                      About PokÃ©thology
-                    </h3>
-                    <div className="bg-slate-950/40 p-4 rounded-xl border border-white/5 shadow-inner leading-relaxed">
-                      <p className="italic text-cyan-300/80 font-serif mb-3 text-sm">Where dreams and adventures begin!</p>
-                      <p className="text-[11px] sm:text-[12px] text-slate-400">The primary function of PokÃ©thology is to act as a highly interactive, all-in-one encyclopedia and combat simulator. Designed with an ultra-high performance gaming framework, it syncs live PokeAPI variables instantly to enable full-scale combat testing under strict competitive parameters.</p>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3 w-full">
-                    <h3 className="text-cyan-400 font-black uppercase tracking-[0.2em] text-[10px] font-hud flex items-center gap-2">
-                      <div className="w-1 h-3 bg-purple-500 rounded-md"></div>
-                      System Modalities
-                    </h3>
-                    <ul className="space-y-2 text-[11px] sm:text-[12px] text-slate-400 bg-slate-950/40 p-5 rounded-xl border border-white/5 shadow-inner">
-                      <li className="flex items-start gap-2"><div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5 shrink-0"></div><span><strong className="text-purple-300">Gen Registry grids</strong> with disappearing Daily hub & Exam drawers.</span></li>
-                      <li className="flex items-start gap-2"><div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5 shrink-0"></div><span><strong className="text-purple-300">Symmetric Matchup Previews</strong> positioned above the simulated Arena.</span></li>
-                      <li className="flex items-start gap-2"><div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5 shrink-0"></div><span><strong className="text-purple-300">Lossless Cry Audio Board</strong> with dynamic volume controls.</span></li>
-                      <li className="flex items-start gap-2"><div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5 shrink-0"></div><span><strong className="text-purple-300">Server-side Gemini AI Chatbot</strong> proxy for real-time answers on lore, combat strategies, and general topics.</span></li>
-                      <li className="flex items-start gap-2"><div className="w-1 h-1 bg-purple-400 rounded-full mt-1.5 shrink-0"></div><span><strong className="text-purple-300">Offline Diagnostics Center</strong> and Kanto Badge verification cards.</span></li>
-                    </ul>
-                  </div>
-                  
-                  <div className="space-y-4 pt-4 border-t border-white/5">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-amber-400 font-black font-hud uppercase tracking-[0.2em] text-[10px] flex items-center gap-2">
-                        <span className="relative flex h-2 w-2">
-                          <span className={cn("animate-ping absolute inline-flex h-full w-full rounded-full opacity-75", isDiagnosticRunning ? "bg-amber-400" : quotaLimitReached ? "bg-red-400" : "bg-cyan-400")}></span>
-                          <span className={cn("relative inline-flex rounded-full h-2 w-2", isDiagnosticRunning ? "bg-amber-500" : quotaLimitReached ? "bg-red-500" : "bg-cyan-500")}></span>
-                        </span>
-                        System Diagnostics
-                      </h3>
-                      
-                      <button
-                        onClick={runDiagnosticsCheck}
-                        disabled={isDiagnosticRunning}
-                        className={cn(
-                          "px-4 py-2 font-hud text-[9px] font-black uppercase tracking-widest rounded-lg border transition-all active:scale-95 disabled:pointer-events-none",
-                          isDiagnosticRunning
-                            ? "bg-amber-500/10 border-amber-500/30 text-amber-400 animate-pulse"
-                            : "bg-slate-900 border-white/10 hover:bg-white hover:text-slate-900 hover:border-white shadow-lg"
-                        )}
-                        id="run-teleme-diag"
-                      >
-                        {isDiagnosticRunning ? "Testing..." : "Run Diagnostic"}
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 text-[10px] font-mono">
-                      <div className="p-3 bg-slate-950/60 border border-white/5 rounded-xl flex flex-col justify-between shadow-inner hover:border-cyan-500/30 transition-colors">
-                        <span className="text-slate-500 text-[8px] uppercase tracking-wider">SOCKET PIPELINE</span>
-                        <span className={cn("font-bold uppercase text-[9px]", wsStatus === "connected" ? "text-emerald-400 animate-pulse" : wsStatus === "connecting" ? "text-amber-400" : "text-rose-400")}>
-                          {wsStatus === "connected" ? `CONNECTED ${wsClientId ? `(${wsClientId})` : ""}` : wsStatus === "connecting" ? "CONNECTING..." : "DISCONNECTED"}
-                        </span>
-                      </div>
-                      <div className="p-2 bg-slate-900 border border-cyan-900/30 rounded flex flex-col justify-between">
-                        <span className="text-slate-500 text-[8px] uppercase tracking-wider">COGNITION ENGINE</span>
-                        <span className="text-cyan-400 font-bold uppercase text-[9px]">
-                          {wsTelemetry?.offlineCoreMode ? "LOCAL OFFLINE CORE" : "GEMINI 1.5 FLASH"}
-                        </span>
-                      </div>
-                      <div className="p-2 bg-slate-900 border border-cyan-900/30 rounded flex flex-col justify-between">
-                        <span className="text-slate-500 text-[8px] uppercase tracking-wider">SERVER MEMORY</span>
-                        <span className="text-cyan-400 font-bold text-[9px]">
-                          {wsTelemetry?.memoryHeapUsed ? `${wsTelemetry.memoryHeapUsed}MB / ${wsTelemetry.memoryHeapTotal}MB` : "ONLINE SECURE"}
-                        </span>
-                      </div>
-                      <div className="p-2 bg-slate-900 border border-cyan-900/30 rounded flex flex-col justify-between">
-                        <span className="text-slate-500 text-[8px] uppercase tracking-wider">SOCKET CONNECTIONS</span>
-                        <span className="text-emerald-400 font-bold text-[9px]">
-                          {wsTelemetry?.connections ? `${wsTelemetry.connections} ACTIVE SOCKETS` : "ESTABLISHED NODE"}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* DIAGNOSTICS CONSOLE */}
-                    {(isDiagnosticRunning || diagnosticsCompleted) && (
-                      <motion.div 
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        className="bg-black/90 border border-cyan-500/30 rounded-lg p-3 font-mono text-[9px] leading-relaxed relative overflow-hidden shadow-inner"
-                      >
-                        <div className="flex items-center justify-between border-b border-cyan-950 pb-1.5 mb-2">
-                          <span className="text-cyan-500/70 font-hud tracking-wider uppercase text-[8px]">INTELLIGENT DIAGNOSTIC LOG</span>
-                          <span className="text-slate-500 text-[8px]">{diagnosticProgress}%</span>
-                        </div>
-                        
-                        {/* Progress Bar */}
-                        <div className="w-full bg-slate-950 rounded-full h-1 overflow-hidden mb-2.5">
-                          <motion.div 
-                            className="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full"
-                            style={{ width: `${diagnosticProgress}%` }}
-                            transition={{ type: "spring", damping: 25, stiffness: 250 }}
-                          />
-                        </div>
-
-                        {/* Logs Stream */}
-                        <div className="space-y-1 max-h-[110px]  flex flex-col">
-                          {diagnosticLogs.map((log, index) => (
-                            <motion.div 
-                              key={`diag-${index}-${log.substring(0, 10)}`}
-                              initial={{ opacity: 0, x: -5 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              className={cn(
-                                log.includes("[SUCCESS]") ? "text-emerald-400 font-bold" :
-                                log.includes("[WARN]") ? "text-amber-400 font-bold" :
-                                log.includes("[OK]") ? "text-cyan-400" : "text-slate-400"
-                              )}
-                            >
-                              {log}
-                            </motion.div>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </div>
-                  <div className="pt-4 mt-2 border-t border-slate-800/50 flex flex-col items-center justify-center">
-                    <DisclaimerButton onClick={() => setIsDisclaimerOpen(true)} variant="pill" />
-                  </div>
-                </div>
-
-                <div className="p-4 bg-slate-950 flex justify-end">
-                  <button
-                    onClick={() => setIsInfoOpen(false)}
-                    className="px-8 py-2.5 bg-cyan-600 hover:bg-cyan-500 font-hud text-[10px] font-black uppercase tracking-widest rounded-lg transition-all shadow-[0_4px_20px_rgba(8,145,178,0.4)] active:scale-95"
-                  >
-                    Got it!
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Music Modal Alternative: Config Modal */}
-        <AnimatePresence>
-          {isMusicOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 250 }}
-              className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
-            >
-              {/* Ambient Glows */}
-              <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-
-              {/* Top System Header Bar */}
-              <div className="shrink-0 flex justify-between items-center px-4 sm:px-8 py-3.5 border-b border-cyan-500/30 w-full bg-slate-900/90 z-20 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <motion.div 
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                    className="p-2 bg-cyan-950/80 border border-cyan-500/50 rounded-xl text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.3)]"
-                  >
-                    <Settings className="w-5 h-5 text-cyan-400 shrink-0" />
-                  </motion.div>
-                  <div>
-                    <h2 className="text-sm sm:text-lg font-hud font-black text-cyan-300 uppercase tracking-widest leading-none">
-                      Combat Options
-                    </h2>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => setIsMusicOpen(false)} 
-                  className="p-2 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-hud font-bold uppercase tracking-wider group shadow-sm"
-                >
-                  <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
-                  <span className="hidden sm:inline">CLOSE</span>
-                </button>
-              </div>
-
-              {/* Main Scroller Area */}
-              <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar text-[11.5px] sm:text-[12.5px] leading-relaxed text-slate-300 select-text">
-                <div className="w-full max-w-4xl mx-auto text-slate-300 text-sm space-y-6 font-mono">
-                  <div className="space-y-6">
-                    {quotaLimitReached && (
-                      <div className="bg-red-950/40 border border-red-500/30 p-4 rounded-xl flex flex-col gap-2 shadow-lg shadow-red-500/10 mb-4 animate-in fade-in slide-in-from-top-1">
-                        <div className="flex items-center gap-2">
-                           <AlertTriangle className="w-4 h-4 text-red-500 animate-pulse" />
-                           <span className="text-[10px] font-bold tracking-wider text-red-400 font-hud uppercase">AI Quota Exhausted</span>
-                        </div>
-                        <p className="text-xs text-red-300 font-mono ml-6 leading-relaxed">
-                          The shared AI quota is exhausted. You can add your own <b>GEMINI_API_KEY</b> in the <b>Settings</b> menu (top-right cog icon) &gt; <b>Secrets</b> to bypass shared limits.
-                        </p>
-                        <button 
-                          onClick={() => setQuotaLimitReached(false)}
-                          className="mt-2 text-xs text-cyan-400 font-hud tracking-widest text-left ml-6 underline uppercase hover:text-cyan-300"
-                        >
-                          Dismiss & Retry
-                        </button>
-                      </div>
-                    )}
-                    
-                    <AudioSettings mode="simple" />
-
-                    <div className="pt-6 border-t border-cyan-500/20">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-amber-950/20 p-4 rounded-xl border border-amber-500/20">
-                        <div className="flex flex-col gap-1.5">
-                          <span className="text-amber-400 font-hud uppercase text-xs font-bold tracking-widest flex items-center gap-2">
-                            <Trophy className="w-4 h-4" />
-                            PokÃ©thology Mission
-                          </span>
-                          <span className="text-slate-400 text-xs">Track your overall combat mastery progress.</span>
-                        </div>
-                        <button
-                          onClick={() => {
-                            setIsMusicOpen(false);
-                            setIsMissionModalOpen(true);
-                          }}
-                          className="px-6 py-2.5 rounded-xl font-hud uppercase text-[10px] font-bold tracking-widest transition-all bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 hover:border-amber-400 hover:shadow-[0_0_15px_rgba(245,158,11,0.3)] whitespace-nowrap"
-                        >
-                          Personalize
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        {/* Stat Animation Overlay */}
-        <AnimatePresence>
-          {statAnimation !== 'none' && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="fixed inset-0  z-[130] flex items-center justify-center pointer-events-none"
-            >
-              <div className={cn(
-                "px-8 py-4 rounded-full font-hud text-2xl uppercase tracking-widest shadow-2xl border-4",
-                statAnimation === 'boost' ? "bg-green-900/90 border-green-400 text-green-100" : "bg-red-900/90 border-red-400 text-red-100"
-              )}>
-                {statAnimation === 'boost' ? 'Stat Boost!' : 'Stat Lowered!'}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Floating HUD Toast Notification List */}
-        <div className="fixed bottom-6 right-6 z-[500] flex flex-col gap-3 pointer-events-none max-w-sm w-[92%] md:w-96" id="hud-toast-container">
-          <AnimatePresence mode="popLayout">
-            {toasts.map((toast) => {
-              let borderColor = "border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)]";
-              let titleColor = "text-cyan-400";
-              let glowBg = "bg-cyan-500/5";
-              let ToastIcon = Info;
-
-              if (toast.type === "combat") {
-                borderColor = "border-red-500/40 shadow-[0_0_18px_rgba(239,68,68,0.15)]";
-                titleColor = "text-red-400";
-                glowBg = "bg-red-500/5";
-                ToastIcon = Target;
-              } else if (toast.type === "success") {
-                borderColor = "border-emerald-500/40 shadow-[0_0_18px_rgba(16,185,129,0.15)]";
-                titleColor = "text-emerald-400";
-                glowBg = "bg-emerald-500/5";
-                ToastIcon = Trophy;
-              } else if (toast.type === "warning") {
-                borderColor = "border-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.12)]";
-                titleColor = "text-amber-400";
-                glowBg = "bg-amber-500/5";
-                ToastIcon = AlertTriangle;
-              }
-
-              return (
-                <motion.div
-                  key={toast.id}
-                  initial={{ opacity: 0, x: 50, y: 15, scale: 0.92 }}
-                  animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: 70, scale: 0.92 }}
-                  transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                  className={cn(
-                    "pointer-events-auto w-full bg-slate-950/95 backdrop-blur-md rounded-xl border p-4 flex gap-3 relative overflow-hidden",
-                    borderColor
-                  )}
-                  onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}
-                >
-                  {/* Diagnostic cyber background lines */}
-                  <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent" />
-                  <div className={cn("absolute inset-0 pointer-events-none opacity-30", glowBg)} />
-
-                  {/* Left Decorative Icon */}
-                  <div className="flex-shrink-0 flex items-start mt-0.5">
-                    <div className={cn("p-1.5 rounded-lg border bg-slate-900/80", borderColor)}>
-                      <ToastIcon className={cn("w-4.5 h-4.5", titleColor)} />
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-grow space-y-0.5">
-                    <div className="flex justify-between items-start gap-1">
-                      <span className={cn("font-hud font-black uppercase text-[10.5px] tracking-wider leading-none", titleColor)}>
-                        {toast.title}
-                      </span>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setToasts(prev => prev.filter(t => t.id !== toast.id));
-                        }}
-                        className="text-slate-500 hover:text-slate-350 transition-colors"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    <p className="text-[10px] text-slate-400 leading-normal font-sans">
-                      {toast.description}
-                    </p>
-                  </div>
-                </motion.div>
-              );
-            })}
-        </AnimatePresence>
-        </div>
-
-        {/* Hub Challenge Progress 8-Second Notification HUD */}
-        <AnimatePresence>
-          {hubChallengeProgressMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: -50, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 350, damping: 26 }}
-              className="fixed top-6 sm:top-8 left-0 right-0 z-[700] flex justify-center px-4 pointer-events-auto"
-            >
-              <div className={cn(
-                "backdrop-blur-xl border px-5 py-3.5 rounded-2xl flex items-center gap-4 relative overflow-hidden max-w-lg w-full",
-                hubChallengeProgressMessage.includes("COMPLETE")
-                  ? "bg-slate-950/95 border-emerald-500/60 shadow-[0_0_35px_rgba(16,185,129,0.35)] text-emerald-400"
-                  : "bg-slate-950/95 border-cyan-500/60 shadow-[0_0_35px_rgba(6,182,212,0.35)] text-cyan-400"
-              )}>
-                {/* 8-Second Animated Depletion Bar */}
-                <motion.div 
-                  initial={{ width: "100%" }}
-                  animate={{ width: "0%" }}
-                  transition={{ duration: 8, ease: "linear" }}
-                  className={cn(
-                    "absolute bottom-0 left-0 h-1",
-                    hubChallengeProgressMessage.includes("COMPLETE")
-                      ? "bg-gradient-to-r from-emerald-500 to-teal-400"
-                      : "bg-gradient-to-r from-cyan-500 to-blue-400"
-                  )}
-                />
-
-                <div className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center border shrink-0",
-                  hubChallengeProgressMessage.includes("COMPLETE")
-                    ? "bg-emerald-500/20 border-emerald-400/60 text-emerald-300"
-                    : "bg-cyan-500/20 border-cyan-400/60 text-cyan-300"
-                )}>
-                  {hubChallengeProgressMessage.includes("COMPLETE") ? (
-                    <Trophy className="w-5 h-5 animate-bounce" />
-                  ) : (
-                    <Swords className="w-5 h-5 animate-pulse" />
-                  )}
-                </div>
-
-                <div className="flex flex-col flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-hud font-black uppercase tracking-widest text-slate-400">
-                      {hubChallengeProgressMessage.includes("COMPLETE") ? "ğŸ‰ DAILY HUB OBJECTIVE MET" : "âš”ï¸ DAILY HUB COMBAT PROGRESS"}
-                    </span>
-                    <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
-                      8s
-                    </span>
-                  </div>
-                  <span className="text-xs sm:text-sm font-hud font-black text-white truncate mt-0.5">
-                    {hubChallengeProgressMessage}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (hubProgressTimeoutRef.current) clearTimeout(hubProgressTimeoutRef.current);
-                    setHubChallengeProgressMessage(null);
-                  }}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors shrink-0"
-                  title="Dismiss notification"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Daily Combat Mission Status Update HUD */}
-        <AnimatePresence>
-          {showMissionUpdateHUD && !isMissionCompleted && (
-            <motion.div
-              initial={{ opacity: 0, y: -40, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="fixed top-24 sm:top-28 left-1/2 -translate-x-1/2 z-[600] pointer-events-none"
-            >
-              <div className="bg-slate-950/95 border-2 border-cyan-500 rounded-2xl p-4 shadow-[0_0_30px_rgba(34,211,238,0.4)] backdrop-blur-md flex items-center gap-4">
-                <div className="bg-cyan-500/20 p-2 rounded-full border border-cyan-500/50">
-                  <Trophy className="w-6 h-6 text-cyan-400 animate-pulse" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[11px] font-hud font-black text-cyan-400 uppercase tracking-widest leading-none">
-                    Mission Progress Updated
-                  </span>
-                  <span className="text-sm font-bold mt-1">
-                    {missionProgressCount} / {missionRequiredCount} Validated
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Daily Combat Mission Celebration Overlay */}
-        <AnimatePresence>
-          {showMissionCelebration && celebratedMission && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0  z-[550] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md"
-              id="combat-mission-celebration-overlay"
-            >
-              {/* Spinning cyber background layer */}
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.06)_0%,transparent_70%)] animate-pulse animate-spin-slow" />
-              
-              <motion.div
-                initial={{ scale: 0.9, y: 30, opacity: 0 }}
-                animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.9, y: 30, opacity: 0 }}
-                transition={{ type: "spring", damping: 25, stiffness: 180 }}
-                className="bg-slate-950 border-2 border-amber-500/80 rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_0_65px_rgba(245,158,11,0.35)] relative flex flex-col items-center p-6 sm:p-8 text-center gap-6"
-              >
-                <HUDCorners />
-                
-                {/* Decorative border bar */}
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent animate-pulse" />
-
-                {/* Celebration visual: Spin award trophy layout */}
-                <div className="relative flex items-center justify-center mt-3">
-                  {/* Glowing background circles */}
-                  <div className="absolute w-24 h-24 bg-amber-500/20 rounded-full blur-2xl animate-ping" />
-                  
-                  <motion.div
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                    className="absolute w-32 h-32 border border-dashed border-amber-500/25 rounded-full pointer-events-none"
-                  />
-                  <motion.div
-                    animate={{ rotate: [360, 0] }}
-                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                    className="absolute w-28 h-28 border border-dotted border-cyan-500/20 rounded-full pointer-events-none"
-                  />
-
-                  <div className="p-5 bg-slate-900 border-2 border-amber-500/60 rounded-full text-amber-400 relative z-10 shadow-[0_0_30px_rgba(245,158,11,0.4)]">
-                    <Trophy className="w-12 h-12 stroke-[1.5]" />
-                  </div>
-                </div>
-
-                {/* Titles */}
-                <div className="space-y-1 relative z-10">
-                  <span className="text-[9px] font-mono tracking-[0.25em] text-amber-500/90 font-bold uppercase block">
-                    MISSION SUCCESSFUL
-                  </span>
-                  <h2 className="text-base sm:text-2xl font-hud font-black text-amber-400 tracking-wider uppercase leading-tight">
-                    Mission Complete!
-                  </h2>
-                  <p className="text-[9.5px] sm:text-[10px] font-mono text-slate-500 tracking-widest uppercase block mt-1.5">
-                    ALL MISSION OBJECTIVES COMPLETED
-                  </p>
-                </div>
-
-                {/* Mission specifications card */}
-                <div className="w-full bg-slate-900/60 p-4 rounded-xl border border-amber-500/20 text-left space-y-2 relative">
-                  <div className="absolute top-2 right-2 flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded text-[7.5px] font-mono text-amber-400 uppercase tracking-widest">
-                    <Star className="w-2.5 h-2.5 fill-amber-400" />
-                    <span>DAILY BONUS</span>
-                  </div>
-                  
-                  <span className="text-[9px] font-mono text-slate-400 uppercase tracking-wider block font-bold">
-                    Target Objectives Summary:
-                  </span>
-                  
-                  <h3 className="font-hud text-xs sm:text-sm font-bold text-amber-300 uppercase leading-snug">
-                    {celebratedMission.title}
-                  </h3>
-                  
-                  <p className="text-[10.5px] text-slate-400 leading-relaxed font-sans pb-1.5 border-b border-slate-800/60">
-                    {celebratedMission.description}
-                  </p>
-                  
-                  <div className="flex items-center justify-between text-[9.5px] font-mono font-bold pt-1">
-                    <span className="text-slate-400 uppercase">ACCREDITATION CODE:</span>
-                    <span className="text-amber-400">POKE-{Date.now().toString().slice(-6)}</span>
-                  </div>
-                </div>
-
-                {/* Subtitle/Congrats text */}
-                <p className="text-[11px] sm:text-xs text-slate-400 leading-relaxed max-w-md">
-                  Your tactical foresight, type matchmaking, and simulation results have been logged to the central encyclopedia core. You are now designated a <span className="text-amber-400 font-bold font-hud uppercase">Certified PokÃ©thology Combatant</span> for today.
-                </p>
-
-                {/* Controls */}
-                <div className="w-full pt-2">
-                  <button
-                    onClick={() => {
-                      setShowMissionCelebration(false);
-                      try {
-                        sounds.scan(); playHaptic('light');
-                      } catch (_) {}
-                    }}
-                    className="w-full py-3 px-4 rounded-xl font-hud text-[10px] sm:text-[11px] font-black tracking-widest uppercase bg-amber-500 text-slate-950 hover:bg-amber-400 hover:shadow-[0_0_20px_rgba(245,158,11,0.5)] transition-all active:scale-[0.98] cursor-pointer"
-                  >
-                    CLAIM BADGES & CLOSE
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        {/* Full-Screen Disclaimer & Copyright Modal */}
-        <DisclaimerModal
-          isOpen={isDisclaimerOpen}
-          onClose={() => setIsDisclaimerOpen(false)}
-        />
-        
-        <PokethologyMissionModal
-          isOpen={isMissionModalOpen}
-          onClose={() => setIsMissionModalOpen(false)}
-        />
-        {/* About & System Info / Bug Report Modal */}
-        <AboutModal
-          isOpen={isAboutOpen}
-          onClose={() => setIsAboutOpen(false)}
-          isLightMode={isLightMode}
-        />
-        <PwaInstallModal
-          isOpen={isPwaModalOpen}
-          onClose={() => setIsPwaModalOpen(false)}
-        />
-        {/* Full-Screen Favorites Management Vault Modal */}
-        <FavoritesVaultModal
-          isOpen={isFavoritesModalOpen}
-          onClose={() => setIsFavoritesModalOpen(false)}
-          favorites={favorites}
-          toggleFavorite={toggleFavorite}
-          onSelectPokemon={(name) => {
-            performSearch(name);
-          }}
-          onStartBattleWithPokemon={async (name) => {
-            await performSearch(name, false, 'battle');
-            handleTabChange('battle');
-          }}
-          isLightMode={isLightMode}
-          sounds={sounds}
-        />
-      </div>
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
+                      <div classNamexœì}ÛvÛH’àû|E·ºDõŠI‰*Y-ÉCQ´Å-İZ¤«ÚëãcƒdŠDØ hŠ¥ÖÌËÎË³çìË>ïìûüÉüÀî'lD&.	 3R²Ë56gÚ%‰¼FDÆ=Jc×ü§2t,¯R'ccVi”ÿ‰(>÷µèĞ§£ç#=¥¾aZUÏ7üwÃ‰a©W³rÙns““²²'BGæGò.îß{ÃÊ÷÷Şuõ¼jSJşñb>À¯æÃû2´Ï»„ŸJƒqÅ³ŸV5kÛÍù×™Û#:"ÇQ7øOe¸4ìÊ³Zm»Q#·½#¿Î=ß¼]VÔ_PjÓ§S¯2¤¶O]ÍšÙ\½™a‹ÓğéÏGØ­Õûö¦^›İ½%·íW5"¾k?˜ö¸²0qZìÁd>"óÙŒºCÃ£¥ãpÑlÍU—Î,cHË•-²A66·qàÕæv?´uÛŸRñ	OÛ)måô«à @I<ú»°Ë¸?%rüäÒûAÛßæƒ~Á†©ßÿçïãßŞÃxñ7Òë·^vô[˜»Í‡Û ­ê››Šgš• 3É¯÷Û&­ÑÈôMÇ6,rØGş¼-W†¥SlşÃ
+Œd¸(€7lÇV–Zp8ÙÍàÃ›}-<Å8³8aAŒ‰ö"ò ƒÑ;€÷ƒJ½t,ìÇ©á‡Û“]å„SKLÑ¾§}*?+†¼5§GÖ«N<’*ü1
+„G“Ó„ÓÅïÈ†íØtC}šòKi`z‹ùZökáçSãV÷ü¢sÙ?X‡V%¨B’0ØŒä1oUh+?±™k:®é/Ù)àskÚpï|!q}Ó½ºéö_?â$ÂM~ áò?û¾û†;¦şgØg´ ‚kÓrAÑş÷[7/;}>|#øù¬Å"¬{Owu¥OfæWv“<™–;Ì}ß±‰bİ¶Ìá‡£û2ã9=êw½xç®fÔ.ß–G•gvWÙ'3¸ø0šÑ]5ŞÜƒğ—&üßYE8©ø®K_qëZ¹[>´=vŸUøêMŒ‘³¨¼©½«½«7gwïÜñÀ(ïìn5êõ­ÆÎşV­º»ùVÎK©»m90‹\˜KÏôgË·[Ö…âÜ¥?nO\K5óLõD8 Ãí–mN7®]êQ{Hc¸:ü…ZCgJ/œÜûÂû¦‡‡}tozAüú ¶@PH€ŠĞ6„“ä+ø¤?÷ôVâÍğGöªïÎonÇ+;
+3ß}Î+Ñ{8±mq®Ø¶3®é9v€j`¸Ò-‰[±!s6%ÙZ‚?3Ó†«/˜ÁÑ=ÿ¿<@1nÆÿLØcîÂ0í¨‹òŒŸ ˜LĞ ÿ%ıH1Ïd;ó–”=D3ïyÕö&áßØ—òæ_PÔå™1óÍayÃ2Ç#ÑÃÃCb?Ï±€ÅM¾<ˆçı,û)Ğ %9›ÈÀqoˆBá +rï‡x…X/Ğ	®2{Æø”BB”¯K#|¨Õ ˜V7M1Lh‚ö=q€ï‡ş „ª‡4µ4øÍêÙfôÎôóºŠ	¶ô—3
+¢ì…=.m‘‘1pFs‹àõpkSÏÃ¯’®ÄûŞ¼fÌ´0*5B~«¼{õ-¿gğdôIBğlŸ€\gVXs·Ò¸³Òú[ïÄ¨Ü­4‘cBÙt`"ÿ^ò$"Yúö3cÍ}¸`Ø±è­_©oï’EåÙ™à?ÂM³]¯%/	6Ï˜çÌ1ñÎ¬Ğ0¸WA™ $RœÁù)Œï"g' ãĞõ& Ù¢¾3#½¥çÓ)9£^‰'†[`«¼	ÀÄ˜¤TlrQ0>Røş¹;à.¼éAx—ïpÕ=¶…¿ ™F-¼v­±„‘²˜‰YGR>&ıîf7ÿÁLØdøï¤"lö•€ƒFM¦ß^µ`ê_å¼ÄŞV}¿ìDX‰Í·$ÜnÖD™,“‹Ø…EìòE4ùš$©»5-œÃ2q{R–fXš,³áULg±Sip"`;×˜‘Åp5ÿEµæI#ÑuÈ÷q^xñ|µäî`ùì]¼;	eGš´ ğ+bOáIr
+R÷kröêDÁÂMŠå¤¥@’"I­ÚL¡y {ŒNJa¡r·–Z©ÈGÛá	*“˜IÎ¬6„Roª\÷½7ØRÎÈ«%!=Ûšı3À’R¢Æ½tŒ1/l)[~|wIî‹°$ä8!åw›ä^¶™Ë?âYÃQsº¸Se¸Ê$½‰äa<ôHîá¿ş/ÿºIFìGvœ)8ŞKÊ6Ã¹ë9n%¸B$ô1¶^HI@1â!ü(
+Ş…%	À“5Éöø¦oÁÖp¹¨Üñ†›ÙVRú›Œ²‘+|S\Çç—’¸vöç­ãNÉhîì§*Èå/¬œ#Á“3mË„ëö¸}~Õë¨ _%ÉIÑ!ç&f´³3GËŠò	œ£‡\°µeèlŸoNÍßhğ
+™EàVÙ#ÓügŸL»
+\ sÓ;ŞÓ‚“·&»Qğ'åŒ—ÀüÿÂô<ØÇ_ÌêˆdGŒ$£ç»Gñµáò‘E}:B¾>è3úMúÎ”7ºv10íĞÁÜÎWö«/ƒv7ôïsÓEÑI|;ñ«ìmÆÒÃš¨ÄHø’m›å³§ÿH<s^PÃŸÃ¼IÛñ¦æô€y|°›Pòa‹ÅK”„d¤xèØp·CßüHƒ¶h G¤ÌŞIm$G¨L¿¥SÃâêtöìû¼µIK~%‰iüE2ödƒe&ÀŒ} ‡Şšö¨\™Æ°—\èÍ€|V“ÙÆæó*rïğ	
+ÒÍšl Ã÷‘	yÔ`¼‚è-ëq#Ò›µüG.Ñ›Ñ!¹••–êÍNéíÓŒ»ê‚) Ñc¦#ép2h¥L‘ø‘’?$Û¤^Û¬úÎ³ËõM)Ô³¦/(â#raø“*\[Îé•ü™ìTûµı]M¯]{8¡^Ø/ãZÊÅ;&arø{½!kÁı4–oÅ¢øVğ¦çœ±lš‹ä4ÕFmw¯‘×«10-à$¨ä^
+QƒçÜÃˆA¤>]Æ>Fô×ÆÆfd]Ø®l¹ya³ú+°he46l²V—hz”ÂĞÌwÏœ©”4<¯š#r|«…9Û§íì¡5Ù¨¼1¥cƒ[ 1âÅ|lºæ†|ã\á¸^¹‡éõ&¦½â=™çUÔDù¸ƒ?¡îóê›çöÖääƒw³ñPĞNôÇú‘O1İÏÄÁ)ïmÂEbÃå¸™º¢¡»²°Åf)öÔÆ˜[~ÁyéÖô„3}¢²k}šÓ,Úêg²^Gyï¾ŸøşÌ;ØŞvEulú“ù`îào¡!{èL·±ãÖuw;ès{jx E_ú6›òvz#¶¿¿ÁyƒÁÕö×ÆÆÃ÷÷R<|¨Îìñ{)İLº†ù¡JPå£a!NÔeT„Qß)ĞÀä­-†–HÎö=ƒ§››©!\
+Ì¡±áªµ×	ı5ÊÆrvava%v15ö“*²?»*[&×Qg¯©Ğ6‚B£ı¶ã¢GØ“hµ3zm~€İdc#6l “aÛT¦ê^AÙoİçÕv?Nß½®Æ;^mFåÍ=NçİØmnÕ›û[õz1¥7,£73ÜğÅßÑ,CjS™Í-OÊ¬ŸE1Í¶ÆKïÚk¾âêkûÛWX÷Ú­Ëµ¿‰Rk­Ôü+4¸9>#i5® ²U¡Î¶˜fVªú¦{ÍÑ½Ó¾ªœY>‡öñ:X?
+zñfé1õ©1°(isN‘œ8£%ûb˜E¯”Gimw¥:Û3:ÛB7G&ÔÀ¤½o÷0ô|`mÔ÷æØk>µA¬?C]°kÌ&¨oDmË'Ş¦ĞSÚ5‡rVF6Õ@_Ç‰·âWCz=‡ì—°…IÎ-ƒm»ÀÃÀª‡¨™õá	‡g¯NÛõ¤LJ¼i»Ğ<Ó']Æ´wÚâU£Üš|CÍÂ4šèiÙ Ó³9æŞ¾*ÏI…Qv»Å²Ò/OIµn ‡%Mn÷	û75r´N8&Ò»î´»Kv^vnÔKÏqîÔnMÊM=fök1%×®ï?İ÷|”e$ê+äº#©læfufŒzˆÆå-²QÛĞ8üê×¨¾áñòà­!ræTRtû}g<FíÒv—¤‡h¹¹¤çƒx€Üµ yiÿ#±!<_İ™9 )!ã¡ê²ÆR–`Ÿƒ@&Ò!ŒêbÏs‡Ö»è†ãudÊÌS˜ëÊ-¹:D$²@– ¡IŞˆÉğ)s7='¥´¨’Bx™äÂïˆ8*ŠÉğr%Âà'/Bê¢uò¤öòZ=Ñ±6¶/ú`C; ?ÚRkñdÙÙƒÚ}s}Ñy’“Í	€•0w•Ô¡Ÿ²ÚÅêĞe¦\¿—°(ş”î6ñ6Ï¢g¸™¨hè±è©WkÍ<`a/ö™ğZ­ú,÷µ'Uì%:†®J|Åú0ÈtXGD¸Ğ$72D¶$·qâHdXìilH©ŒÑßPG4òOB´­‡şÄİ#\Mª‹(sneRa7ò5K†eà¸[“ ~ŠÒ÷Ğªåá”à	S‹‹CLöÔj±õà)xç‚ìySÛ"•:üƒÿ«½E½CPC‘a<œşŒRm¨˜Ø„+åÖ)JÚ‰sQÊÒÑ¨ÊÈôçú¼õš´o^kIY‚Š¬ç¤a1Ïàfª¼ ğ@ã)iq»éMœã”Šs•‘”·€-D}E-P îÄ½|µ&Àû×¡hŒÿ…_ËCÓZôâ³F[·\©ø‹¨	ÕÎÌÛÜÈwAô´ñMòÑ4LõáKRG®|wk\Ø1"ex S¼œC},3k¼C­ì\+Ûhn¾ÕÉƒ*õh/Š–«ñ%KÆŸsf†‹ª‰Ò?¹ôbš\ü¨§mNÇ:FÊs‡G÷±™Z¡RäÃò$·/ŠÕ½'ì×æ°ÅáŸş§3ø••¹úDéºİ\D!Tí³ø¾‘²ÍÕ+äbâÎ®lè°©#«ÌRîR÷ÚsyT²Jø“ú5åæ“ƒP‚Ãù¯tµv)¯‚^'"RÜ>"ÓNB7¬”âth2ÙÉŒ
+}…
+TPåhL4ªõ7õ|b•—PDÊD&’aÄ¾(:Âd§8½ˆuqÌé<¼İS3Ÿú¹êÉÔ,pÏŸyŞl3a>×§æ8ìÃû'ÆhLƒÌ(ßßû¬OÚa>ÆD&ËP+úÍr oÌßèè]èŞ“hìÁ££’7Í¹©u< V‚ÈG!ÔÉ2^ÀŸëÉÒ3a¾d(j™®¸8>É39À‰†ÚÊ(IqÉªUB€„%)mÙ€rÍãMlrcĞ T­›˜Ù@«"véø¬Ó}yÖ/$.O¨UHCÄåß^ƒdJ¶É}ì^÷°q/ºì=”rÕ˜zqô?ìáüòÔ‡3›»3‹Çº2>c< È#¨ÅÀ{Ô™¸#]`˜\`–CÄÕ­Ùc.r)Š‡\õó;Öæ¬{ÒÂ9•0MÇEëæ5itÏ»ın§·’?:}&Ã*.m€Ñc4'YD~Â¥Iî†9³F6¹Üt$Cıû¹ãªe$õåŒ†2n‹øa5mà]ÕÌ3ĞáÄf×
+ŸÇGÓ›c¾=‚}Äw:f™wŠÃe!0a¿—›$»¾¥í©HÌ§ë`8iT6+fT¨63ö»„å@´ß¥¬"z²Ztø<cÃ‰á¶' *É 4v7}§Z,[Ï¬X:>iõ:˜€¬ß#­ËÖùë~·‹ïù÷¡–úşèğûä‘—znª
+6B{&ƒÈ\h”&×ÚQ‹Œ[‹™¸hø<Ø(’(s:krL\#MdÎøaf ³Në¼F®¯º—pöå³ëÍ"I‚òò2‰vÛûÉ¬X~@=0É6-ØóI‚¯ÊÜÉ:ãbÚó4wÙ©L¢áDMË59Qø‰N©kX<˜.™N¤[À „ñü¥Å¼€cıÉA+éú\Ì6şôU¬¹ÚÌœıÍmƒHûôcÒõÙë^·İ:'­~¿Õşé1hSlxHØWŠK‘$ƒÈøG?9.ñ~b|ÊÁŒÜû†5çä´ó¢s©óOÌ¼›A–
+&5A@ãWŠ6avÄšèr~Rœ	ö÷ó"Moöµß6Ì5ïI.›ÈaDÄÉü•âLè*ƒ8(ªkØş~vœùÊïšgàªà"‰6°Å_+Úğ-	õWcçS ìğçFLrğãÍOİËN¿ÛFwğÎéc°F‚“h;ü•¢M¸'ŞøÔ°>ÖÀ&=Á#2­¡1¢˜“ÇBu¼€£ß´àZ-øú*à|ı¹ $ÖÁD×¾u¤q§¡«•ÄE/š6aæmÆg6Ğ#L°Oä°‚ÔÍw{,WîD8îz’)§’ñäy!Ñæ4¼t|í|ø·ÿ=‚sïØ¾»
+ÉÖÎm&3„ızSñ
+À|îad,‚5ó³ùz˜‹›³èÈœOÉ “vU°O˜qæÒ
+.ŒiPH,qÙÙ0ìåbB]º‘ëå)ñRİºæIöòİ}BrÄ"vN©÷pÏÍU,Ä‰›Ú#ILzd+ôµH"
+%}?ÃE1>ì=…«¶"døQG$k^Óú'ƒ& sNØÊÛø3ï{À
+IÇÆæ)‰Î3)Ò7»«ìa¼Å.ù.Ä5s“Qÿ”»5,N{–ÆDGZ±ŠU2Ï4à/D÷Qt ¬ï,b$ß½”¹I†Ä›å6ñ&æ˜–KeÁK­¤®aÚmÓÎM©¥4ºBRŞÑQàóf“æG“/ÿÜíüB^¼:?c[7í³îÏ¹Rb^Ë:Õ)¦|A2;üfy…,‰ı	E¯7æ–Ğ¹3¦Oø×¹ùÛ#’Âÿ^ÿ–ş[Vø¢t©êÉÃËÿÇÍŸ{ÇhòÂ‰©ø–ó=şôÏ:W7¯Iço­Åµ÷-ë{òÉ:Yße’€&_Pxÿ>A¾ oÙ‚¾ejÏ0¡2Xı,¹Ùw—›ñ"HÉş2g¦‚¼Å‰áÄêabN	{Íğç=Æ„ı„•³¬*}ƒÄÊ·À{:Jä1]…ïğo‰¢YQ¹¬lM,şÎÕl—‚õ~Ï¶<wÆa#øS|I6/YÄÑÑ}ü·dg×ÑLÎ®õ¹‚Q±Aü·¤‡ãNè„}“õ4K|•ô†›<÷¢îøWYaÃä÷ÕêtEø/ğ†Ğ
+ğÉçq!>HÖ-»¡S¬Á!×¤?‚×Oß j|\¦³Ë„Œ©vdZhqƒay¾Ïg’núæ”:s_šŸwnó^Ê©7¶XºVeÑ3ÇîÚ˜ÇÜW,æÏŸÃüC€åõğ23l1]Xß”7F†oHÖPh¡9û•ø²½$ èPË¥¶A8¬¤;¼Ñ ,Ârvà«Ê	hÎ¶¼¸Ì²<+{Ó6
+:z«ÙQHØW^»k Gêâˆğ¿1õÊ÷A	É·ÂäşìïtÎüäaB{ö+³ƒ±¿èGÃã	0Õ0ÆKûúÕÿŞs9		iùÍ[0=¢t ºàãÈñ¯5¿gNçc7Êª®¶³ßıÒoÍG¦ƒéÍŠ Æ*D6„‘éáŒH‰ËäIÓÁı5†~.BÀ½EÑ.Xf¿q˜!†Ç#Z“Ó»Ö‰ÇOÖŠÇá˜Öfl9Ãº˜{æ°íØ6+o‹S]²Î¡Iò½,/öË3T$ŸZ3; Ha’¿vÚR-U±G#²	ÕÈ\Œ‡XÄ–9*PI›·¢Šîğêöy¿ÃàvùËL÷æğ•)(à„bÉ7Õ5B³í¢J¡Ëòİ`ËØİdQÌ,o-5¢¼üM‰øM‰XT‰{4}Ó!Êæ÷•é#òº¦şĞ”†³r‚µœ?*peDÚ¨×¼¥ŸÎc_€*Q©>ëuúıîåËŞJZÃO­=ooÊ³oÊ³Ï¥<Ó%×Î¿:>ABíF¢Áˆ,$š1Èu“ÈÏ,ºİ‹YÕ¢ÙÁÓ±öº”Ş¹É†e”-"×j"{u)HXëÕi÷
+VyÚíñŒpW—ı›«sAS›dÙöE{6EmQÉ3±è£¼æGdÅŸÒ Á0á•ìUmı<°¿]gQ„“(Xg#9†˜#¼a´NÒšäĞÁ8åx—õ‡Nqé¸‹ãßCÊw/'Å
+i­£ì¥ãàDF†ûlva„"/;[İ :w’"iJWÎ3İŠÜcŒí
+_€êyÁ:’äWtÀş1H-É•	¤ìÀ™ûL>eÊTæ\éä”)¤´T4„DÆ¨¸)ñî@Ôğ’ç¤±O%šÂ^0dÁ&ÖµŠÅm§IŸ:e3B’’Y S‹mâØrùm.Ï…Wşt”Rs¤¶5±A‰tÕ"æ ˆ°ÄÅÌDÏyÂbåJw;µO×}rN‡½¹d/v0ï(óZ> ‡#{œ˜|àã¬Ní™—i´@úĞ9a–‡M+{ÿ@^ùºHØ+ù¦ó²Ûëß¼ÆüúW¯.»ı×äU?Hiôè‹¹HJU…ÓëÚo&uÁüÓrÒ¾¯£+¸sòÌøú—VÚ8“ü¬¦N~
+Ñ±…¸ÍXôÙËäbæ÷‹Â}¤)Kû,ÆæÜe"s¸¬#ÆyEüH¾óÉºÆt´«  ¯bÈ©³°-Çå;äJ-ùPë
+i+T‰`#‡ú<µ…ØÆ"Áti‘eøE¾p‹õs³~Q’ÖlFÊ€*…Rê(Hä~bZÏ$Œe¤	Û¯%=¶¦>úMÅÓa±$Ûa™7­%P ²tæ.Ñæ0‡İeÓ|Dğ—~‘²eíÈòwsÍ†æN{)D1ò/QwAé/¦¢`#5‹×g­+ |SQÆà¼½æ(Lş•š0ıı9œÀ2³7$†öÄkßÊå­w[Ä¶‘½ŒÊMínøŒ»ÊË4_bŠRş$İĞ8Îfnû·€–ì?ÑÿŒ$?A[C°_7aj¢çú”’ü—sÉÜÂ°>ø8ñ„8·¼Ø«ca®Ë³W§ä–şÜ¥O’auõåÉÈ}SW®A}  @àUÎ\§eIÑjy+CÑõÄ¥·G¥°öb±¨šxuŒ]cÊêh¿{WÅ.ˆÕwï›corôú×ÿêÒ_­ùÅé¨9:s~S1¾á©Tz²’ıAÕÊ¥¦˜w` õm'/Õ¼¼§ÇOKaÕÉ#‚Ú(§Æ²°„µR„R1•M¼XÈuÜ\ÆŞ•’ä:L„ƒ­ÂáG	t>ñÖ‘ëneùô:šô7zM¢mû„›í7F]ş¨ Ù/ËräŸ3´zÂT­#¬‹”Ó"|[
+Añ“Æšûgàn-’m<LM20ú<…å›SÇ°3,8£F£¶[™Şd[pÿJœWö7ÉJşîôô%‰oÌo1…m:ƒmº¡3–é°<¿ã‹Õƒ1 ˆ;¤Àñ°òÍÈÎÑK”Yø¿âù‰ØİGOåjeOòõ+j#RvÆŞÒd½¡¬Æ¶ü‘é¡æ|„¨7tà8¨7]º@°ä5BÈ~ãÄ.I…	*ˆ¿$‚˜$ZÕAà=
+/Ç¿Ñv||ÍY€Œ—O$W0Æ«µ¸²àğ†ù×´‡‹”±1$™¥-"š;J¢c\iS“˜j}Z¦«¬Å$¦Ès²qÓ9¹ºBï4r}õÓ¿ıËiçoÕjuƒà“^¿uÓ~'½×½~çbCmë[Ïº_œ¸àYíÉh>X´°ÈÅ”Õq­9
+OE>‹§ºbì:w&Vÿ°oM—»]®šÍÂ›8ì$ÑÇ
+¾èŸßÑ\ë^ß½ÃuæüĞQ( Ã©íıfÊo|:ZÇÛLïZ®ŞÇÄNÆ·Kc‹àNIİY„=ëò²ÖRÇ‰pg‹u­È:—I9Ş{É„sByCæ ™Î$ZwkQEÃg[{ûøÿåpV‰"d%yqºœip<3_úÊ;ğqÇ=Ò"Ll£Ÿ?Ğ‰i	P²0\	¥9t(â?  hÎ ³¼c?,*¼>»á…¬ôÆ/îŒŸÇ`K’t‰ÎiioüMØeóv¹¿cŸ‡!å&U2dş]|Ø²¨ë÷]Ó°ÑËLâsÿ¸„IOñ0«\xû2ñäõL7çF~S«Ö›tú–4TùW\ÁEÛë^¼:oõ»W—Ï¥Wø‰góâÅ²„´ôrŠ¡Pù7+æÊ¹ Òù[ûüUæJúg7VŸœvúv¿s*º$Ò‘]—ép×¹-”é0Û)òĞaR™$Pºø`KgN¼yğÇÂ°}ÀtFU½à¡Ç³ÏÉk4@Ër)<%3×Ãì……À‰‡…‚€!ó|üèÎÜöŒ0èL0J—,L$TÁ+%àĞ£S3)é–á©‘Ö’Ìæî˜‚06¶;`qªkŸ´òãÒ5bUA›íúæTŒ½¥67Ï}(÷M´îIx"­}X!ŠäqÉmöwI –¥oyS¯gÈàkH«¦ÇX¬ªË—ˆºh*B,ÄFÙ¨‹”tÇ!8P=“–ÖÑ»Îßº})µĞ¸> ­q°À•İ’òL„‹ÂÛ›ÿ.óßÌmµWÙ¡˜86¯Íä:y˜ÿ¡7dvk"W±/×[$ˆ¡D:LA¯ÜoMä>ëÈ}®äí«Ëİ›‹ÕÁ|ÅtˆO'EQk¶zDş2¾»j ó—&4î¬-4ÖRB£(ìünBã>“ìö¶´;¢‘·´Û-“%¸^Œ8¢ğÈ¨MŒjµ2jS.£‘XYôÌÊM»rù‹ËJùD6YÎ¹ËœtØ«\ÀÉÉğt>Ùö€Óe2¼0P5mù‹’ÊD¤$J¥ —oš2…E§ƒ&Y¨GiûxE’+?¥@‘Fo IåÍµ“·…Â¹©iYP®[ËƒĞñpwäc‰’é±àÒÎ8šrø³bä‰Ì:37¸¢Npgğ¼]pÚ;Š‰éÄS…V:f’Sx‡˜zó¢xÅJn†Útº²dUò¥3hCè’†O&Ô°ü	h×ûto‰u=¦¾_=–ÿ‡XæX×ÜàÄÑMÏ±· Ë¸ø…RØ?bÃœÌ¡cÓ%˜I¼ªÈÓ®T5|¢ó–TW\ûÀãP%~â¿L@J™‹‰½#ç¹æÀçV××€M÷|}øü¡eÿûÿø×°:Áñ<h¼!¢²ä(	œã°Ï†')ª’†‡´1<í9ªú@;ø~Ïÿîpº.8jØIÛ5©'İ7fg1La¤£…³ °s|<2t—ÕU†ju+”-†K²zpz>‹oÚ@±$ÒC#ôtÇ¹ )Nøf z¡v`õT3‹Ãí¹µ¢©ô	@VVnjm˜
+5q mO‡%¢¡O(“¡Qı	l®‰äãvn`iFÎ”şwòPËÃ»}\Áğ[2†ÁÈÔ#şÂ	ß («ŞÂóe pÃßº€cö6ğ€1×ãn û¶–‘F®dB’êQÌ…ë ±³½ïV£h+Ü‰ÈØt	ßò†ASj¸VhÊ”6_:>`ëw_’\ÆŠÏ¬,á[tQ¬±º(–tåúòlxÍOgÃÓu-¶6¸°µñTÂêå“;²ÄzRÓÄìE‚Vm‹ı_uos+i%ã™&iê
+ØñgµòãO &È3R“;¶›É|U»qBì}ÊlÈóvÕ`ÛvrİX;m˜hx\2ÃcÊ	ÒÒ*18;™¸˜kk ,Q›D‘ŒGÉ=¨3İóHşdìÊçicèŞĞf£®bj“»ª(ƒ÷ä²3lÇN`lŞ©ª-mtõãbX¥qhŞšC6gt”f÷‹hW'ä‘è*P&—!s·§²¤EÎ›)D,BgW€uáø…äà<(•‡ğ¯”u,;ıE¥Îr'x!ñt¤ABü´ÎÜO„¹*Xx%“«³©îæØTCĞhÓ¶Y&Œ7¬Ú‡{mú ¹Ãd,*OË¥âÌte˜˜¢ØIF.5¦ãRAÈíÇè.kÆ¦­âT³c‹¼|l¥h0Ñ"Çc¸ §†»DŞÛ{œÛd 1pş(i}––•L€dƒhÉ07l6a»*H†M[-gFG¦Á˜ƒ=nÖq«XŠÍÛİfúÈ’“¹°YÁ	 +£[Àì¡ğ€ú£[–µpÜLEá-í!*0€„ Ñºî’†k¢w¥GX³ş¢­Úfi‡*Œƒ§âƒT…#¸À¸æY­gÔ7mš8$¬ÏSi<tîO¡ùÃã¾ ¢ÆşàˆÉşªÈŸTÈÄš—ÂA²ô¢¹½ĞévÎºÌA:Üiù–Ö…-Í”–E'L?%¿ä›Ì+ÿª
+]±Â//òÈ “ƒkcŠ¢÷2€’¬4aÅHFUüÀ+‹\cÁQ…¨×ÿ|©›Ğ[NåÔÌg„Î&]›Á¢#€Dé2Lô3 lğKûşß†sÇó€’z¤°Àsş8†;JCÄÒ6°Ä/ÏÅ%ÿÁß£îGô$1G”¼¤pù˜¤Õ%í‰á_ ×¹[² >k=—‡e=DTJbøÊVtí:Lø<1\Ì@­éÌşÑ÷+H
+NNMcl;p©ÂÍÌex³pÑ?ÁŒæ²Ñ˜’ÈüL>dØ„•möÁ
+Wí.™ù±IÒOÑöUò êBRÔ×Bó»ËuUˆ¥—úŠw¹Dè‹d5Ö×¤Â|yW
+Ycá#‘³*ŞBÍS–ø/èšÁc ;IÀhCóc“…ŸÄv3·mÙ'œcòğùûÜñs½|¬)0ÊÌ…^·AºH„Ş|8^=Ş--Ú!q5‰ù‡»–?ùfşä›©É7‹M>ïyÀw	X¬V%ë%E9öJNÊ³H×íÎmaí	~PgÇ2»úI™çËæ,T*™5ÙF½Sa#&s‚×ç_Ìì¦5ICªÙÒÆPtÅHÑ¢¤Ï¹v 1É£à¡Âij]ğiã®‚oCüN"·‹3Û+G×Tf6G@ÑævÅ§Xp¤â©²mP™‹û\¤¬V«Aá‰€N%u ™.“”®´yAÿdi6ÛÂâ\âpJ—K@‚ˆ”TŠ¥=yªy¬ù$[ì*·VÊqF²Sûÿ÷®Ú?uúäº{İ9ï^æWŒ–İj³.Ò¸ ¯¾ÄjKÃ°6M	á‡5KŞJJ–ÈßFbôzâæ†Wœcï5S{ß¾º¼dñä{hÔˆRo¥÷eñ‡‡Í÷8léá}Şdƒ»—/Ct9íö¢Q”È’wé»3 İ •ÉˆGïèûShûêåefHçòåZØOŠÁj¬ôõİåójP_Õøaúßó«vëœ\½x˜DÚW7vÆ/;İË.AãÅy«wöíœ¥„¨sósç†\t.®n^?Ù!¯u´S:uÜå5f¯<Æ…¾ÿ^lzşpqB¶‰ªExZš0quÉ £×i¿Øøêû(¤”W—½õ`A¼Q	!GÓ\„‡¤3şÎ—­¡ÇìOÎ»½3¸E.¯N?É©ëØ%t19í¶^^^õúİv7¶wuŞQTR€öeŸ÷‘ ¢8X½nÉÍ"™Ÿ‹å¥I¶¢brÚÄğRG•øİs(˜‘9róWäÂY-VÔWy™7Œe…?×¯Ì¯¬‡‘âB­Ù€)Ã¦ƒUÑmòä`±Ä˜¬¢“¾j÷v/ûóóîËÎe_ Qr~õrİ<2ZS:¾A÷:ˆÌ|øÓ£2é(e~oá(ŠRiÂ Íe¶´DJ§RÏÀ[^Fì"¨ˆŸ$FHrF†møÉ´GæØá>úÜf§í;ªTB*;˜÷:ŒÅÏV?º”VúŠ<ósgì¡Û.5¦+y¨Œ­‡îLu.³æ†·gQ³rÙrÆ[@]GôyRêT>+À/HyÿG¬|Ïú€?`´ª7 AÙ—kXëxóá½ş•Äÿî€T4E]Â‚üßåÜüSXÆ?¸>ÓZóõÊ¥7½Wív§×{[Ú”J°¿ìÿª]ÿÒº¹û•8ü¯ÑëÕObŸ±U(-Ç9=k´LøÑ)~Pô=äW	&¢™IN´¼¤=®]Èl*Üí+eXIDfk²v$=`Uv˜SÓƒQM »µïtÜ(NcşÀ½FlæjÑ^)‡FÑ¬ëù¯úÍ–zA‡NáÒÅYuEBm½Zº°FS,ÀµjZ.‘GT#ïÎîŞ5"7×ı­úns«ş#î>&9ğn—æ—ãğÎêSï- ÜfüñÏm5^İuøå;ÃªÉßŠ&kÏ+šã<mÉäÀ¾¸^åäü€àL½d¤kšzËù‚×fı´Å“óxKÅxÓ²³§dá’X4Š*×qtéŒ ùÃµ€è½Ü"(4`*jW©ÈªË¢ªKÚKéü9å’vv·õúVcgŸm^!ß¥¼|³Ä)>viQ]ëzîçP­dÒçÎ‚ëN_í	j,·¹cÑÕŒ©Ûª°u*-g~.\h™±!Ñ§I^LÙWX<ùk®†|a˜vP6¦åRcıBÈB†‚LäEèï[m¦<~ùiåd
+Š<Vg·‚¿¸_»B…eYø’Š(¾DoW©HöTÅ³C:µt6N¢H&ÃTø„¤Xb|ƒ†	)§x?´l(ÜC€ÿõ,“ıQaÚ5V·Tga)–÷X_MN—c‘#[”¤™5Çk«İ¨•™MåJ2-&¼ıJ,ÿW<cÒ¹› òQZ»uÕ·’°‘0¾)Ì$+÷§€lÑ`ü`l	€€‹Ñ]îÖ†¡$4œ|•‡xÃN£/aç,l¸u¹©ø]ëºûî§Îk 3ÇÀÚ3_kx2ìç)µç¤Œ ÃxY2txÓMòÃØÿo>t©Ï[R–3Xp8/±E@Î÷Or£½ÃOöšükIµB;ÿgÄ4*‰ƒJZ{3V‡0s‹WcGÈ‚^˜×n|cI’×«U`º3?5½©éaìŞÚ5«s|Ò®b«ä|ĞêU×¥ª¬½Œ+b€š„êÚµbAv¼qój²3M×ƒíµ±l±'Ÿf†ysØ5ìa)…íŠEÜ×p^fSéƒ8?YJˆyÅN¼] ›ŸÕ|Z½iNHS:îãÒò÷µçV:0e9]–Q"ÕêcÉ}+îJÅ„‰œé×U_á»Ë\EÊJjË	§›{¡bSäR¨¿‘r&¥„„Ï¬XQBå5»“q4‰[¦‹LÄÔ‘çlDish&<Kj¹¬E·¯)@¶a™¿ÑOA³W•ü´eÂG(‘ ›"á-0å
+¶Ş2–+T€÷ã×¿ÃL©(¼o<Z	»'½\QXıÂŒET³ú"}¤DI¨Õ¨¦î"©I22^ì&U“IK*sÕZ– µÑ‰¥M2#%O–åÀe¹«7÷ù1fƒu‡A?ü·ˆ¼ó¯õ8h#Ìs¿òûÓ]Ï²^2ßİ{İô6TŸà×ïXöıÜYPá»LY“OS¯ã…å,Ê•ö¸ËÈ%ô…~›ğKÏÒ¬ƒ»@Y½(«÷şšYå>ww—¥‰j2 1}ÖøÓ[2 º»Ä d@Ş„ÉU0„Ñ0Ó¼iäxÈ™3;7àÎN+îY_óû[z‘Z4d$ÛèŞN :²zêüróõÍ·¥ôÅ‰}û¦oÑ¨ë¤µ[Ö~l9‹“1›†`hJÛ²£ìb•ˆ#–cä/i.H³¥WÑºz€#GS’%–ïƒ9±ûªìÅ™¹Ù.„`ÙÆ‰-ˆ2¨JŠëï³Jé6AkÙ>xóá8¹6"ô¨ĞnF8ƒÆ³•vCğÖÈÛq¹»Â¸ğv%¨=²Â®$ø¨¬R½QtOâ Šœ‰§·	MSf[ÒèãRórf¯>]®À#‰o¬9’ñËj7£f-Hªµ%Ë‘sİw£0•²š	ÁŒ·¬\o;szá’[²¼»ŞO¥ÔÂ»ÿÄíg’bJYÙ%vvoñëJå«öPAò\ªÉ* `zå™K?â/øßê­‰e@ğa|lK2#+Ï\¬#<2\Pì=³} ¨r’ÙÈñSÄNÙm'X'RQ„šAÈÌ`eH°µ ¦A_Má±Ê&’åAKBÈ2çelF§¼SPä„‚×ÃSlÕ9*äNéĞq9tUu—‘¤}\ÌÒ,¢Übëã¦­l¸jÂ@¾ë PPvÓ¾Ô@‹Ên­µğ/t_uáÀ<ÁQ±¹màåVØÏ1ÓÃ6–ÂûWÒx'ÄÙÔÆu ¡:×\ ºà¦¬”!a@Nn±&¦5¸±ñ:%¨Âc:Ds5K´êÚ_%5Æ¼`‰V9´MS÷X,RB=°ø5eQ¬Š5*»”x‡áü«Qh
+*–>’e«I’$ÅPæN+§”~é{èšÌoA¾É«&ãU{q¤ø¡˜F(MU–`]äöÄ°,jiÔ°_éñ†{-!Ô¢¬[Xw4™¢Ã~/àŒóxõÑıÇ\Ua5R'ãáp¸Fb8	×µ.·W@A…¬Â³õÃû!Ïæı„Zƒ´¢ŠåzÈ2zO ­Ê¤ŠÁ»J3tU³ÇÊí»êğ©(Ïl/.Ë9j Lğo_]\ŸwúÒ¦ÿ“R†ÙÍJ§{IIl§)•Nw0ƒmFú”z 4bê”#Š:’xÀHRD¿˜¡x€Ä#à×0â]Ó”ãç'àjÿSª×jRøä	è¶V¶Uyîsÿ+"eH$› ‡#Y øğj\3ü¾ Œ¿Çt\šøU?b@sUt"‘…
+'Ul)¦èb›WËøÔèôê	‰\e;ÿ$ûş<£ùiÔÒˆ¿ËÑ0ĞJïdæ"¡·3£®Ô^rFVw—J‹“C¹Ô†Ì]LC ÖPå´	«TôÜ[Àj¥Î«E¼‹$ W4%©*üé¦¦7‡Ü7àqVùîOù‰´Eß!_­Š¿\ãøKÿïı·!§­îùk`ÛNÈÕÉéğÀõ‹NŸlşış÷ÿûşUhïŸ´úäúæêåM§×S±k«Ã§·¾g(sFÎ¯™TSÌ+¶S‡‰“Ğ¥NéìÊ[hœ?öU¾Ãêjğ*a\zàXû&ğ¼ô¦j·è°Ş&à³^{¡;gy¸š6mxöw¥‡òªG%şXFÜ
+yN îVN¼oN©3÷oèm5(»	›wtğ §­\„qøL½Iêª˜9\*‰A]I‰0ãxÌğÅ 5-Ç7˜l¿QqT
+ıÉlAÈz„µ”´æ¸1'z´Y”gÏ|øW$Kz5!
+¬$Db±® ş:¾Òãwfèhå©x"¡r7OÊûr¥ÊZY@*U6vC±²±¯©s"æŠ˜õ{P‰=Ùu¢äÈÜáEa¨&¸ÁÈÊŒ¡B!up~O±s3!€ƒÛHTQCr¶CÆ{a\Ú^Ê×5Ÿ_*X¨)?½€Š™‘ıMÇúèJˆõ	ÉC¤tâ>Zá¦S:"N~BYÅèË”Ï!œBN× ÛÑƒú÷¹éÒQğàgÃ2Wã§õöÊ§¾mjÑ»®XLÅ~€Ôƒ¯tôEæj=¾šÍbUªÒå©²VÑôíN8Ü;¤@TeïcÅáç‘ŠÛ¢Î’4eÆ’‰8Í˜ù`)oPU`X‘Ê <4]`ÑŞş;¾æ­¬¯Amoó]íO[‚­ñİµ?aD»Hµ¢oL¶ÌYHèXzÆ«âbèNí3ÖE.8âzQàõıâ¥ºšÙºÈ±ÇÆşú•‘÷¾¸¨eLæË–§µ”Ô¨¢æ7E|áî¨ÖÜ]ÛqmÌ4/¹õ¤jLÁÈ^Ç*ååjføzA#|\a5i‚—\ãÒˆtõ£‰•Mºca¸èµÍ˜‹ùãZWòœtnFy<7Î£ş‘â´†“‡•İÈcNğŸ´y6şVÌ¨®PÉ†×:ICĞß &ïìí_1÷	âĞ…ŠÊÃ%8Ê‘áM˜“h:æ¥™Ü¹\œä.!klìÙY}ÛêO¾m ±LğŸÔ¶9¾o›ÈÁ¯¹k€+éhËÖÇ§·—šG*¢(Y\O.ô$ˆ3=*U¥Lâ¨#¨Á?XÁâ^¿Ú|û4ùXBÔlÈ)„:+Zªj^q9%]±O¬ÑŒJFÄ[ÿL˜ÕîSI)İ^éÀ^¼:_M>‘dTà˜¡ò°¡(¿˜‚
+e²ÅPĞòÑœ#i…ºyö ER‰ÛÄ³täym–­œ(äiLÉ†©
+µ(æŞ:?Î RbcŠS®ì>•.Eâg¡Úp¼d‰F,ßR’e)WöVˆ`‚Xãª^ë×m~Uª‡ä=\W‡qaLüôÃøÍ”ÿG©cAV©PQ+¬fÜÖsÂoMËSÀ«<êr›ÆÉÕå+Mbá•ªë/k•)38ÔÇ©şäKáŞ÷äjğ+e¹Â<Ò›O±”¡,1 z™Rš”(Ê“.’Ø5â¬Êqà_– yö\^p,£,P»ã©Š°$M‘ç Ü§+Ì‰9u…‰qÓ•âÔ,{*“dU9.`
+°µL”i¯Ìe–™Õfj5X^4¯˜¥¡İ¾éœvû-–­¿}uÚ9XÉ"˜ŠB8¾¾ú©S¹?…‘ª¶³(oV}§ÇŒnV=ËÒreoóae,ÖQûŞ|À o»íØ ßù<Õ€œĞçV¨AËİS9š¿ÆÀh“™«¡‹µC'şSÀ«şp25tğòjA1>¼« åÜ‚¹O”|,g<f:}–KÁ+±%
+–‚¨Lyb
+Q	l8±b¥ÌıÇ(ìÎ€I–À£M]4cAO‰ps®4l?8DVYÎwFÆ2›™‚!ˆ\JJğ­rÄËø+¤ T¹òzÔïIu£9‘âXƒRíìáëU½¡nÁdRÿ™ädXŞ°.6”ı> ·ÀBÊï6É½\„Ê—¬Â}Ã
+­ÌmPf.²|1XOåÎÔğ|cQe"TEjfbÎåñâ¹Äá4%¨@&x¶ÿ6•«xz¶öy«{ANZ§/ûü°ÔQRzô»&á±U¬Üb”.‰sÄâÜÙ’'”‘¤áŒ[²‡ÂÈ¦‡ùxM21ã¬Vˆ=GuùiÓaN.Ö>ˆ˜PA:›tÆ…¼ùd24hfÄÒ`²ªİ?„y1*”l““ù˜ÜĞ™ãJw‘½£2{\d®QCI"Ó;ÇCÄÂ4ØgôEºÃë…ÑÅòÑ–¥´)¼‹bÛ¼!ñ…ñÑq1«¹0lcL§¨*ıÙ€»L¶QkÖB=ó¨]áùgßlñmØèè>úS|îÃ•kÑ°+ŒP¿'§Ğcy×°§¨+Û@r%WLP!¼Gw8áDšÿê£pNØ™_Lõn`q¢ÃX¦/i‹°-Ø"Öeúº™ bÑ¾8ö˜–¥ÍVƒÑğÒ;ºçÿ• Q‚rn÷æ §Û^@í·;®ë¸'ø2Gø#LçáŸşéÿ  ÿÿ ;
+‡
