@@ -114,7 +114,7 @@
 
 /* Smooth transition helper classes with GPU Compositing */
 .smooth-transition {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
   transform: translateZ(0);
 }
@@ -126,12 +126,90 @@
 }
 
 .smooth-fade {
-  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity;
 }
 
 .smooth-colors {
-  transition: background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Fluid Hardware-Accelerated Continuous Spin Animation */
+@keyframes spin-fluid {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-fluid {
+  animation: spin-fluid 2s linear infinite;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+@keyframes spin-fluid-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-fluid-slow {
+  animation: spin-fluid-slow 16s linear infinite;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.animate-spin-slow {
+  animation: spin-fluid 20s linear infinite;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+@keyframes pulse-fluid {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(0.985);
+  }
+}
+
+.animate-pulse-fluid {
+  animation: pulse-fluid 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: opacity, transform;
+  transform: translateZ(0);
+}
+
+@keyframes float-fluid {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-float-fluid {
+  animation: float-fluid 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 

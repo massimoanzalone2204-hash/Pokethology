@@ -6662,47 +6662,29 @@ export default function App() {
                         </div>
 
                           {loadingList ? (
-                          <div className="flex-1 flex flex-col items-center justify-center text-cyan-500/70 min-h-[360px] p-6 text-center select-none">
+                          <motion.div 
+                            initial={{ opacity: 0, scale: 0.96 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.96 }}
+                            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                            className="flex-1 flex flex-col items-center justify-center text-cyan-500/70 min-h-[360px] p-6 text-center select-none"
+                          >
+                            {/* Fluid Rotating Pokéball (GPU Composited) */}
                             <div className="relative mb-6 flex items-center justify-center">
-                              {/* Outer Glows & Cyber Rings */}
-                              <div className="absolute w-36 h-36 sm:w-48 sm:h-48 rounded-full bg-cyan-500/20 blur-2xl animate-pulse pointer-events-none" />
-                              <div className="absolute w-28 h-28 sm:w-36 sm:h-36 rounded-full border border-cyan-400/30 border-dashed animate-spin-slow pointer-events-none" style={{ animationDuration: '18s' }} />
-                              <div className="absolute w-32 h-32 sm:w-40 sm:h-40 rounded-full border border-cyan-500/20 pointer-events-none animate-ping" style={{ animationDuration: '3s' }} />
-
-                              <motion.div
-                                animate={{ rotate: 360 }}
-                                transition={{ repeat: Infinity, duration: 2.2, ease: "linear" }}
-                                className="relative w-22 h-22 sm:w-28 sm:h-28 flex items-center justify-center filter drop-shadow-[0_0_25px_rgba(6,182,212,0.7)] z-10"
+                              <div className="absolute w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-cyan-500/15 blur-2xl animate-pulse-fluid pointer-events-none" />
+                              <div
+                                className="relative w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center filter drop-shadow-[0_8px_20px_rgba(0,0,0,0.6)] z-10 animate-spin-fluid will-change-transform transform-gpu"
                               >
                                 <PokeballIcon className="w-full h-full object-contain" />
-                              </motion.div>
-
-                              {/* Center Blue Lampent Light */}
-                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                                <motion.div
-                                  animate={{ scale: [0.85, 1.6, 0.85], opacity: [0.4, 0.9, 0.4] }}
-                                  transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-                                  className="absolute w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-cyan-400/40 blur-md"
-                                />
-                                <motion.div
-                                  animate={{ scale: [0.9, 1.4, 0.9], opacity: [0.6, 1, 0.6] }}
-                                  transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                                  className="absolute w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-cyan-300/60 blur-sm"
-                                />
-                                <motion.div
-                                  animate={{ scale: [0.95, 1.25, 0.95], opacity: [0.9, 1, 0.9] }}
-                                  transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
-                                  className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-cyan-200 shadow-[0_0_20px_#00f0ff,0_0_35px_#06b6d4,0_0_50px_#38bdf8] border-2 border-white"
-                                />
                               </div>
                             </div>
-                            <span className="font-hud font-black text-sm sm:text-lg text-cyan-300 uppercase tracking-[0.25em] animate-pulse" style={{ textShadow: '0 0 14px rgba(34,211,238,0.8)' }}>
-                              SCANNING DATABASE...
+                            <span className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-[0.2em] animate-pulse-fluid" style={{ textShadow: '0 0 12px rgba(34,211,238,0.7)' }}>
+                              Scanning Gen {currentGenId} Pokémon
                             </span>
-                            <p className="text-[10.5px] sm:text-xs font-mono text-cyan-400/90 uppercase tracking-widest mt-2 animate-pulse">
-                              Retrieving Gen {currentGenId} Pokémon & battle telemetry...
+                            <p className="text-xs sm:text-sm font-mono font-bold text-cyan-400/90 uppercase tracking-[0.25em] mt-2 animate-pulse-fluid">
+                              Synchronization Pokédex
                             </p>
-                          </div>
+                          </motion.div>
                         ) : sortedAndFilteredList.length > 0 ? (
                           <div 
                             ref={gridScrollRef}
