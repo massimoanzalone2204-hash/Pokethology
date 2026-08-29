@@ -5314,7 +5314,7 @@ export default function App() {
                                         />
 
                                         {/* Opponent Sprite (Top Right Area) */}
-                                        <div className="absolute top-[6%] right-2 xs:top-[8%] xs:right-4 sm:top-[12%] sm:right-12 md:top-[9%] md:right-16 lg:top-[9%] lg:right-24 xl:top-[8%] xl:right-24 pointer-events-auto z-10">
+                                        <div className="absolute top-[12%] right-2 xs:top-[15%] xs:right-4 sm:top-[20%] sm:right-12 md:top-[16%] md:right-16 lg:top-[16%] lg:right-24 xl:top-[14%] xl:right-24 pointer-events-auto z-10">
                                           {battleOpponent && (
                                             <motion.div
                                               key={battleOpponent?.name + '-' + isBattling}
@@ -5322,7 +5322,7 @@ export default function App() {
                                               animate={getBattleSpriteAnimation(defenderAnimation, opponentStatus, opponentStatAnimation)}
                                               transition={getBattleSpriteTransition(defenderAnimation, opponentStatAnimation)}
 
-                                              className="relative flex flex-col items-center justify-end group"
+                                              className="relative flex flex-col items-center justify-end   group"
                                             >
                                               <div className="relative h-28 w-28 xs:h-32 xs:w-32 sm:h-40 sm:w-40 md:h-48 md:w-48 lg:h-52 lg:w-52 xl:h-56 xl:w-56 flex items-center justify-center max-h-[35vh]">
                                               {opponentDialogue && (
@@ -5397,14 +5397,14 @@ export default function App() {
 
 
                                         {/* Player Sprite (Bottom Left Area) */}
-                                        <div className="absolute bottom-24 left-2 xs:bottom-28 xs:left-4 sm:bottom-32 sm:left-12 md:bottom-24 md:left-16 lg:bottom-28 lg:left-24 xl:bottom-24 xl:left-24 pointer-events-auto z-10">
+                                        <div className="absolute bottom-20 left-2 xs:bottom-24 xs:left-4 sm:bottom-28 sm:left-12 md:bottom-20 md:left-16 lg:bottom-24 lg:left-24 xl:bottom-20 xl:left-24 pointer-events-auto z-10">
                                           <motion.div
                                             key={pokemon?.name + '-' + isBattling}
                                             initial={{ opacity: 1, scale: 0.8 }}
                                             animate={getBattleSpriteAnimation(attackerAnimation, pokemonStatus, playerStatAnimation)}
                                             transition={getBattleSpriteTransition(attackerAnimation, playerStatAnimation)}
 
-                                            className="relative flex flex-col items-center justify-end group"
+                                            className="relative flex flex-col items-center justify-end   group"
                                           >
                                             <div className="relative h-28 w-28 xs:h-32 xs:w-32 sm:h-44 sm:w-44 md:h-52 md:w-52 lg:h-60 lg:w-60 xl:h-64 xl:w-64 flex items-center justify-center max-h-[35vh]">
                                               {playerDialogue && (
@@ -5450,7 +5450,7 @@ export default function App() {
                                                 
 
                                               </motion.div>
-                                              <div className="hidden xs:block absolute -bottom-5 text-[7px] text-cyan-400/50 font-hud uppercase tracking-wider whitespace-nowrap">tap Pokemon to play cry and rotate</div>
+                                              <div className="hidden xs:block absolute -bottom-6 text-[7px] text-cyan-400/50 font-hud uppercase tracking-wider whitespace-nowrap">tap Pokemon to play cry and rotate</div>
                                             </div>
                                             
                                           </motion.div>
