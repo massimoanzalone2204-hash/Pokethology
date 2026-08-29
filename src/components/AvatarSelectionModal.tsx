@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Bookmark, User } from 'lucide-react';
+import { X, Bookmark, User, Check, Sparkles, Shield, Crown, Swords, Skull, Compass, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn, playHaptic } from '../lib/utils';
 import { TRAINER_SPRITES, TrainerSprite } from '../data/trainerSprites';
 import { sounds } from '../lib/sounds';
@@ -19,149 +19,334 @@ export const AvatarSelectionModal: React.FC<AvatarSelectionModalProps> = ({
   setCurrentAvatar,
 }) => {
   const [avatarFilter, setAvatarFilter] = useState<'All' | 'Protagonist' | 'Rival' | 'Gym Leader' | 'Champion' | 'Trainer' | 'Villain'>('All');
+  const [savedSuccess, setSavedSuccess] = useState(false);
+  const [isLoreExpanded, setIsLoreExpanded] = useState(false);
+
+  // Close on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+        try { sounds.scan(); playHaptic('light'); } catch (_) {}
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  const filteredTrainers = useMemo(() => {
+    if (avatarFilter === 'All') return TRAINER_SPRITES;
+    return TRAINER_SPRITES.filter(t => t.role === avatarFilter);
+  }, [avatarFilter]);
+
+  const getRoleBadgeStyle = (role: string) => {
+    switch (role) {
+      case 'Champion':
+        return {
+          badge: "bg-amber-500/20 text-amber-300 border-amber-500/40",
+          icon: Crown,
+        };
+      case 'Gym Leader':
+        return {
+          badge: "bg-cyan-500/20 text-cyan-300 border-cyan-500/40",
+          icon: Shield,
+        };
+      case 'Protagonist':
+        return {
+          badge: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+          icon: Sparkles,
+        };
+      case 'Rival':
+        return {
+          badge: "bg-orange-500/20 text-orange-300 border-orange-500/40",
+          icon: Swords,
+        };
+      case 'Villain':
+        return {
+          badge: "bg-rose-500/20 text-rose-300 border-rose-500/40",
+          icon: Skull,
+        };
+      default:
+        return {
+          badge: "bg-blue-500/20 text-blue-300 border-blue-500/40",
+          icon: Compass,
+        };
+    }
+  };
+
+  const handleSaveDefault = () => {
+    try {
+      localStorage.setItem('pokethology_user_avatar', currentAvatar.id);
+      try { sounds.scan(); } catch (_) {}
+      playHaptic('medium');
+      setSavedSuccess(true);
+      setTimeout(() => {
+        setSavedSuccess(false);
+        onClose();
+      }, 500);
+    } catch (_) {
+      onClose();
+    }
+  };
 
   if (!isOpen) return null;
+
+  const currentRoleStyle = getRoleBadgeStyle(currentAvatar.role);
+  const CurrentRoleIcon = currentRoleStyle.icon;
 
   return (
     <AnimatePresence>
       <motion.div
+        key="avatar-modal-fullscreen"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[120] flex bg-black/90 backdrop-blur-md"
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-[200] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden w-screen h-screen select-none"
       >
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 40 }}
-          transition={{ type: "spring", damping: 25, stiffness: 250 }}
-          className="m-auto w-[96vw] max-w-6xl max-h-[92vh] sm:max-h-[90vh] bg-slate-950 border-2 border-cyan-500/60 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(6,182,212,0.3)] flex flex-col my-auto relative z-10"
-        >
-          {/* Top Header */}
-          <div className="shrink-0 p-3 sm:p-5 lg:p-6 border-b border-cyan-500/30 bg-slate-900/90 flex items-center justify-between z-20 backdrop-blur-md">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl bg-cyan-500/20 border border-cyan-400 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.4)]">
-                <User className="w-4 h-4 sm:w-6 sm:h-6 text-cyan-400" />
-              </div>
-              <div>
-                <h2 className="font-hud font-black text-sm sm:text-xl lg:text-2xl text-cyan-400 uppercase tracking-widest leading-tight">
-                  SELECT YOUR IDENTITY
-                </h2>
-                <p className="text-[9px] sm:text-xs text-slate-400 font-mono">Choose your trainer avatar to represent you across the Pokedex & Arena</p>
-              </div>
+        {/* Ambient Holographic Glows */}
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
+
+        {/* Top HUD Header Bar */}
+        <div className="shrink-0 border-b border-cyan-500/30 bg-slate-900/90 px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-between gap-3 z-20 shadow-lg backdrop-blur-xl">
+          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/60 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.4)] shrink-0">
+              <User className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
             </div>
-            <button
-              onClick={() => { onClose(); try { sounds.scan(); playHaptic('light'); } catch(e){} }}
-              className="p-2 sm:p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-all border border-slate-700 cursor-pointer"
-              title="Close"
-            >
-              <X className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
+            <div className="flex items-center gap-2 flex-wrap min-w-0">
+              <h2 className="font-hud font-black text-sm sm:text-lg lg:text-xl text-cyan-300 uppercase tracking-widest leading-tight drop-shadow">
+                Choose Avatar
+              </h2>
+              <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-950/80 border border-cyan-500/40 text-cyan-300">
+                {TRAINER_SPRITES.length} ARCHIVED
+              </span>
+            </div>
           </div>
 
-          <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-            {/* Left Side: Avatar Details & Default Save */}
-            <div className="w-full lg:w-96 p-3 sm:p-6 lg:p-8 bg-slate-950/90 border-b lg:border-b-0 lg:border-r border-cyan-900/40 flex flex-row lg:flex-col items-center justify-between lg:justify-center relative gap-3 sm:gap-6 shrink-0 z-10">
-              <div className="flex flex-row lg:flex-col items-center gap-3 sm:gap-6 flex-1 min-w-0">
-                {/* Avatar Image Container */}
-                <div className="relative w-20 h-20 sm:w-28 sm:h-28 lg:w-44 lg:h-44 xl:w-52 xl:h-52 bg-slate-900/60 rounded-3xl flex items-center justify-center border-2 border-cyan-500/40 shadow-[0_0_30px_rgba(34,211,238,0.2)] group shrink-0 p-2 overflow-visible">
-                  <div className="absolute inset-0 rounded-3xl bg-cyan-400/5 animate-pulse" />
-                  <img 
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => { onClose(); try { sounds.scan(); playHaptic('light'); } catch (_) {} }}
+              className="p-1.5 sm:p-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white transition-all border border-slate-700/80 hover:border-cyan-400/50 shadow-md cursor-pointer flex items-center gap-1.5"
+              title="Close (Esc)"
+            >
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden md:inline text-xs font-mono font-bold tracking-wider">ESC</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Modal Body: Prominent Top Section + Lower Categories & Grid */}
+        <div className="flex-1 flex flex-col overflow-hidden min-h-0 w-full">
+          
+          {/* ========================================================================= */}
+          {/* PROMINENT UPPER SPOTLIGHT SECTION (Hero Avatar Preview & Identity)        */}
+          {/* ========================================================================= */}
+          <div className="shrink-0 bg-gradient-to-b from-slate-900/95 via-slate-900/80 to-slate-950/90 border-b border-cyan-500/30 p-3 sm:p-5 lg:p-6 shadow-2xl relative overflow-hidden z-10">
+            {/* Cyber background effects */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-cyan-500/10 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-6 relative z-10">
+              
+              {/* Left/Center: Large Holographic Pedestal & Big Trainer Avatar Sprite */}
+              <div className="flex items-center gap-4 sm:gap-6 min-w-0 w-full md:w-auto">
+                <div className="relative w-28 h-28 xxs:w-32 xxs:h-32 sm:w-44 sm:h-44 md:w-52 md:h-52 lg:w-56 lg:h-56 flex items-center justify-center shrink-0">
+                  {/* Cyber glow rings */}
+                  <div className="absolute inset-0 rounded-full border border-cyan-400/35 animate-spin-slow pointer-events-none" style={{ animationDuration: '20s' }} />
+                  <div className="absolute inset-2 sm:inset-3 rounded-full border border-dashed border-cyan-400/25 pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-cyan-500/25 to-transparent rounded-full blur-xl pointer-events-none" />
+                  <div className="absolute -bottom-1.5 w-24 sm:w-36 md:w-44 h-4 bg-cyan-400/40 rounded-full blur-md" />
+
+                  {/* Animated Big Trainer Sprite */}
+                  <motion.img 
+                    key={currentAvatar.id}
+                    initial={{ scale: 0.85, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     src={`https://play.pokemonshowdown.com/sprites/trainers/${currentAvatar.id}.png`} 
                     alt={currentAvatar.name}
-                    className="w-16 h-16 sm:w-24 sm:h-24 lg:w-36 lg:h-36 xl:w-40 xl:h-40 object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform duration-300 [image-rendering:pixelated]"
+                    className="relative z-10 w-24 h-24 xxs:w-28 xxs:h-28 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-52 lg:h-52 object-contain drop-shadow-[0_12px_30px_rgba(0,0,0,0.95)] [image-rendering:pixelated]"
                   />
                 </div>
-                
-                {/* Avatar Details */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling pr-1 sm:pr-2 lg:pr-3 flex flex-col max-h-[22vh] lg:max-h-none">
-                  <h3 className="text-base sm:text-2xl lg:text-3xl xl:text-4xl font-hud font-black text-left lg:text-center text-cyan-300 uppercase tracking-[0.15em] mb-1 sm:mb-2 drop-shadow-lg shrink-0">
-                    {currentAvatar.name}
-                  </h3>
-                  <div className="text-[9px] sm:text-xs lg:text-sm text-emerald-400 font-bold uppercase tracking-widest text-center mb-1.5 sm:mb-4 py-0.5 sm:py-1 px-2 sm:px-3 border border-emerald-500/30 bg-emerald-950/30 rounded-full self-start lg:self-center shrink-0">
-                    {currentAvatar.role}
+
+                {/* Right Details: Name, Role Badge, Compact Lore */}
+                <div className="flex-1 min-w-0 flex flex-col justify-center gap-1 sm:gap-1.5 max-w-lg">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-hud font-black text-sm xs:text-base sm:text-xl md:text-2xl text-cyan-200 uppercase tracking-widest drop-shadow-[0_0_10px_rgba(34,211,238,0.5)] truncate">
+                      {currentAvatar.name}
+                    </h3>
+                    <div className={cn(
+                      "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8.5px] sm:text-[10px] font-mono font-bold uppercase tracking-wider border shrink-0 shadow-sm",
+                      currentRoleStyle.badge
+                    )}>
+                      <CurrentRoleIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                      {currentAvatar.role}
+                    </div>
                   </div>
 
-                  <p className="text-[11px] sm:text-sm lg:text-base font-serif italic text-slate-300 leading-relaxed opacity-90 text-left lg:text-center mb-1 sm:mb-4">
-                    &ldquo;{currentAvatar.lore}&rdquo;
-                  </p>
+                  {/* Compact Lore Quote Box with Show All / Show Less Toggle */}
+                  <div className="p-2 sm:p-2.5 rounded-xl bg-slate-950/75 border border-cyan-500/25 relative overflow-hidden shadow-inner flex flex-col gap-1">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-cyan-400 to-blue-500" />
+                    <p className={cn(
+                      "text-[10.5px] sm:text-xs font-serif italic text-slate-300 leading-relaxed pl-1 transition-all",
+                      !isLoreExpanded && "line-clamp-2"
+                    )}>
+                      &ldquo;{currentAvatar.lore}&rdquo;
+                    </p>
+                    {currentAvatar.lore && (
+                      <div className="flex justify-end pl-1 mt-0.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsLoreExpanded(!isLoreExpanded);
+                            try { sounds.scan(); playHaptic('light'); } catch (_) {}
+                          }}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-cyan-950/70 hover:bg-cyan-900/90 border border-cyan-500/30 text-cyan-300 hover:text-cyan-100 text-[8.5px] sm:text-[9.5px] font-hud font-bold uppercase tracking-wider transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
+                        >
+                          <Eye className="w-2.5 h-2.5 text-cyan-400" />
+                          <span>{isLoreExpanded ? "Show Less" : "Show All"}</span>
+                          {isLoreExpanded ? (
+                            <ChevronUp className="w-2.5 h-2.5 text-cyan-400" />
+                          ) : (
+                            <ChevronDown className="w-2.5 h-2.5 text-cyan-400" />
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <button
-                onClick={() => {
-                  try {
-                    localStorage.setItem('pokethology_user_avatar', currentAvatar.id);
-                    sounds.scan(); playHaptic('light');
-                    onClose();
-                  } catch(e) {}
-                }}
-                className="w-full mt-1 lg:mt-auto py-2.5 sm:py-3.5 lg:py-4 px-4 sm:px-6 bg-emerald-600 hover:bg-emerald-500 text-emerald-50 rounded-lg sm:rounded-xl lg:rounded-2xl font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 sm:gap-3 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:-translate-y-0.5 lg:hover:-translate-y-1 text-xs sm:text-sm lg:text-base shrink-0 cursor-pointer"
-              >
-                <Bookmark className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5" />
-                Set as Default
-              </button>
-            </div>
-
-            {/* Right Side: Grid Selection */}
-            <div className="flex-1 flex flex-col h-full min-h-[300px] bg-slate-900/30 relative overflow-hidden">
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 pointer-events-none mix-blend-overlay" />
-              
-              <div className="p-3 sm:p-5 lg:p-5 border-b border-cyan-900/30 bg-slate-900/80 flex gap-2 sm:gap-3 overflow-x-auto hide-scrollbar shrink-0 z-10 backdrop-blur-md">
-                {(['All', 'Protagonist', 'Rival', 'Gym Leader', 'Champion', 'Trainer', 'Villain'] as const).map(role => (
-                  <button 
-                    key={role}
-                    onClick={() => { setAvatarFilter(role); try { sounds.scan(); } catch(e){} }}
-                    className={cn(
-                      "px-4 py-2 sm:px-5 sm:py-2.5 lg:px-6 lg:py-2.5 rounded-xl border-2 whitespace-nowrap transition-all text-xs sm:text-sm lg:text-sm font-bold tracking-widest uppercase cursor-pointer", 
-                      avatarFilter === role 
-                        ? "bg-cyan-950 border-cyan-400 text-cyan-100 shadow-[0_0_20px_rgba(34,211,238,0.3)]" 
-                        : "bg-slate-900/50 border-slate-700/50 text-slate-400 hover:text-slate-200 hover:border-cyan-500/50"
-                    )}
-                  >
-                    {role}
-                  </button>
-                ))}
+              {/* Right: Compact Apply / Set Active Button */}
+              <div className="w-full md:w-auto shrink-0 flex justify-end">
+                <button
+                  onClick={handleSaveDefault}
+                  className={cn(
+                    "w-full md:w-auto py-2 sm:py-2.5 px-4 sm:px-5 rounded-xl font-hud font-black uppercase tracking-widest transition-all flex items-center justify-center gap-1.5 text-[11px] sm:text-xs cursor-pointer shadow-lg active:scale-95",
+                    savedSuccess
+                      ? "bg-emerald-500 text-slate-950 shadow-[0_0_25px_rgba(16,185,129,0.7)]"
+                      : "bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.35)] hover:shadow-[0_0_25px_rgba(16,185,129,0.6)]"
+                  )}
+                >
+                  {savedSuccess ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[3]" />
+                      SAVED ACTIVE AVATAR!
+                    </>
+                  ) : (
+                    <>
+                      <Bookmark className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      SET AS ACTIVE AVATAR
+                    </>
+                  )}
+                </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-3 sm:p-5 lg:p-6 z-10">
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 lg:gap-4 pb-16">
-                  {TRAINER_SPRITES.filter(t => avatarFilter === 'All' || t.role === avatarFilter).map(trainer => (
-                    <button
-                      key={trainer.id}
-                      onClick={() => { setCurrentAvatar(trainer); try { sounds.scan(); } catch(e){} }}
+            </div>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* LOWER SECTION: Category Tabs & List of Other Avatars                      */}
+          {/* ========================================================================= */}
+          <div className="flex-1 flex flex-col min-h-0 bg-slate-950/60 relative overflow-hidden">
+            
+            {/* Category Tabs Bar (Search Bar Removed) */}
+            <div className="p-2 sm:p-3 border-b border-cyan-900/40 bg-slate-900/80 shrink-0 z-10 backdrop-blur-md flex items-center justify-between overflow-x-auto hide-scrollbar">
+              <div className="flex gap-1.5 sm:gap-2 mx-auto sm:mx-0 max-w-full">
+                {(['All', 'Protagonist', 'Rival', 'Gym Leader', 'Champion', 'Trainer', 'Villain'] as const).map(role => {
+                  const isSelected = avatarFilter === role;
+                  const count = role === 'All' ? TRAINER_SPRITES.length : TRAINER_SPRITES.filter(t => t.role === role).length;
+                  return (
+                    <button 
+                      key={role}
+                      onClick={() => { 
+                        setAvatarFilter(role); 
+                        try { sounds.scan(); playHaptic('light'); } catch (_) {} 
+                      }}
                       className={cn(
-                        "relative aspect-[4/4.8] rounded-xl lg:rounded-2xl border-2 transition-all duration-300 group overflow-hidden flex flex-col items-center justify-between p-2 sm:p-2.5 lg:p-3 cursor-pointer",
-                        currentAvatar.id === trainer.id 
-                          ? "border-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.5)] bg-cyan-900/60 ring-1 ring-cyan-400/50" 
-                          : "border-slate-700/40 hover:border-cyan-500/60 hover:bg-slate-800/80 hover:shadow-[0_0_20px_rgba(34,211,238,0.3)] bg-slate-900/40"
+                        "px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-xl border whitespace-nowrap transition-all text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase cursor-pointer flex items-center gap-1.5", 
+                        isSelected
+                          ? "bg-cyan-950/90 border-cyan-400 text-cyan-200 shadow-[0_0_15px_rgba(34,211,238,0.3)] ring-1 ring-cyan-400/40" 
+                          : "bg-slate-900/60 border-slate-700/60 text-slate-400 hover:text-slate-200 hover:border-cyan-500/40"
                       )}
                     >
-                      <div className="w-full flex-1 flex items-center justify-center min-h-0 pt-0.5 pb-1">
+                      <span>{role}</span>
+                      <span className="text-[8px] sm:text-[9px] px-1 py-0.2 rounded bg-slate-800/80 text-slate-400 font-mono">
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Expansive Responsive Trainer Grid */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-2.5 sm:p-4 lg:p-6 z-10 min-h-0">
+              <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2 sm:gap-3 pb-16">
+                {filteredTrainers.map(trainer => {
+                  const isSelected = currentAvatar.id === trainer.id;
+
+                  return (
+                    <button
+                      key={trainer.id}
+                      onClick={() => { 
+                        setCurrentAvatar(trainer); 
+                        try { sounds.scan(); playHaptic('light'); } catch (_) {} 
+                      }}
+                      className={cn(
+                        "relative aspect-[4/4.8] rounded-xl sm:rounded-2xl border-2 transition-all duration-150 group overflow-hidden flex flex-col items-center justify-between p-1.5 sm:p-2.5 cursor-pointer text-left",
+                        isSelected 
+                          ? "border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.45)] bg-gradient-to-b from-cyan-950/80 to-slate-900/90 ring-2 ring-cyan-400/50 scale-[1.02]" 
+                          : "border-slate-800/80 hover:border-cyan-500/60 hover:bg-slate-900/70 hover:shadow-[0_0_12px_rgba(34,211,238,0.2)] bg-slate-950/60"
+                      )}
+                    >
+                      {/* Active Selection Indicator */}
+                      {isSelected && (
+                        <div className="absolute top-1.5 right-1.5 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-cyan-400 text-slate-950 flex items-center justify-center shadow-md z-20">
+                          <Check className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 stroke-[3]" />
+                        </div>
+                      )}
+
+                      {/* Trainer Sprite Container */}
+                      <div className="w-full flex-1 flex items-center justify-center min-h-0 py-0.5">
                         <img 
                           src={`https://play.pokemonshowdown.com/sprites/trainers/${trainer.id}.png`} 
                           alt={trainer.name}
+                          loading="lazy"
                           className={cn(
-                            "w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 object-contain transition-all duration-300 drop-shadow-md [image-rendering:pixelated]",
-                            currentAvatar.id === trainer.id ? "scale-105 drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]" : "group-hover:scale-105 opacity-80 group-hover:opacity-100 group-hover:drop-shadow-[0_0_15px_rgba(34,211,238,0.4)]"
+                            "w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 object-contain transition-all duration-200 drop-shadow-md [image-rendering:pixelated]",
+                            isSelected ? "scale-110 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]" : "group-hover:scale-105 opacity-85 group-hover:opacity-100"
                           )}
                         />
                       </div>
+
+                      {/* Name & Role Tag */}
                       <div className={cn(
-                        "w-full bg-slate-950/90 py-1 px-1 rounded-lg transition-opacity duration-300 border border-cyan-500/20 shrink-0",
-                        currentAvatar.id === trainer.id ? "opacity-100 border-cyan-400/50 bg-cyan-950/80" : "opacity-80 group-hover:opacity-100"
+                        "w-full py-1 px-1 rounded-lg sm:rounded-xl transition-all duration-200 border shrink-0 text-center",
+                        isSelected 
+                          ? "bg-cyan-950 border-cyan-400/60" 
+                          : "bg-slate-900/90 border-slate-800 group-hover:border-cyan-500/30"
                       )}>
-                        <span className="block w-full text-center text-[10px] sm:text-xs font-bold text-cyan-100 truncate tracking-wider uppercase">
+                        <span className={cn(
+                          "block text-[9.5px] sm:text-[11px] font-hud font-bold truncate tracking-wider uppercase leading-tight",
+                          isSelected ? "text-cyan-200" : "text-slate-300 group-hover:text-cyan-100"
+                        )}>
                           {trainer.name}
+                        </span>
+                        <span className="block text-[7.5px] sm:text-[8.5px] font-mono text-slate-500 uppercase tracking-widest truncate leading-tight mt-0.5">
+                          {trainer.role}
                         </span>
                       </div>
                     </button>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
             </div>
+
           </div>
-        </motion.div>
+
+        </div>
       </motion.div>
     </AnimatePresence>
   );

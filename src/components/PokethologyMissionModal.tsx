@@ -156,7 +156,7 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[600] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden"
+          className="fixed inset-0 z-[600] flex flex-col bg-slate-950/98 backdrop-blur-2xl overflow-hidden w-screen h-screen"
           onClick={onClose}
         >
           {/* Ambient Background Glows */}
@@ -166,14 +166,14 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
           {/* Top System Header Bar */}
           <div 
             onClick={(e) => e.stopPropagation()} 
-            className="shrink-0 border-b border-amber-500/30 bg-slate-900/90 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-3 z-20 shadow-lg"
+            className="shrink-0 border-b border-amber-500/30 bg-slate-900/90 px-3 sm:px-8 py-2.5 sm:py-3.5 flex items-center justify-between gap-3 z-20 shadow-lg"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
                 <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 filter drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]" />
               </div>
-              <div className="flex items-center gap-2">
-                <h2 className="font-hud font-black text-base sm:text-xl text-amber-400 uppercase tracking-widest leading-none whitespace-nowrap">
+              <div className="flex items-center gap-2 min-w-0">
+                <h2 className="font-hud font-black text-sm sm:text-xl text-amber-400 uppercase tracking-widest leading-none truncate">
                   POKÉTHOLOGY MISSION
                 </h2>
               </div>
@@ -192,7 +192,7 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
           {/* Fullscreen Body Content */}
           <div 
             onClick={(e) => e.stopPropagation()}
-            className="flex-1 overflow-y-auto custom-scrollbar p-3.5 sm:p-6 md:p-8 max-w-7xl mx-auto w-full flex flex-col gap-6"
+            className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-6 md:p-8 max-w-7xl mx-auto w-full flex flex-col gap-4 sm:gap-6 min-h-0"
           >
             {/* Primary Objective Banner */}
             <div className="bg-amber-950/25 border border-amber-500/30 p-3.5 sm:p-4 md:p-5 rounded-2xl shadow-inner flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">

@@ -4077,7 +4077,6 @@ export default function App() {
                     {(loadingPokemon && !pokemon && !isSelectingOpponent) ? (
                       <PokethologyRadarScanner
                         targetName={query || "Database"}
-                        onAbort={handleAbort}
                       />
                     ) : error ? (
                       <motion.div
@@ -5209,7 +5208,7 @@ export default function App() {
 
                                           <button 
                                             onClick={() => setIsMusicOpen(true)}
-                                            title="System Options"
+                                            title="Combat Options"
                                             className={cn(
                                               hudButtonClass(false, 'cyan'),
                                               "shadow-sm whitespace-nowrap transition-all duration-300 shrink-0",
@@ -5221,7 +5220,7 @@ export default function App() {
                                           </button>
                                           <button 
                                             onClick={() => setIsTypeChartOpen(true)}
-                                            title="Type Chart"
+                                            title="Type Table"
                                             className={cn(
                                               hudButtonClass(false, 'cyan'),
                                               "shadow-sm whitespace-nowrap transition-all duration-300 shrink-0",
@@ -6304,11 +6303,11 @@ export default function App() {
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/5 to-transparent pointer-events-none"></div>
                         
                         <motion.div 
-                          className="relative w-44 h-44 xxs:w-52 xxs:h-52 xs:w-64 xs:h-64 sm:w-72 sm:h-72 md:w-60 md:h-60 lg:w-68 lg:h-68 flex items-center justify-center shrink max-h-[28vh] sm:max-h-[34vh] md:max-h-[26vh] lg:max-h-[28vh] -mt-1 sm:-mt-3 md:mt-0 mb-1 sm:mb-2 md:mb-0.5"
+                          className="relative w-56 h-56 xxs:w-64 xxs:h-64 xs:w-80 xs:h-80 sm:w-96 sm:h-96 md:w-88 md:h-88 lg:w-[26rem] lg:h-[26rem] xl:w-[28rem] xl:h-[28rem] flex items-center justify-center shrink max-h-[38vh] sm:max-h-[44vh] md:max-h-[36vh] lg:max-h-[42vh] -mt-1 sm:-mt-2 md:mt-0 mb-1 sm:mb-2 md:mb-1"
                           initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: "easeOut" }}
                         >
-                          <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 75%)' }}></div>
-                          <PokethologyLogo className="w-full h-full object-contain filter drop-shadow-[0_0_30px_rgba(6,182,212,0.5)]" />
+                          <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.3) 0%, transparent 75%)' }}></div>
+                          <PokethologyLogo className="w-full h-full object-contain filter drop-shadow-[0_0_40px_rgba(6,182,212,0.65)]" />
                         </motion.div>
 
                         <div className="flex flex-col gap-1 sm:gap-2 md:gap-1.5 relative z-10 shrink-0 w-full max-w-4xl px-2 sm:px-4">
@@ -6320,7 +6319,7 @@ export default function App() {
                             Where dreams and adventures begin!
                           </p>
                           
-                          <div className="flex justify-center items-center mt-2 sm:mt-4 md:mt-2.5 lg:mt-3 w-full max-w-md mx-auto px-4">
+                          <div className="flex justify-center items-center mt-5 sm:mt-8 md:mt-7 lg:mt-8 w-full max-w-md mx-auto px-4">
                             <motion.button
                               disabled={isInitializingDb}
                               whileHover={isInitializingDb ? {} : { scale: 1.04, boxShadow: "0 0 30px rgba(34,211,238,0.7)" }}
@@ -6372,7 +6371,7 @@ export default function App() {
                           </div>
 
                           {/* Home Screen Copyright & Legal Disclaimer Toggle */}
-                          <div className="flex flex-col items-center justify-center mt-2 sm:mt-4 md:mt-2.5 lg:mt-3 mb-1 select-none px-2">
+                          <div className="flex flex-col items-center justify-center mt-6 sm:mt-10 md:mt-8 lg:mt-10 mb-3 select-none px-2 pt-2">
                             <DisclaimerButton onClick={() => setIsDisclaimerOpen(true)} variant="pill" />
                           </div>
                         </div>
@@ -6663,29 +6662,46 @@ export default function App() {
                         </div>
 
                           {loadingList ? (
-                          <div className="flex-1 flex flex-col items-center justify-center text-cyan-500/70 min-h-[300px]">
-                            <div className="relative mb-6">
-                              <Loader2 className="w-16 h-16 animate-spin text-cyan-400" />
-                              <div className="absolute inset-0 border-4 border-cyan-500/30 rounded-full animate-ping"></div>
-                              <div className="absolute inset-2 border-4 border-cyan-400/50 rounded-full animate-[spin_2s_linear_infinite_reverse]"></div>
+                          <div className="flex-1 flex flex-col items-center justify-center text-cyan-500/70 min-h-[360px] p-6 text-center select-none">
+                            <div className="relative mb-6 flex items-center justify-center">
+                              {/* Outer Glows & Cyber Rings */}
+                              <div className="absolute w-36 h-36 sm:w-48 sm:h-48 rounded-full bg-cyan-500/20 blur-2xl animate-pulse pointer-events-none" />
+                              <div className="absolute w-28 h-28 sm:w-36 sm:h-36 rounded-full border border-cyan-400/30 border-dashed animate-spin-slow pointer-events-none" style={{ animationDuration: '18s' }} />
+                              <div className="absolute w-32 h-32 sm:w-40 sm:h-40 rounded-full border border-cyan-500/20 pointer-events-none animate-ping" style={{ animationDuration: '3s' }} />
+
+                              <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ repeat: Infinity, duration: 2.2, ease: "linear" }}
+                                className="relative w-22 h-22 sm:w-28 sm:h-28 flex items-center justify-center filter drop-shadow-[0_0_25px_rgba(6,182,212,0.7)] z-10"
+                              >
+                                <PokeballIcon className="w-full h-full object-contain" />
+                              </motion.div>
+
+                              {/* Center Blue Lampent Light */}
+                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                                <motion.div
+                                  animate={{ scale: [0.85, 1.6, 0.85], opacity: [0.4, 0.9, 0.4] }}
+                                  transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+                                  className="absolute w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-cyan-400/40 blur-md"
+                                />
+                                <motion.div
+                                  animate={{ scale: [0.9, 1.4, 0.9], opacity: [0.6, 1, 0.6] }}
+                                  transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                                  className="absolute w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-cyan-300/60 blur-sm"
+                                />
+                                <motion.div
+                                  animate={{ scale: [0.95, 1.25, 0.95], opacity: [0.9, 1, 0.9] }}
+                                  transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
+                                  className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-cyan-200 shadow-[0_0_20px_#00f0ff,0_0_35px_#06b6d4,0_0_50px_#38bdf8] border-2 border-white"
+                                />
+                              </div>
                             </div>
-                            <span className="font-hud text-lg tracking-[0.3em] uppercase animate-pulse text-cyan-400" style={{ textShadow: '0 0 8px rgba(34,211,238,0.8)' }}>Scanning Database...</span>
-                            <span className="text-xs text-cyan-600 font-mono uppercase tracking-widest mt-2">Retrieving Gen {currentGenId} Data</span>
-                            <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => {
-                                setLoadingList(false);
-                                setListMode('home');
-                                sounds.scan(); playHaptic('light');
-                              }}
-                              className="mt-8 px-5 py-2 hover:bg-rose-950/10 border border-neutral-800 hover:border-cyan-500/40 rounded-lg text-[9px] font-hud uppercase tracking-[0.2em] text-cyan-400 hover:text-cyan-300 transition-all font-black"
-                            >
-                              <span className="relative z-10 flex items-center justify-center gap-1.5">
-                                <X className="w-3 h-3 text-rose-500" />
-                                Cancel Scan
-                              </span>
-                            </motion.button>
+                            <span className="font-hud font-black text-sm sm:text-lg text-cyan-300 uppercase tracking-[0.25em] animate-pulse" style={{ textShadow: '0 0 14px rgba(34,211,238,0.8)' }}>
+                              SCANNING DATABASE...
+                            </span>
+                            <p className="text-[10.5px] sm:text-xs font-mono text-cyan-400/90 uppercase tracking-widest mt-2 animate-pulse">
+                              Retrieving Gen {currentGenId} Pokémon & battle telemetry...
+                            </p>
                           </div>
                         ) : sortedAndFilteredList.length > 0 ? (
                           <div 
@@ -7078,10 +7094,11 @@ export default function App() {
           onClose={() => setIsInfoOpen(false)}
         />
 
-        {/* Music Modal Alternative: Config Modal */}
+        {/* Combat Options Modal */}
         <MusicConfigModal
           isOpen={isMusicOpen}
           onClose={() => setIsMusicOpen(false)}
+          onOpenMissionModal={() => setIsMissionModalOpen(true)}
         />
 
         {/* Stat Animation Overlay */}

@@ -63,9 +63,9 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
   const currentTrackId = bgmState?.trackId;
 
   return (
-    <div className="flex flex-col gap-3 w-full">
+    <div className="flex flex-col gap-4 w-full">
       {(mode === 'full' || mode === 'simple') && (
-        <div className="bg-slate-950/90 border border-slate-800/80 rounded-2xl overflow-hidden flex flex-col shadow-xl shadow-black/50 mb-2">
+        <div className="bg-slate-950/70 rounded-2xl overflow-hidden flex flex-col shadow-xl shadow-black/40 mb-1">
           {/* Banner / Cover Art Header */}
           <div className="relative p-4 sm:p-5 flex flex-row items-end gap-4 overflow-hidden min-h-[140px] sm:min-h-[160px]">
             {/* Background blurred cover */}
@@ -76,19 +76,18 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/60 to-transparent z-10" />
             
             {/* Foreground Album Cover */}
-            <div className="relative z-20 shrink-0 shadow-2xl shadow-black/60 rounded-xl overflow-hidden border border-white/10 w-24 h-24 sm:w-28 sm:h-28">
+            <div className="relative z-20 shrink-0 shadow-2xl shadow-black/60 rounded-xl overflow-hidden w-24 h-24 sm:w-28 sm:h-28">
               <img 
                 src="https://f4.bcbits.com/img/a4164358298_10.jpg" 
                 alt="Poké & Chill Album Cover" 
                 className="w-full h-full object-cover"
-                
               />
             </div>
             
             {/* Album Info */}
             <div className="relative z-20 flex-1 flex flex-col justify-end pb-0.5 min-w-0">
               <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 text-[9px] font-mono font-bold rounded border border-emerald-500/30 whitespace-nowrap">OFFICIAL BGM</span>
+                <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 text-[9px] font-mono font-bold rounded whitespace-nowrap">OFFICIAL BGM</span>
                 <Music className="w-3.5 h-3.5 text-emerald-400 animate-pulse shrink-0 hidden sm:block" />
               </div>
               <h3 className="font-hud text-base sm:text-xl font-black uppercase tracking-widest text-white truncate drop-shadow-md">
@@ -101,11 +100,11 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
           </div>
 
           {/* Player Controls Header */}
-          <div className="p-3 bg-slate-900/80 border-y border-slate-800/80 flex items-center justify-between backdrop-blur-sm z-20 relative">
+          <div className="p-3 bg-slate-900/60 flex items-center justify-between backdrop-blur-sm z-20 relative">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 onClick={() => sounds.playPrevBGM()}
-                className="flex items-center gap-1 p-1.5 sm:px-2.5 sm:py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors group"
+                className="flex items-center gap-1 p-1.5 sm:px-2.5 sm:py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors group cursor-pointer"
                 title="Previous Track"
               >
                 <SkipBack className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -113,7 +112,7 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
               </button>
               <button
                 onClick={handleToggleBgm}
-                className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-all ${
+                className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-all cursor-pointer ${
                   isPlaying
                     ? 'bg-emerald-600 hover:bg-emerald-500 text-slate-950 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
                     : 'bg-slate-700 hover:bg-slate-600 text-slate-200'
@@ -124,7 +123,7 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
               </button>
               <button
                 onClick={() => sounds.playNextBGM()}
-                className="flex items-center gap-1 p-1.5 sm:px-2.5 sm:py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors group"
+                className="flex items-center gap-1 p-1.5 sm:px-2.5 sm:py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors group cursor-pointer"
                 title="Next Track"
               >
                 <span className="hidden sm:inline-block text-[9px] font-hud uppercase tracking-wider text-slate-400 group-hover:text-slate-300">NEXT</span>
@@ -132,13 +131,13 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
               </button>
               <button
                 onClick={handleToggleShuffle}
-                className={`p-1.5 sm:p-2 rounded-lg transition-colors ml-1 sm:ml-2 ${bgmState?.isShuffle ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800/80 hover:bg-slate-700 text-slate-400'}`}
+                className={`p-1.5 sm:p-2 rounded-lg transition-colors ml-1 sm:ml-2 cursor-pointer ${bgmState?.isShuffle ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800/80 hover:bg-slate-700 text-slate-400'}`}
               >
                 <Shuffle className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
               <button
                 onClick={handleToggleLoop}
-                className={`p-1.5 sm:p-2 rounded-lg transition-colors ml-0.5 sm:ml-1 ${bgmState?.isLoop ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800/80 hover:bg-slate-700 text-slate-400'}`}
+                className={`p-1.5 sm:p-2 rounded-lg transition-colors ml-0.5 sm:ml-1 cursor-pointer ${bgmState?.isLoop ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800/80 hover:bg-slate-700 text-slate-400'}`}
               >
                 <Repeat className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
@@ -167,7 +166,7 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
           </div>
 
           {/* Progress Bar */}
-          <div className="h-1 sm:h-1.5 bg-slate-800 w-full relative z-20">
+          <div className="h-1 sm:h-1.5 bg-slate-800/80 w-full relative z-20">
             <div 
               className="absolute top-0 left-0 h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.6)] transition-all duration-300 ease-linear" 
               style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
@@ -175,17 +174,17 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
           </div>
 
           {/* Tracklist (Scrollable) */}
-          <div className="max-h-40 sm:max-h-48 overflow-y-auto custom-scrollbar bg-slate-950/90 p-2 flex flex-col gap-1 z-20 relative">
+          <div className="max-h-40 sm:max-h-48 overflow-y-auto custom-scrollbar bg-slate-950/70 p-2 flex flex-col gap-1 z-20 relative">
             {POKE_CHILL_TRACKS.map((track) => {
               const isActive = currentTrackId === track.id;
               return (
                 <button
                   key={track.id}
                   onClick={() => handleTrackChange(track.id)}
-                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg transition-all text-left group ${
+                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg transition-all text-left group cursor-pointer ${
                     isActive
-                      ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 shadow-sm'
-                      : 'bg-transparent border border-transparent hover:bg-slate-800/60 text-slate-400'
+                      ? 'bg-emerald-500/15 text-emerald-300 shadow-sm'
+                      : 'bg-transparent hover:bg-slate-800/40 text-slate-400'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -204,8 +203,8 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
         </div>
       )}
 
-      {/* Clean Volume Sliders Block: SFX Volume first, BGM Volume directly under actual SFX */}
-      <div className="p-3.5 bg-slate-950/80 border border-slate-800/80 rounded-xl flex flex-col gap-3.5 text-left w-full">
+      {/* Clean Volume Sliders Block */}
+      <div className="p-4 bg-slate-950/70 rounded-2xl flex flex-col gap-3.5 text-left w-full shadow-lg">
         {/* SFX Volume Bar */}
         <div className="flex flex-col gap-1.5">
           <div className="flex justify-between items-center text-[10px] font-mono text-slate-300">
@@ -231,8 +230,8 @@ export function AudioSettings({ mode = 'simple' }: AudioSettingsProps) {
           </div>
         </div>
 
-        {/* BGM Volume Bar — Directly under actual SFX */}
-        <div className="flex flex-col gap-1.5 pt-2.5 border-t border-slate-800/60">
+        {/* BGM Volume Bar */}
+        <div className="flex flex-col gap-1.5 pt-2.5">
           <div className="flex justify-between items-center text-[10px] font-mono text-slate-300">
             <span className="font-hud uppercase font-bold text-emerald-400 tracking-wider">BGM Volume</span>
             <span className="text-emerald-400 font-bold">{Math.round(bgmVolume * 100)}%</span>

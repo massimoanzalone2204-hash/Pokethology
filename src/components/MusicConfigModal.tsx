@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Music, X, Trophy } from 'lucide-react';
+import { Settings2, X, Trophy } from 'lucide-react';
 import { AudioSettings } from './AudioSettings';
 import { sounds } from '../lib/sounds';
 import { playHaptic } from '../lib/utils';
@@ -35,13 +35,12 @@ export const MusicConfigModal: React.FC<MusicConfigModalProps> = ({
         <div className="shrink-0 flex justify-between items-center px-4 sm:px-8 py-3.5 border-b border-cyan-500/30 w-full bg-slate-900/90 z-20 shadow-lg">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)] shrink-0">
-              <Music className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 filter drop-shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
+              <Settings2 className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 filter drop-shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
             </div>
             <div>
               <h2 className="font-hud font-black text-base sm:text-xl text-cyan-300 uppercase tracking-widest leading-none">
-                AUDIO & MUSIC MATRIX
+                COMBAT OPTIONS
               </h2>
-              <p className="text-[9px] sm:text-xs text-slate-400 font-mono mt-0.5">Configure ambient battle tracks, SFX volume & sound engine parameters</p>
             </div>
           </div>
 
@@ -57,32 +56,39 @@ export const MusicConfigModal: React.FC<MusicConfigModalProps> = ({
           </button>
         </div>
 
-        {/* Modal Body */}
+        {/* Modal Body without harsh section borders */}
         <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-4 sm:p-8 max-w-4xl mx-auto w-full flex flex-col gap-6">
-          <div className="bg-slate-900/60 border border-cyan-500/30 rounded-2xl p-6 backdrop-blur-xl shadow-xl">
-            <AudioSettings />
-          </div>
-
           {onOpenMissionModal && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-amber-950/20 p-4 rounded-xl border border-amber-500/20">
-              <div className="flex flex-col gap-1.5">
-                <span className="text-amber-400 font-hud uppercase text-xs font-bold tracking-widest flex items-center gap-2">
-                  <Trophy className="w-4 h-4" />
-                  Pokethology Mission
-                </span>
-                <span className="text-slate-400 text-xs">Track your overall combat mastery progress.</span>
+            <div className="bg-amber-950/30 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 backdrop-blur-md">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0 shadow-sm">
+                  <Trophy className="w-5 h-5 text-amber-400" />
+                </div>
+                <div>
+                  <span className="text-amber-300 font-hud uppercase text-xs sm:text-sm font-bold tracking-wider block">
+                    POKÉTHOLOGY MISSIONS
+                  </span>
+                  <span className="text-slate-400 text-[10px] sm:text-xs font-mono">
+                    Track your type mastery & Pokédex conquest progress
+                  </span>
+                </div>
               </div>
               <button
                 onClick={() => {
                   onClose();
                   onOpenMissionModal();
+                  try { sounds.scan(); playHaptic('light'); } catch (_) {}
                 }}
-                className="px-6 py-2.5 rounded-xl font-hud uppercase text-[10px] font-bold tracking-widest transition-all bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 hover:border-amber-400 hover:shadow-[0_0_15px_rgba(245,158,11,0.3)] whitespace-nowrap cursor-pointer"
+                className="px-5 py-2.5 rounded-xl font-hud uppercase text-xs font-bold tracking-wider bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 transition-all cursor-pointer text-center shrink-0"
               >
-                Personalize
+                OPEN MISSIONS
               </button>
             </div>
           )}
+
+          <div className="bg-slate-900/50 rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
+            <AudioSettings />
+          </div>
         </div>
       </motion.div>
     </AnimatePresence>

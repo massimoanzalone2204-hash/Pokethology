@@ -54,23 +54,15 @@ export const TypeChartModal: React.FC<TypeChartModalProps> = ({
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Top Header Bar */}
-        <header className="shrink-0 border-b border-red-500/30 bg-slate-900/90 px-4 sm:px-8 py-3 flex items-center justify-between gap-3 z-30 shadow-lg">
-          <div className="flex items-center gap-3">
+        <header className="shrink-0 border-b border-red-500/30 bg-slate-900/90 px-3 sm:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-3 z-30 shadow-lg">
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-red-600/20 border border-red-500/50 flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.35)] shrink-0">
               <Layers className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 animate-pulse" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="font-hud font-black text-sm sm:text-lg text-red-400 uppercase tracking-wider sm:tracking-[0.2em] leading-none">
-                  TYPE EFFECTIVENESS CHART
-                </h2>
-                <span className="hidden md:inline-block px-2 py-0.5 rounded-full bg-red-950/80 border border-red-500/40 text-red-300 text-[10px] font-mono font-bold uppercase">
-                  18 Standard Types
-                </span>
-              </div>
-              <p className="text-[9px] sm:text-[10px] font-mono text-slate-400 tracking-wider uppercase mt-0.5 hidden sm:block">
-                Offensive & Defensive Multipliers Grid
-              </p>
+              <h2 className="font-hud font-black text-sm sm:text-lg text-red-400 uppercase tracking-wider sm:tracking-[0.2em] leading-none">
+                TYPE TABLE
+              </h2>
             </div>
           </div>
 
