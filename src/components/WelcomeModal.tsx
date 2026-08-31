@@ -36,7 +36,7 @@ export const WelcomeModal = ({ isOpen, onClose, onOpenTutorial }: WelcomeModalPr
               <X className="w-5 h-5" />
             </button>
 
-            <div className="relative w-40 h-40 sm:w-48 sm:h-48 mb-6 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
+            <div className="relative w-40 h-40 sm:w-48 sm:h-48 mb-6">
                <PokethologyLogo className="w-full h-full object-contain" />
             </div>
 

@@ -63,40 +63,309 @@ export const TerrainEffect = memo(({ playerType, opponentType }: { playerType?: 
 export const StatusOverlay = memo(({ status }: { status: string | null }) => {
   if (!status) return null;
 
-  const config: Record<string, { label: string; icon: any; color: string; border: string; bg: string }> = {
-    brn: { label: 'BURN', icon: Flame, color: 'text-orange-400', border: 'border-orange-500/50', bg: 'bg-orange-950/80' },
-    par: { label: 'PARALYSIS', icon: Zap, color: 'text-yellow-400', border: 'border-yellow-500/50', bg: 'bg-yellow-950/80' },
-    psn: { label: 'POISON', icon: Skull, color: 'text-purple-400', border: 'border-purple-500/50', bg: 'bg-purple-950/80' },
-    tox: { label: 'TOXIC', icon: Skull, color: 'text-purple-400', border: 'border-purple-500/50', bg: 'bg-purple-950/80' },
-    slp: { label: 'SLEEP', icon: Shield, color: 'text-slate-400', border: 'border-slate-500/50', bg: 'bg-slate-900/80' },
-    frz: { label: 'FROZEN', icon: Sparkles, color: 'text-cyan-300', border: 'border-cyan-400/50', bg: 'bg-cyan-950/80' },
-  };
+  const normStatus = status.toLowerCase();
 
-  const current = config[status.toLowerCase()] || {
-    label: status.toUpperCase(),
-    icon: Activity,
-    color: 'text-amber-400',
-    border: 'border-amber-500/50',
-    bg: 'bg-amber-950/80'
-  };
-
-  const Icon = current.icon;
+  const isBurn = normStatus === 'brn' || normStatus === 'bur' || normStatus === 'burn';
+  const isParalysis = normStatus === 'par' || normStatus === 'paralysis';
+  const isPoison = normStatus === 'psn' || normStatus === 'poi' || normStatus === 'poison' || normStatus === 'tox' || normStatus === 'toxic';
+  const isToxic = normStatus === 'tox' || normStatus === 'toxic';
+  const isFreeze = normStatus === 'frz' || normStatus === 'freeze' || normStatus === 'frozen';
+  const isSleep = normStatus === 'slp' || normStatus === 'sle' || normStatus === 'sleep';
+  const isConfusion = normStatus === 'con' || normStatus === 'confusion';
 
   return (
-    <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0.8, opacity: 0 }}
-      className={cn(
-        "inline-flex items-center gap-1 px-2 py-0.5 rounded border text-[9px] font-hud font-bold uppercase tracking-wider shadow-sm",
-        current.bg,
-        current.border,
-        current.color
+    <div className="absolute inset-0 pointer-events-none z-20 flex items-center justify-center overflow-visible">
+      {/* 1. BURN GLOW EFFECT */}
+      {isBurn && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          {/* Outer Pulsing Fire Glow */}
+          <motion.div
+            animate={{
+              scale: [0.95, 1.12, 1],
+              opacity: [0.45, 0.85, 0.55],
+            }}
+            transition={{
+              duration: 1.6,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute -inset-4 sm:-inset-6 rounded-full bg-gradient-to-t from-red-600/35 via-orange-500/30 to-amber-400/25 blur-2xl"
+          />
+          {/* Inner Fiery Core */}
+          <motion.div
+            animate={{
+              scale: [1, 1.08, 0.96, 1.05, 1],
+              opacity: [0.6, 0.9, 0.65, 0.85, 0.6],
+            }}
+            transition={{
+              duration: 1.2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute -inset-1 sm:-inset-2 rounded-full border-2 border-orange-500/40 blur-sm mix-blend-screen shadow-[0_0_25px_rgba(249,115,22,0.8)]"
+          />
+          {/* Rising Ember Sparks */}
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={`burn-ember-${i}`}
+              initial={{ y: 20, x: (i - 2.5) * 16, opacity: 0, scale: 0.5 }}
+              animate={{
+                y: [-10, -50 - (i * 8)],
+                x: [(i - 2.5) * 16, (i - 2.5) * 20 + ((i % 2 === 0 ? 1 : -1) * 12)],
+                opacity: [0, 1, 0.8, 0],
+                scale: [0.6, 1.2, 0.4]
+              }}
+              transition={{
+                duration: 1.4 + (i * 0.2),
+                repeat: Infinity,
+                delay: i * 0.22,
+                ease: "easeOut"
+              }}
+              className="absolute w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-gradient-to-t from-orange-500 to-yellow-300 blur-[0.5px] shadow-[0_0_10px_rgba(251,146,60,0.9)]"
+            />
+          ))}
+        </div>
       )}
-    >
-      <Icon className="w-3 h-3" />
-      <span>{current.label}</span>
-    </motion.div>
+
+      {/* 2. FREEZE GLOW EFFECT */}
+      {isFreeze && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          {/* Crystalline Frost Glow */}
+          <motion.div
+            animate={{
+              scale: [1, 1.08, 1],
+              opacity: [0.5, 0.9, 0.55],
+            }}
+            transition={{
+              duration: 2.2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute -inset-4 sm:-inset-6 rounded-full bg-gradient-to-b from-cyan-400/35 via-sky-500/25 to-blue-600/30 blur-2xl"
+          />
+          {/* Subzero Ice Crystals Aura */}
+          <motion.div
+            animate={{
+              rotate: [0, 180, 360],
+              scale: [0.98, 1.06, 0.98],
+              opacity: [0.7, 1, 0.7],
+            }}
+            transition={{
+              rotate: { duration: 18, repeat: Infinity, ease: "linear" },
+              scale: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+              opacity: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+            }}
+            className="absolute -inset-2 sm:-inset-3 rounded-2xl border border-cyan-300/60 blur-[1px] shadow-[0_0_30px_rgba(34,211,238,0.85)]"
+          />
+          {/* Glistening Frost Flares */}
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={`frz-sparkle-${i}`}
+              animate={{
+                scale: [0.4, 1.3, 0.4],
+                opacity: [0.2, 1, 0.2],
+                rotate: [0, 90, 180],
+              }}
+              transition={{
+                duration: 1.8,
+                repeat: Infinity,
+                delay: i * 0.3,
+                ease: "easeInOut"
+              }}
+              style={{
+                top: `${20 + (i * 12)}%`,
+                left: `${15 + ((i * 23) % 70)}%`
+              }}
+              className="absolute w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-cyan-200 shadow-[0_0_12px_rgba(103,232,249,1)]"
+            />
+          ))}
+        </div>
+      )}
+
+      {/* 3. PARALYSIS GLOW EFFECT */}
+      {isParalysis && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          {/* Voltage Energy Halo */}
+          <motion.div
+            animate={{
+              scale: [0.95, 1.15, 0.98, 1.12, 0.95],
+              opacity: [0.4, 0.85, 0.5, 0.9, 0.4],
+            }}
+            transition={{
+              duration: 1.1,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute -inset-4 sm:-inset-6 rounded-full bg-yellow-400/25 blur-2xl"
+          />
+          {/* Electric Crackle Pulses */}
+          <motion.div
+            animate={{
+              scale: [1, 1.08, 0.98, 1.06, 1],
+              opacity: [0.5, 1, 0.3, 0.95, 0.5],
+            }}
+            transition={{
+              duration: 0.6,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            className="absolute -inset-1 sm:-inset-3 rounded-full border border-yellow-300/60 blur-[1px] shadow-[0_0_30px_rgba(250,204,21,0.9)]"
+          />
+          {/* Sparking Voltage Jolts */}
+          {[...Array(5)].map((_, i) => (
+            <motion.div
+              key={`par-spark-${i}`}
+              animate={{
+                opacity: [0, 1, 0, 1, 0],
+                scale: [0.6, 1.4, 0.5, 1.2, 0.4],
+                x: [(i % 2 === 0 ? -1 : 1) * (15 + i * 8), (i % 2 === 0 ? 1 : -1) * (20 + i * 6)],
+                y: [(i - 2) * 14, (i - 2) * 18]
+              }}
+              transition={{
+                duration: 0.8,
+                repeat: Infinity,
+                delay: i * 0.15,
+                ease: "easeInOut"
+              }}
+              className="absolute w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-yellow-200 shadow-[0_0_12px_rgba(250,204,21,1)]"
+            />
+          ))}
+        </div>
+      )}
+
+      {/* 4. POISON & TOXIC GLOW EFFECT */}
+      {isPoison && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          {/* Toxic Miasma Vapor Glow */}
+          <motion.div
+            animate={{
+              scale: [0.95, 1.1, 0.95],
+              opacity: [0.4, 0.8, 0.4],
+            }}
+            transition={{
+              duration: 2.4,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className={cn(
+              "absolute -inset-4 sm:-inset-6 rounded-full blur-2xl",
+              isToxic ? "bg-gradient-to-t from-fuchsia-700/35 via-purple-600/35 to-violet-500/30" : "bg-purple-600/25"
+            )}
+          />
+          {/* Venom Border Pulse */}
+          <motion.div
+            animate={{
+              scale: [1, 1.06, 1],
+              opacity: [0.5, 0.9, 0.5],
+            }}
+            transition={{
+              duration: 1.8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className={cn(
+              "absolute -inset-1 sm:-inset-2 rounded-full border blur-[1px]",
+              isToxic ? "border-fuchsia-400/60 shadow-[0_0_28px_rgba(217,70,239,0.85)]" : "border-purple-400/60 shadow-[0_0_24px_rgba(168,85,247,0.8)]"
+            )}
+          />
+          {/* Drifting Poison Bubbles */}
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={`psn-bubble-${i}`}
+              initial={{ y: 25, opacity: 0, scale: 0.4 }}
+              animate={{
+                y: [-5, -45 - (i * 6)],
+                x: [(i - 2.5) * 14, (i - 2.5) * 18 + ((i % 2 === 0 ? 1 : -1) * 8)],
+                opacity: [0, 0.9, 0.6, 0],
+                scale: [0.5, 1.1, 0.3]
+              }}
+              transition={{
+                duration: 1.9 + (i * 0.2),
+                repeat: Infinity,
+                delay: i * 0.28,
+                ease: "easeOut"
+              }}
+              className="absolute w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-purple-400/90 shadow-[0_0_10px_rgba(192,132,252,0.9)]"
+            />
+          ))}
+        </div>
+      )}
+
+      {/* 5. SLEEP GLOW EFFECT */}
+      {isSleep && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          {/* Twilight Astral Sleep Glow */}
+          <motion.div
+            animate={{
+              scale: [0.94, 1.08, 0.94],
+              opacity: [0.35, 0.7, 0.35],
+            }}
+            transition={{
+              duration: 3.2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute -inset-4 sm:-inset-6 rounded-full bg-gradient-to-t from-indigo-900/40 via-slate-700/30 to-sky-900/30 blur-2xl"
+          />
+          {/* Gentle Breathing Aura Ring */}
+          <motion.div
+            animate={{
+              scale: [0.98, 1.05, 0.98],
+              opacity: [0.4, 0.75, 0.4],
+            }}
+            transition={{
+              duration: 2.8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute -inset-1 sm:-inset-2 rounded-full border border-indigo-400/40 blur-[1px] shadow-[0_0_20px_rgba(129,140,248,0.6)]"
+          />
+          {/* Floating Dream Orbs */}
+          {[...Array(4)].map((_, i) => (
+            <motion.div
+              key={`slp-orb-${i}`}
+              animate={{
+                y: [0, -18, 0],
+                x: [0, (i % 2 === 0 ? 8 : -8), 0],
+                opacity: [0.2, 0.8, 0.2],
+                scale: [0.6, 1.2, 0.6]
+              }}
+              transition={{
+                duration: 2.6,
+                repeat: Infinity,
+                delay: i * 0.6,
+                ease: "easeInOut"
+              }}
+              style={{
+                top: `${25 + (i * 15)}%`,
+                left: `${20 + ((i * 25) % 60)}%`
+              }}
+              className="absolute w-2 h-2 rounded-full bg-indigo-300/80 shadow-[0_0_10px_rgba(165,180,252,0.8)]"
+            />
+          ))}
+        </div>
+      )}
+
+      {/* 6. CONFUSION GLOW EFFECT */}
+      {isConfusion && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          {/* Swirling Psychic Distortion Ring */}
+          <motion.div
+            animate={{
+              rotate: [0, 360],
+              scale: [0.96, 1.08, 0.96],
+              opacity: [0.5, 0.85, 0.5],
+            }}
+            transition={{
+              rotate: { duration: 6, repeat: Infinity, ease: "linear" },
+              scale: { duration: 1.8, repeat: Infinity, ease: "easeInOut" },
+              opacity: { duration: 1.8, repeat: Infinity, ease: "easeInOut" }
+            }}
+            className="absolute -inset-2 sm:-inset-4 rounded-full border-2 border-dashed border-pink-400/60 blur-[1px] shadow-[0_0_25px_rgba(244,114,182,0.8)]"
+          />
+        </div>
+      )}
+    </div>
   );
 });
 

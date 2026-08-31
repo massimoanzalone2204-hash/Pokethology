@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
-import { Trophy, ShieldAlert, Zap, TrendingUp, Clock, RotateCcw, Target, Sparkles, ChevronRight, Hash, Eye, Award } from 'lucide-react';
+import { Trophy, ShieldAlert, Zap, TrendingUp, Clock, RotateCcw, Target, ChevronRight, Hash, Eye, Award } from 'lucide-react';
 import { HUDCorners } from './HUDCorners';
 
 interface BattleResultScreenProps {
@@ -128,7 +128,7 @@ export function BattleResultScreen({
             </div>
             <div>
               <h2 className={cn("font-hud font-black text-xl sm:text-3xl uppercase tracking-widest leading-none", accentColor)}>
-                {isVictory ? "VICTORY ACHIEVED" : "DEFEAT SUSTAINED"}
+                {isVictory ? "MATCH WIN" : "MATCH LOSE"}
               </h2>
             </div>
           </div>
@@ -163,11 +163,11 @@ export function BattleResultScreen({
                 isVictory ? "border-emerald-500/70 shadow-[0_0_25px_rgba(16,185,129,0.2)]" : "border-slate-700/60 opacity-90"
               )}>
                 <HUDCorners />
-                <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 px-2 py-0.5 rounded-lg text-[10px] font-hud font-black tracking-wider uppercase border bg-slate-950/80 border-inherit z-10">
+                <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 px-1.5 py-0.5 rounded-md text-[8.5px] sm:text-[9.5px] font-hud font-black tracking-wider uppercase border bg-slate-950/85 border-inherit z-10 shadow-sm">
                   {isVictory ? (
-                    <span className="text-emerald-400 flex items-center gap-1 font-extrabold"><Sparkles className="w-3 h-3" /> WINNER</span>
+                    <span className="text-emerald-400 font-extrabold">WINNER</span>
                   ) : (
-                    <span className="text-rose-400 font-extrabold">FAINTED</span>
+                    <span className="text-rose-400 font-extrabold">LOSER</span>
                   )}
                 </div>
 
@@ -217,11 +217,11 @@ export function BattleResultScreen({
                 !isVictory ? "border-rose-500/70 shadow-[0_0_25px_rgba(244,63,94,0.2)]" : "border-slate-700/60 opacity-90"
               )}>
                 <HUDCorners />
-                <div className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 px-2 py-0.5 rounded-lg text-[10px] font-hud font-black tracking-wider uppercase border bg-slate-950/80 border-inherit z-10">
+                <div className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 px-1.5 py-0.5 rounded-md text-[8.5px] sm:text-[9.5px] font-hud font-black tracking-wider uppercase border bg-slate-950/85 border-inherit z-10 shadow-sm">
                   {!isVictory ? (
-                    <span className="text-rose-400 flex items-center gap-1 font-extrabold"><Sparkles className="w-3 h-3" /> WINNER</span>
+                    <span className="text-rose-400 font-extrabold">WINNER</span>
                   ) : (
-                    <span className="text-slate-400 font-extrabold">FAINTED</span>
+                    <span className="text-slate-400 font-extrabold">LOSER</span>
                   )}
                 </div>
 
@@ -266,34 +266,34 @@ export function BattleResultScreen({
             </div>
 
             {/* Quick Metrics Bar */}
-            <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-              <div className={cn("p-3 sm:p-4 rounded-xl border flex flex-col items-center text-center", cardBg)}>
-                <span className={cn("text-[11px] sm:text-xs uppercase font-hud tracking-wider flex items-center gap-1 font-bold", isLightMode ? "text-slate-600" : "text-slate-400")}>
-                  <Hash className="w-3.5 h-3.5 text-cyan-400" /> Turns
+            <div className="grid grid-cols-3 gap-2 sm:gap-3.5">
+              <div className={cn("p-2.5 sm:p-3.5 rounded-xl border flex flex-col items-center justify-center text-center", cardBg)}>
+                <span className={cn("text-[9px] sm:text-[11px] uppercase font-hud tracking-wider flex items-center justify-center gap-1 font-bold whitespace-nowrap", isLightMode ? "text-slate-600" : "text-slate-400")}>
+                  <Hash className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-cyan-400 shrink-0" /> Turns
                 </span>
-                <span className="font-mono font-black text-lg sm:text-2xl mt-1 text-cyan-400">{turnNumber}</span>
+                <span className="font-mono font-black text-base sm:text-xl mt-0.5 text-cyan-400 leading-none">{turnNumber}</span>
               </div>
 
-              <div className={cn("p-3 sm:p-4 rounded-xl border flex flex-col items-center text-center", cardBg)}>
-                <span className={cn("text-[11px] sm:text-xs uppercase font-hud tracking-wider flex items-center gap-1 font-bold", isLightMode ? "text-slate-600" : "text-slate-400")}>
-                  <Award className="w-3.5 h-3.5 text-amber-400" /> Rank
+              <div className={cn("p-2.5 sm:p-3.5 rounded-xl border flex flex-col items-center justify-center text-center", cardBg)}>
+                <span className={cn("text-[9px] sm:text-[11px] uppercase font-hud tracking-wider flex items-center justify-center gap-1 font-bold whitespace-nowrap", isLightMode ? "text-slate-600" : "text-slate-400")}>
+                  <Award className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400 shrink-0" /> Rank
                 </span>
-                <span className={cn("font-hud font-black text-lg sm:text-2xl mt-1", accentColor)}>
+                <span className={cn("font-hud font-black text-base sm:text-xl mt-0.5 leading-none", accentColor)}>
                   {isVictory ? (victorHPPercent > 50 ? 'S-RANK' : 'A-RANK') : 'C-RANK'}
                 </span>
               </div>
 
-              <div className={cn("p-3 sm:p-4 rounded-xl border flex flex-col items-center text-center", cardBg)}>
-                <span className={cn("text-[11px] sm:text-xs uppercase font-hud tracking-wider flex items-center gap-1 font-bold", isLightMode ? "text-slate-600" : "text-slate-400")}>
-                  <TrendingUp className="w-3.5 h-3.5 text-emerald-400" /> Victor HP
+              <div className={cn("p-2.5 sm:p-3.5 rounded-xl border flex flex-col items-center justify-center text-center", cardBg)}>
+                <span className={cn("text-[9px] sm:text-[11px] uppercase font-hud tracking-wider flex items-center justify-center gap-1 font-bold whitespace-nowrap", isLightMode ? "text-slate-600" : "text-slate-400")}>
+                  <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-400 shrink-0" /> Victor HP
                 </span>
-                <span className="font-mono font-black text-lg sm:text-2xl mt-1 text-emerald-400">
+                <span className="font-mono font-black text-base sm:text-xl mt-0.5 text-emerald-400 leading-none">
                   {victorHPPercent}%
                 </span>
               </div>
             </div>
 
-            {/* Mission Objective Milestone Notice */}
+            {/* Single Daily Hub Mission Notice */}
             {missionNotice && (
               <div className={cn(
                 "p-3.5 sm:p-4 rounded-2xl border flex items-center gap-3.5 relative overflow-hidden shadow-lg",
@@ -308,22 +308,22 @@ export function BattleResultScreen({
                     : "bg-cyan-500/20 border-cyan-400 text-cyan-300"
                 )}>
                   {missionNotice.isComplete ? (
-                    <Trophy className="w-6 h-6 animate-bounce" />
+                    <Trophy className="w-5 h-5 animate-bounce" />
                   ) : (
-                    <Target className="w-6 h-6 animate-pulse" />
+                    <Target className="w-5 h-5 animate-pulse" />
                   )}
                 </div>
                 <div className="flex flex-col text-left overflow-hidden">
                   <span className={cn(
-                    "text-xs font-hud font-black uppercase tracking-wider flex items-center gap-1",
+                    "text-[10px] font-hud font-black uppercase tracking-wider flex items-center gap-1.5",
                     missionNotice.isComplete ? "text-emerald-400" : "text-cyan-400"
                   )}>
-                    {missionNotice.isComplete ? "🎉 MISSION OBJECTIVE COMPLETED" : "⚔️ DAILY HUB MISSION PROGRESS"}
+                    {missionNotice.isComplete ? "🎉 DAILY HUB MISSION COMPLETED" : "⚔️ DAILY HUB MISSION UPDATED"}
                   </span>
                   <span className="text-sm font-black text-white truncate mt-0.5">
                     {missionNotice.title}
                   </span>
-                  <span className="text-xs text-slate-200 font-sans truncate font-medium">
+                  <span className="text-xs text-slate-300 font-sans truncate font-medium">
                     {missionNotice.description}
                   </span>
                 </div>

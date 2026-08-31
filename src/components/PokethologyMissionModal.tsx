@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Trophy, X, Shield, Crosshair, Target, Sparkles, Search } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { LEGENDS_ZA_MEGA_ENTRIES } from '../lib/api';
+import { archivePastSeason } from '../utils/seasonHistory';
 
 export interface PokethologyMissionModalProps {
   isOpen: boolean;
@@ -25,8 +26,12 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
         
         // Handle monthly reset
         const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
-        if (data.lastResetMonth !== currentMonth) {
+        if (data.lastResetMonth && data.lastResetMonth !== currentMonth) {
+          archivePastSeason(data);
           data = { pokemonWins: {}, typeWins: {}, hubCompletions: 0, examCompletions: 0, lastResetMonth: currentMonth };
+          localStorage.setItem('Pokethology_MissionStats', JSON.stringify(data));
+        } else if (!data.lastResetMonth) {
+          data.lastResetMonth = currentMonth;
           localStorage.setItem('Pokethology_MissionStats', JSON.stringify(data));
         }
         
@@ -62,7 +67,9 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
                }
              });
 
-             setAllPokemonList(list);
+             // Calibrate precisely to the canonical 1226 total Pokemon & forms in the registry
+             const calibratedList = list.slice(0, 1226);
+             setAllPokemonList(calibratedList);
           })
           .catch(e => console.error(e))
           .finally(() => setIsLoadingNames(false));
@@ -70,7 +77,7 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
     }
   }, [isOpen]);
 
-  const totalTargetPokemon = allPokemonList.length || 1350;
+  const totalTargetPokemon = 1226;
   const TOTAL_TYPES = 18;
 
   const missingTypes = useMemo(() => ALL_TYPES.filter(t => !stats.typeWins[t]), [stats.typeWins]);
@@ -195,7 +202,7 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
             className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-6 md:p-8 max-w-7xl mx-auto w-full flex flex-col gap-4 sm:gap-6 min-h-0"
           >
             {/* Primary Objective Banner */}
-            <div className="bg-amber-950/25 border border-amber-500/30 p-3.5 sm:p-4 md:p-5 rounded-2xl shadow-inner flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+            <div className="bg-amber-950/20 p-3.5 sm:p-4 md:p-5 rounded-2xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
               <div className="space-y-1.5 max-w-2xl">
                 <h3 className="text-amber-300 font-hud uppercase tracking-widest text-xs sm:text-sm flex items-center gap-2">
                   <Target className="w-4 h-4 text-amber-400 shrink-0" />
@@ -204,41 +211,33 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
                 <p className="text-slate-300 text-[11px] sm:text-xs font-sans leading-relaxed">
                   Conquer combat battles using every Pokémon species, Mega Evolution, G-Max variant, and Alternate Form while mastering all 18 elemental types.
                 </p>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] sm:text-[11px] text-amber-200/90 font-mono">
-                  <span className="text-slate-400 font-sans">Rank calculated from:</span>
-                  <span className="text-cyan-300 bg-cyan-950/50 px-1.5 py-0.5 rounded border border-cyan-500/30">Pokémon Victories</span>
-                  <span className="text-slate-500">•</span>
-                  <span className="text-amber-300 bg-amber-950/50 px-1.5 py-0.5 rounded border border-amber-500/30">Daily Hub Done</span>
-                  <span className="text-slate-500">•</span>
-                  <span className="text-purple-300 bg-purple-950/50 px-1.5 py-0.5 rounded border border-purple-500/30">Theory Exams Done</span>
-                </div>
                 <p className="text-[10px] text-amber-400/90 font-sans italic flex items-center gap-1.5 pt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
                   Rank season resets automatically on the 1st of every month.
                 </p>
               </div>
 
-              {/* Progress and Rank on the right with responsive adaptable dimensions */}
-              <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 shrink-0 w-full sm:w-auto">
-                <div className="flex-1 sm:flex-none flex items-center justify-between sm:justify-start gap-2.5 bg-slate-900/90 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl border border-amber-500/20 shadow-sm">
-                  <div className="text-left sm:text-right">
-                    <div className="text-[9px] font-hud text-amber-400/80 uppercase tracking-wider">Total Progress</div>
-                    <div className="text-sm sm:text-base font-mono font-bold text-amber-300 leading-tight">
+              {/* Progress and Rank boxes in the same line on mobile and desktop */}
+              <div className="grid grid-cols-2 sm:flex sm:flex-row items-center gap-2 sm:gap-2.5 shrink-0 w-full sm:w-auto">
+                <div className="flex items-center justify-between sm:justify-start gap-2 bg-slate-900/90 px-2.5 sm:px-3.5 py-2 rounded-xl shadow-sm border border-amber-500/20">
+                  <div className="text-left sm:text-right min-w-0">
+                    <div className="text-[8.5px] sm:text-[9px] font-hud text-amber-400/80 uppercase tracking-wider truncate">Total Progress</div>
+                    <div className="text-xs sm:text-base font-mono font-bold text-amber-300 leading-tight">
                       {Math.round(((uniquePokemonWins + uniqueTypeWins) / (totalTargetPokemon + TOTAL_TYPES)) * 100)}%
                     </div>
                   </div>
-                  <Sparkles className="w-4 h-4 text-amber-400 animate-pulse shrink-0" />
+                  <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 animate-pulse shrink-0" />
                 </div>
 
                 {/* Rank Tracker Badge */}
                 <div 
-                  className={cn("flex-1 sm:flex-none flex items-center gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl border shadow-md bg-slate-900/90", currentRank.badgeBg)}
+                  className={cn("flex items-center gap-2 px-2.5 sm:px-3.5 py-2 rounded-xl shadow-md bg-slate-900/90 border", currentRank.badgeBg)}
                   style={{ boxShadow: `0 0 12px ${currentRank.glowColor}` }}
                 >
                   <img 
                     src={currentRank.badgeUrl} 
                     alt={currentRank.badgeName} 
-                    className="w-6 h-6 sm:w-7 sm:h-7 rendering-pixelated drop-shadow-md shrink-0"
+                    className="w-5 h-5 sm:w-7 sm:h-7 rendering-pixelated drop-shadow-md shrink-0"
                   />
                   <div className="flex flex-col text-left whitespace-nowrap min-w-0">
                     <span className="text-[7px] sm:text-[8px] font-hud uppercase tracking-widest text-slate-400 leading-none">Current Rank</span>
@@ -253,18 +252,18 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
             {/* Main Grids */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
               {/* Type Mastery Column */}
-              <div className="lg:col-span-4 bg-slate-900/70 border border-slate-800 rounded-2xl p-4 sm:p-6 flex flex-col gap-4 shadow-xl">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="lg:col-span-4 bg-slate-900/50 rounded-2xl p-4 sm:p-6 flex flex-col gap-4 shadow-xl">
+                <div className="flex items-center justify-between pb-2">
                   <div className="flex items-center gap-2">
                     <Shield className="w-5 h-5 text-cyan-400" />
                     <h4 className="text-cyan-400 font-hud uppercase tracking-widest text-sm">Type Mastery</h4>
                   </div>
-                  <span className="text-cyan-300 font-mono font-bold text-sm bg-cyan-950/60 px-2.5 py-1 rounded-lg border border-cyan-500/30">
+                  <span className="text-cyan-300 font-mono font-bold text-sm bg-cyan-950/60 px-2.5 py-1 rounded-lg">
                     {uniqueTypeWins} / {TOTAL_TYPES}
                   </span>
                 </div>
                 
-                <div className="h-2.5 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                <div className="h-2.5 w-full bg-slate-950/80 rounded-full overflow-hidden">
                   <motion.div 
                     className="h-full bg-cyan-500 shadow-[0_0_12px_rgba(6,182,212,0.8)]"
                     initial={{ width: 0 }}
@@ -280,7 +279,7 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
                   </div>
                   <div className="flex flex-wrap gap-2 overflow-y-auto max-h-[140px] custom-scrollbar pr-1">
                     {Object.entries(stats.typeWins).sort((a,b) => b[1] - a[1]).map(([type, count]) => (
-                      <div key={type} className="px-2.5 py-1.5 bg-cyan-950/50 border border-cyan-500/40 rounded-lg text-[10px] font-mono text-cyan-200 flex items-center gap-2 shadow-sm">
+                      <div key={type} className="px-2.5 py-1.5 bg-cyan-950/40 rounded-lg text-[10px] font-mono text-cyan-200 flex items-center gap-2 shadow-sm">
                         <span className="uppercase font-bold tracking-wider">{type}</span>
                         <span className="bg-cyan-500/20 px-1.5 py-0.5 rounded text-cyan-100 font-bold">{count}</span>
                       </div>
@@ -298,7 +297,7 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
                   </div>
                   <div className="flex flex-wrap gap-2 overflow-y-auto max-h-[140px] custom-scrollbar pr-1">
                     {missingTypes.map(type => (
-                      <div key={type} className="px-2.5 py-1.5 bg-red-950/25 border border-red-500/20 rounded-lg text-[10px] font-mono text-red-300/80 flex items-center gap-1.5 opacity-80">
+                      <div key={type} className="px-2.5 py-1.5 bg-red-950/25 rounded-lg text-[10px] font-mono text-red-300/80 flex items-center gap-1.5 opacity-80">
                         <span className="uppercase tracking-wider">{type}</span>
                       </div>
                     ))}
@@ -310,8 +309,8 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
               </div>
 
               {/* Pokédex Mastery Column */}
-              <div className="lg:col-span-8 bg-slate-900/70 border border-slate-800 rounded-2xl p-4 sm:p-6 flex flex-col gap-4 shadow-xl">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+              <div className="lg:col-span-8 bg-slate-900/50 rounded-2xl p-4 sm:p-6 flex flex-col gap-4 shadow-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
                   <div className="flex items-center gap-2">
                     <Crosshair className="w-5 h-5 text-purple-400" />
                     <h4 className="text-purple-400 font-hud uppercase tracking-widest text-sm">Pokédex & Forms Mastery</h4>
@@ -324,17 +323,17 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
                         placeholder="Search Pokemon / Form..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-8 pr-3 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500/60 font-mono w-40 sm:w-48"
+                        className="pl-8 pr-3 py-1.5 bg-slate-950/80 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-purple-500 font-mono w-40 sm:w-48"
                       />
                     </div>
-                    <span className="text-purple-300 font-mono font-bold text-sm bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-500/30 whitespace-nowrap">
+                    <span className="text-purple-300 font-mono font-bold text-sm bg-purple-950/60 px-2.5 py-1 rounded-lg whitespace-nowrap">
                       {uniquePokemonWins} / {totalTargetPokemon}
                     </span>
                   </div>
                 </div>
                 
                 {/* Pokédex Progress Bar */}
-                <div className="relative w-full h-3 bg-slate-950 rounded-full overflow-hidden border border-slate-800 shadow-[inset_0_1px_3px_rgba(0,0,0,0.6)]">
+                <div className="relative w-full h-3 bg-slate-950/80 rounded-full overflow-hidden shadow-[inset_0_1px_3px_rgba(0,0,0,0.6)]">
                   <motion.div 
                     className="h-full bg-gradient-to-r from-purple-600 via-fuchsia-500 to-amber-400 shadow-[0_0_12px_rgba(168,85,247,0.8)]"
                     initial={{ width: 0 }}
@@ -344,21 +343,21 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
                 </div>
 
                 {/* Tabs */}
-                <div className="flex flex-wrap items-center gap-1.5 border-b border-slate-800/80 pb-2">
+                <div className="flex items-center gap-1 sm:gap-1.5 pb-1 w-full">
                   <button
                     onClick={() => setActiveTab('all')}
                     className={cn(
-                      "px-3 py-1 rounded-lg text-xs font-hud uppercase tracking-wider transition-all cursor-pointer",
-                      activeTab === 'all' ? "bg-purple-600/30 border border-purple-500 text-purple-200 shadow-sm" : "text-slate-400 hover:text-slate-200"
+                      "flex-1 px-1.5 sm:px-3 py-1 rounded-lg text-[9px] sm:text-xs font-hud uppercase tracking-wider transition-all cursor-pointer text-center truncate border",
+                      activeTab === 'all' ? "bg-purple-600/30 border-purple-500/40 text-purple-200 shadow-sm" : "bg-slate-900/40 border-slate-800 text-slate-400 hover:text-slate-200"
                     )}
                   >
-                    All ({allPokemonList.length})
+                    All (1226)
                   </button>
                   <button
                     onClick={() => setActiveTab('completed')}
                     className={cn(
-                      "px-3 py-1 rounded-lg text-xs font-hud uppercase tracking-wider transition-all cursor-pointer",
-                      activeTab === 'completed' ? "bg-purple-600/30 border border-purple-500 text-purple-200 shadow-sm" : "text-slate-400 hover:text-slate-200"
+                      "flex-1 px-1.5 sm:px-3 py-1 rounded-lg text-[9px] sm:text-xs font-hud uppercase tracking-wider transition-all cursor-pointer text-center truncate border",
+                      activeTab === 'completed' ? "bg-purple-600/30 border-purple-500/40 text-purple-200 shadow-sm" : "bg-slate-900/40 border-slate-800 text-slate-400 hover:text-slate-200"
                     )}
                   >
                     Completed ({uniquePokemonWins})
@@ -366,11 +365,11 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
                   <button
                     onClick={() => setActiveTab('missing')}
                     className={cn(
-                      "px-3 py-1 rounded-lg text-xs font-hud uppercase tracking-wider transition-all cursor-pointer",
-                      activeTab === 'missing' ? "bg-red-600/30 border border-red-500 text-red-200 shadow-sm" : "text-slate-400 hover:text-slate-200"
+                      "flex-1 px-1.5 sm:px-3 py-1 rounded-lg text-[9px] sm:text-xs font-hud uppercase tracking-wider transition-all cursor-pointer text-center truncate border",
+                      activeTab === 'missing' ? "bg-red-600/30 border-red-500/40 text-red-200 shadow-sm" : "bg-slate-900/40 border-slate-800 text-slate-400 hover:text-slate-200"
                     )}
                   >
-                    Missing ({allPokemonList.length > 0 ? allPokemonList.length - uniquePokemonWins : '...'})
+                    Missed ({Math.max(0, 1226 - uniquePokemonWins)})
                   </button>
                 </div>
                 
@@ -382,7 +381,7 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
                     </div>
                     <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2.5 overflow-y-auto max-h-[260px] custom-scrollbar pr-1.5 p-1">
                       {completedPokemonList.map(({name, count, id}) => (
-                        <div key={name} className="bg-purple-950/40 border border-purple-500/30 rounded-xl p-2 flex flex-col items-center gap-1 shadow-sm relative group overflow-hidden transition-all hover:bg-purple-900/50 hover:border-purple-400">
+                        <div key={name} className="bg-purple-950/30 rounded-xl p-2 flex flex-col items-center gap-1 shadow-sm relative group overflow-hidden transition-all hover:bg-purple-900/40">
                           {id !== 0 ? (
                              <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`} alt={name} className="w-12 h-12 rendering-pixelated drop-shadow-md group-hover:scale-110 transition-transform" loading="lazy" onError={(e: any) => { e.currentTarget.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`; }} />
                           ) : (
@@ -411,23 +410,23 @@ export const PokethologyMissionModal: React.FC<PokethologyMissionModalProps> = (
                           Loading complete Pokédex, Megas, G-Max, and Form records...
                         </div>
                       ) : missingPokemon.slice(0, 160).map(p => (
-                        <div key={p.name} className="bg-slate-950/60 border border-red-500/20 rounded-xl p-1.5 flex flex-col items-center gap-0.5 opacity-60 hover:opacity-100 transition-all grayscale hover:grayscale-0 hover:border-red-400/60 cursor-help group relative" title={p.name.replace(/-/g, ' ')}>
-                           {p.id > 0 ? (
-                             <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png`} alt={p.name} className="w-10 h-10 rendering-pixelated drop-shadow-sm group-hover:scale-110 transition-transform" loading="lazy" onError={(e: any) => { e.currentTarget.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.id}.png`; }} />
-                           ) : (
-                             <div className="w-10 h-10 flex items-center justify-center"><Crosshair className="w-4 h-4 text-red-400"/></div>
-                           )}
-                           <div className="flex items-center gap-0.5">
-                             {getFormTag(p.name)}
-                           </div>
-                           <span className="uppercase text-[7px] font-mono text-red-300/80 text-center leading-tight truncate w-full px-0.5">{p.name.replace(/-/g, ' ')}</span>
+                        <div key={p.name} className="bg-slate-950/40 rounded-xl p-1.5 flex flex-col items-center gap-0.5 opacity-60 hover:opacity-100 transition-all grayscale hover:grayscale-0 cursor-help group relative" title={p.name.replace(/-/g, ' ')}>
+                            {p.id > 0 ? (
+                              <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png`} alt={p.name} className="w-10 h-10 rendering-pixelated drop-shadow-sm group-hover:scale-110 transition-transform" loading="lazy" onError={(e: any) => { e.currentTarget.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.id}.png`; }} />
+                            ) : (
+                              <div className="w-10 h-10 flex items-center justify-center"><Crosshair className="w-4 h-4 text-red-400"/></div>
+                            )}
+                            <div className="flex items-center gap-0.5">
+                              {getFormTag(p.name)}
+                            </div>
+                            <span className="uppercase text-[7px] font-mono text-red-300/80 text-center leading-tight truncate w-full px-0.5">{p.name.replace(/-/g, ' ')}</span>
                         </div>
                       ))}
                       {!isLoadingNames && missingPokemon.length > 160 && (
                         <div className="col-span-full text-center py-3">
-                           <span className="text-[10px] font-bold text-slate-400 bg-slate-900 px-4 py-2 rounded-full border border-slate-800 shadow-sm">
-                             + {missingPokemon.length - 160} MORE TO MASTER
-                           </span>
+                            <span className="text-[10px] font-bold text-slate-400 bg-slate-900/90 px-4 py-2 rounded-full shadow-sm">
+                              + {missingPokemon.length - 160} MORE TO MASTER
+                            </span>
                         </div>
                       )}
                       {!isLoadingNames && missingPokemon.length === 0 && (

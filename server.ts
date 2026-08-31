@@ -933,6 +933,12 @@ const getOfflineNewsSet = (dateStr: string) => ({
       description: "Watch free full-length Pokémon series episodes, feature films, and animated movies. Follow Ash, Pikachu, Liko, Roy, and more trainers on their journeys across different generations.",
       url: "https://watch.pokemon.com",
       tag: "ANIME"
+    },
+    {
+      title: "The Official Pokémon TCG Portal",
+      description: "Direct access to the official Pokémon Trading Card Game portal for deck construction guidelines, card expansion database searches, rules, and championship circuit schedules.",
+      url: "https://tcg.pokemon.com",
+      tag: "CARD / TCG"
     }
   ],
   isFallback: true
@@ -947,7 +953,8 @@ app.get("/api/news", (req, res) => {
     groundingSources: [
       { title: "Pokémon Official Portal", url: "https://www.pokemon.com" },
       { title: "Pokémon Competitive Hub", url: "https://www.pokemon.com/us/play-pokemon" },
-      { title: "Pokémon Watch TV", url: "https://watch.pokemon.com" }
+      { title: "Pokémon Watch TV", url: "https://watch.pokemon.com" },
+      { title: "Pokémon TCG Portal", url: "https://tcg.pokemon.com" }
     ],
     searchQueries: ["official pokemon outlets"],
     isFallback: false

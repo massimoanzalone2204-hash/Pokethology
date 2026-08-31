@@ -209,12 +209,12 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                 
                 {/* POKEMON 1 CARD */}
                 <div className={cn(
-                  "rounded-2xl p-3 sm:p-4 border relative overflow-hidden flex flex-col items-center text-center transition-all",
+                  "rounded-2xl p-3 sm:p-4 relative overflow-hidden flex flex-col items-center text-center transition-all",
                   isLightMode
-                    ? "bg-white border-slate-200 shadow-sm"
-                    : "bg-slate-900/80 border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                    ? "bg-white shadow-sm"
+                    : "bg-slate-900/60 shadow-[0_0_20px_rgba(6,182,212,0.08)]"
                 )}>
-                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-widest bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-widest bg-cyan-500/20 text-cyan-400">
                     P1
                   </span>
 
@@ -251,7 +251,7 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                   <button
                     onClick={handleSwap}
                     title="Swap P1 and P2"
-                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 p-2 sm:p-2.5 rounded-full bg-cyan-500 text-slate-950 font-bold shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:scale-110 active:scale-95 transition-all border border-cyan-300 cursor-pointer"
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 p-2 sm:p-2.5 rounded-full bg-cyan-500 text-slate-950 font-bold shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:scale-110 active:scale-95 transition-all cursor-pointer"
                   >
                     <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
@@ -259,12 +259,12 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
 
                 {/* POKEMON 2 CARD */}
                 <div className={cn(
-                  "rounded-2xl p-3 sm:p-4 border relative overflow-hidden flex flex-col items-center text-center transition-all",
+                  "rounded-2xl p-3 sm:p-4 relative overflow-hidden flex flex-col items-center text-center transition-all",
                   isLightMode
-                    ? "bg-white border-slate-200 shadow-sm"
-                    : "bg-slate-900/80 border-purple-500/40 shadow-[0_0_15px_rgba(168,85,247,0.1)]"
+                    ? "bg-white shadow-sm"
+                    : "bg-slate-900/60 shadow-[0_0_20px_rgba(168,85,247,0.08)]"
                 )}>
-                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-widest bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-widest bg-purple-500/20 text-purple-400">
                     P2
                   </span>
 
@@ -301,7 +301,7 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                     </>
                   ) : (
                     <div className="py-6 w-full flex flex-col items-center justify-center space-y-2">
-                      <div className="w-10 h-10 rounded-full bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 my-1">
+                      <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400 my-1">
                         <Search className="w-5 h-5" />
                       </div>
                       <span className="text-xs font-hud font-bold text-slate-300">Select Pokémon 2</span>
@@ -314,8 +314,8 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
 
               {/* SEARCH INPUT BAR FOR POKEMON 2 */}
               <div className={cn(
-                "p-3.5 sm:p-4 rounded-2xl border space-y-3 relative overflow-hidden",
-                isLightMode ? "bg-white border-slate-200" : "bg-slate-900/60 border-slate-800"
+                "p-3.5 sm:p-4 rounded-2xl space-y-3 relative overflow-hidden",
+                isLightMode ? "bg-white shadow-sm" : "bg-slate-900/50"
               )}>
                 <HUDCorners />
                 <label className="text-xs font-hud font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
@@ -332,10 +332,10 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                       onKeyDown={handleKeyDown}
                       placeholder="Enter Pokémon name or ID (e.g. Charizard, Mewtwo, 150)..."
                       className={cn(
-                        "w-full px-3.5 py-2.5 rounded-xl text-xs font-sans border outline-none transition-all",
+                        "w-full px-3.5 py-2.5 rounded-xl text-xs font-sans outline-none transition-all",
                         isLightMode
-                          ? "bg-slate-100 border-slate-300 text-slate-900 focus:border-cyan-500"
-                          : "bg-slate-950 border-slate-700 text-slate-100 focus:border-cyan-400"
+                          ? "bg-slate-100 text-slate-900 focus:ring-1 focus:ring-cyan-500"
+                          : "bg-slate-950/80 text-slate-100 focus:ring-1 focus:ring-cyan-400"
                       )}
                     />
                   </div>
@@ -344,10 +344,10 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                     onClick={() => handleSearch()}
                     disabled={isSearching || !searchQuery.trim()}
                     className={cn(
-                      "px-4 py-2.5 rounded-xl text-xs font-hud font-bold uppercase tracking-wider flex items-center gap-2 border transition-all cursor-pointer shrink-0",
+                      "px-4 py-2.5 rounded-xl text-xs font-hud font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer shrink-0",
                       isSearching
-                        ? "bg-slate-800 border-slate-700 text-slate-500 cursor-not-allowed"
-                        : "bg-cyan-500 hover:bg-cyan-400 text-slate-950 border-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.4)]"
+                        ? "bg-slate-800 text-slate-500 cursor-not-allowed"
+                        : "bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-[0_0_12px_rgba(6,182,212,0.4)]"
                     )}
                   >
                     {isSearching ? (
@@ -363,7 +363,7 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
 
                 {/* If Multiple Forms Discovered on Search, Display Form Selection Pills */}
                 {availableFormsForP2.length > 1 && (
-                  <div className="p-3 rounded-xl bg-purple-950/40 border border-purple-500/40 space-y-2">
+                  <div className="p-3 rounded-xl bg-purple-950/40 space-y-2">
                     <span className="text-[10px] font-hud uppercase tracking-wider text-purple-300 font-bold flex items-center gap-1.5">
                       <Layers className="w-3.5 h-3.5 text-purple-400" />
                       Multiple Forms Available — Click to Select:
@@ -375,10 +375,10 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                           type="button"
                           onClick={() => handleSelectForm(f.name)}
                           className={cn(
-                            "px-2.5 py-1 rounded-lg text-[9.5px] font-hud uppercase tracking-wider border transition-all cursor-pointer",
+                            "px-2.5 py-1 rounded-lg text-[9.5px] font-hud uppercase tracking-wider transition-all cursor-pointer",
                             secondPokemon?.name.toLowerCase() === f.name.toLowerCase()
-                              ? "bg-purple-500 text-slate-950 border-purple-300 font-black shadow-md"
-                              : "bg-slate-900/90 text-purple-200 border-purple-500/40 hover:bg-purple-900/60 hover:text-white"
+                              ? "bg-purple-500 text-slate-950 font-black shadow-md"
+                              : "bg-slate-900/90 text-purple-200 hover:bg-purple-900/60 hover:text-white"
                           )}
                         >
                           {f.name.replace(/-/g, ' ')}
@@ -389,7 +389,7 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                 )}
 
                 {searchError && (
-                  <div className="flex items-center gap-1.5 text-xs text-rose-400 bg-rose-950/40 border border-rose-800/50 p-2.5 rounded-xl font-mono">
+                  <div className="flex items-center gap-1.5 text-xs text-rose-400 bg-rose-950/40 p-2.5 rounded-xl font-mono">
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{searchError}</span>
                   </div>
@@ -408,10 +408,10 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                           onClick={() => handleSearch(name)}
                           disabled={isSearching}
                           className={cn(
-                            "px-2.5 py-1 rounded-lg text-[10px] font-hud uppercase tracking-wider border transition-all cursor-pointer",
+                            "px-2.5 py-1 rounded-lg text-[10px] font-hud uppercase tracking-wider transition-all cursor-pointer",
                             isLightMode
-                              ? "bg-slate-100 border-slate-300 text-slate-700 hover:bg-cyan-50 hover:border-cyan-400 hover:text-cyan-800"
-                              : "bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-cyan-950/60 hover:border-cyan-500/80 hover:text-cyan-300"
+                              ? "bg-slate-100 text-slate-700 hover:bg-cyan-50 hover:text-cyan-800"
+                              : "bg-slate-800/80 text-slate-300 hover:bg-cyan-950/60 hover:text-cyan-300"
                           )}
                         >
                           {name}
@@ -431,16 +431,16 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                 >
                   {/* WINNER BANNER HIGHLIGHT */}
                   <div className={cn(
-                    "p-3.5 sm:p-4 rounded-2xl border flex items-center justify-between gap-3 relative overflow-hidden",
+                    "p-3.5 sm:p-4 rounded-2xl flex items-center justify-between gap-3 relative overflow-hidden",
                     p1Total === p2Total
-                      ? "bg-amber-950/30 border-amber-500/40 text-amber-300"
+                      ? "bg-amber-950/30 text-amber-300"
                       : p1Total > p2Total
-                        ? "bg-cyan-950/40 border-cyan-500/50 text-cyan-300"
-                        : "bg-purple-950/40 border-purple-500/50 text-purple-300"
+                        ? "bg-cyan-950/40 text-cyan-300"
+                        : "bg-purple-950/40 text-purple-300"
                   )}>
                     <HUDCorners />
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="p-2 sm:p-2.5 rounded-xl bg-white/10 border border-white/20 shrink-0">
+                      <div className="p-2 sm:p-2.5 rounded-xl bg-white/10 shrink-0">
                         <Trophy className="w-5 h-5 text-amber-400 animate-bounce" />
                       </div>
                       <div className="min-w-0">
@@ -468,11 +468,11 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
 
                   {/* STAT-BY-STAT COMPARISON BARS */}
                   <div className={cn(
-                    "p-4 sm:p-5 rounded-2xl border space-y-4 relative overflow-hidden",
-                    isLightMode ? "bg-white border-slate-200" : "bg-slate-900/80 border-slate-800"
+                    "p-4 sm:p-5 rounded-2xl space-y-4 relative overflow-hidden",
+                    isLightMode ? "bg-white shadow-sm" : "bg-slate-900/60"
                   )}>
                     <HUDCorners />
-                    <div className="flex items-center justify-between border-b pb-3 border-slate-800">
+                    <div className="flex items-center justify-between pb-2">
                       <h4 className="text-xs font-hud font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
                         <Swords className="w-4 h-4" />
                         <span>Base Stat Head-to-Head</span>
@@ -506,9 +506,9 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                                 <span className={cn(
                                   "text-[10px] font-mono font-bold px-1.5 py-0.5 rounded",
                                   diff > 0 
-                                    ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30" 
+                                    ? "bg-cyan-500/20 text-cyan-400" 
                                     : diff < 0 
-                                      ? "bg-purple-500/20 text-purple-400 border border-purple-500/30" 
+                                      ? "bg-purple-500/20 text-purple-400" 
                                       : "bg-slate-800 text-slate-400"
                                 )}>
                                   {diff > 0 ? `+${diff} P1` : diff < 0 ? `+${Math.abs(diff)} P2` : 'EQUAL'}
@@ -527,7 +527,7 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                             </div>
 
                             {/* Dual Dynamic Bar */}
-                            <div className="grid grid-cols-2 gap-1.5 h-2 bg-slate-950 rounded-full p-0.5 border border-slate-800">
+                            <div className="grid grid-cols-2 gap-1.5 h-2 bg-slate-950/80 rounded-full p-0.5">
                               {/* P1 Bar (Fills to the left or scaled right) */}
                               <div className="w-full flex justify-end bg-slate-900 rounded-l-full overflow-hidden">
                                 <div 
@@ -555,10 +555,10 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                     
                     {/* PHYSICAL MEASUREMENTS */}
                     <div className={cn(
-                      "p-4 rounded-2xl border space-y-3",
-                      isLightMode ? "bg-white border-slate-200" : "bg-slate-900/80 border-slate-800"
+                      "p-4 rounded-2xl space-y-3",
+                      isLightMode ? "bg-white shadow-sm" : "bg-slate-900/60"
                     )}>
-                      <h5 className="text-xs font-hud font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2 border-b border-slate-800 pb-2">
+                      <h5 className="text-xs font-hud font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2 pb-1">
                         <Scale className="w-3.5 h-3.5" />
                         <span>Physical Metrics</span>
                       </h5>
@@ -586,10 +586,10 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
 
                     {/* ABILITIES COMPARISON */}
                     <div className={cn(
-                      "p-4 rounded-2xl border space-y-3",
-                      isLightMode ? "bg-white border-slate-200" : "bg-slate-900/80 border-slate-800"
+                      "p-4 rounded-2xl space-y-3",
+                      isLightMode ? "bg-white shadow-sm" : "bg-slate-900/60"
                     )}>
-                      <h5 className="text-xs font-hud font-bold uppercase tracking-wider text-purple-400 flex items-center gap-2 border-b border-slate-800 pb-2">
+                      <h5 className="text-xs font-hud font-bold uppercase tracking-wider text-purple-400 flex items-center gap-2 pb-1">
                         <Zap className="w-3.5 h-3.5" />
                         <span>Abilities</span>
                       </h5>
@@ -635,7 +635,7 @@ export const PokemonComparisonSidebar: React.FC<PokemonComparisonSidebarProps> =
                           onSelectMainPokemon(secondPokemon);
                           onClose();
                         }}
-                        className="w-full py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-hud font-bold text-xs uppercase tracking-wider border border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.4)] flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.98]"
+                        className="w-full py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-hud font-bold text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(168,85,247,0.4)] flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.98]"
                       >
                         <Eye className="w-4 h-4" />
                         <span>Inspect {secondPokemon.name.replace(/-/g, ' ')} in Full Pokédex</span>

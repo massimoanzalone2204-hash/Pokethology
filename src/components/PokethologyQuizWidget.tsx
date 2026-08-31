@@ -1574,8 +1574,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
       </div>
 
       {/* ACTIVE REGION HEADER BANNER */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-3 sm:p-3.5 flex items-center justify-between gap-2 text-left relative overflow-hidden shadow-sm">
-        <HUDCorners />
+      <div className="bg-slate-900/60 rounded-xl p-3 sm:p-3.5 flex items-center justify-between gap-2 text-left relative overflow-hidden shadow-sm">
         <h3 className="text-xs xs:text-sm sm:text-base font-hud font-black text-amber-300 uppercase tracking-wider flex items-center gap-2 min-w-0 break-words">
           {React.createElement(REGION_ICONS[currentRegionData.region] || BookOpen, { className: "w-4 h-4 text-amber-400 shrink-0" })}
           <span className="truncate">{currentRegionData.region} Exam</span>
@@ -1588,8 +1587,8 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
           const allLocked = currentRegionData.questions.every((q: any) => lockedMap[q.id]);
           if (allLocked) {
              return (
-                <div className="py-12 flex flex-col items-center justify-center gap-4 bg-slate-950/60 rounded-2xl border border-emerald-500/20 mt-2">
-                  <div className="w-20 h-20 rounded-full bg-emerald-500/10 border-2 border-emerald-500/40 flex items-center justify-center shadow-[0_0_40px_rgba(52,211,153,0.2)]">
+                <div className="py-12 flex flex-col items-center justify-center gap-4 bg-slate-950/60 rounded-2xl mt-2">
+                  <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center shadow-[0_0_40px_rgba(52,211,153,0.2)]">
                     <Award className="w-10 h-10 text-emerald-400" />
                   </div>
                   <h3 className="text-xl font-hud font-black text-emerald-400 tracking-widest uppercase text-center">{currentRegionData.region} Cleared</h3>
@@ -1608,16 +1607,14 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
             <div
               key={`q-${q.id || qIndex}-${qIndex}`}
               className={cn(
-                'bg-slate-900/60 border rounded-xl p-4 flex flex-col gap-3 relative transition-all text-left shadow-md',
+                'bg-slate-900/60 rounded-2xl p-4 flex flex-col gap-3 relative transition-all text-left shadow-md',
                 isLocked
                   ? isCorrect
-                    ? 'border-emerald-500/40 bg-emerald-950/10'
-                    : 'border-rose-500/40 bg-rose-950/10'
-                  : 'border-slate-800/80 hover:border-slate-700'
+                    ? 'bg-emerald-950/20'
+                    : 'bg-rose-950/20'
+                  : 'hover:bg-slate-900/80'
               )}
             >
-              <HUDCorners />
-
               {/* Question header */}
               <div className="flex justify-between items-start gap-2">
                 <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider">
@@ -1626,10 +1623,10 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
                 {isLocked && (
                   <span
                     className={cn(
-                      'text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded border flex items-center gap-1',
+                      'text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded flex items-center gap-1',
                       isCorrect
-                        ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40'
-                        : 'bg-rose-950/60 text-rose-300 border-rose-500/40'
+                        ? 'bg-emerald-950/80 text-emerald-300'
+                        : 'bg-rose-950/80 text-rose-300'
                     )}
                   >
                     {isCorrect ? (
@@ -1654,20 +1651,20 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
                 {q.options.map((opt, optIdx) => {
                   const isSelected = selectedOption === optIdx;
-                  let optStyle = 'bg-slate-950/80 border-slate-800 text-slate-300 hover:border-cyan-500/40 hover:bg-slate-900';
+                  let optStyle = 'bg-slate-950/60 text-slate-300 hover:bg-slate-900';
 
                   if (isLocked) {
                     if (optIdx === q.answerIndex) {
-                      optStyle = 'bg-emerald-950/80 border-emerald-500 text-emerald-300 font-bold shadow-[0_0_15px_rgba(16,185,129,0.3)]';
+                      optStyle = 'bg-emerald-950/90 text-emerald-300 font-bold shadow-[0_0_15px_rgba(16,185,129,0.25)]';
                     } else if (isSelected && !isCorrect) {
-                      optStyle = 'bg-rose-950/80 border-rose-500 text-rose-300 line-through opacity-80 shadow-[0_0_15px_rgba(244,63,94,0.3)]';
+                      optStyle = 'bg-rose-950/90 text-rose-300 line-through opacity-80 shadow-[0_0_15px_rgba(244,63,94,0.25)]';
                     } else {
-                      optStyle = 'bg-slate-950/40 border-slate-900 text-slate-500 opacity-60';
+                      optStyle = 'bg-slate-950/40 text-slate-500 opacity-60';
                     }
                   } else if (isSelected) {
-                    optStyle = 'bg-cyan-950/80 border-cyan-400 text-cyan-200 font-bold shadow-[0_0_15px_rgba(6,182,212,0.3)]';
+                    optStyle = 'bg-cyan-950 text-cyan-200 font-bold shadow-[0_0_15px_rgba(6,182,212,0.3)]';
                   } else {
-                    optStyle = 'bg-slate-800 border-slate-700 text-slate-300 hover:border-cyan-500/50 hover:bg-slate-700 transition-colors';
+                    optStyle = 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 transition-colors';
                   }
 
                   return (
@@ -1676,7 +1673,7 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
                       disabled={isLocked}
                       onClick={() => handleSelectOption(q.id, optIdx)}
                       className={cn(
-                        'p-2.5 rounded-lg border text-left text-xs transition-all flex items-center justify-between gap-2 cursor-pointer',
+                        'p-2.5 rounded-xl text-left text-xs transition-all flex items-center justify-between gap-2 cursor-pointer',
                         optStyle
                       )}
                     >
@@ -1709,8 +1706,8 @@ export const PokethologyQuizWidget: React.FC = memo(() => {
                   </button>
                 </div>
               ) : (
-                <div className="mt-2 p-3 rounded-lg bg-slate-950/80 border border-slate-800 text-xs text-slate-300 leading-relaxed font-sans">
-                  <div className="flex justify-between items-center mb-1.5 border-b border-slate-800 pb-1.5">
+                <div className="mt-2 p-3 rounded-xl bg-slate-950/60 text-xs text-slate-300 leading-relaxed font-sans">
+                  <div className="flex justify-between items-center mb-1.5 pb-1">
                     <strong className={cn("font-hud uppercase tracking-wider text-[10px]", isCorrect ? "text-emerald-400" : "text-rose-400")}>
                       {isCorrect ? "CORRECT" : "INCORRECT"}
                     </strong>

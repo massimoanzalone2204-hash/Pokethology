@@ -48,6 +48,9 @@ import { PokethologyExamModal } from './components/PokethologyExamModal';
 import { SettingsModal } from './components/SettingsModal';
 import { BattleHistory } from './components/BattleHistory';
 import { PokethologyMissionModal } from './components/PokethologyMissionModal';
+import { PokethologyMissionBadge } from './components/PokethologyMissionBadge';
+import { HistoricalModal } from './components/HistoricalModal';
+import { getCurrentSeasonStats } from './utils/seasonHistory';
 import { AboutModal } from './components/AboutModal';
 import { DisclaimerModal, DisclaimerButton } from './components/DisclaimerModal';
 import { PwaInstallModal } from './components/PwaInstallModal';
@@ -66,7 +69,7 @@ import { BattleExitConfirmationModal } from './components/BattleExitConfirmation
 import { BattleHelpModal } from './components/BattleHelpModal';
 import { InfoModal } from './components/InfoModal';
 import { MusicConfigModal } from './components/MusicConfigModal';
-import { MissionCelebrationOverlay } from './components/MissionCelebrationOverlay';
+import { DailyHubNotification, DailyHubNotificationData } from './components/DailyHubNotification';
 
 import { TRAINER_SPRITES, TrainerSprite } from './data/trainerSprites';
 import { getShowdownName } from './utils/showdownName';
@@ -130,7 +133,27 @@ export default function App() {
       case 'hit': return { scale: [1, 0.95, 1], filter: ['brightness(1)', 'brightness(2) invert(1)', 'brightness(1)'], x: [0, -15, 15, -10, 10, -5, 5, 0] };
       case 'hit_critical': return { scale: [1, 1.1, 1], filter: ['brightness(1)', 'brightness(2.5) sepia(1) hue-rotate(-50deg) saturate(3)', 'brightness(1)'], x: [0, -25, 25, -20, 20, -10, 10, 0] };
       case 'hit_status': return { scale: 1.02 };
-      default: return { scale: 1, opacity: 1, rotate: 0, x: 0, filter: 'brightness(1)' };
+      default: {
+        if (status) {
+          const s = status.toLowerCase();
+          if (s === 'brn' || s === 'burn' || s === 'bur') {
+            return { scale: 1, opacity: 1, rotate: 0, x: 0, filter: 'drop-shadow(0 0 14px rgba(249,115,22,0.85)) brightness(1.05)' };
+          }
+          if (s === 'frz' || s === 'freeze' || s === 'frozen') {
+            return { scale: 1, opacity: 1, rotate: 0, x: 0, filter: 'drop-shadow(0 0 16px rgba(34,211,238,0.9)) brightness(1.1) saturate(1.15)' };
+          }
+          if (s === 'par' || s === 'paralysis') {
+            return { scale: 1, opacity: 1, rotate: 0, x: 0, filter: 'drop-shadow(0 0 14px rgba(250,204,21,0.85))' };
+          }
+          if (s === 'psn' || s === 'poi' || s === 'poison' || s === 'tox' || s === 'toxic') {
+            return { scale: 1, opacity: 1, rotate: 0, x: 0, filter: 'drop-shadow(0 0 14px rgba(168,85,247,0.85))' };
+          }
+          if (s === 'slp' || s === 'sleep' || s === 'sle') {
+            return { scale: 1, opacity: 1, rotate: 0, x: 0, filter: 'drop-shadow(0 0 12px rgba(129,140,248,0.75)) brightness(0.92)' };
+          }
+        }
+        return { scale: 1, opacity: 1, rotate: 0, x: 0, filter: 'brightness(1)' };
+      }
     }
   };
 
@@ -886,6 +909,7 @@ export default function App() {
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
   const [isMissionModalOpen, setIsMissionModalOpen] = useState(false);
+  const [isHistoricalModalOpen, setIsHistoricalModalOpen] = useState(false);
   const [isDiagnosticRunning, setIsDiagnosticRunning] = useState(false);
   const [diagnosticProgress, setDiagnosticProgress] = useState(0);
   const [diagnosticLogs, setDiagnosticLogs] = useState<string[]>([]);
@@ -977,17 +1001,27 @@ export default function App() {
     }, 5000);
   };
 
-  // Celebratory overlay state for Daily Combat Mission completes
-  const [showMissionCelebration, setShowMissionCelebration] = useState<boolean>(false);
-  const [showMissionUpdateHUD, setShowMissionUpdateHUD] = useState<boolean>(false);
-  const [hubChallengeProgressMessage, setHubChallengeProgressMessage] = useState<string | null>(null);
+  // Daily Hub & Combat 8-Second Notification state
+  const [dailyHubNotification, setDailyHubNotification] = useState<DailyHubNotificationData | null>(null);
   const [lastBattleMissionNotice, setLastBattleMissionNotice] = useState<{
     title: string;
     description: string;
     isComplete: boolean;
   } | null>(null);
-  const hubProgressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [celebratedMission, setCelebratedMission] = useState<any>(null);
+
+  // Global listener for Daily Hub mission notifications across the app
+  useEffect(() => {
+    const handleHubNotification = (e: Event) => {
+      const customEvent = e as CustomEvent<DailyHubNotificationData>;
+      if (customEvent.detail) {
+        setDailyHubNotification(customEvent.detail);
+      }
+    };
+    window.addEventListener('pokethology_hub_notification', handleHubNotification);
+    return () => {
+      window.removeEventListener('pokethology_hub_notification', handleHubNotification);
+    };
+  }, []);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -1475,6 +1509,7 @@ export default function App() {
     setShowVSScreen(false);
     setIsBattling(true);
     setBattleState('battling');
+    setLastBattleMissionNotice(null);
     setActiveTab('battle');
     setBattleLog([{ text: "BATTLE START!", type: 'system' }]);
 
@@ -2443,7 +2478,7 @@ export default function App() {
 
             let latestMissionNotice: { title: string; description: string; isComplete: boolean } | null = null;
 
-            // 1. Evaluate Main Daily Combat Mission
+            // 1. Evaluate Main Daily Combat Protocol
             const isHardMode = (localStorage.getItem(`pokethology_mission_hard_${today}`) || localStorage.getItem(`poketheology_mission_hard_${today}`)) === 'true';
             const currentMission = getDailyCombatMission(today, isHardMode);
             let matched = false;
@@ -2486,56 +2521,17 @@ export default function App() {
                 const completedKey = `pokethology_mission_completed_${today}`;
                 localStorage.setItem(completedKey, 'true');
                 setIsMissionCompleted(true);
-                
-                latestMissionNotice = {
-                  title: "Daily Combat Protocol",
-                  description: `Protocol Fully Cleared (${nextCount}/${required})!`,
-                  isComplete: true
-                };
-
-                // Trigger celebratory animation, award sound and success toast
-                if (prevCount < required) {
-                  setCelebratedMission(currentMission);
-                  setShowMissionCelebration(true);
-                  try {
-                    sounds.success();
-                  } catch (_) {}
-                  addToast(
-                    "  MISSION FULLY COMPLETE", 
-                    "You have successfully validated today's daily combat protocol! Open the congratulations interface.", 
-                    "success"
-                  );
-                }
-              } else {
-                latestMissionNotice = {
-                  title: "Daily Combat Protocol",
-                  description: `Progress Updated: ${nextCount}/${required} Defeats Recorded.`,
-                  isComplete: false
-                };
-
-                // Show floating animated HUD element for status update
-                setShowMissionUpdateHUD(true);
-                setTimeout(() => setShowMissionUpdateHUD(false), 4500);
-                
-                if (nextCount === required - 1) {
-                  addToast(
-                    "  DAILY MISSION FOCUS", 
-                    `Almost there! Progress: ${nextCount}/${required}. Just 1 more win to complete the mission!`, 
-                    "combat"
-                  );
-                } else {
-                  addToast(
-                    "   DAILY MISSION PROGRESS", 
-                    `Progress updated: ${nextCount}/${required} defeats recorded. Keep going!`, 
-                    "info"
-                  );
-                }
               }
             }
 
-            // 2. ALWAYS Evaluate All Daily Hub Combat Challenges (Bronze, Silver, Gold activities)
+            // 2. Evaluate Daily Hub Combat Challenges (Identify single primary updated challenge for the victory screen)
             const hubChallenges = getDailyHubCombatChallenges(today);
-            let hubMessageToDisplay: string | null = null;
+            let primaryUpdatedHubChallenge: {
+              challenge: typeof hubChallenges[0];
+              newProgress: number;
+              isFinished: boolean;
+              justCompleted: boolean;
+            } | null = null;
 
             for (const challenge of hubChallenges) {
               const stateKey = `pokethology_hub_combat_${today}_${challenge.id}`;
@@ -2595,66 +2591,84 @@ export default function App() {
                   localStorage.setItem(stateKey, String(newProgress));
                   const isFinished = newProgress >= challenge.required;
                   const wasFinished = currentProgress >= challenge.required;
+                  const justCompleted = isFinished && !wasFinished;
                   
-                  if (isFinished) {
-                    if (!wasFinished) {
-                      try {
-                        let stats = JSON.parse(localStorage.getItem('Pokethology_MissionStats') || '{"pokemonWins":{}, "typeWins":{}, "hubCompletions":0, "examCompletions":0}');
-                        const currentMonth = new Date().toISOString().slice(0, 7);
-                        if (stats.lastResetMonth !== currentMonth) {
-                          stats = { pokemonWins: {}, typeWins: {}, hubCompletions: 0, examCompletions: 0, lastResetMonth: currentMonth };
-                        }
-                        stats.hubCompletions = (stats.hubCompletions || 0) + 1;
-                        localStorage.setItem('Pokethology_MissionStats', JSON.stringify(stats));
-                        window.dispatchEvent(new Event('storage'));
-                      } catch (e) {
-                        console.error("Error updating hub stats", e);
+                  if (isFinished && !wasFinished) {
+                    try {
+                      let stats = JSON.parse(localStorage.getItem('Pokethology_MissionStats') || '{"pokemonWins":{}, "typeWins":{}, "hubCompletions":0, "examCompletions":0}');
+                      const currentMonth = new Date().toISOString().slice(0, 7);
+                      if (stats.lastResetMonth !== currentMonth) {
+                        stats = { pokemonWins: {}, typeWins: {}, hubCompletions: 0, examCompletions: 0, lastResetMonth: currentMonth };
                       }
+                      stats.hubCompletions = (stats.hubCompletions || 0) + 1;
+                      localStorage.setItem('Pokethology_MissionStats', JSON.stringify(stats));
+                      window.dispatchEvent(new Event('storage'));
+                    } catch (e) {
+                      console.error("Error updating hub stats", e);
                     }
-                    hubMessageToDisplay = `DAILY HUB: ${challenge.title} (${newProgress}/${challenge.required}) - MISSION COMPLETE!`;
-                    latestMissionNotice = {
-                      title: `Daily Hub: ${challenge.title}`,
-                      description: `Challenge Cleared (${newProgress}/${challenge.required})! Daily Progress & Rank upgraded.`,
-                      isComplete: true
-                    };
-                    addToast(
-                      "  DAILY HUB MISSION COMPLETED",
-                      `Activity Complete: ${challenge.title} (${newProgress}/${challenge.required})! Your Daily Hub progress & rank have increased.`,
-                      "success"
-                    );
                     try { sounds.success?.(); } catch (_) {}
-                  } else {
-                    if (!hubMessageToDisplay) {
-                      hubMessageToDisplay = `DAILY HUB: ${challenge.title} (${newProgress}/${challenge.required})`;
-                      if (!latestMissionNotice) {
-                        latestMissionNotice = {
-                          title: `Daily Hub: ${challenge.title}`,
-                          description: `Goal Advanced: ${newProgress}/${challenge.required} completed.`,
-                          isComplete: false
-                        };
-                      }
-                    }
-                    addToast(
-                      "   DAILY HUB COMBAT PROGRESS",
-                      `Combat Goal Advanced: ${challenge.title} (${newProgress}/${challenge.required})!`,
-                      "combat"
-                    );
+                  }
+
+                  // Pick the primary challenge for the single victory notice:
+                  // Priority 1: A challenge that just completed in this battle
+                  // Priority 2: The first matching challenge that progressed
+                  if (!primaryUpdatedHubChallenge || (!primaryUpdatedHubChallenge.justCompleted && justCompleted)) {
+                    primaryUpdatedHubChallenge = {
+                      challenge,
+                      newProgress,
+                      isFinished,
+                      justCompleted
+                    };
                   }
                 }
               }
             }
 
-            if (hubMessageToDisplay) {
-              setHubChallengeProgressMessage(hubMessageToDisplay);
-              if (hubProgressTimeoutRef.current) clearTimeout(hubProgressTimeoutRef.current);
-              hubProgressTimeoutRef.current = setTimeout(() => {
-                setHubChallengeProgressMessage(null);
-              }, 8000);
+            // 3. Trigger clean, direct 8-second upper right notification for the updated Daily Hub mission
+            if (primaryUpdatedHubChallenge) {
+              const { challenge, newProgress, isFinished } = primaryUpdatedHubChallenge;
+              latestMissionNotice = {
+                title: challenge.title,
+                description: isFinished
+                  ? `Goal Achieved (${newProgress}/${challenge.required}) • Daily Hub progress & rank updated!`
+                  : `Daily Hub Progress: ${newProgress}/${challenge.required} completed.`,
+                isComplete: isFinished
+              };
+
+              setDailyHubNotification({
+                id: `hub-notice-${Date.now()}`,
+                tier: challenge.tier || 'daily',
+                title: challenge.title,
+                missionName: challenge.title,
+                progress: newProgress,
+                required: challenge.required,
+                isCompleted: isFinished,
+                explanation: isFinished
+                  ? `Goal Achieved (${newProgress}/${challenge.required}) • Daily Hub mission completed and saved!`
+                  : `Daily Hub Combat: ${newProgress}/${challenge.required} validated (+1 progress logged).`
+              });
+            } else if (matched) {
+              const countKey = `pokethology_mission_progress_count_${today}`;
+              const required = getRequiredCount(currentMission, isHardMode);
+              const savedCountStr = localStorage.getItem(countKey);
+              let countVal = savedCountStr ? parseInt(savedCountStr, 10) : 0;
+              const isFinished = countVal >= required;
+
+              setDailyHubNotification({
+                id: `mission-notice-${Date.now()}`,
+                tier: 'daily',
+                title: 'Daily Combat Protocol',
+                missionName: currentMission.description,
+                progress: countVal,
+                required: required,
+                isCompleted: isFinished,
+                explanation: isFinished
+                  ? `Combat Protocol Complete! (${countVal}/${required}) • Daily streak maintained.`
+                  : `${currentMission.description} (${countVal}/${required} validated).`
+              });
             }
 
-            if (latestMissionNotice) {
-              setLastBattleMissionNotice(latestMissionNotice);
-            }
+            setLastBattleMissionNotice(latestMissionNotice);
 
             // Sync state with open widgets immediately
             try {
@@ -3843,15 +3857,29 @@ export default function App() {
                 className="z-30 flex flex-col items-center justify-center shrink-0 pointer-events-none mx-1 sm:mx-4"
               >
                 <div className="relative flex flex-col items-center justify-center text-center">
-                  <motion.div 
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
-                    className="absolute -inset-3 xs:-inset-5 sm:-inset-8 rounded-full border-2 border-dashed border-amber-400/40 pointer-events-none"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500/30 via-red-500/40 to-cyan-500/30 blur-xl rounded-full scale-150 animate-pulse" />
-                  <h1 className="text-4xl xs:text-5xl sm:text-8xl md:text-9xl font-black font-hud tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 via-amber-400 to-red-600 drop-shadow-[0_0_35px_rgba(245,158,11,0.95)] select-none px-2 flex items-center justify-center leading-none text-center" style={{ WebkitTextStroke: '1.5px rgba(255,255,255,0.8)' }}>
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500/30 via-red-500/40 to-cyan-500/30 blur-2xl rounded-full scale-150 animate-pulse-fluid" />
+                  <motion.h1
+                    animate={{
+                      scale: [1, 1.14, 0.98, 1.16, 1],
+                      rotate: [0, -3.5, 3.5, -2, 0],
+                      filter: [
+                        'drop-shadow(0 0 25px rgba(245,158,11,0.9)) drop-shadow(0 0 45px rgba(239,68,68,0.7))',
+                        'drop-shadow(0 0 42px rgba(234,179,8,1)) drop-shadow(0 0 65px rgba(239,68,68,0.95))',
+                        'drop-shadow(0 0 28px rgba(245,158,11,0.85)) drop-shadow(0 0 50px rgba(239,68,68,0.75))',
+                        'drop-shadow(0 0 45px rgba(234,179,8,1)) drop-shadow(0 0 70px rgba(239,68,68,1))',
+                        'drop-shadow(0 0 25px rgba(245,158,11,0.9)) drop-shadow(0 0 45px rgba(239,68,68,0.7))'
+                      ]
+                    }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 2.2,
+                      ease: "easeInOut"
+                    }}
+                    className="text-5xl xs:text-6xl sm:text-8xl md:text-9xl font-black font-hud tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 via-amber-400 to-red-600 select-none px-2 flex items-center justify-center leading-none text-center transform-gpu will-change-transform"
+                    style={{ WebkitTextStroke: '2px rgba(255,255,255,0.85)' }}
+                  >
                     VS
-                  </h1>
+                  </motion.h1>
                 </div>
               </motion.div>
 
@@ -4362,7 +4390,7 @@ export default function App() {
                                   />
                                 </div>
                                 
-                                {/* Left Visual Toggles (Favorite Star) */}
+                                {/* Left Visual Toggles (Favorite Star & Rank Ball Archive) */}
                                 <div className="absolute -left-4 top-0 flex flex-col gap-2 z-20">
                                   <button
                                     type="button"
@@ -4398,6 +4426,28 @@ export default function App() {
                                           ? "fill-yellow-400 text-yellow-400 animate-pulse filter drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]"
                                           : "text-slate-400 hover:text-yellow-300"
                                       )}
+                                    />
+                                  </button>
+
+                                  {/* Rank Ball Icon (Opens Historical Season Records) */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setIsHistoricalModalOpen(true);
+                                      try { sounds.scan(); playHaptic('light'); } catch (_) {}
+                                    }}
+                                    onMouseEnter={() => { try { sounds.hover(); } catch (_) {} }}
+                                    className={cn(
+                                      hudButtonClass(false, 'amber'),
+                                      "!p-1.5 !rounded-full shadow-lg flex items-center justify-center cursor-pointer transition-all bg-slate-900/80 border-slate-700 hover:border-amber-400 group relative"
+                                    )}
+                                    title={`Operator Rank: ${getCurrentSeasonStats().scores.rank.badgeName} (Click to open Season Records)`}
+                                  >
+                                    <HUDCorners />
+                                    <img 
+                                      src={getCurrentSeasonStats().scores.rank.badgeUrl} 
+                                      alt={getCurrentSeasonStats().scores.rank.badgeName}
+                                      className="w-5 h-5 object-contain rendering-pixelated group-hover:scale-115 group-hover:rotate-12 transition-transform duration-300 drop-shadow-[0_0_8px_rgba(245,158,11,0.7)]"
                                     />
                                   </button>
                                 </div>
@@ -5314,7 +5364,7 @@ export default function App() {
                                         />
 
                                         {/* Opponent Sprite (Top Right Area) */}
-                                        <div className="absolute top-[12%] right-2 xs:top-[15%] xs:right-4 sm:top-[20%] sm:right-12 md:top-[16%] md:right-16 lg:top-[16%] lg:right-24 xl:top-[14%] xl:right-24 pointer-events-auto z-10">
+                                        <div className="absolute top-[12%] right-2 xs:top-[15%] xs:right-4 sm:top-[20%] sm:right-12 md:top-[16%] md:right-16 lg:top-[9%] lg:right-24 xl:top-[7%] xl:right-24 2xl:top-[6%] 2xl:right-28 pointer-events-auto z-10">
                                           {battleOpponent && (
                                             <motion.div
                                               key={battleOpponent?.name + '-' + isBattling}
@@ -6306,8 +6356,7 @@ export default function App() {
                           className="relative w-56 h-56 xxs:w-64 xxs:h-64 xs:w-80 xs:h-80 sm:w-96 sm:h-96 md:w-88 md:h-88 lg:w-[26rem] lg:h-[26rem] xl:w-[28rem] xl:h-[28rem] flex items-center justify-center shrink max-h-[38vh] sm:max-h-[44vh] md:max-h-[36vh] lg:max-h-[42vh] -mt-1 sm:-mt-2 md:mt-0 mb-1 sm:mb-2 md:mb-1"
                           initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: "easeOut" }}
                         >
-                          <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.3) 0%, transparent 75%)' }}></div>
-                          <PokethologyLogo className="w-full h-full object-contain filter drop-shadow-[0_0_40px_rgba(6,182,212,0.65)]" />
+                          <PokethologyLogo className="w-full h-full object-contain" />
                         </motion.div>
 
                         <div className="flex flex-col gap-1 sm:gap-2 md:gap-1.5 relative z-10 shrink-0 w-full max-w-4xl px-2 sm:px-4">
@@ -6431,8 +6480,7 @@ export default function App() {
                             <div className="flex justify-between items-center px-2 py-2">
                               <div className="flex items-center gap-4 sm:gap-6 shrink-0">
                                 <div className="relative w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center shrink-0">
-                                  <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.18) 0%, transparent 70%)' }}></div>
-                                  <PokethologyLogo className="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(6,182,212,0.35)]" />
+                                  <PokethologyLogo className="w-full h-full object-contain" />
                                 </div>
                                 <div className="flex flex-col min-w-0">
                                   <h1 className="text-base xxs:text-lg xs:text-xl sm:text-2xl md:text-3xl font-hud font-black bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_10px_rgba(6,182,212,0.4)] tracking-[0.12em] xs:tracking-[0.15em] sm:tracking-[0.2em] leading-none">
@@ -7050,6 +7098,7 @@ export default function App() {
           setIsTutorialOpen={setIsTutorialOpen}
           handleSystemRestart={handleSystemRestart}
           isRebooting={isRebooting}
+          onOpenHistorical={() => setIsHistoricalModalOpen(true)}
         />
 
         {/* Battle Exit Confirmation Modal */}
@@ -7081,6 +7130,7 @@ export default function App() {
           isOpen={isMusicOpen}
           onClose={() => setIsMusicOpen(false)}
           onOpenMissionModal={() => setIsMissionModalOpen(true)}
+          onOpenHistorical={() => setIsHistoricalModalOpen(true)}
         />
 
         {/* Stat Animation Overlay */}
@@ -7178,112 +7228,11 @@ export default function App() {
         </AnimatePresence>
         </div>
 
-        {/* Hub Challenge Progress 8-Second Notification HUD */}
-        <AnimatePresence>
-          {hubChallengeProgressMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: -50, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 350, damping: 26 }}
-              className="fixed top-6 sm:top-8 left-0 right-0 z-[700] flex justify-center px-4 pointer-events-auto"
-            >
-              <div className={cn(
-                "backdrop-blur-xl border px-5 py-3.5 rounded-2xl flex items-center gap-4 relative overflow-hidden max-w-lg w-full",
-                hubChallengeProgressMessage.includes("COMPLETE")
-                  ? "bg-slate-950/95 border-emerald-500/60 shadow-[0_0_35px_rgba(16,185,129,0.35)] text-emerald-400"
-                  : "bg-slate-950/95 border-cyan-500/60 shadow-[0_0_35px_rgba(6,182,212,0.35)] text-cyan-400"
-              )}>
-                {/* 8-Second Animated Depletion Bar */}
-                <motion.div 
-                  initial={{ width: "100%" }}
-                  animate={{ width: "0%" }}
-                  transition={{ duration: 8, ease: "linear" }}
-                  className={cn(
-                    "absolute bottom-0 left-0 h-1",
-                    hubChallengeProgressMessage.includes("COMPLETE")
-                      ? "bg-gradient-to-r from-emerald-500 to-teal-400"
-                      : "bg-gradient-to-r from-cyan-500 to-blue-400"
-                  )}
-                />
-
-                <div className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center border shrink-0",
-                  hubChallengeProgressMessage.includes("COMPLETE")
-                    ? "bg-emerald-500/20 border-emerald-400/60 text-emerald-300"
-                    : "bg-cyan-500/20 border-cyan-400/60 text-cyan-300"
-                )}>
-                  {hubChallengeProgressMessage.includes("COMPLETE") ? (
-                    <Trophy className="w-5 h-5 animate-bounce" />
-                  ) : (
-                    <Swords className="w-5 h-5 animate-pulse" />
-                  )}
-                </div>
-
-                <div className="flex flex-col flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-hud font-black uppercase tracking-widest text-slate-400">
-                      {hubChallengeProgressMessage.includes("COMPLETE") ? "  DAILY HUB OBJECTIVE MET" : "   DAILY HUB COMBAT PROGRESS"}
-                    </span>
-                    <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
-                      8s
-                    </span>
-                  </div>
-                  <span className="text-xs sm:text-sm font-hud font-black text-white truncate mt-0.5">
-                    {hubChallengeProgressMessage}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (hubProgressTimeoutRef.current) clearTimeout(hubProgressTimeoutRef.current);
-                    setHubChallengeProgressMessage(null);
-                  }}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors shrink-0"
-                  title="Dismiss notification"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Daily Combat Mission Status Update HUD */}
-        <AnimatePresence>
-          {showMissionUpdateHUD && !isMissionCompleted && (
-            <motion.div
-              initial={{ opacity: 0, y: -40, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="fixed top-24 sm:top-28 left-1/2 -translate-x-1/2 z-[600] pointer-events-none"
-            >
-              <div className="bg-slate-950/95 border-2 border-cyan-500 rounded-2xl p-4 shadow-[0_0_30px_rgba(34,211,238,0.4)] backdrop-blur-md flex items-center gap-4">
-                <div className="bg-cyan-500/20 p-2 rounded-full border border-cyan-500/50">
-                  <Trophy className="w-6 h-6 text-cyan-400 animate-pulse" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[11px] font-hud font-black text-cyan-400 uppercase tracking-widest leading-none">
-                    Mission Progress Updated
-                  </span>
-                  <span className="text-sm font-bold mt-1">
-                    {missionProgressCount} / {missionRequiredCount} Validated
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Daily Combat Mission Celebration Overlay */}
-        <MissionCelebrationOverlay
-          isOpen={showMissionCelebration}
-          onClose={() => setShowMissionCelebration(false)}
-          dailyStreak={dailyStreak}
-          missionName={celebratedMission?.title}
-          missionRequirementText={celebratedMission?.desc}
+        {/* 8-Second Upper Right Daily Hub Mission Progress Notification */}
+        <DailyHubNotification
+          notification={dailyHubNotification}
+          onClose={() => setDailyHubNotification(null)}
+          onOpenDailyHub={() => setIsMissionModalOpen(true)}
         />
 
         {/* Full-Screen Disclaimer & Copyright Modal */}
@@ -7295,6 +7244,13 @@ export default function App() {
         <PokethologyMissionModal
           isOpen={isMissionModalOpen}
           onClose={() => setIsMissionModalOpen(false)}
+        />
+
+        {/* Full-Screen Historical Seasons & Records Modal */}
+        <HistoricalModal
+          isOpen={isHistoricalModalOpen}
+          onClose={() => setIsHistoricalModalOpen(false)}
+          dailyStreak={dailyStreak}
         />
         {/* About & System Info / Bug Report Modal */}
         <AboutModal

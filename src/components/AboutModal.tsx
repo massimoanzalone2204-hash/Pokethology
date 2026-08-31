@@ -73,7 +73,7 @@ export function AboutModal({ isOpen, onClose, isLightMode = false }: AboutModalP
                   </div>
                   <div className="flex justify-between items-center text-slate-300">
                     <span className="text-slate-400">Core Neural Registry:</span>
-                    <span className="text-amber-400 font-bold">Generations I - IX (1025 Units + Regional Forms)</span>
+                    <span className="text-amber-400 font-bold">Generations I - IX (1226 Total Pokémon & Regional Forms)</span>
                   </div>
                   <div className="flex justify-between items-center text-slate-300">
                     <span className="text-slate-400">AI Cognition Engine:</span>

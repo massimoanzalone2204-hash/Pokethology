@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Settings2, X, Trophy } from 'lucide-react';
 import { AudioSettings } from './AudioSettings';
+import { getCurrentSeasonStats } from '../utils/seasonHistory';
 import { sounds } from '../lib/sounds';
 import { playHaptic } from '../lib/utils';
 
@@ -9,14 +10,19 @@ interface MusicConfigModalProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenMissionModal?: () => void;
+  onOpenHistorical?: () => void;
 }
 
 export const MusicConfigModal: React.FC<MusicConfigModalProps> = ({
   isOpen,
   onClose,
   onOpenMissionModal,
+  onOpenHistorical,
 }) => {
   if (!isOpen) return null;
+
+  const currentStats = getCurrentSeasonStats();
+  const { rank } = currentStats.scores;
 
   return (
     <AnimatePresence>
@@ -56,35 +62,68 @@ export const MusicConfigModal: React.FC<MusicConfigModalProps> = ({
           </button>
         </div>
 
-        {/* Modal Body without harsh section borders */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar optimize-scrolling p-4 sm:p-8 max-w-4xl mx-auto w-full flex flex-col gap-6">
-          {onOpenMissionModal && (
-            <div className="bg-amber-950/30 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 backdrop-blur-md">
-              <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0 shadow-sm">
-                  <Trophy className="w-5 h-5 text-amber-400" />
+        {/* Modal Body */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar optimize-scrolling p-3.5 sm:p-8 max-w-4xl mx-auto w-full flex flex-col gap-4 sm:gap-5">
+          {/* Quick Access Registry & Missions */}
+          <div className="flex flex-col gap-2 w-full">
+            {onOpenHistorical && (
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  onClose();
+                  onOpenHistorical();
+                  try { sounds.scan(); playHaptic('light'); } catch (_) {}
+                }}
+                className="flex items-center justify-between p-2.5 sm:p-3 bg-slate-950/60 hover:bg-slate-950/90 border border-cyan-900/40 hover:border-cyan-500/50 rounded-xl transition-all group w-full cursor-pointer gap-2"
+              >
+                <div className="flex items-center gap-2.5 text-cyan-400 min-w-0 flex-1">
+                  <img 
+                    src={rank.badgeUrl} 
+                    alt={rank.badgeName} 
+                    className="w-5 h-5 shrink-0 object-contain rendering-pixelated group-hover:scale-110 transition-transform drop-shadow-[0_0_6px_rgba(6,182,212,0.4)]"
+                  />
+                  <div className="flex flex-col text-left min-w-0 flex-1">
+                    <span className="font-hud text-[9px] sm:text-[10px] font-bold uppercase tracking-widest truncate">
+                      {rank.badgeName} Rank
+                    </span>
+                    <span className="text-[7.5px] sm:text-[8.5px] font-mono text-slate-400 leading-tight truncate">
+                      {currentStats.scores.averageScore}% Rating • Season Archives
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-amber-300 font-hud uppercase text-xs sm:text-sm font-bold tracking-wider block">
-                    POKÉTHOLOGY MISSIONS
-                  </span>
-                  <span className="text-slate-400 text-[10px] sm:text-xs font-mono">
-                    Track your type mastery & Pokédex conquest progress
-                  </span>
-                </div>
-              </div>
-              <button
+                <span className="text-[7.5px] sm:text-[8.5px] font-mono text-cyan-500 group-hover:text-cyan-300 uppercase tracking-widest shrink-0 px-2 py-0.5 rounded bg-cyan-950/40 border border-cyan-900/50">
+                  Archives
+                </span>
+              </motion.button>
+            )}
+
+            {onOpenMissionModal && (
+              <motion.button
+                whileTap={{ scale: 0.98 }}
                 onClick={() => {
                   onClose();
                   onOpenMissionModal();
                   try { sounds.scan(); playHaptic('light'); } catch (_) {}
                 }}
-                className="px-5 py-2.5 rounded-xl font-hud uppercase text-xs font-bold tracking-wider bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 transition-all cursor-pointer text-center shrink-0"
+                className="flex items-center justify-between p-2.5 sm:p-3 bg-slate-950/60 hover:bg-slate-950/90 border border-cyan-900/40 hover:border-cyan-500/50 rounded-xl transition-all group w-full cursor-pointer gap-2"
               >
-                OPEN MISSIONS
-              </button>
-            </div>
-          )}
+                <div className="flex items-center gap-2.5 text-cyan-400 min-w-0 flex-1">
+                  <Trophy className="w-5 h-5 shrink-0 text-cyan-400 group-hover:scale-110 transition-transform" />
+                  <div className="flex flex-col text-left min-w-0 flex-1">
+                    <span className="font-hud text-[9px] sm:text-[10px] font-bold uppercase tracking-widest truncate">
+                      Pokéthology Missions
+                    </span>
+                    <span className="text-[7.5px] sm:text-[8.5px] font-mono text-slate-400 leading-tight truncate">
+                      Type Mastery & Dex Conquest
+                    </span>
+                  </div>
+                </div>
+                <span className="text-[7.5px] sm:text-[8.5px] font-mono text-cyan-500 group-hover:text-cyan-300 uppercase tracking-widest shrink-0 px-2 py-0.5 rounded bg-cyan-950/40 border border-cyan-900/50">
+                  Open
+                </span>
+              </motion.button>
+            )}
+          </div>
 
           <div className="bg-slate-900/50 rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
             <AudioSettings />

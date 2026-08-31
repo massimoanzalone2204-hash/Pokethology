@@ -881,15 +881,14 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     return (
       <div 
         className={cn(
-          "bg-slate-950/80 border rounded-xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden shadow-lg text-left transition-all duration-300",
+          "bg-slate-950/70 rounded-2xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden shadow-lg text-left transition-all duration-300",
           isLocked
             ? isCorrect
-              ? "border-emerald-500/40 bg-emerald-950/10 shadow-[0_0_20px_rgba(16,185,129,0.1)]"
-              : "border-rose-500/40 bg-rose-950/10 shadow-[0_0_20px_rgba(244,63,94,0.1)]"
-            : "border-slate-800 hover:border-slate-700"
+              ? "bg-emerald-950/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]"
+              : "bg-rose-950/20 shadow-[0_0_20px_rgba(244,63,94,0.1)]"
+            : "hover:bg-slate-900/60"
         )}
       >
-        <HUDCorners />
         <div className="flex justify-between items-center">
           <h4 className={`text-xs sm:text-sm font-hud ${tierColor} uppercase font-bold tracking-wider flex items-center gap-2`}>
             <BrainCircuit className={`w-4 h-4 ${tierColor}`} />
@@ -898,10 +897,10 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
           {isLocked && (
             <span
               className={cn(
-                'text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded border flex items-center gap-1',
+                'text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded flex items-center gap-1',
                 isCorrect
-                  ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40'
-                  : 'bg-rose-950/60 text-rose-300 border-rose-500/40'
+                  ? 'bg-emerald-950/80 text-emerald-300'
+                  : 'bg-rose-950/80 text-rose-300'
               )}
             >
               {isCorrect ? (
@@ -922,20 +921,20 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
         <div className="grid grid-cols-1 gap-2 mt-1">
           {q.options.map((option: string, i: number) => {
             const isSelected = selectedOption === i;
-            let optStyle = 'bg-slate-900 border-slate-700 text-slate-300 hover:border-cyan-500/50 hover:bg-slate-800';
+            let optStyle = 'bg-slate-900/80 text-slate-300 hover:bg-slate-800';
 
             if (isLocked) {
               if (i === correctIdx) {
-                optStyle = 'bg-emerald-950/80 border-emerald-500 text-emerald-300 font-bold shadow-[0_0_15px_rgba(16,185,129,0.3)]';
+                optStyle = 'bg-emerald-950/90 text-emerald-300 font-bold shadow-[0_0_15px_rgba(16,185,129,0.25)]';
               } else if (isSelected && !isCorrect) {
-                optStyle = 'bg-rose-950/80 border-rose-500 text-rose-300 line-through opacity-80 shadow-[0_0_15px_rgba(244,63,94,0.3)]';
+                optStyle = 'bg-rose-950/90 text-rose-300 line-through opacity-80 shadow-[0_0_15px_rgba(244,63,94,0.25)]';
               } else {
-                optStyle = 'bg-slate-950/40 border-slate-900 text-slate-500 opacity-60';
+                optStyle = 'bg-slate-950/40 text-slate-500 opacity-60';
               }
             } else if (isSelected) {
-              optStyle = 'bg-cyan-950/90 border-cyan-400 text-cyan-200 font-bold shadow-[0_0_15px_rgba(6,182,212,0.35)]';
+              optStyle = 'bg-cyan-950 text-cyan-200 font-bold shadow-[0_0_15px_rgba(6,182,212,0.3)]';
             } else {
-              optStyle = 'bg-slate-900/90 border-slate-700 text-slate-300 hover:border-cyan-500/50 hover:bg-slate-800 transition-colors';
+              optStyle = 'bg-slate-900/80 text-slate-300 hover:bg-slate-800 transition-colors';
             }
             
             return (
@@ -944,7 +943,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
                 disabled={isLocked}
                 onClick={() => handleSelectChoice(tier, qId, i, isLocked)}
                 className={cn(
-                  'p-3 rounded-lg text-left text-xs sm:text-sm transition-all duration-200 flex items-center justify-between gap-2 border cursor-pointer',
+                  'p-3 rounded-xl text-left text-xs sm:text-sm transition-all duration-200 flex items-center justify-between gap-2 cursor-pointer',
                   optStyle
                 )}
               >
@@ -975,8 +974,8 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
             </button>
           </div>
         ) : (
-          <div className="mt-2 p-3 rounded-lg bg-slate-950/80 border border-slate-800 text-xs text-slate-300 leading-relaxed font-sans">
-            <div className="flex justify-between items-center mb-1.5 border-b border-slate-800 pb-1.5">
+          <div className="mt-2 p-3 rounded-xl bg-slate-950/60 text-xs text-slate-300 leading-relaxed font-sans">
+            <div className="flex justify-between items-center mb-1.5 pb-1">
               <strong className={cn("font-hud uppercase tracking-wider text-[10px]", isCorrect ? "text-emerald-400" : "text-rose-400")}>
                 {isCorrect ? "CORRECT" : "INCORRECT"}
               </strong>
@@ -1005,8 +1004,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
     if (tier === 'gold') tierColor = "text-yellow-400";
 
     return (
-      <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden shadow-lg text-left">
-        <HUDCorners />
+      <div className="bg-slate-950/70 rounded-2xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden shadow-lg text-left">
         <div className="flex justify-between items-center">
           <h4 className={`text-xs sm:text-sm font-hud ${tierColor} uppercase font-bold tracking-wider flex items-center gap-2`}>
             <Swords className={`w-4 h-4 ${tierColor}`} />
@@ -1017,7 +1015,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
         
         <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">{challenge.title}</p>
         
-        <div className="mt-2 p-4 bg-slate-900/80 rounded-xl border border-slate-800 flex flex-col items-center justify-center gap-2">
+        <div className="mt-2 p-4 bg-slate-900/60 rounded-xl flex flex-col items-center justify-center gap-2">
           <div className="text-2xl font-hud font-black text-white">{prog} <span className="text-sm text-slate-400">/ {challenge.required}</span></div>
           {isDone ? (
             <span className="text-xs font-hud text-emerald-400 uppercase tracking-widest font-bold">Challenge Complete</span>
@@ -1071,22 +1069,22 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
 
   return (
     <div id="combat-mission-dashboard" className="relative w-full flex flex-col gap-4 text-center">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-950/70 p-4.5 rounded-2xl border border-cyan-500/10 text-left shadow-lg">
-        <div className="space-y-1.5 border-b sm:border-b-0 sm:border-r border-slate-900 pb-3 sm:pb-0 sm:pr-4 flex flex-col justify-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-950/70 p-4.5 rounded-2xl text-left shadow-lg">
+        <div className="space-y-1.5 pb-3 sm:pb-0 sm:pr-4 flex flex-col justify-center">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 md:gap-2">
               <Award className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
               <span className="text-[10px] sm:text-xs font-hud font-black text-cyan-400 uppercase tracking-widest">Rank</span>
             </div>
             {dailyStreak !== undefined && (
-              <div className="px-2 py-0.5 rounded-full bg-orange-950/80 border border-orange-500/40 text-orange-400 text-[8.5px] sm:text-[9.5px] font-hud font-bold whitespace-nowrap shadow-[0_0_10px_rgba(249,115,22,0.3)] flex items-center gap-1">
+              <div className="px-2 py-0.5 rounded-full bg-orange-950/80 text-orange-400 text-[8.5px] sm:text-[9.5px] font-hud font-bold whitespace-nowrap shadow-[0_0_10px_rgba(249,115,22,0.3)] flex items-center gap-1">
                 <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-orange-500 text-orange-400" />
                 <span>{dailyStreak} DAY{dailyStreak !== 1 ? "S" : ""}</span>
               </div>
             )}
           </div>
           <div className="mt-1">
-            <span className={cn("inline-flex items-center px-2.5 py-1 rounded-md border text-xs sm:text-sm font-hud uppercase font-black tracking-widest drop-shadow-md", operatorRank.color)}>
+            <span className={cn("inline-flex items-center px-2.5 py-1 rounded-lg text-xs sm:text-sm font-hud uppercase font-black tracking-widest drop-shadow-md", operatorRank.color)}>
               {operatorRank.title}
             </span>
           </div>
@@ -1096,7 +1094,7 @@ export const PokethologyCombatMissionWidget: React.FC<PokethologyCombatMissionWi
             <span className="text-[10px] font-hud font-extrabold text-slate-400 uppercase tracking-wider">Daily Progress</span>
             <span className="text-xs font-hud font-black text-white">{totalCompletedCount} / 12</span>
           </div>
-          <div className="w-full bg-slate-900 h-2 sm:h-2.5 rounded-full overflow-hidden border border-slate-800 shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)]">
+          <div className="w-full bg-slate-900/90 h-2 sm:h-2.5 rounded-full overflow-hidden shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)]">
             <motion.div 
               className="h-full bg-gradient-to-r from-cyan-600 via-cyan-400 to-emerald-400"
               initial={{ width: 0 }}
