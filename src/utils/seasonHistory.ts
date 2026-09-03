@@ -89,13 +89,21 @@ const TOTAL_TYPES = 18;
 const EXPECTED_MONTHLY_HUB = 30;
 const EXPECTED_MONTHLY_EXAM = 30;
 
+const ENGLISH_MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
 export function formatMonthName(isoMonth: string): string {
   try {
     const [yearStr, monthStr] = isoMonth.split('-');
     const year = parseInt(yearStr, 10);
-    const month = parseInt(monthStr, 10) - 1;
-    const date = new Date(year, month, 1);
-    return date.toLocaleString('default', { month: 'long', year: 'numeric' });
+    const monthIndex = parseInt(monthStr, 10) - 1;
+    if (monthIndex >= 0 && monthIndex < 12 && !isNaN(year)) {
+      return `${ENGLISH_MONTHS[monthIndex]} ${year}`;
+    }
+    const date = new Date(year, monthIndex, 1);
+    return date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
   } catch (_) {
     return isoMonth;
   }
@@ -251,7 +259,17 @@ export function getPastSeasonsHistory(): SeasonHistoryEntry[] {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        return parsed;
+        return parsed.map((entry) => {
+          if (entry.id) {
+            const englishMonth = formatMonthName(entry.id);
+            return {
+              ...entry,
+              monthName: englishMonth,
+              title: `Season ${entry.seasonNumber || 1} · ${englishMonth}`
+            };
+          }
+          return entry;
+        });
       }
     }
   } catch (e) {

@@ -220,7 +220,7 @@ export const BattleHistory: React.FC<BattleHistoryProps> = React.memo(({ isLight
 
     const handleDownloadSummary = () => {
       const summaryText = history.slice(0, 5).map((r, i) => 
-        `Battle #${i + 1}: ${r.playerPokemon} vs ${r.opponentPokemon} - Result: ${r.result.toUpperCase()} (${new Date(r.timestamp).toLocaleString()})`
+        `Battle #${i + 1}: ${r.playerPokemon} vs ${r.opponentPokemon} - Result: ${r.result.toUpperCase()} (${new Date(r.timestamp).toLocaleString('en-US')})`
       ).join("\n");
       const blob = new Blob([summaryText || "No battle logs recorded yet."], { type: "text/plain" });
       const url = URL.createObjectURL(blob);
@@ -476,7 +476,7 @@ export const BattleHistory: React.FC<BattleHistoryProps> = React.memo(({ isLight
                                                     </div>
                                                     {unlocked && unlockTimestamp && (
                                                         <div className="text-[6.5px] border-t border-slate-900 pt-1 mt-1 text-slate-500 leading-normal lowercase">
-                                                            secured on {new Date(unlockTimestamp).toLocaleDateString()} versus {unlockOpponent}
+                                                            secured on {new Date(unlockTimestamp).toLocaleDateString('en-US')} versus {unlockOpponent}
                                                         </div>
                                                     )}
                                                 </div>
@@ -544,7 +544,7 @@ export const BattleHistory: React.FC<BattleHistoryProps> = React.memo(({ isLight
                                                 </div>
                                                 {unlocked && unlockTimestamp && (
                                                     <div className="text-[7.5px] text-emerald-600 font-bold border-t border-slate-200 pt-1 mt-1 text-center font-sans tracking-wide">
-                                                        Secured vs {unlockOpponent?.toUpperCase()} on {new Date(unlockTimestamp).toLocaleString()}
+                                                        Secured vs {unlockOpponent?.toUpperCase()} on {new Date(unlockTimestamp).toLocaleString('en-US')}
                                                     </div>
                                                 )}
                                             </div>
@@ -674,7 +674,7 @@ export const BattleHistory: React.FC<BattleHistoryProps> = React.memo(({ isLight
                                 </div>
                                 <span className="text-slate-600 font-mono flex items-center gap-1 shrink-0">
                                     <Clock className="w-2.5 h-2.5" />
-                                    {new Date(record.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    {new Date(record.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                                 </span>
                             </div>
                         ))}
