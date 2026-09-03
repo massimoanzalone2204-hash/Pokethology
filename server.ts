@@ -10,11 +10,16 @@ import fs from "fs";
 import { extractSuggestedPokemon } from "./server/utils/stringUtils";
 import { strategies } from "./server/utils/battleUtils";
 import { handleApiError } from "./server/utils/errorHandling";
-import { generateWithRetry, isQuotaError, registerApiCallRecorder } from "./server/services/geminiService";
+import { generateWithRetry, isQuotaError, registerApiCallRecorder, isQuotaCooldownActive, setQuotaCooldown } from "./server/services/geminiService";
 import { typeAdvantageMap, suggestions } from "./server/constants";
 import { initializeWebSocketServer } from "./server/websocket";
 
 dotenv.config();
+
+// Ensure invalid GOOGLE_API_KEY placeholder doesn't break @google/genai internal key selection
+if (process.env.GOOGLE_API_KEY && process.env.GOOGLE_API_KEY.includes(" ")) {
+  delete process.env.GOOGLE_API_KEY;
+}
 
 // Load pokemon names
 let pokemonNamesList: string[] = [];
@@ -43,7 +48,13 @@ const analysisCache = new LRUCache<string, string>({ max: 200, ttl: 1000 * 60 * 
 const chatCache = new LRUCache<string, any>({ max: 500, ttl: 1000 * 60 * 20 }); // 20 minutes chat cache
 
 // Initialize Gemini
-const getApiKey = () => process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+const getApiKey = () => {
+  const key = process.env.GEMINI_API_KEY;
+  if (key && key.trim().length > 10 && !key.includes(" ")) return key.trim();
+  const altKey = process.env.GOOGLE_API_KEY;
+  if (altKey && altKey.trim().length > 10 && !altKey.includes(" ")) return altKey.trim();
+  return undefined;
+};
 
 const ai = new GoogleGenAI({
   apiKey: getApiKey(),
@@ -851,9 +862,9 @@ app.get("/api/quiz", async (req, res) => {
   const currentTheme = QUIZ_THEMES[themeIndex];
 
   const apiKey = getApiKey();
-  if (!apiKey) {
+  if (!apiKey || isQuotaCooldownActive()) {
     const offlineSet = getOfflineQuizSet();
-    const fallbackResponse = { date: currentDateStr, questions: offlineSet, isFallback: true };
+    const fallbackResponse = { date: currentDateStr, questions: offlineSet, isFallback: true, isQuota: isQuotaCooldownActive() };
     dailyQuizCache.set(currentDateStr, fallbackResponse);
     return res.json(fallbackResponse);
   }
@@ -979,10 +990,10 @@ app.post("/api/chat", async (req, res) => {
     return res.json(chatCache.get(cacheKey));
   }
 
-  if (!apiKey) {
-    console.log("No Gemini API key found. Falling back to offline generator.");
+  if (!apiKey || isQuotaCooldownActive()) {
+    console.log("No active Gemini API key or quota cooldown active. Falling back to offline generator.");
     const text = generateOfflineChatResponse(messages, context, lang);
-    const result = { text, suggestedPokemon, navigatePokemon, isFallback: true };
+    const result = { text, suggestedPokemon, navigatePokemon, isFallback: true, isQuota: isQuotaCooldownActive() };
     chatCache.set(cacheKey, result);
     return res.json(result);
   }
@@ -994,7 +1005,6 @@ app.post("/api/chat", async (req, res) => {
       parts: [{ text: m.text }]
     }));
 
-    
     
 
     const currentViewed = context.selectedPokemon ? context.selectedPokemon.name : "None";
@@ -1060,12 +1070,17 @@ app.post("/api/chat", async (req, res) => {
     chatCache.set(cacheKey, result);
     res.json(result);
   } catch (error: any) {
-    const isQuota = isQuotaError(error);
-    console.error(`[Chat Error] Quota: ${isQuota}`, error);
+    const isQuota = isQuotaError(error) || (error as any)?.isQuota;
+    if (isQuota) {
+      setQuotaCooldown(60000);
+      console.warn(`[Chat Quota Notice] Serving offline fallback (429/quota).`);
+    } else {
+      console.error(`[Chat Error]`, error);
+    }
     
     // Fallback logic
     const text = generateOfflineChatResponse(messages, context, lang);
-    const result = { text, isFallback: true, isQuota, suggestedPokemon, navigatePokemon };
+    const result = { text, isFallback: true, isQuota: Boolean(isQuota), suggestedPokemon, navigatePokemon };
     chatCache.set(cacheKey, result);
     return res.json(result);
   }
@@ -1076,9 +1091,9 @@ app.post("/api/analyze", async (req, res) => {
   const apiKey = getApiKey();
   const lang = 'en';
 
-  if (!apiKey) {
+  if (!apiKey || isQuotaCooldownActive()) {
     const analysis = generateOfflineAnalysis(battleData, lang);
-    return res.json({ analysis });
+    return res.json({ analysis, isFallback: true, isQuota: isQuotaCooldownActive() });
   }
 
   const cacheKey = JSON.stringify(battleData) + "-" + lang;
@@ -1087,9 +1102,6 @@ app.post("/api/analyze", async (req, res) => {
   }
   
   try {
-    
-    
-
     const response = await generateWithRetry({
       model: DEFAULT_MODEL,
       contents: `Perform a detailed tactical analysis of this Pokémon battle: ${JSON.stringify(battleData)}`,
@@ -1104,15 +1116,16 @@ app.post("/api/analyze", async (req, res) => {
     analysisCache.set(cacheKey, response.text);
     res.json({ analysis: response.text });
   } catch (error: any) {
-    const isQuota = isQuotaError(error);
+    const isQuota = isQuotaError(error) || (error as any)?.isQuota;
     if (isQuota) {
-      console.log("Gemini Quota Exceeded during analysis, seamlessly activating local neural engine fallback.");
+      setQuotaCooldown(60000);
+      console.warn("Gemini Quota Exceeded during analysis, seamlessly activating local neural engine fallback.");
     } else {
       console.log("Analysis failed, falling back to offline generator.");
     }
     const analysis = generateOfflineAnalysis(battleData, lang);
     // Return a seamless, perfect 200 OK response with the fallback content
-    return res.json({ analysis, isFallback: true, isQuota });
+    return res.json({ analysis, isFallback: true, isQuota: Boolean(isQuota) });
   }
 });
 
@@ -1121,9 +1134,9 @@ app.post("/api/suggest", async (req, res) => {
   const apiKey = getApiKey();
   const lang = 'en';
 
-  if (!apiKey) {
+  if (!apiKey || isQuotaCooldownActive()) {
     const suggestion = generateOfflineSuggestion(pokemonName, lang);
-    return res.json({ suggestion });
+    return res.json({ suggestion, isFallback: true, isQuota: isQuotaCooldownActive() });
   }
 
   const cacheKey = pokemonName + "-" + lang;
@@ -1132,9 +1145,6 @@ app.post("/api/suggest", async (req, res) => {
   }
   
   try {
-    
-    
-
     const response = await generateWithRetry({
       model: LITE_MODEL,
       contents: `Provide a single, incredibly interesting fun fact or pro battle tip about ${pokemonName}. Keep it under 20 words with expressive emojis. Write this fact exclusively in English.`,
@@ -1147,15 +1157,16 @@ app.post("/api/suggest", async (req, res) => {
     suggestionCache.set(cacheKey, response.text);
     res.json({ suggestion: response.text });
   } catch (error: any) {
-    const isQuota = isQuotaError(error);
+    const isQuota = isQuotaError(error) || (error as any)?.isQuota;
     if (isQuota) {
-      console.log("Gemini Quota Exceeded during suggestion, seamlessly activating local neural engine fallback.");
+      setQuotaCooldown(60000);
+      console.warn("Gemini Quota Exceeded during suggestion, seamlessly activating local neural engine fallback.");
     } else {
       console.log("Suggestion failed, falling back to offline generator.");
     }
     const suggestion = generateOfflineSuggestion(pokemonName, lang);
     // Return a seamless, perfect 200 OK response with the fallback content
-    return res.json({ suggestion, isFallback: true, isQuota });
+    return res.json({ suggestion, isFallback: true, isQuota: Boolean(isQuota) });
   }
 });
 
@@ -1164,9 +1175,9 @@ app.post("/api/strategy", async (req, res) => {
   const apiKey = getApiKey();
   const lang = 'en';
 
-  if (!apiKey) {
+  if (!apiKey || isQuotaCooldownActive()) {
     const strategy = generateOfflineStrategy(battleData, lang);
-    return res.json({ strategy });
+    return res.json({ strategy, isFallback: true, isQuota: isQuotaCooldownActive() });
   }
 
   const cacheKey = JSON.stringify(battleData) + "-" + lang;
@@ -1175,9 +1186,6 @@ app.post("/api/strategy", async (req, res) => {
   }
   
   try {
-    
-    
-
     const response = await generateWithRetry({
       model: DEFAULT_MODEL,
       contents: `Evaluate this direct combat scene and give an elite tactical breakdown:
@@ -1199,15 +1207,16 @@ app.post("/api/strategy", async (req, res) => {
     strategyCache.set(cacheKey, response.text);
     res.json({ strategy: response.text });
   } catch (error: any) {
-    const isQuota = isQuotaError(error);
+    const isQuota = isQuotaError(error) || (error as any)?.isQuota;
     if (isQuota) {
-      console.log("Gemini Quota Exceeded during strategy, seamlessly activating local neural engine fallback.");
+      setQuotaCooldown(60000);
+      console.warn("Gemini Quota Exceeded during strategy, seamlessly activating local neural engine fallback.");
     } else {
       console.log("Strategy failed, falling back to offline generator.");
     }
     const strategy = generateOfflineStrategy(battleData, lang);
     // Return a seamless, perfect 200 OK response with the fallback content
-    return res.json({ strategy, isFallback: true, isQuota });
+    return res.json({ strategy, isFallback: true, isQuota: Boolean(isQuota) });
   }
 });
 

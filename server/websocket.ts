@@ -1,7 +1,7 @@
 import { WebSocketServer, WebSocket } from "ws";
 import * as http from "http";
 import * as os from "os";
-import { generateWithRetry, isQuotaError } from "./services/geminiService";
+import { generateWithRetry, isQuotaError, isQuotaCooldownActive, setQuotaCooldown } from "./services/geminiService";
 import { GoogleGenAI } from "@google/genai";
 import { LRUCache } from "lru-cache";
 import fs from "fs";
@@ -16,7 +16,19 @@ try {
   console.log("WebSocket engine: Could not load pokemon_names.json", e);
 }
 
-const getApiKey = () => process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+// Ensure invalid GOOGLE_API_KEY placeholder doesn't break @google/genai internal key selection
+if (process.env.GOOGLE_API_KEY && process.env.GOOGLE_API_KEY.includes(" ")) {
+  delete process.env.GOOGLE_API_KEY;
+}
+
+const getApiKey = () => {
+  const key = process.env.GEMINI_API_KEY;
+  if (key && key.trim().length > 10 && !key.includes(" ")) return key.trim();
+  const altKey = process.env.GOOGLE_API_KEY;
+  if (altKey && altKey.trim().length > 10 && !altKey.includes(" ")) return altKey.trim();
+  return undefined;
+};
+
 const LITE_MODEL = "gemini-3.1-flash-lite";
 
 const ai = new GoogleGenAI({
@@ -218,7 +230,7 @@ export function initializeWebSocketServer(server: http.Server) {
           ws.send(JSON.stringify({ type: "chat:typing", payload: { isTyping: true } }));
 
           const apiKey = getApiKey();
-          if (!apiKey) {
+          if (!apiKey || isQuotaCooldownActive()) {
             // Offline fallback
             setTimeout(() => {
               const fullText = generateOfflineChatResponse(messages, context, lang);
@@ -246,6 +258,7 @@ export function initializeWebSocketServer(server: http.Server) {
                       suggestedPokemon,
                       navigatePokemon,
                       isFallback: true,
+                      isQuota: isQuotaCooldownActive(),
                       groundingChunks: []
                     }
                   }));
@@ -334,8 +347,13 @@ export function initializeWebSocketServer(server: http.Server) {
             }, 25);
 
           } catch (err: any) {
-            console.error("[WS Gemini Error]", err);
-            const isQuota = isQuotaError(err);
+            const isQuota = isQuotaError(err) || (err as any)?.isQuota;
+            if (isQuota) {
+              setQuotaCooldown(60000);
+              console.warn("[WS Gemini Quota Notice] Gracefully switching to offline cognitive fallback mode (429/quota).");
+            } else {
+              console.error("[WS Unexpected Error]", err?.message || err);
+            }
             const fallbackText = generateOfflineChatResponse(messages, context, lang);
 
             ws.send(JSON.stringify({
@@ -345,8 +363,8 @@ export function initializeWebSocketServer(server: http.Server) {
                 suggestedPokemon,
                 navigatePokemon,
                 isFallback: true,
-                isQuota,
-                error: err.message || "Gemini limit hit"
+                isQuota: Boolean(isQuota),
+                error: isQuota ? "Rate limit reached. Offline mode active." : (err?.message || "Generation error")
               }
             }));
           }
